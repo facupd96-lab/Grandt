@@ -1,17 +1,27 @@
 :root {
-    /* Colors - Premium Dark Theme */
-    --bg-main: #0f172a;
-    --bg-card: #1e293b;
-    --bg-input: #0f172a;
+    /* Gran DT Theme Palette */
+    --gdt-navy: #0a1d37;
+    --gdt-navy-header: #071529;
+    --gdt-red: #d32f2f;
+    --gdt-yellow: #ffcc00;
+    --gdt-green-dark: #1b5e20;
+    --gdt-green-light: #2e7d32;
+    --gdt-grass-1: #297534;
+    --gdt-grass-2: #32863e;
     
-    --border-color: #334155;
-    --border-light: #475569;
+    /* Colors - Premium Dark Theme */
+    --bg-main: #0b1322;
+    --bg-card: #132238;
+    --bg-input: #09101d;
+    
+    --border-color: #213552;
+    --border-light: #334d73;
     
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     
-    --primary: #3b82f6;
-    --primary-hover: #2563eb;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
     
     --success: #10b981;
     --success-hover: #059669;
@@ -31,7 +41,7 @@
     
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+    --shadow-glow: 0 0 15px rgba(37, 99, 235, 0.5);
     
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -90,52 +100,70 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Layout */
 .main-header {
-    background: rgba(30, 41, 59, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(180deg, #061224 0%, #0c213d 100%);
+    border-bottom: 2.5px solid var(--gdt-red);
     position: sticky;
     top: 0;
     z-index: 40;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .header-container {
     max-width: 1600px;
     margin: 0 auto;
-    padding: 1rem 1.5rem;
+    padding: 0.4rem 1.25rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
 }
 
 .header-title h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #fff, #94a3b8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Outfit', sans-serif;
+    text-transform: uppercase;
+}
+
+.header-title h1 .gdt-badge {
+    background: var(--gdt-red);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
 }
 
 .header-title .subtitle {
-    color: var(--text-muted);
-    font-size: 0.875rem;
+    color: #94a3b8;
+    font-size: 0.78rem;
     font-weight: 500;
 }
 
 .header-status {
     display: flex;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
 }
 
 .status-badge {
-    background: var(--bg-main);
+    background: rgba(9, 16, 29, 0.7);
     border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-pill);
-    font-size: 0.875rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.35rem;
+    white-space: nowrap;
 }
 
 .container.dashboard-grid {
@@ -739,7 +767,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
     max-height: 90vh;
 }
 .modal-content.modal-lg {
-    max-width: 800px;
+    max-width: 950px;
+    width: 95vw;
+    max-height: 94vh;
+    height: auto;
 }
 
 .modal-header {
@@ -773,57 +804,225 @@ input[type="range"]::-webkit-slider-thumb:hover {
     justify-content: flex-end;
 }
 
-/* Best 11 Pitch */
+/* Best 11 Pitch - Authentic Gran DT Theme */
 .bg-pitch {
-    background: #0f172a;
-    background-image: 
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background: #185023;
+    background-image: repeating-linear-gradient(
+        0deg,
+        #1e5b29 0px,
+        #1e5b29 55px,
+        #246b31 55px,
+        #246b31 110px
+    );
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    position: relative;
+    padding: 0;
+    overflow-y: auto;
+    max-height: calc(88vh - 160px);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
+.bg-pitch::-webkit-scrollbar {
+    width: 8px;
+}
+.bg-pitch::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+/* Clarín / Gran DT Perimeter Advertising Board */
+.pitch-ad-board {
+    background: #091526;
+    border-bottom: 3px solid var(--gdt-red);
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.pitch-ad-board .clarin-logo {
+    background: var(--gdt-red);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+
+/* Pitch Container with Lines */
+.pitch-container {
+    position: relative;
+    padding: 0.6rem 0.5rem 0.2rem 0.5rem;
+    min-height: 380px;
+}
+
+.pitch-lines-svg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Best 11 Grid Rows - Compact Responsive Fit */
 .best11-grid {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    padding: 2rem 0;
+    gap: 0.45rem;
+    position: relative;
+    z-index: 5;
 }
+
 .pitch-row {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
 }
-.pitch-player {
+
+/* Gran DT Authentic Player Card Badge */
+.gdt-card-badge {
+    background: linear-gradient(180deg, #23692d 0%, #174a1f 100%);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    width: 88px;
+    padding: 3px 3px 2px 3px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25rem;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
 }
-.player-shirt {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+.gdt-card-badge:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 204, 0, 0.5);
+    border-color: #ffcc00;
 }
-.player-shirt.arq { background: var(--pos-arq); }
-.player-shirt.def { background: var(--pos-def); }
-.player-shirt.vol { background: var(--pos-vol); }
-.player-shirt.del { background: var(--pos-del); }
+.gdt-card-badge.captain {
+    border-color: #ffcc00;
+    box-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
+}
 
-.pitch-player .player-name {
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: rgba(15, 23, 42, 0.8);
-    padding: 0.125rem 0.5rem;
-    border-radius: var(--radius-sm);
+/* Card Icons Header Row */
+.gdt-card-icons {
+    position: absolute;
+    top: -6px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1px;
+    pointer-events: none;
+    z-index: 10;
 }
-.pitch-player .player-score {
-    font-size: 0.875rem;
+.gdt-badge-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.56rem;
+    font-weight: 800;
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    border: 1px solid #fff;
+}
+.gdt-badge-icon.swap { background: #374151; }
+.gdt-badge-icon.warning { background: #f59e0b; color: #000; }
+.gdt-badge-icon.captain-icon { background: #1d4ed8; color: #fff; }
+
+/* Jersey SVG Container */
+.gdt-jersey-wrap {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+}
+
+/* Player Name & Team Text */
+.gdt-player-name {
+    font-size: 0.66rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    line-height: 1.1;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+.gdt-player-team {
+    font-size: 0.56rem;
     font-weight: 700;
-    color: var(--primary);
-    font-family: 'Outfit';
+    color: #cbd5e1;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    margin-top: 0px;
+    letter-spacing: 0.2px;
+}
+.gdt-player-score {
+    font-size: 0.64rem;
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffcc00;
+    padding: 0px 5px;
+    border-radius: 3px;
+    margin-top: 2px;
+    border: 1px solid rgba(255, 204, 0, 0.3);
+}
+
+/* Suplentes Section */
+.gdt-bench-section {
+    margin-top: 0.4rem;
+    background: rgba(0, 0, 0, 0.35);
+    border-top: 1.5px solid rgba(255, 255, 255, 0.2);
+    padding: 0.35rem 0.5rem;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+.gdt-bench-title {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+.gdt-bench-grid {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+}
+.gdt-bench-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.gdt-bench-pos-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Utilities */

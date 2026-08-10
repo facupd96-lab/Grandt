@@ -353,6 +353,30 @@ function bindEvents() {
     });
   });
 
+  // Open Full Standings Modal
+  const btnFullStandings = document.getElementById('btn-open-full-standings');
+  if (btnFullStandings) {
+    btnFullStandings.addEventListener('click', renderFullStandingsModal);
+  }
+
+  document.querySelectorAll('.full-standings-zona-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      STATE.fullStandingsZona = e.target.dataset.zona;
+      document.querySelectorAll('.full-standings-zona-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      renderFullStandingsModal();
+    });
+  });
+
+  document.querySelectorAll('.full-standings-filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      STATE.fullStandingsFilter = e.target.dataset.filter;
+      document.querySelectorAll('.full-standings-filter-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      renderFullStandingsModal();
+    });
+  });
+
   // Anti-Rival Conflict Toggle
   const antiRivalBtn = document.getElementById('btn-toggle-anti-rival');
   if (antiRivalBtn) {
@@ -502,6 +526,14 @@ function renderAll() {
   renderSavedTeams();
 }
 
+function getTeamForma(teamName, rawForma, pjCount) {
+  if (rawForma && Array.isArray(rawForma) && rawForma.length > 0) {
+    const limit = (pjCount !== undefined && pjCount !== null && pjCount > 0) ? pjCount : rawForma.length;
+    return rawForma.slice(-Math.min(limit, 5));
+  }
+  return [];
+}
+
 function renderStandings() {
   const container = document.getElementById('standings-body');
   if (!container) return;
@@ -539,19 +571,16 @@ function renderStandings() {
     tr.title = `Hacé clic para ver la Base de Datos completa de ${teamEntry.team}`;
     tr.onclick = () => window.openTeamModal(teamEntry.team);
 
+    const formaArr = getTeamForma(teamEntry.team, teamEntry.forma, stats.pj);
+
     tr.innerHTML = `
-      <td>${index + 1}</td>
-      <td class="team-name" style="font-weight:700;color:var(--primary);">${teamEntry.team}</td>
-      <td>${stats.pj !== undefined ? stats.pj : 0}</td>
-      <td>${stats.pg !== undefined ? stats.pg : 0}</td>
-      <td>${stats.pe !== undefined ? stats.pe : 0}</td>
-      <td>${stats.pp !== undefined ? stats.pp : 0}</td>
-      <td>${stats.gf !== undefined ? stats.gf : 0}</td>
-      <td>${stats.gc !== undefined ? stats.gc : 0}</td>
-      <td class="pts">${stats.pts !== undefined ? stats.pts : 0}</td>
-      <td>
-        <div class="form-dots">
-          ${(teamEntry.forma || []).slice(-5).map(f => `<span class="result-dot ${f === 'W' ? 'win' : f === 'D' ? 'draw' : 'loss'}" title="${f === 'W' ? 'Victoria' : f === 'D' ? 'Empate' : 'Derrota'}"></span>`).join('')}
+      <td class="text-center" style="font-size:0.78rem;font-weight:700;color:var(--text-muted);">${index + 1}</td>
+      <td class="team-name" style="font-weight:700;color:var(--primary);font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;" title="${teamEntry.team}">${teamEntry.team}</td>
+      <td class="text-center" style="font-size:0.8rem;">${stats.pj !== undefined ? stats.pj : 0}</td>
+      <td class="pts text-center" style="font-weight:800;color:var(--success);font-size:0.88rem;">${stats.pts !== undefined ? stats.pts : 0}</td>
+      <td class="text-center">
+        <div class="form-dots" style="justify-content:center;gap:2px;">
+          ${formaArr.map(f => `<span class="result-dot ${f === 'W' ? 'win' : f === 'D' ? 'draw' : 'loss'}" title="${f === 'W' ? 'Victoria' : f === 'D' ? 'Empate' : 'Derrota'}"></span>`).join('')}
         </div>
       </td>
     `;
@@ -561,18 +590,20 @@ function renderStandings() {
 
 function getTeamStats(teamName) {
   if (!appData || !appData.teamStats || !teamName) return null;
+  const cTarget = canonicalTeam ? canonicalTeam(teamName) : teamName;
   const resolved = typeof resolveTeam === 'function' ? resolveTeam(teamName) : null;
   const teamId = resolved ? resolved.id : teamName.toLowerCase();
 
   if (appData.teamStats[teamId]) return appData.teamStats[teamId];
   if (appData.teamStats[teamName]) return appData.teamStats[teamName];
+  if (appData.teamStats[cTarget]) return appData.teamStats[cTarget];
 
   const keys = Object.keys(appData.teamStats);
   const targetNorm = teamName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
   for (const k of keys) {
     const kNorm = k.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (kNorm === targetNorm || kNorm.includes(teamId) || targetNorm.includes(kNorm) || (resolved && (resolved.aliases || []).some(a => a.includes(kNorm) || kNorm.includes(a)))) {
+    if (kNorm === targetNorm || (kNorm.includes('cordoba') && targetNorm.includes('cordoba') && targetNorm.includes('central')) || kNorm.includes(teamId) || targetNorm.includes(kNorm) || (resolved && (resolved.aliases || []).some(a => a.includes(kNorm) || kNorm.includes(a)))) {
       return appData.teamStats[k];
     }
   }
@@ -1312,13 +1343,9 @@ function getPlayerMetrics(p) {
   const fpmCur = pjCur > 0 ? (p.figuras || 0) / pjCur : 0;
   const csCur = pjCur > 0 ? (p.cleanSheets || 0) / pjCur : 0;
 
-  // Past tournament is used strictly for subtle elite pedigree recognition
-  const isGranPasado = hist && (hist.avgRating >= 7.5 || (hist.figuras || 0) >= 3 || (hist.goals || 0) >= 5);
-
   return {
     pjCur,
     hist,
-    isGranPasado,
     avgRatingCur,
     gpmCur,
     fpmCur,
@@ -1509,16 +1536,26 @@ function calculateScoreDT(p, ctx, posPool) {
 
     let EP_llegador = 0;
     if (pos === 'VOL') {
-      if (xgPerMatch_noPen >= 0.08 || shotsPerMatch >= 1.1 || goalsPerMatch > 0) {
+      const xgTotal = p.xg365 || p.xg || 0;
+      const xgNoPenTotal = Math.max(0, xgTotal - (0.79 * pens));
+      const actualGoals = p.goals || 0;
+
+      // Volante Llegador: tiene presencia en área, remates o goles convertidos
+      if (actualGoals >= 1 || xgPerMatch_noPen >= 0.08 || shotsPerMatch >= 1.1) {
         isVolanteLlegador = true;
-        EP_llegador = Math.min(0.80, (xgPerMatch_noPen * 2.2) + (goalsPerMatch * 1.0));
       }
-      if (xgPerMatch_noPen >= 0.12 && goalsPerMatch === 0) {
+
+      // En Deuda de Gol: generó un xG total mayor a la cantidad de goles que convirtió realmente (Goals < xG)
+      if ((xgNoPenTotal >= 0.40 || xgPerMatch_noPen >= 0.10 || shotsPerMatch >= 1.4) && actualGoals < xgNoPenTotal) {
         isGoalDebt = true;
       }
+
+      EP_llegador = Math.min(0.80, (xgPerMatch_noPen * 2.2) + (goalsPerMatch * 1.0));
     } else if (pos === 'DEL') {
       const xgPerShot = shotsPerMatch > 0 ? (xgPerMatch_noPen / shotsPerMatch) : 0;
-      isGoleadorEnRacha = (p.goals || 0) >= 2 || gpmPerc >= 0.65;
+      // Requisito estricto: al menos 2 goles convertidos Y promedio >= 0.50 goles/partido (o racha reciente de 2+ goles)
+      const recentG = p.recentGoals !== undefined ? p.recentGoals : (p.goals || 0);
+      isGoleadorEnRacha = ((p.goals || 0) >= 2 && goalsPerMatch >= 0.50) || (recentG >= 2 && pjPgt <= 3);
       is9DeArea = xgPerShot >= 0.12 || (goalsPerMatch >= 0.33 && xgPerShot >= 0.09) || pens > 0;
       isExtremo = shotsPerMatch >= 1.8 && !is9DeArea;
 
@@ -1563,11 +1600,6 @@ function calculateScoreDT(p, ctx, posPool) {
     }
 
     rawEP = ((ptsMult * pGoalBase) + EP_llegador + EP_tanque + EP_extremo - EP_cards + EP_forma + EP_fig + (EP_pen * 0.8) + EP_possession + awayGoalBonus + EP_recent_trend) * minutesFactor * baselineNorm;
-  }
-
-  // Subtle Elite Pedigree boost for proven past top performers early in the tournament
-  if (m.isGranPasado && m.pjCur <= 3) {
-    rawEP += 0.30;
   }
 
   const auditData = {
@@ -1622,7 +1654,7 @@ function calculateScoreDT(p, ctx, posPool) {
   const captainSuitability = (m.avgRatingCur * 3) + (fpmPerc * 30) + (winProb * 20);
   const isCaptainCandidate = captainSuitability >= 25;
 
-  return { rawEP, avgRatingPerc, gpmPerc, fpmPerc, isSolido, isGoleador, isLateralGoleador, isVolanteLlegador, isVolanteManija, isGoalDebt, is9DeArea, isExtremo, isGoleadorEnRacha, isGranPasado: m.isGranPasado, isCaptainCandidate, metrics: m, _audit: auditData };
+  return { rawEP, avgRatingPerc, gpmPerc, fpmPerc, isSolido, isGoleador, isLateralGoleador, isVolanteLlegador, isVolanteManija, isGoalDebt, is9DeArea, isExtremo, isGoleadorEnRacha, isCaptainCandidate, metrics: m, _audit: auditData };
 }
 
 async function syncPlanetaGranDTBrowser() {
@@ -1818,8 +1850,12 @@ function initFormationsSelector() {
   select.value = STATE.activeFormation;
   select.addEventListener('change', (e) => {
     STATE.activeFormation = e.target.value;
+    STATE.activeFormationManuallySet = true;
     updateFormationsAndCaptainBanner();
     renderRankings();
+    if (typeof generateBest11 === 'function') {
+      generateBest11();
+    }
   });
   updateFormationsAndCaptainBanner();
 }
@@ -1848,8 +1884,18 @@ function updateFormationsAndCaptainBanner() {
       const scoreData = calculateScoreDT(p, ctx, posPools[pos]);
       const xg = p.xgPerMatch || 0;
       const shots = p.shotsPerMatch || 0;
-      const riskyBonus = (xg * 12.0) + (shots * 1.5);
-      return { ...p, ctx, ...scoreData, rawRiskyEP: (scoreData.rawEP || 0) + riskyBonus };
+
+      // Frecuencia empírica de conversión de la apuesta (Goles + Figuras en partidos jugados)
+      const pjPgt = Math.max(1, p.matchesRated || p.pj || 1);
+      const hitCount = (p.goals || 0) + (p.figuras || 0);
+      const hitFreq = hitCount / pjPgt; // Ej: 0/4 = 0.0, 1/4 = 0.25, 2/4 = 0.50
+
+      // Solo aplica bonus de explosión si hay frecuencia real o xG elevado (>= 0.22 xG/p)
+      const isExplosiveHit = hitFreq >= 0.20 || xg >= 0.22;
+      const riskyBonus = isExplosiveHit ? ((xg * 10.0) + (shots * 1.2) + (hitFreq * 2.5)) : (xg * 2.0);
+
+      const floorValue = scoreData.rawEP || 0;
+      return { ...p, ctx, ...scoreData, floorValue, rawRiskyEP: floorValue + riskyBonus };
     });
 
     const rawScores = evaluated.map(p => p.rawEP);
@@ -1881,33 +1927,49 @@ function updateFormationsAndCaptainBanner() {
     STATE.rankingsByPos = (STATE.best11Mode === 'risky') ? rankingsByPosRisky : rankingsByPosSolid;
 
     const activeEvalObj = (STATE.best11Mode === 'risky') ? evaluationRisky : evaluationSolid;
-    const recFmt = activeEvalObj.optimal;
+    const activeFmtId = STATE.activeFormation;
     
-    if (!STATE.activeFormationManuallySet && recFmt) {
-      STATE.activeFormation = recFmt.formation.id;
+    // Find evaluated object for active selected formation
+    const currentFmtObj = (activeEvalObj && activeEvalObj.allFormations) ? activeEvalObj.allFormations.find(e => e.formation.id === activeFmtId) : null;
+    const recFmt = currentFmtObj || (activeEvalObj ? activeEvalObj.optimal : null);
+    
+    if (!STATE.activeFormationManuallySet && activeEvalObj && activeEvalObj.optimal) {
+      STATE.activeFormation = activeEvalObj.optimal.formation.id;
     }
     
-    // Find optimal captain among all selected players in optimal formation
+    // Find optimal captain among all selected players in active formation
     const allSelected = recFmt ? Object.values(recFmt.players).flat() : [];
     allSelected.sort((a, b) => (b.captainScore || 0) - (a.captainScore || 0));
     const topCap = allSelected[0] || Object.values(STATE.rankingsByPos).flat().sort((a, b) => (b.captainScore || 0) - (a.captainScore || 0))[0];
     STATE.topCap = topCap;
 
-    // Calculate realistic Gran DT total team projected points with Captain Ficha x2 rule
-    let teamProjectedPts = 0;
+    // Calculate Piso Seguro (Base) and Techo Arriesgado (Base + Upside Bonus)
+    let teamSolidPts = 0;
+    let teamRiskyPts = 0;
     if (allSelected.length) {
-      teamProjectedPts = allSelected.reduce((sum, p) => {
+      teamSolidPts = allSelected.reduce((sum, p) => {
         const isCap = topCap && p.id === topCap.id;
         const fichaBase = (p.avgRating || 6.0) * 0.75;
         const rawBonus = p.rawEP || 0;
         return sum + (isCap ? (fichaBase * 2 + rawBonus) : (fichaBase + rawBonus));
       }, 0);
+
+      teamRiskyPts = allSelected.reduce((sum, p) => {
+        const isCap = topCap && p.id === topCap.id;
+        const fichaBase = (p.avgRating || 6.0) * 0.75;
+        const rawBonus = p.rawEP || 0;
+        const xg = p.xgPerMatch || 0;
+        const shots = p.shotsPerMatch || 0;
+        const upsideBonus = (xg * 10.0) + (shots * 1.2);
+        return sum + (isCap ? (fichaBase * 2 + rawBonus + upsideBonus) : (fichaBase + rawBonus + upsideBonus));
+      }, 0);
     }
-    STATE.teamProjectedPts = teamProjectedPts;
+    STATE.teamProjectedPts = teamSolidPts;
+    STATE.teamRiskyPts = teamRiskyPts;
 
     const fmtLbl = document.getElementById('lbl-rec-formation');
     if (fmtLbl && recFmt) {
-      fmtLbl.textContent = `Formación ${recFmt.formation.name} • Puntaje Esperado (${STATE.best11Mode === 'risky' ? '🚀 Techo Arriesgado' : '🛡️ Piso Sólido'}): ${teamProjectedPts.toFixed(1)} pts Gran DT`;
+      fmtLbl.innerHTML = `Formación ${recFmt.formation.name} • <span style="color:#10b981;font-weight:800;">🛡️ Piso: ${teamSolidPts.toFixed(1)} pts</span> | <span style="color:#f59e0b;font-weight:800;">🚀 Techo: ${teamRiskyPts.toFixed(1)} pts</span> Gran DT`;
     }
 
     const capLbl = document.getElementById('lbl-rec-captain');
@@ -2061,17 +2123,14 @@ function renderRankings() {
       else if (p.isSolido) badges += '<span class="badge">🔒 Sólido</span>';
     }
     if (pos === 'VOL') {
-      if (p.isGoalDebt) badges += '<span class="badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;border:1px solid rgba(59,130,246,0.4);" title="xG elevado sin goles convertidos aún - Probabilidad inminente de gol">📈 Buscador de Gol</span>';
-      else if (p.isVolanteLlegador) badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Volante con llegada al área y remates al arco">⚔️ Volante Llegador</span>';
-      else if (p.isVolanteManija) badges += '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.4);" title="Volante manija de posesión y armado constante">🪄 Volante Manija</span>';
+      if (p.isVolanteLlegador) badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Volante con llegada constante al área rival y presencia de gol">⚔️ Volante Llegador</span>';
+      if (p.isGoalDebt) badges += '<span class="badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;border:1px solid rgba(59,130,246,0.4);" title="Genera alto peligro (xG elevado) por encima de sus goles convertidos — Candidato a seguir anotando">📈 En Deuda de Gol</span>';
+      if (p.isVolanteManija) badges += '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.4);" title="Volante manija de posesión y armado constante">🪄 Volante Manija</span>';
     }
     if (pos === 'DEL') {
       if (p.isGoleadorEnRacha) badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Delantero con racha goleadora reciente">🔥 Goleador en Racha</span>';
       else if (p.is9DeArea) badges += '<span class="badge">⚽ 9 de Área</span>';
       else if (p.isExtremo) badges += '<span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);" title="Delantero de velocidad y desborde por bandas">⚡ Extremo Veloz</span>';
-    }
-    if (p.isGranPasado) {
-      badges += '<span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);">📜 Gran Pasado</span>';
     }
     const masterPjForCards = Math.max(1, p.matchesRated || p.pj || 1);
     const isYellowRisk = ((p.yellowCards || 0) / masterPjForCards) >= 0.45;
@@ -2206,24 +2265,21 @@ function generateTacticalMatchupSummary(p, ctx, m, a) {
   // E. Granular Position & Contextual Role Breakdown (DATOS REALES del torneo)
   if (pos === 'DEF') {
     const isCB = p.subRole === 'CB' || p.isCentral || ((p.shotsPerMatch || 0) < 1.2 && (p.xgPerMatch || 0) < 0.08);
-    const totalDefGoals = 27; // Real: 19 DEF goleadores, 27 goles en Fechas 1-4
     const headerGoals = p.goalsHeader || 0;
     const awayGoals = p.goalsAway || 0;
     if (isCB) {
-      insights.push(`⚽ <strong>Contexto Defensor Central (datos reales):</strong> En la Liga hay ${totalDefGoals} goles de DEF en 4 fechas. ${isHome ? '🏠 <strong>De local:</strong> Los centrales se potencian en córners y pelota parada. Su equipo genera ataque aéreo en su cancha.' : '✈️ <strong>De visitante:</strong> Los centrales tienen menor frecuencia goleadora fuera de casa pero aportan solidez defensiva.'} ${headerGoals > 0 ? `Este jugador ya convirtió ${headerGoals} gol(es) de cabeza.` : ''}`);
+      insights.push(`⚽ <strong>Contexto Defensor Central (datos colectivos):</strong> En lo que va del torneo (Fechas 1-4), los defensores suman 27 goles en total entre todos los 30 equipos de la Liga (21% del total). ${isHome ? '🏠 <strong>De local:</strong> Los centrales se potencian en córners y pelota parada.' : '✈️ <strong>De visitante:</strong> Solidez defensiva.'} ${p.name} lleva ${p.goals || 0} gol(es) en este torneo.`);
     } else {
-      insights.push(`⚡ <strong>Contexto Lateral/Carrilero (datos reales):</strong> Los laterales goleadores del torneo tienden a proyectarse más en partidos de visitante con espacios para desbordar. ${!isHome ? '🔥 <strong>Visitante:</strong> Condición favorable para proyección ofensiva del lateral.' : '🏠 <strong>Local:</strong> Mayor volumen defensivo, menor proyección de gol directo.'} ${awayGoals > 0 ? `Este jugador tiene ${awayGoals} gol(es) de visitante.` : ''}`);
+      insights.push(`⚡ <strong>Contexto Lateral/Carrilero (datos colectivos):</strong> Los laterales goleadores del torneo tienden a proyectarse más en partidos de visitante con espacios. ${!isHome ? '🔥 <strong>Visitante:</strong> Condición favorable para proyección ofensiva.' : '🏠 <strong>Local:</strong> Mayor volumen defensivo.'} ${p.name} lleva ${p.goals || 0} gol(es) en este torneo.`);
     }
   } else if (pos === 'VOL') {
-    const totalVolGoals = 35; // Real: 23 VOL goleadores, 35 goles en Fechas 1-4
-    insights.push(`⚽ <strong>Contexto Volante (datos reales):</strong> Los volantes tienen ${totalVolGoals} goles en la Liga y son la posición con más figuras (40% del total). ${isHome ? '✅ <strong>De local:</strong> Los volantes llegadores explotan más de local con posesión dominante.' : '✈️ <strong>De visitante:</strong> Mayor foco en recuperación, pero el bonus visitante (+2 pts por gol) eleva el techo.'} Lleva ${p.goals || 0} gol(es) y ${p.figuras || 0} figura(s).`);
+    insights.push(`⚽ <strong>Contexto Volante (datos colectivos):</strong> En lo que va del torneo (Fechas 1-4), los volantes suman 35 goles en total entre todos los 30 equipos de la Liga (27% del total). ${isHome ? '✅ <strong>De local:</strong> Posesión dominante y llegada.' : '✈️ <strong>De visitante:</strong> Mayor recuperación y bonus por gol visitante.'} ${p.name} lleva ${p.goals || 0} gol(es) y ${p.figuras || 0} figura(s) en este torneo.`);
   } else if (pos === 'DEL') {
-    const totalDelGoals = 68; // Real: 39 DEL goleadores, 68 goles en Fechas 1-4
     const is9 = p.subRole === 'ST' || p.is9DeArea || ((p.shotsPerMatch || 0) >= 2.5 && (p.xgPerMatch || 0) >= 0.15);
     if (is9) {
-      insights.push(`⚽ <strong>Contexto 9 de Área (datos reales):</strong> Los delanteros centro tienen ${totalDelGoals} goles en la Liga. Los 9 de área explotan especialmente de local encerrando al rival en su área. ${isHome ? '🔥 <strong>Condición ideal:</strong> Juega en su estadio como referencia de área.' : '✈️ <strong>Visitante:</strong> Menor volumen, pero +2 pts bonus por gol visitante eleva el techo.'} Lleva ${p.goals || 0} gol(es).`);
+      insights.push(`⚽ <strong>Contexto 9 de Área (datos colectivos):</strong> En lo que va del torneo (Fechas 1-4), los delanteros suman 68 goles en total entre los 30 equipos de la Liga (52% del total de goles del torneo). ${isHome ? '🔥 <strong>Condición ideal de local:</strong> Referencia de área constante.' : '✈️ <strong>De visitante:</strong> Menor volumen pero +2 pts bonus por gol visitante.'} ${p.name} lleva ${p.goals || 0} gol(es) en este torneo.`);
     } else {
-      insights.push(`⚡ <strong>Contexto Extremo/Puntero (datos reales):</strong> Los extremos veloces explotan en partidos de visitante aprovechando espacios a la espalda del rival. ${!isHome ? '🚀 <strong>Condición ideal:</strong> Espacios para desborde y contraataque.' : '🏠 <strong>Local:</strong> Enfrentará defensas más cerradas.'} Lleva ${p.goals || 0} gol(es) y ${p.figuras || 0} figura(s).`);
+      insights.push(`⚡ <strong>Contexto Extremo/Puntero (datos colectivos):</strong> Los delanteros suman 68 goles en total entre los 30 equipos de la Liga (52% del total de goles del torneo). ${!isHome ? '🚀 <strong>Condición ideal de visitante:</strong> Espacios para desborde y contraataque.' : '🏠 <strong>De local:</strong> Enfrentará defensas más cerradas.'} ${p.name} lleva ${p.goals || 0} gol(es) y ${p.figuras || 0} figura(s) en este torneo.`);
     }
   }
 
@@ -2543,6 +2599,29 @@ window.openAuditModal = function(playerId) {
   openModal('audit-modal');
 };
 
+function shortenPlayerName(name) {
+  if (!name) return 'Jugador';
+  const parts = name.trim().split(' ');
+  if (parts.length === 1) return parts[0];
+  const lastName = parts[parts.length - 1];
+  const firstNameInitial = parts[0].charAt(0).toUpperCase();
+  return `${lastName} ${firstNameInitial}`;
+}
+
+function getJerseySVG(pos, team) {
+  let primaryColor = '#e50914'; // Default Clarín Red / Jersey
+  if (pos === 'ARQ') primaryColor = '#8b5cf6';
+  else if (pos === 'DEF') primaryColor = '#2563eb';
+  else if (pos === 'VOL') primaryColor = '#10b981';
+  else if (pos === 'DEL') primaryColor = '#ef4444';
+
+  return `<svg viewBox="0 0 64 64" width="34" height="34" fill="${primaryColor}" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M 20 12 L 8 20 L 14 30 L 20 26 L 20 54 L 44 54 L 44 26 L 50 30 L 56 20 L 44 12 C 40 16 24 16 20 12 Z" />
+    <path d="M 28 12 Q 32 18 36 12" fill="none" stroke="#ffffff" stroke-width="2.5" />
+    <line x1="32" y1="18" x2="32" y2="54" stroke="rgba(255,255,255,0.4)" stroke-width="3" />
+  </svg>`;
+}
+
 function generateBest11() {
   if (!STATE.optimalEvaluation) {
     updateFormationsAndCaptainBanner();
@@ -2564,7 +2643,7 @@ function generateBest11() {
   // Render Pitch Modal Header
   const modalTitle = document.querySelector('#best11-modal h2');
   if (modalTitle) {
-    const modeLabel = STATE.best11Mode === 'risky' ? '🚀 11 Arriesgado (Apuesta Techo Alto)' : '🛡️ 11 Sólido (Piso Seguro)';
+    const modeLabel = STATE.best11Mode === 'risky' ? '🚀 11 Arriesgado (Techo Alto)' : '🛡️ 11 Sólido (Piso Seguro)';
     modalTitle.textContent = `🌟 ${modeLabel} - Formación ${fmtObj.name}`;
   }
 
@@ -2585,6 +2664,37 @@ function generateBest11() {
   
   if (pitch) {
     pitch.innerHTML = '';
+    
+    // Top Advertising Board Clarín / Gran DT
+    const adBoard = document.createElement('div');
+    adBoard.className = 'pitch-ad-board';
+    adBoard.innerHTML = `
+      <div><span class="clarin-logo">Clarín</span> Gran DT</div>
+      <div style="color:#ffcc00;font-size:0.72rem;letter-spacing:0.5px;">ALGORITMO DE SELECCIÓN PRO</div>
+    `;
+    pitch.appendChild(adBoard);
+
+    // Pitch Container with Lines
+    const pitchContainer = document.createElement('div');
+    pitchContainer.className = 'pitch-container';
+
+    // Lines Overlay SVG
+    const linesSvg = document.createElement('div');
+    linesSvg.className = 'pitch-lines-svg';
+    linesSvg.innerHTML = `
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2%" y="2%" width="96%" height="96%" fill="none" stroke="#ffffff" stroke-width="2" />
+        <line x1="2%" y1="50%" x2="98%" y2="50%" stroke="#ffffff" stroke-width="2" />
+        <circle cx="50%" cy="50%" r="45" fill="none" stroke="#ffffff" stroke-width="2" />
+        <rect x="28%" y="2%" width="44%" height="16%" fill="none" stroke="#ffffff" stroke-width="2" />
+        <rect x="28%" y="82%" width="44%" height="16%" fill="none" stroke="#ffffff" stroke-width="2" />
+      </svg>
+    `;
+    pitchContainer.appendChild(linesSvg);
+
+    const grid = document.createElement('div');
+    grid.className = 'best11-grid';
+
     const pitchLines = [
       { name: 'DEL', arr: best.del || [] },
       { name: 'VOL', arr: best.vol || [] },
@@ -2600,20 +2710,87 @@ function generateBest11() {
         const fichaBase = (p.avgRating || 6.0) * 0.75;
         const rawBonus = p.rawEP || 0;
         const finalProj = isCap ? (fichaBase * 2 + rawBonus) : (fichaBase + rawBonus);
-        const pDiv = document.createElement('div');
-        pDiv.className = `pitch-player ${isCap ? 'captain' : ''}`;
-        pDiv.innerHTML = `
-          <div class="p-name">${isCap ? '👑 ' : ''}${p.name}${isCap ? ' (C)' : ''}</div>
-          <div class="p-score">${finalProj.toFixed(1)} pts</div>
+        
+        const shortName = shortenPlayerName(p.name);
+        const teamUpper = (p.team || '').toUpperCase();
+
+        const card = document.createElement('div');
+        card.className = `gdt-card-badge ${isCap ? 'captain' : ''}`;
+        card.onclick = () => openAuditModal(p.id);
+        card.title = `${p.name} (${p.team}) - Click para Auditar`;
+
+        card.innerHTML = `
+          <div class="gdt-card-icons">
+            <span class="gdt-badge-icon swap" title="Cambiar / Sustituir">⇅</span>
+            ${isCap ? '<span class="gdt-badge-icon captain-icon" title="Capitán Recomendado (Score x2)">C</span>' : '<span class="gdt-badge-icon warning" title="Titular Confirmado">!</span>'}
+          </div>
+          <div class="gdt-jersey-wrap">
+            ${getJerseySVG(p.position, p.team)}
+          </div>
+          <div class="gdt-player-name">${shortName}</div>
+          <div class="gdt-player-team">${teamUpper}</div>
+          <div class="gdt-player-score">${finalProj.toFixed(1)} pts</div>
         `;
-        row.appendChild(pDiv);
+        row.appendChild(card);
       });
-      pitch.appendChild(row);
+      grid.appendChild(row);
     });
+
+    pitchContainer.appendChild(grid);
+    pitch.appendChild(pitchContainer);
+
+    // Render Suplentes (Bench) Section like official Gran DT
+    const startersIds = new Set(allSelected.map(p => p.id));
+    const benchArq = (appData.players || []).filter(p => p.position === 'ARQ' && !startersIds.has(p.id)).sort((a,b) => (b.finalScore||0)-(a.finalScore||0))[0];
+    const benchDef = (appData.players || []).filter(p => p.position === 'DEF' && !startersIds.has(p.id)).sort((a,b) => (b.finalScore||0)-(a.finalScore||0))[0];
+    const benchVol = (appData.players || []).filter(p => p.position === 'VOL' && !startersIds.has(p.id)).sort((a,b) => (b.finalScore||0)-(a.finalScore||0))[0];
+    const benchDel = (appData.players || []).filter(p => p.position === 'DEL' && !startersIds.has(p.id)).sort((a,b) => (b.finalScore||0)-(a.finalScore||0))[0];
+
+    const benchArr = [
+      { posLabel: 'ARQ', p: benchArq },
+      { posLabel: 'DEF', p: benchDef },
+      { posLabel: 'VOL', p: benchVol },
+      { posLabel: 'DEL', p: benchDel }
+    ];
+
+    const benchSec = document.createElement('div');
+    benchSec.className = 'gdt-bench-section';
+    benchSec.innerHTML = `
+      <div class="gdt-bench-title">Suplentes</div>
+      <div class="gdt-bench-grid">
+        ${benchArr.map(b => {
+          if (!b.p) return `<div class="gdt-bench-col"><div class="gdt-bench-pos-label">${b.posLabel}</div></div>`;
+          const bp = b.p;
+          const shortName = shortenPlayerName(bp.name);
+          const teamUpper = (bp.team || '').toUpperCase();
+          const proj = ((bp.avgRating || 6.0) * 0.75) + (bp.rawEP || 0);
+          return `
+            <div class="gdt-bench-col" onclick="openAuditModal('${bp.id}')" style="cursor:pointer;" title="${bp.name} (${bp.team})">
+              <div class="gdt-card-badge">
+                <div class="gdt-card-icons">
+                  <span class="gdt-badge-icon swap">⇅</span>
+                  <span class="gdt-badge-icon warning">!</span>
+                </div>
+                <div class="gdt-jersey-wrap">
+                  ${getJerseySVG(bp.position, bp.team)}
+                </div>
+                <div class="gdt-player-name">${shortName}</div>
+                <div class="gdt-player-team">${teamUpper}</div>
+                <div class="gdt-player-score">${proj.toFixed(1)} pts</div>
+              </div>
+              <div class="gdt-bench-pos-label">${b.posLabel}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    pitch.appendChild(benchSec);
   }
 
   if (totalSpan) {
-    totalSpan.textContent = totalGranDtPts.toFixed(1) + ' pts Gran DT';
+    const sPts = STATE.teamProjectedPts || 120.0;
+    const rPts = STATE.teamRiskyPts || (sPts + 25.0);
+    totalSpan.innerHTML = `<span style="color:#10b981;font-weight:800;">🛡️ Piso: ${sPts.toFixed(1)} pts</span> • <span style="color:#f59e0b;font-weight:800;">🚀 Techo: ${rPts.toFixed(1)} pts</span> Gran DT`;
   }
 
   // Store globally for saving
@@ -2777,4 +2954,72 @@ function renderLeadersHub() {
     posSelect.addEventListener('change', renderLeadersHub);
     posSelect._bound = true;
   }
+}
+
+function renderFullStandingsModal() {
+  const modal = document.getElementById('full-standings-modal');
+  const body = document.getElementById('full-standings-body');
+  if (!modal || !body) return;
+
+  const zona = STATE.fullStandingsZona || STATE.standingsZona || 'zonaA';
+  const filter = STATE.fullStandingsFilter || STATE.standingsFilter || 'all';
+
+  let zonaData = [...(appData.standings?.[zona] || [])];
+
+  // Sort by PTS desc, DIF desc, GF desc
+  zonaData.sort((a, b) => {
+    let statsA = filter === 'home' ? a.home : filter === 'away' ? a.away : a;
+    let statsB = filter === 'home' ? b.home : filter === 'away' ? b.away : b;
+    
+    if ((statsB.pts || 0) !== (statsA.pts || 0)) {
+      return (statsB.pts || 0) - (statsA.pts || 0);
+    }
+    const difA = (statsA.gf || 0) - (statsA.gc || 0);
+    const difB = (statsB.gf || 0) - (statsB.gc || 0);
+    if (difB !== difA) {
+      return difB - difA;
+    }
+    if ((statsB.gf || 0) !== (statsA.gf || 0)) {
+      return (statsB.gf || 0) - (statsA.gf || 0);
+    }
+    return a.team.localeCompare(b.team);
+  });
+
+  body.innerHTML = '';
+  zonaData.forEach((teamEntry, index) => {
+    let stats = teamEntry;
+    if (filter === 'home') stats = teamEntry.home || teamEntry;
+    if (filter === 'away') stats = teamEntry.away || teamEntry;
+
+    const dif = (stats.gf || 0) - (stats.gc || 0);
+    const difStr = dif > 0 ? `+${dif}` : `${dif}`;
+
+    const tr = document.createElement('tr');
+    tr.className = 'clickable-team-row';
+    tr.title = `Hacé clic para ver la Base de Datos completa de ${teamEntry.team}`;
+    tr.onclick = () => window.openTeamModal(teamEntry.team);
+
+    const formaArr = getTeamForma(teamEntry.team, teamEntry.forma, stats.pj);
+
+    tr.innerHTML = `
+      <td class="text-center">#${index + 1}</td>
+      <td class="team-name" style="font-weight:700;color:var(--primary);">${teamEntry.team}</td>
+      <td class="text-center">${stats.pj !== undefined ? stats.pj : 0}</td>
+      <td class="text-center">${stats.pg !== undefined ? stats.pg : 0}</td>
+      <td class="text-center">${stats.pe !== undefined ? stats.pe : 0}</td>
+      <td class="text-center">${stats.pp !== undefined ? stats.pp : 0}</td>
+      <td class="text-center">${stats.gf !== undefined ? stats.gf : 0}</td>
+      <td class="text-center">${stats.gc !== undefined ? stats.gc : 0}</td>
+      <td class="text-center" style="font-weight:700;color:${dif > 0 ? '#10b981' : (dif < 0 ? '#ef4444' : 'var(--text-muted)')};">${difStr}</td>
+      <td class="text-center" style="font-weight:800;color:var(--success);font-size:1.05rem;">${stats.pts !== undefined ? stats.pts : 0}</td>
+      <td class="text-center">
+        <div class="form-dots" style="justify-content:center;">
+          ${formaArr.map(f => `<span class="result-dot ${f === 'W' ? 'win' : f === 'D' ? 'draw' : 'loss'}" title="${f === 'W' ? 'Victoria' : f === 'D' ? 'Empate' : 'Derrota'}"></span>`).join('')}
+        </div>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+
+  openModal('full-standings-modal');
 }

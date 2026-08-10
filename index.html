@@ -13,8 +13,8 @@
     <header class="main-header">
         <div class="header-container">
             <div class="header-title">
-                <h1>🏆 Gran DT Analyzer Pro</h1>
-                <p class="subtitle">Análisis por posición con cuotas reales • <span id="lbl-status-fecha">Cargando...</span></p>
+                <h1>⚽ GRAN DT <span class="gdt-badge">PRO</span></h1>
+                <p class="subtitle">Análisis Estadístico Avanzado y Algoritmo de Armado • <span id="lbl-status-fecha">Cargando...</span></p>
             </div>
             <div class="header-status">
                 <div class="status-badge" id="lbl-health-badge" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#10b981;font-weight:600;" title="Estado de Integridad y Solidez de los Datos">
@@ -64,8 +64,9 @@
 
             <!-- Posiciones -->
             <div class="card">
-                <div class="card-header">
-                    <h2>🏆 Posiciones</h2>
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 1rem;">
+                    <h2 style="font-size:0.95rem;margin:0;">🏆 Posiciones</h2>
+                    <button class="btn btn-secondary" id="btn-open-full-standings" style="padding:3px 8px;font-size:0.75rem;background:rgba(255,255,255,0.08);border:1px solid var(--border-color);" title="Ver Tabla Completa con Goles y Estadísticas">🔍 Completa</button>
                 </div>
                 <div class="card-body">
                     <div class="standings-tabs-container">
@@ -80,25 +81,20 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive standings-wrap">
+                    <div class="table-responsive standings-wrap" style="overflow-x:hidden;">
                         <table class="standings-table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th style="width:25px;" class="text-center">#</th>
                                     <th>Equipo</th>
-                                    <th>PJ</th>
-                                    <th>PG</th>
-                                    <th>PE</th>
-                                    <th>PP</th>
-                                    <th>GF</th>
-                                    <th>GC</th>
-                                    <th>PTS</th>
-                                    <th>Forma</th>
+                                    <th class="text-center">PJ</th>
+                                    <th class="text-center">PTS</th>
+                                    <th class="text-center">Forma</th>
                                 </tr>
                             </thead>
                             <tbody id="standings-body">
                                 <!-- Generado dinámicamente por app.js -->
-                                <tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:20px;">Cargando posiciones...</td></tr>
+                                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Cargando posiciones...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -235,26 +231,26 @@
                 <button class="close-modal">&times;</button>
             </div>
             <!-- Banner de Formación Recomendada y Capitán Ideal dentro del Modal -->
-            <div id="formation-recommendation-banner" style="background:linear-gradient(135deg, rgba(37,99,235,0.15), rgba(16,185,129,0.15));border-bottom:1px solid rgba(59,130,246,0.3);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                <div style="display:flex;align-items:center;gap:12px;">
-                    <span style="font-size:1.5rem;">📋</span>
+            <div id="formation-recommendation-banner" style="background:linear-gradient(135deg, rgba(37,99,235,0.12), rgba(16,185,129,0.12));border-bottom:1px solid rgba(59,130,246,0.3);padding:6px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:1.1rem;">📋</span>
                     <div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;">FORMACIÓN RECOMENDADA (ALGORITMO OPTIMO)</div>
-                        <div style="font-size:1.05rem;font-weight:800;color:var(--text-main);" id="lbl-rec-formation">Calculando formación óptima...</div>
+                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;">ALGORITMO ÓPTIMO</div>
+                        <div style="font-size:0.88rem;font-weight:800;color:var(--text-main);" id="lbl-rec-formation">Calculando...</div>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-                    <div style="display:flex;align-items:center;gap:6px;background:rgba(15,23,42,0.6);padding:3px;border-radius:8px;border:1px solid var(--border-color);">
-                        <button class="btn-strategy-mode active" id="btn-mode-solid" style="background:var(--primary);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:0.78rem;font-weight:700;cursor:pointer;">🛡️ 11 Sólido</button>
-                        <button class="btn-strategy-mode" id="btn-mode-risky" style="background:transparent;color:var(--text-muted);border:none;border-radius:6px;padding:4px 10px;font-size:0.78rem;font-weight:700;cursor:pointer;">🚀 11 Arriesgado</button>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:2px;border-radius:6px;border:1px solid var(--border-color);">
+                        <button class="btn-strategy-mode active" id="btn-mode-solid" style="background:var(--primary);color:#fff;border:none;border-radius:4px;padding:3px 8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🛡️ Sólido</button>
+                        <button class="btn-strategy-mode" id="btn-mode-risky" style="background:transparent;color:var(--text-muted);border:none;border-radius:4px;padding:3px 8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🚀 Arriesgado</button>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-size:0.72rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;">👑 CAPITÁN RECOMENDADO</div>
-                        <div style="font-size:0.92rem;font-weight:700;color:#f59e0b;" id="lbl-rec-captain">-</div>
+                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;">👑 CAPITÁN RECOMENDADO</div>
+                        <div style="font-size:0.82rem;font-weight:700;color:#f59e0b;" id="lbl-rec-captain">-</div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        <label style="font-size:0.78rem;font-weight:600;color:var(--text-muted);">Formación:</label>
-                        <select id="select-active-formation" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:6px;padding:4px 10px;font-size:0.85rem;font-weight:800;outline:none;cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:4px;">
+                        <label style="font-size:0.75rem;font-weight:600;color:var(--text-muted);">Formación:</label>
+                        <select id="select-active-formation" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:6px;padding:2px 6px;font-size:0.8rem;font-weight:800;outline:none;cursor:pointer;">
                         </select>
                     </div>
                 </div>
@@ -320,6 +316,54 @@
             </div>
             <div class="modal-body" id="team-detail-body">
                 <p>Cargando información del equipo...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tabla de Posiciones Completa -->
+    <div id="full-standings-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>🏆 Tabla de Posiciones Completa (LPF 2026)</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+                    <div class="standings-tabs">
+                        <button class="tab-pill full-standings-zona-btn active" data-zona="zonaA">Zona A</button>
+                        <button class="tab-pill full-standings-zona-btn" data-zona="zonaB">Zona B</button>
+                    </div>
+                    <div class="standings-tabs filter-tabs">
+                        <button class="tab-pill-sm full-standings-filter-btn active" data-filter="all">Todos</button>
+                        <button class="tab-pill-sm full-standings-filter-btn" data-filter="home">Local</button>
+                        <button class="tab-pill-sm full-standings-filter-btn" data-filter="away">Visitante</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width:40px;">#</th>
+                                <th>Equipo</th>
+                                <th class="text-center">PJ</th>
+                                <th class="text-center">PG</th>
+                                <th class="text-center">PE</th>
+                                <th class="text-center">PP</th>
+                                <th class="text-center">GF</th>
+                                <th class="text-center">GC</th>
+                                <th class="text-center">DIF</th>
+                                <th class="text-center">PTS</th>
+                                <th class="text-center">Forma</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-standings-body">
+                            <!-- Generado dinámicamente por app.js -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary close-modal">Cerrar</button>

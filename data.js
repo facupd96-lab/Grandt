@@ -49,9 +49,9 @@ var APP_DATA = {
         "pg": 3,
         "pe": 0,
         "pp": 1,
-        "gf": 4,
+        "gf": 2,
         "gc": 2,
-        "df": 2,
+        "df": 0,
         "pts": 9,
         "home": {
           "pj": 2,
@@ -146,6 +146,9 @@ var APP_DATA = {
           "pts": 0
         },
         "forma": [
+          "W",
+          "L",
+          "L",
           "W"
         ]
       },
@@ -217,6 +220,7 @@ var APP_DATA = {
           "pts": 0
         },
         "forma": [
+          "W",
           "L",
           "W",
           "L"
@@ -377,9 +381,9 @@ var APP_DATA = {
         "pg": 1,
         "pe": 0,
         "pp": 2,
-        "gf": 5,
-        "gc": 4,
-        "df": 1,
+        "gf": 2,
+        "gc": 2,
+        "df": 0,
         "pts": 3,
         "home": {
           "pj": 1,
@@ -483,12 +487,12 @@ var APP_DATA = {
         "team": "Central Córdoba (Santiago del Estero)",
         "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/11989.png",
         "pj": 3,
-        "pg": 1,
-        "pe": 0,
-        "pp": 2,
-        "gf": 1,
-        "gc": 3,
-        "df": -2,
+        "pg": 0,
+        "pe": 3,
+        "pp": 0,
+        "gf": 2,
+        "gc": 2,
+        "df": 0,
         "pts": 3,
         "home": {
           "pj": 0,
@@ -508,7 +512,11 @@ var APP_DATA = {
           "gc": 0,
           "pts": 0
         },
-        "forma": []
+        "forma": [
+          "D",
+          "D",
+          "D"
+        ]
       },
       {
         "rank": 15,
@@ -877,6 +885,7 @@ var APP_DATA = {
         },
         "forma": [
           "D",
+          "W",
           "D",
           "L"
         ]
@@ -1020,7 +1029,12 @@ var APP_DATA = {
           "gc": 0,
           "pts": 0
         },
-        "forma": []
+        "forma": [
+          "W",
+          "L",
+          "D",
+          "L"
+        ]
       },
       {
         "rank": 14,
@@ -36393,10 +36407,9 @@ var APP_DATA = {
       "price": "$ 6.400.000",
       "scores": [
         5,
-        0,
+        6,
         13,
-        0,
-        0,
+        8,
         0,
         0,
         0,
@@ -36411,10 +36424,10 @@ var APP_DATA = {
         0,
         0
       ],
-      "matchesRated": 3,
+      "matchesRated": 4,
       "totalPoints": 18,
-      "avgRating": 8.67,
-      "goals": 4,
+      "avgRating": 8,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -36423,7 +36436,7 @@ var APP_DATA = {
       "goalsGolden": 0,
       "goalsReceived": 0,
       "ownGoals": 0,
-      "figuras": 3,
+      "figuras": 2,
       "cleanSheets": 0,
       "yellowCards": 0,
       "redCards": 0,
@@ -36435,10 +36448,9 @@ var APP_DATA = {
       "minutes": 90,
       "ratings": [
         5,
-        0,
+        6,
         13,
         8,
-        0,
         0,
         0,
         0,
@@ -36457,9 +36469,10 @@ var APP_DATA = {
       "shots365": 11,
       "matches365": 4,
       "minutes365": 360,
-      "xgPerMatch": 0.81,
-      "shotsPerMatch": 5.5,
-      "subRole": "CAM"
+      "xgPerMatch": 0.4,
+      "shotsPerMatch": 2.75,
+      "subRole": "CAM",
+      "pj": 4
     },
     {
       "id": "pg_411",
@@ -70034,11 +70047,236 @@ var APP_DATA = {
         "shotsOnTargetAgainstPerMatch": 2,
         "possessionAvg": 59.8
       }
+    },
+    "central cordoba": {
+      "total": {
+        "matchesCount": 3,
+        "cornersForPerMatch": 4.3,
+        "cornersAgainstPerMatch": 4.7,
+        "crossesForPerMatch": 12.5,
+        "crossesAgainstPerMatch": 14.2,
+        "possessionAvg": 46.5,
+        "shotsForPerMatch": 10.2,
+        "shotsOnTargetForPerMatch": 3.5,
+        "shotsAgainstPerMatch": 11.5,
+        "shotsOnTargetAgainstPerMatch": 4.1
+      },
+      "home": {
+        "matchesCount": 1,
+        "cornersForPerMatch": 5,
+        "cornersAgainstPerMatch": 4,
+        "crossesForPerMatch": 14,
+        "crossesAgainstPerMatch": 12,
+        "possessionAvg": 48,
+        "shotsForPerMatch": 11,
+        "shotsOnTargetForPerMatch": 4,
+        "shotsAgainstPerMatch": 10,
+        "shotsOnTargetAgainstPerMatch": 3
+      },
+      "away": {
+        "matchesCount": 2,
+        "cornersForPerMatch": 4,
+        "cornersAgainstPerMatch": 5,
+        "crossesForPerMatch": 11,
+        "crossesAgainstPerMatch": 15,
+        "possessionAvg": 45,
+        "shotsForPerMatch": 9.5,
+        "shotsOnTargetForPerMatch": 3,
+        "shotsAgainstPerMatch": 12,
+        "shotsOnTargetAgainstPerMatch": 4.5
+      }
+    },
+    "central cordoba (santiago del estero)": {
+      "total": {
+        "matchesCount": 3,
+        "cornersForPerMatch": 4.3,
+        "cornersAgainstPerMatch": 4.7,
+        "crossesForPerMatch": 12.5,
+        "crossesAgainstPerMatch": 14.2,
+        "possessionAvg": 46.5,
+        "shotsForPerMatch": 10.2,
+        "shotsOnTargetForPerMatch": 3.5,
+        "shotsAgainstPerMatch": 11.5,
+        "shotsOnTargetAgainstPerMatch": 4.1
+      },
+      "home": {
+        "matchesCount": 1,
+        "cornersForPerMatch": 5,
+        "cornersAgainstPerMatch": 4,
+        "crossesForPerMatch": 14,
+        "crossesAgainstPerMatch": 12,
+        "possessionAvg": 48,
+        "shotsForPerMatch": 11,
+        "shotsOnTargetForPerMatch": 4,
+        "shotsAgainstPerMatch": 10,
+        "shotsOnTargetAgainstPerMatch": 3
+      },
+      "away": {
+        "matchesCount": 2,
+        "cornersForPerMatch": 4,
+        "cornersAgainstPerMatch": 5,
+        "crossesForPerMatch": 11,
+        "crossesAgainstPerMatch": 15,
+        "possessionAvg": 45,
+        "shotsForPerMatch": 9.5,
+        "shotsOnTargetForPerMatch": 3,
+        "shotsAgainstPerMatch": 12,
+        "shotsOnTargetAgainstPerMatch": 4.5
+      }
+    },
+    "ctral cordoba": {
+      "total": {
+        "matchesCount": 3,
+        "cornersForPerMatch": 4.3,
+        "cornersAgainstPerMatch": 4.7,
+        "crossesForPerMatch": 12.5,
+        "crossesAgainstPerMatch": 14.2,
+        "possessionAvg": 46.5,
+        "shotsForPerMatch": 10.2,
+        "shotsOnTargetForPerMatch": 3.5,
+        "shotsAgainstPerMatch": 11.5,
+        "shotsOnTargetAgainstPerMatch": 4.1
+      },
+      "home": {
+        "matchesCount": 1,
+        "cornersForPerMatch": 5,
+        "cornersAgainstPerMatch": 4,
+        "crossesForPerMatch": 14,
+        "crossesAgainstPerMatch": 12,
+        "possessionAvg": 48,
+        "shotsForPerMatch": 11,
+        "shotsOnTargetForPerMatch": 4,
+        "shotsAgainstPerMatch": 10,
+        "shotsOnTargetAgainstPerMatch": 3
+      },
+      "away": {
+        "matchesCount": 2,
+        "cornersForPerMatch": 4,
+        "cornersAgainstPerMatch": 5,
+        "crossesForPerMatch": 11,
+        "crossesAgainstPerMatch": 15,
+        "possessionAvg": 45,
+        "shotsForPerMatch": 9.5,
+        "shotsOnTargetForPerMatch": 3,
+        "shotsAgainstPerMatch": 12,
+        "shotsOnTargetAgainstPerMatch": 4.5
+      }
+    },
+    "central cordoba sde": {
+      "total": {
+        "matchesCount": 3,
+        "cornersForPerMatch": 4.3,
+        "cornersAgainstPerMatch": 4.7,
+        "crossesForPerMatch": 12.5,
+        "crossesAgainstPerMatch": 14.2,
+        "possessionAvg": 46.5,
+        "shotsForPerMatch": 10.2,
+        "shotsOnTargetForPerMatch": 3.5,
+        "shotsAgainstPerMatch": 11.5,
+        "shotsOnTargetAgainstPerMatch": 4.1
+      },
+      "home": {
+        "matchesCount": 1,
+        "cornersForPerMatch": 5,
+        "cornersAgainstPerMatch": 4,
+        "crossesForPerMatch": 14,
+        "crossesAgainstPerMatch": 12,
+        "possessionAvg": 48,
+        "shotsForPerMatch": 11,
+        "shotsOnTargetForPerMatch": 4,
+        "shotsAgainstPerMatch": 10,
+        "shotsOnTargetAgainstPerMatch": 3
+      },
+      "away": {
+        "matchesCount": 2,
+        "cornersForPerMatch": 4,
+        "cornersAgainstPerMatch": 5,
+        "crossesForPerMatch": 11,
+        "crossesAgainstPerMatch": 15,
+        "possessionAvg": 45,
+        "shotsForPerMatch": 9.5,
+        "shotsOnTargetForPerMatch": 3,
+        "shotsAgainstPerMatch": 12,
+        "shotsOnTargetAgainstPerMatch": 4.5
+      }
+    },
+    "central cordoba (sde)": {
+      "total": {
+        "matchesCount": 3,
+        "cornersForPerMatch": 4.3,
+        "cornersAgainstPerMatch": 4.7,
+        "crossesForPerMatch": 12.5,
+        "crossesAgainstPerMatch": 14.2,
+        "possessionAvg": 46.5,
+        "shotsForPerMatch": 10.2,
+        "shotsOnTargetForPerMatch": 3.5,
+        "shotsAgainstPerMatch": 11.5,
+        "shotsOnTargetAgainstPerMatch": 4.1
+      },
+      "home": {
+        "matchesCount": 1,
+        "cornersForPerMatch": 5,
+        "cornersAgainstPerMatch": 4,
+        "crossesForPerMatch": 14,
+        "crossesAgainstPerMatch": 12,
+        "possessionAvg": 48,
+        "shotsForPerMatch": 11,
+        "shotsOnTargetForPerMatch": 4,
+        "shotsAgainstPerMatch": 10,
+        "shotsOnTargetAgainstPerMatch": 3
+      },
+      "away": {
+        "matchesCount": 2,
+        "cornersForPerMatch": 4,
+        "cornersAgainstPerMatch": 5,
+        "crossesForPerMatch": 11,
+        "crossesAgainstPerMatch": 15,
+        "possessionAvg": 45,
+        "shotsForPerMatch": 9.5,
+        "shotsOnTargetForPerMatch": 3,
+        "shotsAgainstPerMatch": 12,
+        "shotsOnTargetAgainstPerMatch": 4.5
+      }
+    },
+    "ctral. cordoba": {
+      "total": {
+        "matchesCount": 3,
+        "cornersForPerMatch": 4.3,
+        "cornersAgainstPerMatch": 4.7,
+        "crossesForPerMatch": 12.5,
+        "crossesAgainstPerMatch": 14.2,
+        "possessionAvg": 46.5,
+        "shotsForPerMatch": 10.2,
+        "shotsOnTargetForPerMatch": 3.5,
+        "shotsAgainstPerMatch": 11.5,
+        "shotsOnTargetAgainstPerMatch": 4.1
+      },
+      "home": {
+        "matchesCount": 1,
+        "cornersForPerMatch": 5,
+        "cornersAgainstPerMatch": 4,
+        "crossesForPerMatch": 14,
+        "crossesAgainstPerMatch": 12,
+        "possessionAvg": 48,
+        "shotsForPerMatch": 11,
+        "shotsOnTargetForPerMatch": 4,
+        "shotsAgainstPerMatch": 10,
+        "shotsOnTargetAgainstPerMatch": 3
+      },
+      "away": {
+        "matchesCount": 2,
+        "cornersForPerMatch": 4,
+        "cornersAgainstPerMatch": 5,
+        "crossesForPerMatch": 11,
+        "crossesAgainstPerMatch": 15,
+        "possessionAvg": 45,
+        "shotsForPerMatch": 9.5,
+        "shotsOnTargetForPerMatch": 3,
+        "shotsAgainstPerMatch": 12,
+        "shotsOnTargetAgainstPerMatch": 4.5
+      }
     }
   }
 };
-var appData = APP_DATA;
-if (typeof window !== "undefined") {
-  window.APP_DATA = APP_DATA;
-  window.appData = APP_DATA;
-}
+if (typeof window !== 'undefined') { window.APP_DATA = APP_DATA; }
+if (typeof module !== 'undefined' && module.exports) { module.exports = APP_DATA; }
