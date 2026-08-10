@@ -1,0 +1,13 @@
+{
+  "name": "grandt-analyzer-new",
+  "version": "1.0.0",
+  "description": "Gran DT Analyzer - New Generation",
+  "main": "sync.js",
+  "type": "module",
+  "scripts": {
+    "sync": "node sync.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2"
+  }
+}
