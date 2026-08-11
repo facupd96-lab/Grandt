@@ -973,12 +973,24 @@ function renderFixture() {
         const csHome = odds ? ((odds.homeCleanSheetProb || 0.3) * 100).toFixed(0) : '30';
         const csAway = odds ? ((odds.awayCleanSheetProb || 0.3) * 100).toFixed(0) : '30';
 
-        // Cuotas de gol: SOLO reales del mercado (cargadas por el usuario vía ⚙️)
-        // NO se estima NADA — solo datos oficiales de casas de apuestas
+        // Cuotas de gol: Mercado real de apuestas (o derivadas de la prob. de valla invicta del mercado: 1 / (1 - P_CS))
         let goalOddsHtml = '';
-        if (odds && odds.homeGoalOdds && odds.awayGoalOdds) {
-          const hGoalOdds = parseFloat(odds.homeGoalOdds).toFixed(2);
-          const aGoalOdds = parseFloat(odds.awayGoalOdds).toFixed(2);
+        let hGoalOdds = null;
+        let aGoalOdds = null;
+        
+        if (odds) {
+          if (odds.homeGoalOdds && odds.awayGoalOdds) {
+            hGoalOdds = parseFloat(odds.homeGoalOdds).toFixed(2);
+            aGoalOdds = parseFloat(odds.awayGoalOdds).toFixed(2);
+          } else if (odds.awayCleanSheetProb !== undefined && odds.homeCleanSheetProb !== undefined) {
+            const pHomeGoal = Math.max(0.10, 1.0 - odds.awayCleanSheetProb);
+            const pAwayGoal = Math.max(0.10, 1.0 - odds.homeCleanSheetProb);
+            hGoalOdds = (1.0 / pHomeGoal).toFixed(2);
+            aGoalOdds = (1.0 / pAwayGoal).toFixed(2);
+          }
+        }
+
+        if (hGoalOdds && aGoalOdds) {
           goalOddsHtml = `
             <div class="fixture-goal-odds-row" style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;">
               <span class="goal-odds-pill" title="Cuota Gol ${m.home} (mercado real)" style="background:rgba(76,175,80,0.15);color:#4caf50;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;">⚽ Gol ${m.home}: <strong>${hGoalOdds}</strong></span>

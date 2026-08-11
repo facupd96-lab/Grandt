@@ -4545,7 +4545,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.901666666666667,
       "underOdds": 1.9908333333333337,
-      "bookmakerCount": 20
+      "bookmakerCount": 20,
+      "homeGoalOdds": 1.36,
+      "awayGoalOdds": 1.98
     },
     "Boca Juniors": {
       "win": 2.0850000000000004,
@@ -4590,7 +4592,9 @@ var APP_DATA = {
       "overUnderLine": 1.75,
       "overOdds": 1.9075,
       "underOdds": 2.018333333333333,
-      "bookmakerCount": 20
+      "bookmakerCount": 20,
+      "homeGoalOdds": 1.59,
+      "awayGoalOdds": 1.81
     },
     "Tigre": {
       "win": 2.5395,
@@ -4635,7 +4639,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.9550000000000003,
       "underOdds": 1.9533333333333334,
-      "bookmakerCount": 20
+      "bookmakerCount": 20,
+      "homeGoalOdds": 1.44,
+      "awayGoalOdds": 1.79
     },
     "Unión": {
       "win": 2.287,
@@ -4680,7 +4686,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.2627272727272723,
       "underOdds": 1.6436363636363638,
-      "bookmakerCount": 18
+      "bookmakerCount": 18,
+      "homeGoalOdds": 1.18,
+      "awayGoalOdds": 3.11
     },
     "Rosario Ctral.": {
       "win": 1.4888888888888887,
@@ -4725,7 +4733,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 2.105714285714286,
       "underOdds": 1.8099999999999998,
-      "bookmakerCount": 9
+      "bookmakerCount": 9,
+      "homeGoalOdds": 1.28,
+      "awayGoalOdds": 3.35
     },
     "Ind. Rivadavia": {
       "win": 1.5388888888888888,
@@ -4770,7 +4780,9 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.6300000000000001,
       "underOdds": 2.2385714285714284,
-      "bookmakerCount": 13
+      "bookmakerCount": 13,
+      "homeGoalOdds": 1.39,
+      "awayGoalOdds": 2.66
     },
     "Atl. Tucumán": {
       "win": 1.715384615384615,
@@ -4815,7 +4827,9 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.8855555555555554,
       "underOdds": 1.8711111111111114,
-      "bookmakerCount": 14
+      "bookmakerCount": 14,
+      "homeGoalOdds": 2.12,
+      "awayGoalOdds": 1.74
     },
     "Dep. Riestra": {
       "win": 3.28,
@@ -4847,7 +4861,9 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.8077777777777777,
       "underOdds": 2.143333333333333,
-      "bookmakerCount": 15
+      "bookmakerCount": 15,
+      "homeGoalOdds": 2.06,
+      "awayGoalOdds": 1.62
     },
     "River": {
       "win": 2.184,
@@ -4879,7 +4895,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 1.9633333333333336,
       "underOdds": 1.9983333333333337,
-      "bookmakerCount": 13
+      "bookmakerCount": 13,
+      "homeGoalOdds": 1.19,
+      "awayGoalOdds": 2.01
     },
     "Vélez": {
       "win": 4.644615384615386,
@@ -4911,7 +4929,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2,
       "underOdds": 1.8824999999999998,
-      "bookmakerCount": 13
+      "bookmakerCount": 13,
+      "homeGoalOdds": 1.16,
+      "awayGoalOdds": 2.6
     },
     "Instituto": {
       "win": 1.5715384615384618,
@@ -4956,7 +4976,9 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 2.246363636363636,
       "underOdds": 1.7009090909090907,
-      "bookmakerCount": 18
+      "bookmakerCount": 18,
+      "homeGoalOdds": 1.58,
+      "awayGoalOdds": 4.1
     },
     "Independiente": {
       "win": 1.5894444444444444,
@@ -5001,7 +5023,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.475,
       "underOdds": 1.6766666666666667,
-      "bookmakerCount": 12
+      "bookmakerCount": 12,
+      "homeGoalOdds": 1.49,
+      "awayGoalOdds": 1.5
     },
     "San Lorenzo": {
       "win": 2.8016666666666663,
@@ -5046,7 +5070,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 1.9366666666666668,
       "underOdds": 2.03,
-      "bookmakerCount": 12
+      "bookmakerCount": 12,
+      "homeGoalOdds": 1.17,
+      "awayGoalOdds": 2.16
     },
     "Gimnasia LP": {
       "win": 1.7000000000000002,
@@ -5091,7 +5117,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.36,
       "underOdds": 1.585,
-      "bookmakerCount": 13
+      "bookmakerCount": 13,
+      "homeGoalOdds": 1.41,
+      "awayGoalOdds": 1.63
     },
     "Def. y Justicia": {
       "win": 2.2353846153846155,
@@ -5136,7 +5164,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.158,
       "underOdds": 1.828,
-      "bookmakerCount": 12
+      "bookmakerCount": 12,
+      "homeGoalOdds": 1.32,
+      "awayGoalOdds": 1.62
     },
     "Argentinos": {
       "win": 2.179166666666667,
@@ -5181,7 +5211,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.216,
       "underOdds": 1.8,
-      "bookmakerCount": 11
+      "bookmakerCount": 11,
+      "homeGoalOdds": 1.53,
+      "awayGoalOdds": 1.38
     },
     "Banfield": {
       "win": 2.7939999999999996,
@@ -5213,7 +5245,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.1233333333333335,
       "underOdds": 1.6933333333333334,
-      "bookmakerCount": 4
+      "bookmakerCount": 4,
+      "homeGoalOdds": 1.17,
+      "awayGoalOdds": 3.11
     },
     "Central Cba. (SdE)": {
       "win": 7.574999999999999,
@@ -5245,7 +5279,9 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.2359999999999998,
       "underOdds": 1.78,
-      "bookmakerCount": 10
+      "bookmakerCount": 10,
+      "homeGoalOdds": 1.34,
+      "awayGoalOdds": 1.62
     },
     "Talleres": {
       "win": 2.3033333333333337,
@@ -5277,7 +5313,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.705,
       "underOdds": 2.225,
-      "bookmakerCount": 4
+      "bookmakerCount": 4,
+      "homeGoalOdds": 1.23,
+      "awayGoalOdds": 2.4
     },
     "Aldosivi vs Tigre": {
       "home": "Aldosivi",
@@ -5296,7 +5334,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.9300000000000002,
       "underOdds": 1.9649999999999999,
-      "bookmakerCount": 4
+      "bookmakerCount": 4,
+      "homeGoalOdds": 1.59,
+      "awayGoalOdds": 1.56
     },
     "San Lorenzo vs Unión": {
       "home": "San Lorenzo",
@@ -5315,7 +5355,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.9050000000000002,
       "underOdds": 2,
-      "bookmakerCount": 4
+      "bookmakerCount": 4,
+      "homeGoalOdds": 1.57,
+      "awayGoalOdds": 1.56
     },
     "Estudiantes LP vs Gimnasia LP": {
       "home": "Estudiantes LP",
@@ -5334,7 +5376,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.875,
       "underOdds": 2.015,
-      "bookmakerCount": 4
+      "bookmakerCount": 4,
+      "homeGoalOdds": 1.37,
+      "awayGoalOdds": 1.89
     },
     "Belgrano vs Ind. Rivadavia": {
       "home": "Belgrano",
@@ -5353,7 +5397,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.68,
       "underOdds": 2.216666666666667,
-      "bookmakerCount": 10
+      "bookmakerCount": 10,
+      "homeGoalOdds": 1.29,
+      "awayGoalOdds": 1.96
     },
     "Newell's vs Dep. Riestra": {
       "home": "Newell's",
@@ -5388,7 +5434,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.75,
       "underOdds": 2.1166666666666667,
-      "bookmakerCount": 10
+      "bookmakerCount": 10,
+      "homeGoalOdds": 1.69,
+      "awayGoalOdds": 1.4
     },
     "Sarmiento vs Huracán": {
       "home": "Sarmiento",
@@ -5407,7 +5455,9 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.76,
       "underOdds": 2.03,
-      "bookmakerCount": 10
+      "bookmakerCount": 10,
+      "homeGoalOdds": 1.92,
+      "awayGoalOdds": 1.71
     },
     "Central Cba. (SdE) vs Instituto": {
       "home": "Central Cba. (SdE)",
@@ -5426,7 +5476,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.7933333333333337,
       "underOdds": 2.06,
-      "bookmakerCount": 10
+      "bookmakerCount": 10,
+      "homeGoalOdds": 1.72,
+      "awayGoalOdds": 1.41
     },
     "River vs Argentinos": {
       "home": "River",
@@ -5445,7 +5497,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.7933333333333337,
       "underOdds": 2.06,
-      "bookmakerCount": 10
+      "bookmakerCount": 10,
+      "homeGoalOdds": 1.44,
+      "awayGoalOdds": 1.66
     },
     "Barracas Ctral. vs Rosario Ctral.": {
       "home": "Barracas Ctral.",
@@ -5464,7 +5518,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.6566666666666665,
       "underOdds": 2.256666666666667,
-      "bookmakerCount": 10
+      "bookmakerCount": 10,
+      "homeGoalOdds": 1.7,
+      "awayGoalOdds": 1.35
     },
     "Estudiantes (RC) vs Atl. Tucumán": {
       "home": "Estudiantes (RC)",
@@ -5483,7 +5539,9 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.6866666666666665,
       "underOdds": 2.123333333333333,
-      "bookmakerCount": 9
+      "bookmakerCount": 9,
+      "homeGoalOdds": 1.64,
+      "awayGoalOdds": 1.91
     },
     "Lanús vs Independiente": {
       "home": "Lanús",
@@ -5518,7 +5576,9 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.74,
       "underOdds": 2.185,
-      "bookmakerCount": 4
+      "bookmakerCount": 4,
+      "homeGoalOdds": 1.26,
+      "awayGoalOdds": 2.24
     },
     "Gimnasia (M) vs Talleres": {
       "home": "Gimnasia (M)",
@@ -5537,7 +5597,9 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.71,
       "underOdds": 2.15,
-      "bookmakerCount": 3
+      "bookmakerCount": 3,
+      "homeGoalOdds": 1.76,
+      "awayGoalOdds": 1.76
     }
   },
   "teamXg": {
