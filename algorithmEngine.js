@@ -19,10 +19,10 @@ const OFFICIAL_FORMATIONS = [
 
 const DEFAULT_POSITION_WEIGHTS = {
   ARQ: {
-    cleanSheet: 40,  // Valla invicta probabilidad
-    avgRating: 30,   // Ficha Clarín promedio
-    teamDefense: 20, // Solidez defensiva del equipo
-    recentForm: 10   // Racha/Forma reciente
+    cleanSheet: 50,  // Probabilidad Valla Invicta (Cuotas apuestas + Solidez defensiva Local/Vis + Rival)
+    avgRating: 25,   // Ficha Clarín promedio
+    teamDefense: 15, // Solidez defensiva dividida por condición (Local/Vis)
+    recentForm: 10   // Racha reciente
   },
   DEF: {
     cleanSheet: 30,  // Valla invicta probabilidad
