@@ -4545,9 +4545,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.901666666666667,
       "underOdds": 1.9908333333333337,
-      "bookmakerCount": 20,
-      "homeGoalOdds": 1.36,
-      "awayGoalOdds": 1.98
+      "bookmakerCount": 20
     },
     "Boca Juniors": {
       "win": 2.0850000000000004,
@@ -4592,9 +4590,7 @@ var APP_DATA = {
       "overUnderLine": 1.75,
       "overOdds": 1.9075,
       "underOdds": 2.018333333333333,
-      "bookmakerCount": 20,
-      "homeGoalOdds": 1.59,
-      "awayGoalOdds": 1.81
+      "bookmakerCount": 20
     },
     "Tigre": {
       "win": 2.5395,
@@ -4639,9 +4635,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.9550000000000003,
       "underOdds": 1.9533333333333334,
-      "bookmakerCount": 20,
-      "homeGoalOdds": 1.44,
-      "awayGoalOdds": 1.79
+      "bookmakerCount": 20
     },
     "Unión": {
       "win": 2.287,
@@ -4686,9 +4680,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.2627272727272723,
       "underOdds": 1.6436363636363638,
-      "bookmakerCount": 18,
-      "homeGoalOdds": 1.18,
-      "awayGoalOdds": 3.11
+      "bookmakerCount": 18
     },
     "Rosario Ctral.": {
       "win": 1.4888888888888887,
@@ -4733,9 +4725,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 2.105714285714286,
       "underOdds": 1.8099999999999998,
-      "bookmakerCount": 9,
-      "homeGoalOdds": 1.28,
-      "awayGoalOdds": 3.35
+      "bookmakerCount": 9
     },
     "Ind. Rivadavia": {
       "win": 1.5388888888888888,
@@ -4780,9 +4770,7 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.6300000000000001,
       "underOdds": 2.2385714285714284,
-      "bookmakerCount": 13,
-      "homeGoalOdds": 1.39,
-      "awayGoalOdds": 2.66
+      "bookmakerCount": 13
     },
     "Atl. Tucumán": {
       "win": 1.715384615384615,
@@ -4827,9 +4815,7 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.8855555555555554,
       "underOdds": 1.8711111111111114,
-      "bookmakerCount": 14,
-      "homeGoalOdds": 2.12,
-      "awayGoalOdds": 1.74
+      "bookmakerCount": 14
     },
     "Dep. Riestra": {
       "win": 3.28,
@@ -4861,9 +4847,7 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.8077777777777777,
       "underOdds": 2.143333333333333,
-      "bookmakerCount": 15,
-      "homeGoalOdds": 2.06,
-      "awayGoalOdds": 1.62
+      "bookmakerCount": 15
     },
     "River": {
       "win": 2.184,
@@ -4895,9 +4879,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 1.9633333333333336,
       "underOdds": 1.9983333333333337,
-      "bookmakerCount": 13,
-      "homeGoalOdds": 1.19,
-      "awayGoalOdds": 2.01
+      "bookmakerCount": 13
     },
     "Vélez": {
       "win": 4.644615384615386,
@@ -4929,9 +4911,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2,
       "underOdds": 1.8824999999999998,
-      "bookmakerCount": 13,
-      "homeGoalOdds": 1.16,
-      "awayGoalOdds": 2.6
+      "bookmakerCount": 13
     },
     "Instituto": {
       "win": 1.5715384615384618,
@@ -4976,9 +4956,7 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 2.246363636363636,
       "underOdds": 1.7009090909090907,
-      "bookmakerCount": 18,
-      "homeGoalOdds": 1.58,
-      "awayGoalOdds": 4.1
+      "bookmakerCount": 18
     },
     "Independiente": {
       "win": 1.5894444444444444,
@@ -5023,9 +5001,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.475,
       "underOdds": 1.6766666666666667,
-      "bookmakerCount": 12,
-      "homeGoalOdds": 1.49,
-      "awayGoalOdds": 1.5
+      "bookmakerCount": 12
     },
     "San Lorenzo": {
       "win": 2.8016666666666663,
@@ -5070,9 +5046,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 1.9366666666666668,
       "underOdds": 2.03,
-      "bookmakerCount": 12,
-      "homeGoalOdds": 1.17,
-      "awayGoalOdds": 2.16
+      "bookmakerCount": 12
     },
     "Gimnasia LP": {
       "win": 1.7000000000000002,
@@ -5117,9 +5091,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.36,
       "underOdds": 1.585,
-      "bookmakerCount": 13,
-      "homeGoalOdds": 1.41,
-      "awayGoalOdds": 1.63
+      "bookmakerCount": 13
     },
     "Def. y Justicia": {
       "win": 2.2353846153846155,
@@ -5164,9 +5136,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.158,
       "underOdds": 1.828,
-      "bookmakerCount": 12,
-      "homeGoalOdds": 1.32,
-      "awayGoalOdds": 1.62
+      "bookmakerCount": 12
     },
     "Argentinos": {
       "win": 2.179166666666667,
@@ -5211,9 +5181,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.216,
       "underOdds": 1.8,
-      "bookmakerCount": 11,
-      "homeGoalOdds": 1.53,
-      "awayGoalOdds": 1.38
+      "bookmakerCount": 11
     },
     "Banfield": {
       "win": 2.7939999999999996,
@@ -5245,9 +5213,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.1233333333333335,
       "underOdds": 1.6933333333333334,
-      "bookmakerCount": 4,
-      "homeGoalOdds": 1.17,
-      "awayGoalOdds": 3.11
+      "bookmakerCount": 4
     },
     "Central Cba. (SdE)": {
       "win": 7.574999999999999,
@@ -5279,9 +5245,7 @@ var APP_DATA = {
       "overUnderLine": 2.5,
       "overOdds": 2.2359999999999998,
       "underOdds": 1.78,
-      "bookmakerCount": 10,
-      "homeGoalOdds": 1.34,
-      "awayGoalOdds": 1.62
+      "bookmakerCount": 10
     },
     "Talleres": {
       "win": 2.3033333333333337,
@@ -5313,9 +5277,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.705,
       "underOdds": 2.225,
-      "bookmakerCount": 4,
-      "homeGoalOdds": 1.23,
-      "awayGoalOdds": 2.4
+      "bookmakerCount": 4
     },
     "Aldosivi vs Tigre": {
       "home": "Aldosivi",
@@ -5334,9 +5296,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.9300000000000002,
       "underOdds": 1.9649999999999999,
-      "bookmakerCount": 4,
-      "homeGoalOdds": 1.59,
-      "awayGoalOdds": 1.56
+      "bookmakerCount": 4
     },
     "San Lorenzo vs Unión": {
       "home": "San Lorenzo",
@@ -5355,9 +5315,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.9050000000000002,
       "underOdds": 2,
-      "bookmakerCount": 4,
-      "homeGoalOdds": 1.57,
-      "awayGoalOdds": 1.56
+      "bookmakerCount": 4
     },
     "Estudiantes LP vs Gimnasia LP": {
       "home": "Estudiantes LP",
@@ -5376,9 +5334,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.875,
       "underOdds": 2.015,
-      "bookmakerCount": 4,
-      "homeGoalOdds": 1.37,
-      "awayGoalOdds": 1.89
+      "bookmakerCount": 4
     },
     "Belgrano vs Ind. Rivadavia": {
       "home": "Belgrano",
@@ -5397,25 +5353,26 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.68,
       "underOdds": 2.216666666666667,
-      "bookmakerCount": 10,
-      "homeGoalOdds": 1.29,
-      "awayGoalOdds": 1.96
+      "bookmakerCount": 10
     },
     "Newell's vs Dep. Riestra": {
       "home": "Newell's",
       "away": "Dep. Riestra",
-      "homeWin": 2.39,
-      "draw": 2.75,
-      "awayWin": 3.54,
-      "homeGoalOdds": 1.48,
-      "awayGoalOdds": 1.61,
-      "homeWinProb": 0.41841004184100417,
-      "drawProb": 0.36363636363636365,
-      "awayWinProb": 0.2824858757062147,
-      "homeCleanSheetProb": 0.3788819875776398,
-      "awayCleanSheetProb": 0.32432432432432434,
-      "homeExpGoals": 0.6756756756756757,
-      "awayExpGoals": 0.6211180124223602
+      "homeWin": 1.904,
+      "draw": 2.64,
+      "awayWin": 3.711,
+      "homeWinProb": 0.44757120176831244,
+      "drawProb": 0.3227937758207829,
+      "awayWinProb": 0.22963502241090458,
+      "homeExpGoals": 1.379164775381298,
+      "awayExpGoals": 0.7076070418555622,
+      "expectedGoals": 2.08677181723686,
+      "homeCleanSheetProb": 0.4928220902093922,
+      "awayCleanSheetProb": 0.251788765435865,
+      "overUnderLine": 2,
+      "overOdds": 1.8166666666666667,
+      "underOdds": 2.03,
+      "bookmakerCount": 10
     },
     "Platense vs Boca Juniors": {
       "home": "Platense",
@@ -5434,9 +5391,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.75,
       "underOdds": 2.1166666666666667,
-      "bookmakerCount": 10,
-      "homeGoalOdds": 1.69,
-      "awayGoalOdds": 1.4
+      "bookmakerCount": 10
     },
     "Sarmiento vs Huracán": {
       "home": "Sarmiento",
@@ -5455,9 +5410,7 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.76,
       "underOdds": 2.03,
-      "bookmakerCount": 10,
-      "homeGoalOdds": 1.92,
-      "awayGoalOdds": 1.71
+      "bookmakerCount": 10
     },
     "Central Cba. (SdE) vs Instituto": {
       "home": "Central Cba. (SdE)",
@@ -5476,9 +5429,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.7933333333333337,
       "underOdds": 2.06,
-      "bookmakerCount": 10,
-      "homeGoalOdds": 1.72,
-      "awayGoalOdds": 1.41
+      "bookmakerCount": 10
     },
     "River vs Argentinos": {
       "home": "River",
@@ -5497,9 +5448,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.7933333333333337,
       "underOdds": 2.06,
-      "bookmakerCount": 10,
-      "homeGoalOdds": 1.44,
-      "awayGoalOdds": 1.66
+      "bookmakerCount": 10
     },
     "Barracas Ctral. vs Rosario Ctral.": {
       "home": "Barracas Ctral.",
@@ -5518,9 +5467,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.6566666666666665,
       "underOdds": 2.256666666666667,
-      "bookmakerCount": 10,
-      "homeGoalOdds": 1.7,
-      "awayGoalOdds": 1.35
+      "bookmakerCount": 10
     },
     "Estudiantes (RC) vs Atl. Tucumán": {
       "home": "Estudiantes (RC)",
@@ -5539,25 +5486,26 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.6866666666666665,
       "underOdds": 2.123333333333333,
-      "bookmakerCount": 9,
-      "homeGoalOdds": 1.64,
-      "awayGoalOdds": 1.91
+      "bookmakerCount": 9
     },
     "Lanús vs Independiente": {
       "home": "Lanús",
       "away": "Independiente",
-      "homeWin": 2.42,
-      "draw": 2.8,
-      "awayWin": 3.37,
-      "homeGoalOdds": 1.41,
-      "awayGoalOdds": 1.6,
-      "homeWinProb": 0.4132231404958678,
-      "drawProb": 0.35714285714285715,
-      "awayWinProb": 0.29673590504451036,
-      "homeCleanSheetProb": 0.375,
-      "awayCleanSheetProb": 0.2907801418439716,
-      "homeExpGoals": 0.7092198581560284,
-      "awayExpGoals": 0.625
+      "homeWin": 2.1266666666666665,
+      "draw": 2.5622222222222226,
+      "awayWin": 3.0277777777777777,
+      "homeWinProb": 0.39488326157731857,
+      "drawProb": 0.32775653194231896,
+      "awayWinProb": 0.27736020648036247,
+      "homeExpGoals": 1.264960080222359,
+      "awayExpGoals": 0.8884893921268239,
+      "expectedGoals": 2.1534494723491826,
+      "homeCleanSheetProb": 0.4112765613467397,
+      "awayCleanSheetProb": 0.28225056329535647,
+      "overUnderLine": 2,
+      "overOdds": 1.7466666666666668,
+      "underOdds": 2.1266666666666665,
+      "bookmakerCount": 10
     },
     "Vélez vs Def. y Justicia": {
       "home": "Vélez",
@@ -5576,9 +5524,7 @@ var APP_DATA = {
       "overUnderLine": 2,
       "overOdds": 1.74,
       "underOdds": 2.185,
-      "bookmakerCount": 4,
-      "homeGoalOdds": 1.26,
-      "awayGoalOdds": 2.24
+      "bookmakerCount": 4
     },
     "Gimnasia (M) vs Talleres": {
       "home": "Gimnasia (M)",
@@ -5597,9 +5543,7 @@ var APP_DATA = {
       "overUnderLine": 1.5,
       "overOdds": 1.71,
       "underOdds": 2.15,
-      "bookmakerCount": 3,
-      "homeGoalOdds": 1.76,
-      "awayGoalOdds": 1.76
+      "bookmakerCount": 3
     }
   },
   "teamXg": {
@@ -6143,12 +6087,12 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 35,
       "avgRating": 9.75,
-      "goals": 2,
+      "goals": 1,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
       "goalsPenalty": 0,
-      "goalsAway": 1,
+      "goalsAway": 0,
       "goalsGolden": 0,
       "goalsReceived": 0,
       "ownGoals": 0,
@@ -6295,12 +6239,12 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 31,
       "avgRating": 9.25,
-      "goals": 3,
+      "goals": 2,
       "goalsOpenPlay": 2,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
       "goalsPenalty": 0,
-      "goalsAway": 0,
+      "goalsAway": 1,
       "goalsGolden": 0,
       "goalsReceived": 0,
       "ownGoals": 0,
@@ -6523,7 +6467,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 37,
       "avgRating": 10,
-      "goals": 3,
+      "goals": 2,
       "goalsOpenPlay": 2,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -6827,7 +6771,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 28,
       "avgRating": 8.5,
-      "goals": 2,
+      "goals": 5,
       "goalsOpenPlay": 2,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -7207,7 +7151,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 27,
       "avgRating": 8.25,
-      "goals": 2,
+      "goals": 1,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -7283,7 +7227,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 24,
       "avgRating": 8,
-      "goals": 2,
+      "goals": 1,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -7435,7 +7379,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 39,
       "avgRating": 10.75,
-      "goals": 4,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 1,
       "goalsFreeKick": 0,
@@ -7587,7 +7531,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 25,
       "avgRating": 7.5,
-      "goals": 2,
+      "goals": 1,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -8271,7 +8215,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 23,
       "avgRating": 7,
-      "goals": 0,
+      "goals": 1,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -9107,7 +9051,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 19,
       "avgRating": 5.75,
-      "goals": 1,
+      "goals": 0,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -9183,7 +9127,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 20,
       "avgRating": 6.25,
-      "goals": 1,
+      "goals": 0,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -9411,7 +9355,7 @@ var APP_DATA = {
       "matchesRated": 2,
       "totalPoints": 20,
       "avgRating": 10,
-      "goals": 2,
+      "goals": 1,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -9487,7 +9431,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 23,
       "avgRating": 7.25,
-      "goals": 0,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -10172,7 +10116,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 18,
       "avgRating": 6.75,
-      "goals": 1,
+      "goals": 7,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -11312,7 +11256,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 25,
       "avgRating": 8.33,
-      "goals": 1,
+      "goals": 2,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -11844,7 +11788,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 13,
       "avgRating": 6.33,
-      "goals": 0,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -12605,7 +12549,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 17,
       "avgRating": 8,
-      "goals": 1,
+      "goals": 4,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -12757,7 +12701,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 17,
       "avgRating": 5.25,
-      "goals": 0,
+      "goals": 2,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -13587,7 +13531,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 18,
       "avgRating": 6.5,
-      "goals": 0,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -14417,7 +14361,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 18,
       "avgRating": 6.5,
-      "goals": 0,
+      "goals": 7,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -16241,7 +16185,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 15,
       "avgRating": 5.5,
-      "goals": 0,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -17837,7 +17781,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 14,
       "avgRating": 5,
-      "goals": 0,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -23581,7 +23525,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 12,
       "avgRating": 4.75,
-      "goals": 0,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -25481,7 +25425,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 18,
       "avgRating": 5.75,
-      "goals": 1,
+      "goals": 0,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -28439,7 +28383,7 @@ var APP_DATA = {
       "matchesRated": 2,
       "totalPoints": 6,
       "avgRating": 5,
-      "goals": 0,
+      "goals": 1,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -29123,7 +29067,7 @@ var APP_DATA = {
       "matchesRated": 2,
       "totalPoints": 11,
       "avgRating": 5.5,
-      "goals": 0,
+      "goals": 1,
       "goalsOpenPlay": 1,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -29807,7 +29751,7 @@ var APP_DATA = {
       "matchesRated": 2,
       "totalPoints": 26,
       "avgRating": 10,
-      "goals": 2,
+      "goals": 1,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -30789,7 +30733,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 16,
       "avgRating": 7.33,
-      "goals": 1,
+      "goals": 0,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -34431,7 +34375,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 13,
       "avgRating": 5.67,
-      "goals": 0,
+      "goals": 1,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -35420,7 +35364,7 @@ var APP_DATA = {
       "matchesRated": 2,
       "totalPoints": 20,
       "avgRating": 10,
-      "goals": 2,
+      "goals": 1,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -35876,12 +35820,12 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 18,
       "avgRating": 8,
-      "goals": 1,
+      "goals": 4,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
       "goalsPenalty": 0,
-      "goalsAway": 1,
+      "goalsAway": 0,
       "goalsGolden": 0,
       "goalsReceived": 0,
       "ownGoals": 0,
@@ -36332,7 +36276,7 @@ var APP_DATA = {
       "matchesRated": 2,
       "totalPoints": 16,
       "avgRating": 8,
-      "goals": 1,
+      "goals": 0,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -36483,7 +36427,7 @@ var APP_DATA = {
       "matchesRated": 4,
       "totalPoints": 18,
       "avgRating": 8,
-      "goals": 1,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -39360,7 +39304,7 @@ var APP_DATA = {
       "matchesRated": 2,
       "totalPoints": 4,
       "avgRating": 4.5,
-      "goals": 0,
+      "goals": 1,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -40044,7 +39988,7 @@ var APP_DATA = {
       "matchesRated": 3,
       "totalPoints": 10,
       "avgRating": 5.33,
-      "goals": 0,
+      "goals": 3,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -41489,7 +41433,7 @@ var APP_DATA = {
       "matchesRated": 1,
       "totalPoints": 0,
       "avgRating": 7,
-      "goals": 0,
+      "goals": 2,
       "goalsOpenPlay": 0,
       "goalsHeader": 0,
       "goalsFreeKick": 0,
@@ -41988,16 +41932,12 @@ var APP_DATA = {
         0,
         6
       ],
-      "goals": 0,
+      "goals": 1,
       "figuras": 0,
       "cleanSheets": 0,
       "yellowCards": 0,
       "redCards": 0,
-      "subRole": "W",
-      "goalsAway": 0,
-      "goalsHeader": 0,
-      "goalsPenalty": 0,
-      "goalsFreeKick": 0
+      "subRole": "W"
     },
     {
       "id": "pg_f4_1786364255862_235",
@@ -42076,16 +42016,12 @@ var APP_DATA = {
         0,
         7
       ],
-      "goals": 0,
+      "goals": 1,
       "figuras": 0,
       "cleanSheets": 0,
       "yellowCards": 0,
       "redCards": 0,
-      "subRole": "W",
-      "goalsAway": 0,
-      "goalsHeader": 0,
-      "goalsPenalty": 0,
-      "goalsFreeKick": 0
+      "subRole": "W"
     },
     {
       "id": "pg_f4_1786364255887_346",
@@ -42101,16 +42037,12 @@ var APP_DATA = {
         0,
         7
       ],
-      "goals": 0,
+      "goals": 1,
       "figuras": 0,
       "cleanSheets": 0,
       "yellowCards": 0,
       "redCards": 0,
-      "subRole": "W",
-      "goalsAway": 0,
-      "goalsHeader": 0,
-      "goalsPenalty": 0,
-      "goalsFreeKick": 0
+      "subRole": "W"
     },
     {
       "id": "pg_f4_1786364255901_706",
@@ -42294,16 +42226,12 @@ var APP_DATA = {
         0,
         8
       ],
-      "goals": 0,
+      "goals": 1,
       "figuras": 1,
       "cleanSheets": 0,
       "yellowCards": 0,
       "redCards": 0,
-      "subRole": "CM",
-      "goalsAway": 0,
-      "goalsHeader": 0,
-      "goalsPenalty": 0,
-      "goalsFreeKick": 0
+      "subRole": "CM"
     },
     {
       "id": "pg_f4_1786364255972_236",
@@ -42613,16 +42541,12 @@ var APP_DATA = {
         0,
         6
       ],
-      "goals": 0,
+      "goals": 1,
       "figuras": 1,
       "cleanSheets": 0,
       "yellowCards": 0,
       "redCards": 0,
-      "subRole": "CM",
-      "goalsAway": 0,
-      "goalsHeader": 0,
-      "goalsPenalty": 0,
-      "goalsFreeKick": 0
+      "subRole": "CM"
     },
     {
       "id": "pg_f4_1786364256062_47",
@@ -42827,16 +42751,12 @@ var APP_DATA = {
         0,
         6
       ],
-      "goals": 0,
+      "goals": 1,
       "figuras": 1,
       "cleanSheets": 0,
       "yellowCards": 0,
       "redCards": 0,
-      "subRole": "CM",
-      "goalsAway": 0,
-      "goalsHeader": 0,
-      "goalsPenalty": 0,
-      "goalsFreeKick": 0
+      "subRole": "CM"
     },
     {
       "id": "pg_f4_1786364256174_557",
@@ -70358,4 +70278,5 @@ var APP_DATA = {
     }
   }
 };
-if (typeof module !== 'undefined') module.exports = APP_DATA;
+if (typeof window !== 'undefined') { window.APP_DATA = APP_DATA; }
+if (typeof module !== 'undefined' && module.exports) { module.exports = APP_DATA; }
