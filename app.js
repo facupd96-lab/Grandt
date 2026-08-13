@@ -2201,7 +2201,7 @@ function calculateScoreDT(p, ctx, posPool) {
     EP_possession,
     EP_saves,
     minutesFactor: Math.min(1.0, Math.max(0.40, avgMinutesPerMatch / 82.0)),
-    baselineNorm,
+    baselineNorm: 1.0,
     isVolanteLlegador,
     isVolanteManija,
     isGoalDebt,
@@ -3158,7 +3158,7 @@ window.openAuditModal = function(playerId) {
     • <strong>Índice de Prioridad en Ranking:</strong> <strong style="color:var(--primary);">${p.finalScore.toFixed(1)}% (Recomendación Top)</strong>
   `;
 
-  const tacticalSummaryHtml = generateTacticalMatchupSummary(p, ctx, m, a);
+  // Re-use tacticalSummaryHtml declared on line 2922
 
   let html = `
     <div style="font-family: inherit; font-size: 13px; line-height: 1.6; color: var(--text-main);">
