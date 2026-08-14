@@ -1,11 +1,11 @@
 @echo off
-title Gran DT Analyzer Pro Server
+title Gran DT Analyzer Pro - Servidor Local
 echo =====================================================
-echo Iniciando Servidor Gran DT Analyzer Pro...
+echo    INICIANDO GRAN DT ANALYZER PRO (SERVIDOR LOCAL)
 echo =====================================================
+echo.
 cd /d "%~dp0"
 
-start http://localhost:3000
-node server.cjs
+powershell -ExecutionPolicy Bypass -File "%~dp0server.ps1"
 
 pause

@@ -372,9 +372,14 @@
     </div>
 
     <!-- Scripts -->
-    <script src="data.js?v=20260810_V3"></script>
-    <script src="teamsRegistry.js?v=20260810_V3"></script>
-    <script src="algorithmEngine.js?v=20260810_V3"></script>
-    <script src="app.js?v=20260810_V3"></script>
+    <script src="data.js"></script>
+    <script src="teamsRegistry.js"></script>
+    <script src="algorithmEngine.js"></script>
+    <script src="app.js"></script>
+    <script>
+    if (typeof init === 'function') {
+      try { init(); } catch (e) { console.error('Fallback init error:', e); }
+    }
+    </script>
 </body>
 </html>

@@ -19,10 +19,10 @@ const OFFICIAL_FORMATIONS = [
 
 const DEFAULT_POSITION_WEIGHTS = {
   ARQ: {
-    cleanSheet: 40,  // Valla invicta probabilidad
-    avgRating: 30,   // Ficha Clarín promedio
-    teamDefense: 20, // Solidez defensiva del equipo
-    recentForm: 10   // Racha/Forma reciente
+    cleanSheet: 50,  // Probabilidad Valla Invicta (Cuotas apuestas + Solidez defensiva Local/Vis + Rival)
+    avgRating: 25,   // Ficha Clarín promedio
+    teamDefense: 15, // Solidez defensiva dividida por condición (Local/Vis)
+    recentForm: 10   // Racha reciente
   },
   DEF: {
     cleanSheet: 30,  // Valla invicta probabilidad
@@ -108,10 +108,11 @@ function evaluateBestFormations(rankingsByPos, activeWeights, mode = 'solid') {
     ? (a, b) => (b.riskyScore || b.finalScore || 0) - (a.riskyScore || a.finalScore || 0)
     : (a, b) => (b.finalScore || 0) - (a.finalScore || 0);
 
-  const sortedArq = [...arqList].sort(sortFn);
-  const sortedDef = [...defList].sort(sortFn);
-  const sortedVol = [...volList].sort(sortFn);
-  const sortedDel = [...delList].sort(sortFn);
+  const filterRotation = list => list.filter(p => !p.hasRotationRisk && !p.isRotationRisk);
+  const sortedArq = filterRotation([...arqList]).sort(sortFn);
+  const sortedDef = filterRotation([...defList]).sort(sortFn);
+  const sortedVol = filterRotation([...volList]).sort(sortFn);
+  const sortedDel = filterRotation([...delList]).sort(sortFn);
 
   function getCanon(t) {
     if (!t) return '';
