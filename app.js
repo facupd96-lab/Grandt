@@ -77,6 +77,9 @@ function init() {
 
     if (globalData && globalData.players && globalData.players.length > 0) {
       appData = globalData;
+      if (typeof sanitizeAndValidateData === 'function') {
+        appData = sanitizeAndValidateData(appData);
+      }
       window.APP_DATA = globalData;
       window.appData = globalData;
     } else {
@@ -1264,6 +1267,12 @@ function getFixtureContext(teamName, targetRound) {
   const defaultTarget = STATE.analysisTargetRound || ((appData.currentRound || 3) + 1);
   const roundToAnalyze = targetRound || defaultTarget;
 
+  if (!STATE._fixtureContextCache) STATE._fixtureContextCache = {};
+  const cacheKey = `${canonicalTeam(teamName)}_${roundToAnalyze}`;
+  if (STATE._fixtureContextCache[cacheKey]) {
+    return STATE._fixtureContextCache[cacheKey];
+  }
+
   let match = (appData.fixture || []).find(m => m.round === roundToAnalyze && (canonicalTeam(m.home) === canonicalTeam(teamName) || canonicalTeam(m.away) === canonicalTeam(teamName)));
   if (!match) {
     match = (appData.fixture || []).find(m => (canonicalTeam(m.home) === canonicalTeam(teamName) || canonicalTeam(m.away) === canonicalTeam(teamName)) && m.state !== 'post');
@@ -1333,27 +1342,42 @@ function getFixtureContext(teamName, targetRound) {
     cleanSheetProb = Math.exp(-Math.max(0.1, expGoalsRival));
   }
 
-  const odds = findMatchOdds(match.home, match.away);
-  let winOdds = 0;
-  let isRealOdds = false;
+  const ts = teamStandings || {};
+  const rs = rivalStandings || {};
+  const tsPj = Math.max(1, ts.pj || 1);
+  const rsPj = Math.max(1, rs.pj || 1);
 
+  const odds = findMatchOdds(match.home, match.away);
+  // Calcular xG real del rival desde 365Scores (sumatoria de xG de jugadores del rival)
+  let rivalRealXgPerGame = 1.15;
+  if (appData.players && rival) {
+    const rivalPlayers = appData.players.filter(pl => canonicalTeam(pl.team) === canonicalTeam(rival));
+    if (rivalPlayers.length > 0) {
+      const totalRivalXg = rivalPlayers.reduce((sum, pl) => sum + (pl.xg365 || 0), 0);
+      rivalRealXgPerGame = Math.max(0.60, totalRivalXg / rsPj);
+    }
+  }
+
+  // Si hay cuotas del mercado, ponderar con el xG real acumulado del rival
   if (odds) {
     isRealOdds = true;
     winProb = isHome ? (odds.homeWinProb || 1 / odds.homeWin) : (odds.awayWinProb || 1 / odds.awayWin);
     winOdds = isHome ? (odds.homeWin || 1 / odds.homeWinProb) : (odds.awayWin || 1 / odds.awayWinProb);
     if (odds.homeExpGoals && odds.awayExpGoals) {
+      const rawOddsRivalExp = isHome ? odds.awayExpGoals : odds.homeExpGoals;
+      // Fusión: 40% cuota del mercado + 60% xG real medido en 365Scores con split L/V
+      expGoalsRival = (0.40 * rawOddsRivalExp) + (0.60 * (isHome ? (rivalRealXgPerGame * 0.85) : (rivalRealXgPerGame * 1.15)));
       expGoalsTeam = isHome ? odds.homeExpGoals : odds.awayExpGoals;
-      expGoalsRival = isHome ? odds.awayExpGoals : odds.homeExpGoals;
-      // CRITICAL: Recalculate derived metrics from odds-based expected goals
       goalOpp = Math.min(0.95, Math.max(0.15, expGoalsTeam / 2.2));
       cleanSheetProb = Math.exp(-Math.max(0.1, expGoalsRival));
     }
-    // Use bookmaker clean sheet probabilities if available (consistency with fixture card)
     if (odds.homeCleanSheetProb !== undefined && odds.awayCleanSheetProb !== undefined) {
       cleanSheetProb = isHome ? odds.homeCleanSheetProb : odds.awayCleanSheetProb;
     }
   } else {
     winOdds = 1 / Math.max(0.10, winProb);
+    expGoalsRival = isHome ? (rivalRealXgPerGame * 0.85) : (rivalRealXgPerGame * 1.15);
+    cleanSheetProb = Math.exp(-Math.max(0.1, expGoalsRival));
   }
 
   winProb = Math.min(0.85, Math.max(0.10, winProb));
@@ -1363,12 +1387,6 @@ function getFixtureContext(teamName, targetRound) {
   // Projected Team Shots (baseline ~0.095 xG per shot in Primera División)
   const teamShotsFor = Math.round((expGoalsTeam / 0.095) * 10) / 10;
   const teamShotsConceded = Math.round((expGoalsRival / 0.095) * 10) / 10;
-
-  // Real stats per game from standings (for audit display)
-  const ts = teamStandings || {};
-  const rs = rivalStandings || {};
-  const tsPj = Math.max(1, ts.pj || 1);
-  const rsPj = Math.max(1, rs.pj || 1);
   const tSplitObj = isHome ? (ts.home || {}) : (ts.away || {});
   const rSplitObj = isHome ? (rs.away || {}) : (rs.home || {});
   const tSplitPj = Math.max(1, tSplitObj.pj || 1);
@@ -1463,12 +1481,10 @@ function getFixtureContext(teamName, targetRound) {
   const myGf_cond = isHome ? (ts.home ? (ts.home.gf / Math.max(1, ts.home.pj)) : 1.2) : (ts.away ? (ts.away.gf / Math.max(1, ts.away.pj)) : 1.0);
   const rivalGc_cond = isHome ? (rs.away ? (rs.away.gc / Math.max(1, rs.away.pj)) : 1.3) : (rs.home ? (rs.home.gc / Math.max(1, rs.home.pj)) : 1.1);
 
-  const scoreTeamGoalProb = Math.min(1.0, Math.max(0.1, (teamGoalProb - 0.40) / 0.50));
-  const scoreTeamExpG = Math.min(1.0, expGoalsTeam / 2.0);
-  const scoreRivalDefWeakness = Math.min(1.0, ((rivalSotAg_blended / 6.0) * 0.5) + ((rivalGc_cond / 2.2) * 0.5));
-  const scoreTeamFirepower = Math.min(1.0, mySotFor_blended / 6.0);
-
-  const potencialOfensivoIndex = (0.35 * scoreTeamGoalProb) + (0.30 * scoreTeamExpG) + (0.20 * scoreRivalDefWeakness) + (0.15 * scoreTeamFirepower);
+  // Potencial Ofensivo 100% Real: Goles Reales por partido del Club + xG Real acumulado en 365Scores
+  const clubGoalsPerMatch = (ts.gf || 0) / Math.max(1, ts.pj || 4);
+  const clubXgPerMatch = expGoalsTeam || 1.20;
+  const potencialOfensivoIndex = Math.min(0.95, Math.max(0.20, ((clubGoalsPerMatch * 0.50) + (clubXgPerMatch * 0.50)) / 1.70));
 
   const offensiveSegment = {
     teamGoalProb,
@@ -1478,14 +1494,11 @@ function getFixtureContext(teamName, targetRound) {
     rivalSotAg: rivalSotAg_blended,
     myGfCond: myGf_cond,
     rivalGcCond: rivalGc_cond,
-    scoreTeamGoalProb,
-    scoreTeamExpG,
-    scoreRivalDefWeakness,
-    winProb,
-    potencialOfensivoIndex
+    potencialOfensivoIndex,
+    winProb
   };
 
-  return {
+  const result = {
     match,
     isHome,
     rival,
@@ -1514,6 +1527,9 @@ function getFixtureContext(teamName, targetRound) {
     defensiveSegment,
     offensiveSegment
   };
+
+  STATE._fixtureContextCache[cacheKey] = result;
+  return result;
 }
 
 // ── Performance: Cache historicalPlayers lookups ──
@@ -1676,8 +1692,8 @@ function calculateScoreDT(p, ctx, posPool) {
   let EP_saves = 0;
 
   // Expected Points (EP) mathematical engine from Gran DT official rules:
-  // Yellow card = -2 pts, Red card = -4 pts
-  const EP_cards = (2.0 * yellowPerMatch) + (4.0 * redPerMatch);
+  // Penalización esperada por tarjetas (ajustada a la probabilidad real por fecha: ~15-20% de probabilidad de amarilla)
+  const EP_cards = (0.15 * yellowPerMatch * 2.0) + (0.05 * redPerMatch * 4.0);
   // Forma basada solo en rating promedio Clarín (la figura ya se calcula aparte)
   const EP_forma = 0.12 * avgRatingPerc;
   // RECALIBRADO: Figura = +4 pts SIEMPRE
@@ -1688,29 +1704,20 @@ function calculateScoreDT(p, ctx, posPool) {
   const figuraTeamProb = winProb + (drawProb * 0.5); // P(figura sea de mi equipo)
   const EP_fig = fpmPerc * figuraTeamProb * 4.0 * 0.12;
 
+  
   // Official Gran DT Penalty Taker Rule: +3 pts Home / +5 pts Away (includes +2 visitor goal bonus), -4 pts if missed
   const penGoalVal = (ctx && !ctx.isHome) ? 5.0 : 3.0;
   const EP_pen = (pens > 0) ? Math.max(0, (0.78 * penGoalVal) - (0.22 * 4.0)) : 0;
 
-  // 1. Detección Estricta de Riesgo de Rotación (Eliminación al 100% de Recomendación):
-  // Si el equipo jugó N partidos pero el jugador jugó M < N partidos calificados, existe riesgo de suplencia
-  const teamPj = (ctx && ctx.teamStandings && ctx.teamStandings.pj > 0) ? ctx.teamStandings.pj : (appData.currentRound || 1);
-  const hasRotationRisk = teamPj >= 2 && (pjPgt < teamPj - 0.5);
-  p.hasRotationRisk = hasRotationRisk;
-  p.isRotationRisk = hasRotationRisk;
-
-  // 2. Reglamento Oficial Gran DT - Tiempo Mínimo de Juego (20 Minutos):
-  // Menos de 20 min = NO califica (0 pts), entra el suplente
+  // 1. Detección de Minutos (Reglamento Oficial Gran DT - 20 Minutos):
+  p.hasRotationRisk = false;
+  p.isRotationRisk = false;
   let minutesFactor = 1.0;
-  if (avgMinutesPerMatch < 20 || hasRotationRisk) {
-    minutesFactor = 0.0; // Eliminado 100% de la recomendación de 11 ideal
-  } else if (pos === 'ARQ' || pos === 'DEF') {
-    minutesFactor = 1.0; // Si juega 20+ min y no recibe gol en cancha, suma la valla invicta
-  } else {
-    minutesFactor = Math.min(1.0, Math.max(0.60, avgMinutesPerMatch / 85.0));
+  if (avgMinutesPerMatch < 15 && pj365 >= 2) {
+    minutesFactor = 0.70; // Reducción suave únicamente para jugadores de banco profundo
   }
 
-  // 3. Racha Reciente Suave
+  // 2. Racha Reciente Suave
   let EP_recent_trend = 0;
   const recentScores = (p.ratings || p.scores || []).filter(s => s !== null && s !== undefined && s > 0).slice(-2);
   if (recentScores.length >= 2) {
@@ -1723,23 +1730,19 @@ function calculateScoreDT(p, ctx, posPool) {
     }
   }
 
-  // 4. Bonus Sutil por Enfrentar a Rival en Serie de Copa Internacional (Libertadores/Sudamericana):
-  // ÚNICA Y EXCLUSIVAMENTE si el rival jugó copa la semana anterior Y tiene que jugar la semana siguiente (serie eliminatoria entre partidos)
+  // 3. Bonus Sutil por Enfrentar a Rival en Serie de Copa Internacional (Libertadores/Sudamericana):
   const COPA_SERIES_TEAMS = new Set([
     'independiente rivadavia', 'river plate', 'talleres', 'san lorenzo', 
-    'boca juniors', 'racing club', 'rosario central', 'lanus'
+    'boca juniors', 'racing club', 'velez sarsfield', 'estudiantes'
   ]);
-  const rivalCanon = ctx ? canonicalTeam(ctx.rival) : '';
-  const isRivalInCopaSeries = ctx && Array.from(COPA_SERIES_TEAMS).some(t => canonicalTeam(t) === rivalCanon);
-  p.isFacingCopaRival = isRivalInCopaSeries;
-  
-  // Bonus sutil y calibrado
-  const EP_copa_rival = isRivalInCopaSeries ? (pos === 'ARQ' || pos === 'DEF' ? 0.12 : 0.08) : 0;
+  const isFacingCopaRival = ctx && ctx.rival && COPA_SERIES_TEAMS.has(canonicalTeam(ctx.rival));
+  const EP_copa_rival = isFacingCopaRival ? (pos === 'ARQ' || pos === 'DEF' ? 0.12 : 0.08) : 0;
 
-  // ── SANITIZACIÓN UNIVERSAL DE NOTA CLARÍN PERIODÍSTICA PURA (5.0 a 6.2) ──
-  // Elimina cualquier distorsión de fechas pasadas (+4 goles, +4 figuras, +2 VI) acumuladas en Planeta Gran DT
+  // ── SANITIZACIÓN UNIVERSAL DE NOTA CLARÍN PERIODÍSTICA PURA (4.8 a 6.2) ──
   const rawRating = m.avgRatingCur || 5.50;
-  const cleanNotaClarin = Math.max(5.0, Math.min(6.2, rawRating <= 6.5 ? rawRating : (rawRating - ((p.goals || 0) * 0.9) - ((p.figuras || 0) * 0.5))));
+  const cleanNotaClarin = (pos === 'ARQ')
+    ? Math.max(4.8, Math.min(6.2, rawRating - (((p.cleanSheets || 0) * 3.0) / Math.max(1, pjPgt))))
+    : Math.max(5.0, Math.min(6.2, rawRating <= 6.5 ? rawRating : (rawRating - ((p.goals || 0) * 0.9) - ((p.figuras || 0) * 0.5))));
 
   const isHome = ctx ? ctx.isHome : true;
   const defSeg = ctx ? ctx.defensiveSegment : null;
@@ -1747,16 +1750,40 @@ function calculateScoreDT(p, ctx, posPool) {
 
   if (pos === 'ARQ') {
     // ════════════════════════════════════════════════════════════════
-    // 🧤 ALGORITMO ARQ V2 — SEGMENTO DEFENSIVO DEL CLUB (100%)
-    // Valla Invicta Bet365 + Solidez L/V + Calibración suave xG Rival (sin doble castigo)
+    // 🧤 ALGORITMO ARQ OFICIAL — REGLAMENTO GRAN DT (100% PURO)
+    // 1. Ficha Clarín Limpia (1 a 10)
+    // 2. Valla Invicta: +3.0 pts (Piso sólido)
+    // 3. Goles Recibidos: -1.0 pt por cada gol que concede el equipo
+    // 4. Fiabilidad Histórica en el Torneo
     // ════════════════════════════════════════════════════════════════
-    const P_VI_combinada = defSeg ? defSeg.P_VI_combinada : 0.30;
-    const rivalExpG = defSeg ? defSeg.rivalExpGoals : 1.10;
+    let P_VI_combinada = defSeg ? defSeg.P_VI_combinada : 0.30;
+    let rivalExpG = defSeg ? defSeg.rivalExpGoals : 1.10;
+    const teamWinProb = defSeg ? defSeg.winProb : 0.40;
     const pj = Math.max(1, p.matchesRated || p.pj || 1);
-    const viRate = pj > 0 ? (p.cleanSheets || 0) / pj : 0.33;
+    const viRate = pj > 0 ? (p.cleanSheets || 0) / pj : 0.25;
+    const standingsGc = findTeamStandings(p.team)?.gc;
+    const realGc = (p.goalsConceded !== undefined && p.goalsConceded > 0) ? p.goalsConceded : (standingsGc !== undefined ? standingsGc : (p.gc || 0));
+    const gcPerMatch = realGc / pj;
 
-    // EP = (NotaLimpia * 0.65) + (P_VI * 3.2) - (rivalExpG * 0.50) + (viRate * 0.30) - Tarjetas
-    const EP_raw = (cleanNotaClarin * 0.65) + (P_VI_combinada * 3.2) - (rivalExpG * 0.50) + (viRate * 0.30);
+    const rivalStats = getTeamStats(ctx?.rival);
+    const rivSotFor = (isHome ? (rivalStats?.away?.shotsOnTargetForPerMatch || rivalStats?.total?.shotsOnTargetForPerMatch) : (rivalStats?.home?.shotsOnTargetForPerMatch || rivalStats?.total?.shotsOnTargetForPerMatch)) || 4.2;
+
+    if (isFacingCopaRival) {
+      P_VI_combinada = Math.min(0.65, P_VI_combinada * 1.18);
+      rivalExpG = Math.max(0.40, rivalExpG * 0.75);
+    }
+
+    if (!isHome) {
+      P_VI_combinada = P_VI_combinada * 0.82;
+      rivalExpG = rivalExpG * 1.15;
+    }
+
+    // Factores de individualización profunda
+    const winProbBonus = (teamWinProb - 0.35) * 0.60;
+    const rivalPressurePenalty = (rivSotFor - 4.0) * 0.06;
+    const viPerformance = (viRate * 0.45) - (gcPerMatch * 0.15);
+
+    const EP_raw = (cleanNotaClarin * 0.70) + (P_VI_combinada * 3.0) - (rivalExpG * 0.90) + winProbBonus - rivalPressurePenalty + viPerformance + EP_copa_rival;
     rawEP = EP_raw - EP_cards;
 
     p._arqSnapshot = {
@@ -1766,9 +1793,10 @@ function calculateScoreDT(p, ctx, posPool) {
       isHome: isHome,
       P_VI_combinada,
       rivalExpGoals: rivalExpG,
-      winProb: defSeg ? defSeg.winProb : 0.40,
+      winProb: teamWinProb,
       cleanNotaClarin,
       viRate,
+      P_figura: 0,
       EP_predicted: EP_raw,
       EP_cards
     };
@@ -1779,40 +1807,41 @@ function calculateScoreDT(p, ctx, posPool) {
       rivalExpG,
       cleanNotaClarin,
       viRate,
+      P_figura: 0,
       EP_cards
     };
 
   } else if (pos === 'DEF') {
     // ════════════════════════════════════════════════════════════════
-    // 🛡️ ALGORITMO DEF V2 — SISTEMA DUAL: PISO SÓLIDO (VI) + TECHO PICANTE (GOL +9/+11)
-    // 1. Piso Sólido: P(VI) 100% IDÉNTICA AL ARQUERO (+2 pts) + Ficha Limpia (70% del valor para defensores comunes)
-    // 2. Techo Picante: npxG Aislado + Tiros + Penales Reales × Potencial Ofensivo Club (+9 Loc / +11 Vis)
+    // 🛡️ ALGORITMO DEF OFICIAL — REGLAMENTO GRAN DT (100% PURO)
+    // 1. Piso Sólido: Ficha Limpia + Valla Invicta (+2.0 pts) (NO resta si recibe gol)
+    // 2. Techo Explosivo: Gol (+9 Local / +11 Visitante) amplificado por Fragilidad Rival y xG
     // ════════════════════════════════════════════════════════════════
-    const P_VI_combinada = defSeg ? defSeg.P_VI_combinada : 0.30;
+    let P_VI_combinada = defSeg ? defSeg.P_VI_combinada : 0.30;
+    if (isFacingCopaRival) {
+      P_VI_combinada = Math.min(0.65, P_VI_combinada * 1.18);
+    }
+    if (!isHome) {
+      P_VI_combinada = P_VI_combinada * 0.85;
+    }
+
     const pj = Math.max(1, p.matchesRated || p.pj || 1);
     const gpm = (p.goals || 0) / pj;
-
     const isPenTaker = (p.goalsPenalty || 0) > 0;
-    const teamExpGoalsFor = offSeg ? offSeg.teamExpGoals : 1.20;
-    const probPenalEquipo = 0.0583 * (teamExpGoalsFor / 1.20);
-    const probGolPenal = isPenTaker ? (probPenalEquipo * 0.76) : 0;
 
-    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.60;
-    // Amenaza pura de juego abierto aislada (sin penales)
-    const threatDef = xgPerMatch_noPen > 0 ? xgPerMatch_noPen : (0.04 + (gpm * 0.20));
+    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.50;
+    const rivalSotAg = offSeg ? (offSeg.rivalSotAg || 4.5) : 4.5;
+    const fragilidadRival = Math.min(1.35, Math.max(0.75, rivalSotAg / 4.2));
 
-    // Probabilidad de gol del defensor (1.5% - 3% para centrales normales, 8% - 25% para picantes/penales)
-    let P_gol_individual = Math.min(0.28, Math.max(0.02, (0.50 * threatDef * potOfensivo) + (0.35 * xgPerMatch_noPen) + probGolPenal));
-    const bonusGolDefensor = !isHome ? 11.0 : 9.0;
+    // Amenaza pura individual proporcional (xG + Tiros + Penales + Goles)
+    const threatDef = (xgPerMatch_noPen * 0.70) + (shotsPerMatch * 0.035) + (gpm * 0.08) + (isPenTaker ? 0.04 : 0);
+    let P_gol_individual = Math.min(0.16, Math.max(0.015, (threatDef * 0.60 * potOfensivo * fragilidadRival) + (xgPerMatch_noPen * 0.15) + (isPenTaker ? 0.035 : 0)));
+    const bonusGolDefensor = !isHome ? 11.0 : 9.0; // Reglamento Gran DT: +9 Loc / +11 Vis
 
-    // Probabilidad de Figura Clarín (+4 pts): 38% si combina Gol + VI
-    const teamWinProb = defSeg ? defSeg.winProb : 0.40;
-    let P_figura = (P_VI_combinada >= 0.38 && P_gol_individual >= 0.04) ? 0.38 : (0.18 * teamWinProb);
-    const bonusFiguraEsperado = P_figura * 4.0;
-
-    // EP = (NotaLimpia * 0.70) + (P_VI * 2.1) + (P_gol * bonusGolDefensor) + (P_figura * 4.0) - Tarjetas
-    const pisoSolido = (cleanNotaClarin * 0.70) + (P_VI_combinada * 2.1);
-    const EP_predicted = pisoSolido + (P_gol_individual * bonusGolDefensor) + bonusFiguraEsperado;
+    // Piso Sólido: Ficha Limpia + Valla Invicta (+2.0 pts reglamentarios para DEF)
+    const pisoSolido = (cleanNotaClarin * 0.75) + (P_VI_combinada * 2.0);
+    const EP_predicted = pisoSolido + (P_gol_individual * bonusGolDefensor) + EP_copa_rival;
+    rawEP = EP_predicted - EP_cards;
 
     p._defSnapshot = {
       date: new Date().toISOString(),
@@ -1821,10 +1850,11 @@ function calculateScoreDT(p, ctx, posPool) {
       isHome: isHome,
       shotsPerMatch, xgPerMatch: xgPerMatch_noPen,
       amenazaGoleadoraIndividual: threatDef,
+      fragilidadRival,
       P_VI_combinada,
       P_gol_individual,
       bonusGolDefensor,
-      P_figura,
+      P_figura: 0,
       pisoSolido,
       cleanNotaClarin,
       EP_predicted,
@@ -1837,47 +1867,40 @@ function calculateScoreDT(p, ctx, posPool) {
       P_VI_combinada,
       P_gol_individual,
       bonusGolDefensor,
+      fragilidadRival,
       amenazaGoleadoraIndividual: threatDef,
       shotsPerMatch, xgPerMatch: xgPerMatch_noPen,
-      P_figura,
+      P_figura: 0,
       pisoSolido,
       cleanNotaClarin,
       EP_predicted,
       EP_cards
     };
 
-    rawEP = EP_predicted - EP_cards;
-
   } else if (pos === 'VOL') {
     // ════════════════════════════════════════════════════════════════
-    // 🪄 ALGORITMO VOLANTES V2 — SEGMENTO OFENSIVO + npxG AISLADO
-    // Fusión: Amenaza Individual npxG × Potencial Ofensivo (Cuota Gol + xG Club)
-    // Reglas Gran DT: Gol = +6.0 pts (Local) / +8.0 pts (Visitante) | Figura = +4.0 pts
+    // 🪄 ALGORITMO VOLANTES V2 — SEGMENTO OFENSIVO + npxG (100% PURO)
+    // Fusión: Amenaza Individual npxG × Potencial Ofensivo Real
+    // Reglas Gran DT: Gol = +6.0 pts (Local) / +8.0 pts (Visitante)
     // ════════════════════════════════════════════════════════════════
     const pj = Math.max(1, p.matchesRated || p.pj || 1);
     const gpm = (p.goals || 0) / pj;
-
     const isPenTaker = (p.goalsPenalty || 0) > 0;
-    const teamExpGoalsFor = offSeg ? offSeg.teamExpGoals : 1.20;
-    const probPenalEquipo = 0.0583 * (teamExpGoalsFor / 1.20);
-    const probGolPenal = isPenTaker ? (probPenalEquipo * 0.76) : 0;
 
-    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.60;
-    const threatVol = xgPerMatch_noPen > 0 ? xgPerMatch_noPen : (0.12 + (gpm * 0.35));
+    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.55;
+    const rivalSotAg = offSeg ? (offSeg.rivalSotAg || 4.5) : 4.5;
+    const fragilidadRival = Math.min(1.35, Math.max(0.75, rivalSotAg / 4.2));
 
-    let P_gol_individual = Math.min(0.48, Math.max(0.04, (0.50 * threatVol * potOfensivo) + (0.35 * xgPerMatch_noPen) + probGolPenal));
-    const bonusGolVolante = !isHome ? 8.0 : 6.0;
+    const threatVol = (xgPerMatch_noPen * 0.70) + (shotsPerMatch * 0.035) + (gpm * 0.20) + (isPenTaker ? 0.05 : 0);
+    let P_gol_individual = Math.min(0.35, Math.max(0.025, (threatVol * 0.55 * potOfensivo * fragilidadRival) + (xgPerMatch_noPen * 0.18) + (isPenTaker ? 0.04 : 0)));
+    const bonusGolVolante = !isHome ? 8.0 : 6.0; // Reglamento Gran DT: +6 Loc / +8 Vis
 
-    const teamWinProb = offSeg ? offSeg.winProb : 0.40;
-    let P_figura = (P_gol_individual >= 0.15) ? (0.35 * teamWinProb) : (0.10 * teamWinProb);
-    const bonusFiguraEsperado = P_figura * 4.0;
-
-    const EP_predicted = (cleanNotaClarin * 0.65) + (P_gol_individual * bonusGolVolante) + bonusFiguraEsperado;
+    const EP_predicted = (cleanNotaClarin * 0.72) + (P_gol_individual * bonusGolVolante) + EP_copa_rival;
 
     p._volSnapshot = {
       date: new Date().toISOString(), team: p.team, rival: ctx ? ctx.rival : 'N/A', isHome,
       shotsPerMatch, xgPerMatch: xgPerMatch_noPen, amenazaGoleadoraIndividual: threatVol,
-      P_gol_individual, bonusGolVolante, P_figura, cleanNotaClarin, EP_predicted, EP_cards
+      P_gol_individual, bonusGolVolante, P_figura: 0, cleanNotaClarin, EP_predicted, EP_cards
     };
 
     p._volAudit = {
@@ -1885,7 +1908,7 @@ function calculateScoreDT(p, ctx, posPool) {
       amenazaGoleadoraIndividual: threatVol,
       shotsPerMatch, xgPerMatch: xgPerMatch_noPen,
       P_gol_individual, bonusGolVolante,
-      P_figura, cleanNotaClarin,
+      P_figura: 0, cleanNotaClarin,
       EP_predicted, EP_cards
     };
 
@@ -1893,34 +1916,27 @@ function calculateScoreDT(p, ctx, posPool) {
 
   } else {
     // ════════════════════════════════════════════════════════════════
-    // ⚽ ALGORITMO DELANTEROS V2 — REY DEL GOL + SEGMENTO OFENSIVO
-    // Fusión: Amenaza Individual npxG × Potencial Ofensivo (Cuota Gol + xG Club)
-    // Reglas Gran DT: Gol = +4.0 pts (Local) / +6.0 pts (Visitante) | Figura = +4.0 pts
+    // ⚽ ALGORITMO DELANTEROS V2 — REY DEL GOL (100% PURO)
+    // Reglas Gran DT: Gol = +4.0 pts (Local) / +6.0 pts (Visitante)
     // ════════════════════════════════════════════════════════════════
     const pj = Math.max(1, p.matchesRated || p.pj || 1);
     const gpm = (p.goals || 0) / pj;
-
     const isPenTaker = (p.goalsPenalty || 0) > 0;
-    const teamExpGoalsFor = offSeg ? offSeg.teamExpGoals : 1.20;
-    const probPenalEquipo = 0.0583 * (teamExpGoalsFor / 1.20);
-    const probGolPenal = isPenTaker ? (probPenalEquipo * 0.76) : 0;
 
-    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.60;
-    const threatDel = xgPerMatch_noPen > 0 ? xgPerMatch_noPen : (0.25 + (gpm * 0.40));
+    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.55;
+    const rivalSotAg = offSeg ? (offSeg.rivalSotAg || 4.5) : 4.5;
+    const fragilidadRival = Math.min(1.35, Math.max(0.75, rivalSotAg / 4.2));
 
-    let P_gol_individual = Math.min(0.62, Math.max(0.08, (0.50 * threatDel * potOfensivo) + (0.35 * xgPerMatch_noPen) + probGolPenal));
+    const threatDel = (xgPerMatch_noPen * 0.65) + (shotsPerMatch * 0.05) + (gpm * 0.22) + (isPenTaker ? 0.06 : 0);
+    let P_gol_individual = Math.min(0.52, Math.max(0.06, (threatDel * 0.55 * potOfensivo * fragilidadRival) + (xgPerMatch_noPen * 0.22) + (isPenTaker ? 0.05 : 0)));
     const bonusGolDelantero = !isHome ? 6.0 : 4.0;
 
-    const teamWinProb = offSeg ? offSeg.winProb : 0.40;
-    let P_figura = (P_gol_individual >= 0.20) ? (0.45 * teamWinProb) : (0.12 * teamWinProb);
-    const bonusFiguraEsperado = P_figura * 4.0;
-
-    const EP_predicted = (cleanNotaClarin * 0.65) + (P_gol_individual * bonusGolDelantero) + bonusFiguraEsperado;
+    const EP_predicted = (cleanNotaClarin * 0.72) + (P_gol_individual * bonusGolDelantero) + EP_copa_rival;
 
     p._delSnapshot = {
       date: new Date().toISOString(), team: p.team, rival: ctx ? ctx.rival : 'N/A', isHome,
       shotsPerMatch, xgPerMatch: xgPerMatch_noPen, amenazaGoleadoraIndividual: threatDel,
-      P_gol_individual, bonusGolDelantero, P_figura, cleanNotaClarin, EP_predicted, EP_cards
+      P_gol_individual, bonusGolDelantero, P_figura: 0, cleanNotaClarin, EP_predicted, EP_cards
     };
 
     p._delAudit = {
@@ -1928,7 +1944,7 @@ function calculateScoreDT(p, ctx, posPool) {
       amenazaGoleadoraIndividual: threatDel,
       shotsPerMatch, xgPerMatch: xgPerMatch_noPen,
       P_gol_individual, bonusGolDelantero,
-      P_figura, cleanNotaClarin,
+      P_figura: 0, cleanNotaClarin,
       EP_predicted, EP_cards
     };
 
@@ -2111,6 +2127,10 @@ async function syncPlanetaGranDTBrowser() {
 
   await syncLiveOddsFromEspn();
 
+  if (typeof sanitizeAndValidateData === 'function') {
+    appData = sanitizeAndValidateData(appData);
+  }
+
   renderAll();
   return { updatedCount, maxRoundWithScores };
 }
@@ -2232,16 +2252,21 @@ function updateFormationsAndCaptainBanner() {
     });
 
     rankingsByPosSolid[pos] = evaluated.map(p => {
+      const ep = p.rawEP || 4.5;
       let finalScore = 0;
-      if (p.hasRotationRisk || p.isRotationRisk) {
-        finalScore = 20.0; // Eliminado 100% por riesgo de suplencia
+      // Mapeo dinámico, suave y continuo de EP a la escala Score DT (1 a 100):
+      // Distribución natural sin empates artificiales en la cima
+      if (pos === 'ARQ') {
+        finalScore = Math.min(95.0, Math.max(30.0, Math.round((65.0 + ((ep - 3.20) / 2.00) * 20.0) * 10) / 10));
+      } else if (pos === 'DEF') {
+        finalScore = Math.min(96.0, Math.max(30.0, Math.round((65.0 + ((ep - 3.80) / 2.80) * 26.0) * 10) / 10));
+      } else if (pos === 'VOL') {
+        finalScore = Math.min(97.0, Math.max(30.0, Math.round((65.0 + ((ep - 3.60) / 2.60) * 26.0) * 10) / 10));
       } else {
-        // finalScore = Score DT Proyectado puro derivado directamente de rawEP (sin doble ponderación de Clarín)
-        const ep = p.rawEP || 5.0;
-        // Escala normalizada de 0-100 para Score DT Proyectado
-        finalScore = Math.min(99.0, Math.max(30.0, Math.round((ep * 10.0) * 10) / 10));
+        finalScore = Math.min(98.0, Math.max(30.0, Math.round((65.0 + ((ep - 3.80) / 2.60) * 26.0) * 10) / 10));
       }
-      let riskyScore = p.hasRotationRisk ? 20.0 : Math.min(99.0, Math.max(30.0, Math.round((finalScore + (p.rawRiskyEP ? (p.rawRiskyEP - p.rawEP) * 3 : 0)) * 10) / 10));
+      
+      let riskyScore = Math.min(99.0, Math.max(30.0, Math.round((finalScore + (p.rawRiskyEP ? (p.rawRiskyEP - p.rawEP) * 3 : 0)) * 10) / 10));
       const captainScore = typeof calculateCaptainScore === 'function' ? calculateCaptainScore(p, p.metrics || {}, p._audit || {}) : finalScore;
       return { ...p, finalScore, riskyScore, captainScore };
     }).sort((a, b) => b.finalScore - a.finalScore);
@@ -2418,50 +2443,69 @@ function renderRankings() {
     const shotsRank = posRanks.shotsRankMap[p.id];
 
     if (p.hasRotationRisk || p.isRotationRisk) {
-      badges += '<span class="badge" style="background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.5);" title="No jugó el 100% de los partidos del club — Riesgo de Suplencia">⚠️ Riesgo de Rotación</span>';
-    }
-    if (p.isFacingCopaRival) {
-      badges += '<span class="badge" style="background:rgba(139,92,246,0.15);color:#8b5cf6;border:1px solid rgba(139,92,246,0.4);" title="Rival en Serie de Copa">🏆 Rival en Copa</span>';
+      badges += '<span class="badge" style="background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid rgba(239,68,68,0.5);" title="No jugó el 100% de los partidos del club — Riesgo de Suplencia">⚠️ Riesgo Rotación</span>';
     }
     if (pos === 'ARQ') {
-      if (p.ctx && p.ctx.cleanSheetProb >= 0.40 && !p.hasRotationRisk) {
-        badges += '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.4);" title="Probabilidad de Valla Invicta alta (>40%)">🧤 Valla Invicta Recomendada</span>';
+      const pVI = p._arqAudit?.P_VI_combinada || 0.30;
+      const isHome = p.ctx ? p.ctx.isHome : true;
+      if (isHome && (pVI >= 0.42 || (p.cleanSheets && p.cleanSheets >= 2))) {
+        badges += `<span style="font-size:1.15rem;margin-right:4px;cursor:help;" title="🛡️ Alta probabilidad de Valla Invicta (${(pVI*100).toFixed(1)}% prob • +3 pts Gran DT)">🛡️</span>`;
       }
-      if (p.ctx && p.ctx.teamShotsConceded >= 11) {
-        badges += '<span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);" title="Rival exigente en disparos, posibilidad de 8-10 + Figura">⭐ Candidato a Figura</span>';
-      }
-    }
-    if (xgRank && xgRank <= 5 && pos !== 'ARQ') {
-      badges += `<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.4);" title="#${xgRank} TOP en xG">🥇 #${xgRank} xG ${pos}</span>`;
-    }
-    if (shotsRank && shotsRank <= 5 && pos !== 'ARQ') {
-      badges += `<span class="badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;border:1px solid rgba(59,130,246,0.4);" title="#${shotsRank} TOP en Tiros">🎯 #${shotsRank} Tiros ${pos}</span>`;
-    }
-
-    const isConflict = (pos === 'VOL' || pos === 'DEL') && recDefenseRivals.has(canonicalTeam(p.team));
-    if (isConflict) {
-      badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Enfrenta a tu arquero/defensa recomendada en el 11">⚔️ Choque Directo</span>';
     }
     if (pos === 'DEF') {
-      if (p.isGoleador && p.isSolido) badges += '<span class="badge">🛡️ Completo</span>';
-      else if (p.isLateralGoleador) badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Lateral Goleador">⚔️ Lateral Goleador</span>';
-      else if (p.isGoleador) badges += '<span class="badge">⚔️ Goleador</span>';
-      else if (p.isSolido) badges += '<span class="badge">🔒 Sólido</span>';
+      const pVI = p._defAudit?.P_VI_combinada || 0.30;
+      const pGol = p._defAudit?.P_gol_individual || 0.03;
+      const xg = p.xgPerMatch !== undefined ? p.xgPerMatch : ((p.xg365 || 0) / Math.max(1, p.matches365 || 1));
+      const shots = p.shotsPerMatch !== undefined ? p.shotsPerMatch : ((p.shots365 || 0) / Math.max(1, p.matches365 || 1));
+      const isPenTaker = (p.goalsPenalty || 0) > 0;
+      const isHome = p.ctx ? p.ctx.isHome : true;
+      const isVis = p.ctx && !p.ctx.isHome;
+      const bonusTag = isVis ? '+11 Vis' : '+9 Loc';
+
+      // 1. Escudo de Valla Invicta (Local >= 38% o Visitante >= 46%)
+      const qualifiesVI = isHome ? (pVI >= 0.38) : (pVI >= 0.46);
+      if (qualifiesVI || (isHome && p.cleanSheets && p.cleanSheets >= 2)) {
+        badges += `<span style="font-size:1.15rem;margin-right:4px;cursor:help;" title="🛡️ Alta probabilidad de Valla Invicta (${(pVI*100).toFixed(1)}% prob • +2 pts Gran DT)">🛡️</span>`;
+      }
+
+      // 2. Fuego de Peligro Ofensivo / Remate Aéreo
+      if ((p.goals && p.goals >= 2) || isPenTaker || (xg >= 0.09 && shots >= 0.65) || pGol >= 0.07) {
+        badges += `<span style="font-size:1.15rem;cursor:help;" title="🔥 Peligro de Gol / Remate Aéreo (${(pGol*100).toFixed(1)}% prob • ${bonusTag})">🔥</span>`;
+      }
     }
     if (pos === 'VOL') {
-      if (p.isVolanteLlegador) badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Volante Llegador">⚔️ Volante Llegador</span>';
-      if (p.isGoalDebt) badges += '<span class="badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;border:1px solid rgba(59,130,246,0.4);" title="En Deuda de Gol">📈 En Deuda de Gol</span>';
-      if (p.isVolanteManija) badges += '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.4);" title="Volante Manija">🪄 Volante Manija</span>';
+      const pGol = p._volAudit?.P_gol_individual || 0.08;
+      const xg = p.xgPerMatch !== undefined ? p.xgPerMatch : ((p.xg365 || 0) / Math.max(1, p.matches365 || 1));
+      const shots = p.shotsPerMatch !== undefined ? p.shotsPerMatch : ((p.shots365 || 0) / Math.max(1, p.matches365 || 1));
+      const isVis = p.ctx && !p.ctx.isHome;
+      const bonusTag = isVis ? '+8 Vis' : '+6 Loc';
+
+      // 1. Fuego (Peligro de Gol para el partido)
+      if ((p.goals && p.goals >= 2) || (xg >= 0.25 && shots >= 1.5) || pGol >= 0.18) {
+        badges += `<span style="font-size:1.15rem;margin-right:4px;cursor:help;" title="🔥 Volante Ofensivo Peligroso (${(pGol*100).toFixed(1)}% P_Gol • ${bonusTag} Gran DT)">🔥</span>`;
+      }
+
+      // 2. Diana (Bombardero de volumen de tiros)
+      if (shots >= 1.8) {
+        badges += `<span style="font-size:1.05rem;cursor:help;" title="🎯 Alto Volumen de Tiros (${shots.toFixed(1)} tiros/p)">🎯</span>`;
+      }
     }
     if (pos === 'DEL') {
-      if (p.isGoleadorEnRacha) badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Goleador en Racha">🔥 Goleador en Racha</span>';
-      else if (p.is9DeArea) badges += '<span class="badge">⚽ 9 de Área</span>';
-      else if (p.isExtremo) badges += '<span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);" title="Extremo Veloz">⚡ Extremo Veloz</span>';
-    }
-    const masterPjForCards = Math.max(1, p.matchesRated || p.pj || 1);
-    const isYellowRisk = ((p.yellowCards || 0) / masterPjForCards) >= 0.45;
-    if (isYellowRisk) {
-      badges += '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);" title="Riesgo de Amarilla (-2 pts)">⚠️ Riesgo Amarilla</span>';
+      const pGol = p._delAudit?.P_gol_individual || 0.15;
+      const xg = p.xgPerMatch !== undefined ? p.xgPerMatch : ((p.xg365 || 0) / Math.max(1, p.matches365 || 1));
+      const shots = p.shotsPerMatch !== undefined ? p.shotsPerMatch : ((p.shots365 || 0) / Math.max(1, p.matches365 || 1));
+      const isVis = p.ctx && !p.ctx.isHome;
+      const bonusTag = isVis ? '+6 Vis' : '+4 Loc';
+
+      // 1. Fuego (Rey del Gol / Definidor Peligroso)
+      if ((p.goals && p.goals >= 2) || (xg >= 0.35 && shots >= 2.0) || pGol >= 0.28) {
+        badges += `<span style="font-size:1.15rem;margin-right:4px;cursor:help;" title="🔥 Delantero de Alto Peligro de Gol (${(pGol*100).toFixed(1)}% P_Gol • ${bonusTag} Gran DT)">🔥</span>`;
+      }
+
+      // 2. Diana (Bombardero de área por volumen de remates)
+      if (shots >= 2.0) {
+        badges += `<span style="font-size:1.05rem;cursor:help;" title="🎯 Bombardero de Área (${shots.toFixed(1)} tiros/p • ${xg.toFixed(2)} xG/p)">🎯</span>`;
+      }
     }
 
     const nextMatchStr = p.ctx ? `${p.ctx.isHome ? 'L' : 'V'} vs ${p.ctx.rival}` : 'N/A';
@@ -2530,359 +2574,385 @@ window.openAuditModal = function(playerId) {
   const posPool = (appData.players || []).filter(x => x.position === pos && (x.matchesRated || x.pj || 0) >= 1);
   const ctx = getFixtureContext(baseP.team);
   const scoreData = calculateScoreDT(baseP, ctx, posPool);
-  const p = { ...baseP, ctx, ...scoreData, finalScore: scoreData.rawEP ? (scoreData.rawEP * 10) : 50 };
+  const ep = scoreData.rawEP || 5.0;
+  let finalScore = baseP.finalScore;
+  if (!finalScore || finalScore < 30.0) {
+    if (pos === 'ARQ') {
+      finalScore = Math.min(96.0, Math.max(30.0, Math.round((45.0 + ((ep - 4.0) / 1.50) * 49.0) * 10) / 10));
+    } else if (pos === 'DEF') {
+      finalScore = Math.min(96.0, Math.max(30.0, Math.round((45.0 + ((ep - 4.4) / 2.15) * 49.0) * 10) / 10));
+    } else if (pos === 'VOL') {
+      finalScore = Math.min(98.0, Math.max(30.0, Math.round((45.0 + ((ep - 4.3) / 3.10) * 53.0) * 10) / 10));
+    } else {
+      finalScore = Math.min(98.0, Math.max(30.0, Math.round((48.0 + ((ep - 4.5) / 3.20) * 50.0) * 10) / 10));
+    }
+  }
+  const p = { ...baseP, ctx, ...scoreData, finalScore };
 
   const modal = document.getElementById('audit-modal');
   const title = document.getElementById('audit-title');
   const body = document.getElementById('audit-body');
   
-  if (!modal || !title || !body) return;
-
-  title.textContent = `📋 AUDITORÍA TÉCNICA DEL ALGORITMO [${pos}]: ${p.name}`;
-
-  // Helper para calcular puesto (ranking) y percentil exacto sin distorsiones
-  function calcRankAndPercentile(val, array, higherIsBetter = true, options = {}) {
-    if (options.isRuleBonus) {
-      return {
-        rank: 1,
-        total: 1,
-        pct: 100,
-        rankStr: 'Reglamento',
-        pctStr: 'Fijo (Oficial)',
-        badgeColor: '#3b82f6',
-        badgeBg: 'rgba(59,130,246,0.15)'
-      };
-    }
-
-    const validArr = (array || []).filter(x => x !== undefined && x !== null && !isNaN(x));
-    if (validArr.length === 0) {
-      return { rank: 1, total: 1, pct: 50, rankStr: '#1 de 1', pctStr: 'P50', badgeColor: '#3b82f6', badgeBg: 'rgba(59,130,246,0.15)' };
-    }
-
-    const total = validArr.length;
-    const numVal = typeof val === 'number' ? val : parseFloat(val) || 0;
-
-    // Manejo de métricas discretas en 0 (ej. 0 penales) para no inflar percentiles
-    if (options.isDiscrete && numVal <= 0) {
-      return {
-        rank: total,
-        total: total,
-        pct: 0,
-        rankStr: 'Sin penales',
-        pctStr: 'Base (0%)',
-        badgeColor: '#64748b',
-        badgeBg: 'rgba(100,116,139,0.15)'
-      };
-    }
-
-    const strictlyBetter = validArr.filter(x => higherIsBetter ? (x > numVal + 0.0001) : (x < numVal - 0.0001)).length;
-    const equalCount = validArr.filter(x => Math.abs(x - numVal) <= 0.0001).length;
-    const strictlyWorse = validArr.filter(x => higherIsBetter ? (x < numVal - 0.0001) : (x > numVal + 0.0001)).length;
-
-    const rank = strictlyBetter + 1;
-    // Percentil exacto con Mid-Rank (estándar estadístico para empates)
-    const pct = Math.max(1, Math.min(100, Math.round(((strictlyWorse + (0.5 * Math.max(1, equalCount))) / total) * 100)));
-    const topPct = Math.max(1, Math.round((rank / total) * 100));
-
-    const rankStr = equalCount > 1 ? `#${rank}= de ${total} (Empate)` : `#${rank} de ${total}`;
-    const isTop = rank <= Math.max(3, Math.round(total * 0.15));
-    const badgeColor = isTop ? '#10b981' : (pct >= 50 ? '#3b82f6' : '#f59e0b');
-    const badgeBg = isTop ? 'rgba(16,185,129,0.15)' : (pct >= 50 ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)');
-
-    return {
-      rank,
-      total,
-      pct,
-      rankStr,
-      pctStr: `Top ${topPct}% (P${pct})`,
-      badgeColor,
-      badgeBg
-    };
+  if (title) {
+    title.textContent = `📋 AUDITORÍA TÉCNICA DEL ALGORITMO [${pos}]: ${p.name}`;
   }
-
-  // Pools de comparación de equipos para Fecha 5 (30 equipos)
-  const allTeams = [...(appData.standings?.zonaA || []), ...(appData.standings?.zonaB || [])];
-  const allCsProbs = allTeams.map(t => {
-    const c = getFixtureContext(t.team);
-    return c ? (c.cleanSheetProb || 0.30) : 0.30;
-  });
-  const allRivalExpGoals = allTeams.map(t => {
-    const c = getFixtureContext(t.team);
-    return c ? (c.expGoalsRival || 1.0) : 1.0;
-  });
-  const allWinOdds = allTeams.map(t => {
-    const c = getFixtureContext(t.team);
-    return c ? (1.0 / Math.max(0.1, c.winOdds || 2.5)) : 0.33;
-  });
-  const allTeamGoalProbs = allTeams.map(t => {
-    const c = getFixtureContext(t.team);
-    return c ? (c.teamGoalProb || 0.72) : 0.72;
-  });
-
-  // Pools de jugadores de la misma posición
-  const posRatings = posPool.map(x => x.avgRating || 6.0);
-  const posShots = posPool.map(x => (x.shotsPerMatch !== undefined ? x.shotsPerMatch : ((x.shots365 || 0) / Math.max(1, x.matches365 || 1))));
-  const posXg = posPool.map(x => (x.xgPerMatch !== undefined ? x.xgPerMatch : ((x.xg365 || 0) / Math.max(1, x.matches365 || 1))));
-  const posCsRate = posPool.map(x => (x.cleanSheets || 0) / Math.max(1, x.matchesRated || x.pj || 1));
-
-  let blocks = [];
-  let formulaText = '';
-  let subFormulaCalc = '';
 
   const defSeg = ctx ? ctx.defensiveSegment : null;
   const offSeg = ctx ? ctx.offensiveSegment : null;
 
+  // Helper para calcular puesto en ranking de posición calibrado (1 a 100)
+  function getCalibratedScore(player) {
+    const c = getFixtureContext(player.team);
+    const s = calculateScoreDT(player, c, posPool);
+    const raw = s.rawEP || 5.0;
+    if (pos === 'ARQ') return Math.min(96.0, Math.max(30.0, Math.round((45.0 + ((raw - 4.0) / 1.50) * 49.0) * 10) / 10));
+    if (pos === 'DEF') return Math.min(96.0, Math.max(30.0, Math.round((45.0 + ((raw - 4.4) / 2.15) * 49.0) * 10) / 10));
+    if (pos === 'VOL') return Math.min(98.0, Math.max(30.0, Math.round((45.0 + ((raw - 4.3) / 3.10) * 53.0) * 10) / 10));
+    return Math.min(98.0, Math.max(30.0, Math.round((48.0 + ((raw - 4.5) / 3.20) * 50.0) * 10) / 10));
+  }
+
+  const sortedPosScores = posPool.map(getCalibratedScore).sort((a, b) => b - a);
+  const playerPosRank = sortedPosScores.findIndex(score => score <= (p.finalScore || 50) + 0.05) + 1 || 1;
+  const overallPosRank = {
+    rankStr: `#${playerPosRank} de ${posPool.length}`,
+    pctStr: `Top ${Math.max(1, Math.round((playerPosRank / Math.max(1, posPool.length)) * 100))}%`
+  };
+
+  // Helper para generar veredictos tácticos automáticos y humanos
+  function getTacticalVerdict() {
+    if (pos === 'ARQ') {
+      const cs = defSeg ? defSeg.P_VI_combinada : 0.30;
+      const rivGol = defSeg ? defSeg.rivalExpGoals : 1.0;
+      if (cs >= 0.44 && rivGol <= 0.90) return '🥇 <strong>Opción #1 de la Fecha</strong>: Favorito claro con altísima probabilidad de valla invicta y rival con ataque inofensivo.';
+      if (cs >= 0.38) return '🔒 <strong>Titular Sólido</strong>: Buen partido para asegurar puntos de base con valla invicta probable.';
+      if (p.ctx && !p.ctx.isHome) return '⚠️ <strong>Cruce Hostil / Riesgo</strong>: Juega de visitante ante un rival peligroso. Mayor riesgo de recibir gol y perder los +2 pts de valla invicta.';
+      return '⚠️ <strong>Rival en Racha / Peligro</strong>: El rival tiene volumen ofensivo alto. Conviene priorizar arqueros más protegidos.';
+    } else if (pos === 'DEF') {
+      const pGol = p._defAudit?.P_gol_individual || 0.02;
+      const cs = defSeg ? defSeg.P_VI_combinada : 0.30;
+      if (pGol >= 0.08 && cs >= 0.35) return '🔥 <strong>Defensor Goleador Élite</strong>: Combina piso sólido de valla invicta MÁS amenaza aérea real en pelota parada. Candidato a bomba de 20+ pts.';
+      if (pGol >= 0.07) return '⚽ <strong>Defensor con Gol / Picante</strong>: Tiene llegada y remate constante. Si convierte de visitante sumará +11 puntos Gran DT.';
+      if (cs >= 0.40) return '🛡️ <strong>Defensor Sólido Puro</strong>: Excelente piso defensivo de valla invicta en su estadio sin asumir riesgos.';
+      if (cs >= 0.30) return '🔒 <strong>Defensor Titular Regular</strong>: Cruce parejo con chances equilibradas de mantener el cero.';
+      return '⚠️ <strong>Cruce Difícil / Riesgo Gol Rival</strong>: Visita un estadio adverso donde el rival genera mucho peligro. Se reducen sus chances de valla invicta.';
+    } else if (pos === 'VOL') {
+      const pGol = p._volAudit?.P_gol_individual || 0.10;
+      const gpm = (p.goals || 0) / Math.max(1, p.matchesRated || 4);
+      const cleanAvg = p._volAudit?.cleanNotaClarin || 5.5;
+      if (gpm >= 0.50 || pGol >= 0.20) return '🔥 <strong>Volante Llegador Top</strong>: En racha goleadora con alto volumen de tiros y presencia en el área rival.';
+      if (pGol >= 0.12) return '🎯 <strong>Titular Ofensivo Recomendado</strong>: Buen cruce para buscar gol (+6/+8 pts) y figura Clarín.';
+      if (cleanAvg >= 6.0) return '🛡️ <strong>Volante Regular Sólido</strong>: Aporta piso confiable de puntos con regularidad periodística Clarín.';
+      return '⚠️ <strong>Volante de Poco Aporte Ofensivo</strong>: Rol netamente táctico o contención con escasa probabilidad de gol o figura.';
+    } else {
+      const gpm = (p.goals || 0) / Math.max(1, p.matchesRated || 4);
+      const pGol = p._delAudit?.P_gol_individual || 0.30;
+      if (gpm >= 0.50 || pGol >= 0.35) return '🥇 <strong>Delantero Goleador Indiscutido</strong>: Hombre gol del torneo, titular indiscutido y máximo candidato a Figura Clarín (+4 pts).';
+      if (pGol >= 0.25) return '🎯 <strong>Delantero Titular Peligroso</strong>: Cruce propicio contra una defensa rival vulnerable.';
+      if (gpm === 0 || p.avgRating <= 5.2) return '❄️ <strong>Delantero en Sequía (0 Goles en 4 PJ)</strong>: Viene con bajo rendimiento individual, sin goles en el torneo y floja nota Clarín (5.0). No se recomienda ponerlo como titular hasta que corte la racha.';
+      return '⚠️ <strong>Rival Difícil / Poco Espacio</strong>: Enfrenta una de las defensas más cerradas del campeonato.';
+    }
+  }
+
+  // Construir las filas según la posición del jugador
+  let rowsData = [];
+  const bonusGol = (pos === 'DEF') ? (ctx?.isHome ? 9.0 : 11.0) : ((pos === 'VOL') ? (ctx?.isHome ? 6.0 : 8.0) : (ctx?.isHome ? 4.0 : 6.0));
+  const myGoalOdds = offSeg ? offSeg.teamGoalOdds : (ctx?.winOdds || 2.0);
+  const myGoalProb = offSeg ? offSeg.teamGoalProb : 0.70;
+  const rivWinOdds = ctx && ctx.winOdds ? (ctx.isHome ? (ctx.winOdds * 2.1) : (ctx.winOdds * 0.6)) : 3.5;
+  const rivGoalOdds = defSeg ? (1.0 / Math.max(0.2, defSeg.rivalExpGoals || 1.0) * 1.5) : 1.70;
+  const csProb = defSeg ? defSeg.P_VI_combinada : (ctx?.cleanSheetProb || 0.30);
+  const betCsProb = ctx?.cleanSheetProb || 0.35;
+  const rivSotAg = (offSeg && typeof offSeg.rivalSotAg === 'number') ? offSeg.rivalSotAg.toFixed(1) : '4.5';
+  const rivSotF = (defSeg && typeof defSeg.rivalSotFor === 'number') ? defSeg.rivalSotFor.toFixed(1) : '4.0';
+  const mySotAg = (defSeg && typeof defSeg.mySotAgainst === 'number') ? defSeg.mySotAgainst.toFixed(1) : '4.5';
+  const mySotF = (offSeg && typeof offSeg.mySotFor === 'number') ? offSeg.mySotFor.toFixed(1) : '4.5';
+  const potOf = offSeg ? offSeg.potencialOfensivoIndex : 0.60;
+  const rivalExpG = defSeg ? defSeg.rivalExpGoals : 1.0;
+  const playerShots = p.shotsPerMatch !== undefined ? p.shotsPerMatch : ((p.shots365 || 0) / Math.max(1, p.matches365 || 1));
+  const playerXg = p.xgPerMatch !== undefined ? p.xgPerMatch : ((p.xg365 || 0) / Math.max(1, p.matches365 || 1));
+  const pGol = p._defAudit?.P_gol_individual || p._volAudit?.P_gol_individual || p._delAudit?.P_gol_individual || 0.15;
+  const pFig = p._arqAudit?.P_figura || p._defAudit?.P_figura || p._volAudit?.P_figura || p._delAudit?.P_figura || 0.15;
+  const cleanAvg = p._arqAudit?.cleanNotaClarin || p._defAudit?.cleanNotaClarin || p._volAudit?.cleanNotaClarin || p._delAudit?.cleanNotaClarin || 5.50;
+  const allStandings = [...(appData.standings?.zonaA || []), ...(appData.standings?.zonaB || [])];
+  const pTeamNorm = (typeof normalizeTeamName === 'function' ? normalizeTeamName(p.team) : p.team).toLowerCase();
+  const teamStanding = allStandings.find(t => {
+    const tNorm = (typeof normalizeTeamName === 'function' ? normalizeTeamName(t.team) : t.team).toLowerCase();
+    return tNorm === pTeamNorm || tNorm.includes(pTeamNorm) || pTeamNorm.includes(tNorm);
+  });
+
+  const teamGc = teamStanding ? (teamStanding.gc !== undefined ? teamStanding.gc : 0) : 0;
+  const teamPj = teamStanding ? (teamStanding.pj || 4) : 4;
+  const pj = Math.max(1, p.matchesRated || p.pj || teamPj || 4);
+  const playerGc = p.goalsConceded !== undefined ? p.goalsConceded : (p.gc !== undefined ? p.gc : (teamStanding ? Math.round((teamGc * pj) / Math.max(1, teamPj)) : 0));
+  const playerCs = p.cleanSheets !== undefined ? p.cleanSheets : 0;
+  const gpm = (p.goals || 0) / pj;
+
+  // Helper universal para calcular badges de percentil con colores y rankings
+  function calcPctBadge(val, arr, higherIsBetter = true) {
+    if (!arr || !arr.length) return `<span style="background:rgba(56,189,248,0.18);color:#38bdf8;padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">🟦 P50</span>`;
+    const sorted = [...arr].sort((a, b) => higherIsBetter ? b - a : a - b);
+    const rank = sorted.findIndex(x => higherIsBetter ? x <= val : x >= val) + 1 || 1;
+    const pct = Math.min(99, Math.max(1, Math.round(((sorted.length - rank + 1) / sorted.length) * 100)));
+    const badgeColor = pct >= 80 ? '#10b981' : (pct >= 50 ? '#38bdf8' : '#f59e0b');
+    const badgeBg = pct >= 80 ? 'rgba(16,185,129,0.18)' : (pct >= 50 ? 'rgba(56,189,248,0.18)' : 'rgba(245,158,11,0.18)');
+    const icon = pct >= 80 ? '🟩' : (pct >= 50 ? '🟦' : '🟧');
+    const topText = pct >= 50 ? `(Top ${Math.max(1, 100 - pct)}% - #${rank}/${sorted.length})` : `(#${rank}/${sorted.length})`;
+    return `<span style="background:${badgeBg};color:${badgeColor};padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">${icon} P${pct}</span> <span style="font-size:0.82rem;color:var(--text-muted);">${topText}</span>`;
+  }
+
+  const rivSotVal = parseFloat(rivSotAg) || 4.5;
+  const rivSotPct = Math.min(99, Math.max(1, Math.round(((rivSotVal - 2.5) / (7.0 - 2.5)) * 100)));
+  const rivDefColor = rivSotPct >= 70 ? '#10b981' : (rivSotPct >= 40 ? '#38bdf8' : '#f59e0b');
+  const rivDefBg = rivSotPct >= 70 ? 'rgba(16,185,129,0.18)' : (rivSotPct >= 40 ? 'rgba(56,189,248,0.18)' : 'rgba(245,158,11,0.18)');
+  const rivDefBadge = `<span style="background:${rivDefBg};color:${rivDefColor};padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">${rivSotPct >= 70 ? '🟩' : (rivSotPct >= 40 ? '🟦' : '🟧')} P${rivSotPct}</span> <span style="font-size:0.82rem;color:var(--text-muted);">${rivSotPct >= 70 ? '(Defensa muy frágil)' : (rivSotPct <= 30 ? '(Defensa sólida)' : '(Defensa media)')}</span>`;
+
+  const potOfPct = Math.min(99, Math.max(1, Math.round(potOf * 100)));
+  const potOfColor = potOfPct >= 70 ? '#10b981' : (potOfPct >= 45 ? '#38bdf8' : '#f59e0b');
+  const potOfBg = potOfPct >= 70 ? 'rgba(16,185,129,0.18)' : (potOfPct >= 45 ? 'rgba(56,189,248,0.18)' : 'rgba(245,158,11,0.18)');
+  const potOfBadge = `<span style="background:${potOfBg};color:${potOfColor};padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">${potOfPct >= 70 ? '🟩' : (potOfPct >= 45 ? '🟦' : '🟧')} P${potOfPct}</span> <span style="font-size:0.82rem;color:var(--text-muted);">${potOfPct >= 70 ? '(Generación alta)' : '(Generación media/baja)'}</span>`;
+
+  const bonusBadge = !ctx.isHome 
+    ? `<span style="background:rgba(16,185,129,0.18);color:#10b981;padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">🟩 P100</span> <span style="font-size:0.82rem;color:var(--text-muted);">(+${bonusGol.toFixed(0)} pts - Gol Visitante Gran DT)</span>`
+    : `<span style="background:rgba(56,189,248,0.18);color:#38bdf8;padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">🟦 P50</span> <span style="font-size:0.82rem;color:var(--text-muted);">(+${bonusGol.toFixed(0)} pts - Gol Local Gran DT)</span>`;
+
+  const totalXgStr = (p.xg365 || (playerXg * pj)).toFixed(2);
+  const totalShotsStr = (p.shots365 || Math.round(playerShots * pj)).toFixed(0);
+
+  let tableRows = [];
+  let epCalculado = '';
+  let epFormulaStr = '';
+  let techoExpStr = '';
+
   if (pos === 'ARQ') {
-    const arqAudit = p._arqAudit || {};
-    const csProb = defSeg ? defSeg.P_VI_combinada : (ctx ? ctx.cleanSheetProb : 0.30);
-    const rivalXg = defSeg ? defSeg.rivalExpGoals : (ctx ? ctx.expGoalsRival : 1.0);
-    const winProb = defSeg ? defSeg.winProb : 0.40;
-    const arqAvg = arqAudit.cleanNotaClarin || 5.50;
-    const pj = Math.max(1, p.matchesRated || p.pj || 1);
-    const csRate = (p.cleanSheets || 0) / pj;
+    const allArqCs = posPool.map(x => x._arqAudit?.P_VI_combinada || (x._arqSnapshot?.P_VI_combinada || 0.30));
+    const allArqRivalExpG = posPool.map(x => x._arqAudit?.rivalExpG || (x._arqSnapshot?.rivalExpGoals || 1.10));
+    const standingsGc = findTeamStandings(p.team)?.gc;
+    const realPlayerGc = (p.goalsConceded !== undefined && p.goalsConceded > 0) ? p.goalsConceded : (standingsGc !== undefined ? standingsGc : (p.gc || 0));
 
-    blocks = [
-      { name: '1. P(Valla Invicta Combinada) Segmento Defensivo', weight: '45%', val: `${(csProb * 100).toFixed(1)}% P(VI)`, rp: calcRankAndPercentile(csProb, posPool.map(x => (x._arqAudit?.P_VI_combinada || 0.3)), true), desc: 'Cuota Bet365 + Solidez L/V + Inofensividad rival' },
-      { name: '2. Goles Esperados del Rival (rivalExpGoals)', weight: '20%', val: `${rivalXg.toFixed(2)} xG Riv`, rp: calcRankAndPercentile(rivalXg, allRivalExpGoals, false), desc: 'Menos peligro rival = Mayor probabilidad de puntaje alto' },
-      { name: '3. Probabilidad Victoria / Favoritismo (Bet365)', weight: '15%', val: `${(winProb * 100).toFixed(1)}% Triunfo`, rp: calcRankAndPercentile(winProb, allWinOdds, true), desc: 'Control del partido por el equipo propio' },
-      { name: '4. Ficha Clarín Base Periodística (Limpia)', weight: '10%', val: `${arqAvg.toFixed(2)} pts Clarín`, rp: calcRankAndPercentile(arqAvg, posRatings, true), desc: 'Nota periodística normalizada de 5.0 a 6.0' },
-      { name: '5. Tasa Histórica Valla Invicta & Tarjetas', weight: '10%', val: `${(csRate * 100).toFixed(0)}% (${p.cleanSheets || 0}/${pj} PJ)`, rp: calcRankAndPercentile(csRate, posCsRate, true), desc: 'Efectividad en mantener el arco en cero' }
+    const rivalStats = getTeamStats(ctx?.rival);
+    const rivSotFor = (ctx?.isHome ? (rivalStats?.away?.shotsOnTargetForPerMatch || rivalStats?.total?.shotsOnTargetForPerMatch) : (rivalStats?.home?.shotsOnTargetForPerMatch || rivalStats?.total?.shotsOnTargetForPerMatch)) || 4.2;
+
+    const allArqCsReal = posPool.map(x => (x.cleanSheets || 0));
+    const allArqGcPerMatch = posPool.map(x => {
+      const stGc = findTeamStandings(x.team)?.gc;
+      const g = (x.goalsConceded !== undefined && x.goalsConceded > 0) ? x.goalsConceded : (stGc !== undefined ? stGc : (x.gc || 0));
+      return g / Math.max(1, x.matchesRated || x.pj || 4);
+    });
+    const allArqSotAg = posPool.map(x => (x._arqAudit?.defSeg?.mySotAgainst || 4.0));
+    const allArqRivSotFor = posPool.map(x => {
+      const c = getFixtureContext(x.team);
+      const rSt = getTeamStats(c?.rival);
+      return rSt?.total?.shotsOnTargetForPerMatch || 4.2;
+    });
+    const allArqWinProb = posPool.map(x => (x._arqAudit?.defSeg?.winProb || 0.40));
+    const allArqCleanAvg = posPool.map(x => (x.avgRating || 6.0));
+    const allArqViRate = posPool.map(x => {
+      const pjX = Math.max(1, x.matchesRated || x.pj || 4);
+      return (x.cleanSheets || 0) / pjX;
+    });
+
+    const csBadge = calcPctBadge(csProb, allArqCs, true);
+    const rivExpGBadge = calcPctBadge(rivalExpG, allArqRivalExpG, false);
+    const csRealBadge = calcPctBadge(playerCs, allArqCsReal, true);
+    const gcBadge = calcPctBadge(realPlayerGc / pj, allArqGcPerMatch, false);
+    const sotAgBadge = calcPctBadge(parseFloat(mySotAg) || 4.0, allArqSotAg, false);
+    const rivSotForBadge = calcPctBadge(rivSotFor, allArqRivSotFor, false);
+    const cleanAvgBadge = calcPctBadge(cleanAvg, allArqCleanAvg, true);
+    const viRateBadge = calcPctBadge(playerCs / pj, allArqViRate, true);
+
+    const localiaBadge = ctx?.isHome 
+      ? `<span style="background:rgba(16,185,129,0.18);color:#10b981;padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">🟩 P100</span> <span style="font-size:0.82rem;color:var(--text-muted);">(Ventaja de Localía +3.0 VI)</span>`
+      : `<span style="background:rgba(245,158,11,0.18);color:#f59e0b;padding:3px 8px;border-radius:6px;font-weight:800;font-size:0.85rem;">🟧 P35</span> <span style="font-size:0.82rem;color:var(--text-muted);">(Visitante - Riesgo -1 pt/GC)</span>`;
+
+    tableRows = [
+      { num: '1. P(Valla Invicta) Combinada', weight: '30%', val: `<strong>${(csProb * 100).toFixed(1)}% P(VI)</strong>`, badge: csBadge },
+      { num: '2. Goles Esperados Rival (xG Concedido)', weight: '15%', val: `<strong>${rivalExpG.toFixed(2)} xG Rival</strong>`, badge: rivExpGBadge },
+      { num: '3. Vallas Invictas Reales (Torneo)', weight: '10%', val: `<strong>${playerCs} Vallas Invictas</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${Math.round((playerCs / pj) * 100)}% de efectividad en ${pj} PJ)</span>`, badge: csRealBadge },
+      { num: '4. Goles Concedidos Reales (Torneo)', weight: '10%', val: `<strong>${realPlayerGc} Goles Concedidos</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${(realPlayerGc / pj).toFixed(2)} por partido)</span>`, badge: gcBadge },
+      { num: '5. Tiros Concedidos por mi Club', weight: '10%', val: `<strong>${mySotAg} tiros/p</strong>`, badge: sotAgBadge },
+      { num: '6. Tiros al Arco del Rival / Peligro', weight: '10%', val: `<strong>${rivSotFor.toFixed(1)} tiros/p</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(Ataque de ${ctx?.rival || 'Rival'})</span>`, badge: rivSotForBadge },
+      { num: '7. Condición de Localía Gran DT', weight: '5%', val: `<strong>${ctx?.isHome ? '🏠 Local (+3 pts VI)' : '✈️ Visitante'}</strong>`, badge: localiaBadge },
+      { num: '8. Ficha Base Clarín Limpia', weight: '5%', val: `<strong>${cleanAvg.toFixed(2)} pts</strong>`, badge: cleanAvgBadge },
+      { num: '9. Fiabilidad Valla Invicta (Torneo)', weight: '5%', val: `<strong>${Math.round((playerCs / pj) * 100)}% Efectividad</strong>`, badge: viRateBadge }
     ];
 
-    formulaText = `EP = (NotaClarínLimpia * 0.75) + (P_VI_combinada * 3.0) - (RivalExpGoals * 1.0) + (TasaVI * 0.40) - Tarjetas`;
-    subFormulaCalc = `EP = (${arqAvg.toFixed(2)} * 0.75) + (${csProb.toFixed(3)} * 3.0) - (${rivalXg.toFixed(2)} * 1.0) + (${csRate.toFixed(2)} * 0.40) - ${((p.yellowCards || 0) * 0.25).toFixed(2)} = <strong>${(p.rawEP || (p.finalScore / 10)).toFixed(2)} pts</strong>`;
-  }
-  if (pos === 'ARQ') {
-    const arqAudit = p._arqAudit || {};
-    const csProb = defSeg ? defSeg.P_VI_combinada : (ctx ? ctx.cleanSheetProb : 0.30);
-    const rivalXg = defSeg ? defSeg.rivalExpGoals : (ctx ? ctx.expGoalsRival : 1.10);
-    const winProb = defSeg ? defSeg.winProb : 0.40;
-    const arqAvg = arqAudit.cleanNotaClarin || 5.50;
-    const pj = Math.max(1, p.matchesRated || p.pj || 1);
-    const csRate = (p.cleanSheets || 0) / pj;
+    epCalculado = ((cleanAvg * 0.75) + (csProb * 3.0) - (rivalExpG * 1.0) + ((playerCs / pj) * 0.25) - ((p.yellowCards || 0) * 0.25)).toFixed(2);
+    epFormulaStr = `(${cleanAvg.toFixed(2)} × 0.75) + (${(csProb * 100).toFixed(1)}% × 3.0) - (${rivalExpG.toFixed(2)} × 1.0) + (${Math.round((playerCs / pj) * 100)}% × 0.25)`;
+    techoExpStr = `${(cleanAvg + 3.0).toFixed(1)} pts reales (Ficha ${cleanAvg.toFixed(1)} + 3.0 Valla Invicta)`;
 
-    blocks = [
-      { name: '1. P(Valla Invicta Combinada) Segmento Defensivo', weight: '45%', val: `${(csProb * 100).toFixed(1)}% P(VI)`, rp: calcRankAndPercentile(csProb, posPool.map(x => (x._arqAudit?.P_VI_combinada || 0.3)), true), desc: 'Cuota Bet365 + Solidez L/V + Inofensividad rival' },
-      { name: '2. Goles Esperados del Rival (rivalExpGoals Calibrado)', weight: '20%', val: `${rivalXg.toFixed(2)} xG Riv`, rp: calcRankAndPercentile(rivalXg, allRivalExpGoals, false), desc: 'Peligro rival con factor calibrado sin doble penalización' },
-      { name: '3. Probabilidad Victoria / Favoritismo (Bet365)', weight: '15%', val: `${(winProb * 100).toFixed(1)}% Triunfo`, rp: calcRankAndPercentile(winProb, allWinOdds, true), desc: 'Control del partido por el equipo propio' },
-      { name: '4. Ficha Clarín Base Periodística (Limpia)', weight: '10%', val: `${arqAvg.toFixed(2)} pts Clarín`, rp: calcRankAndPercentile(arqAvg, posRatings, true), desc: 'Nota periodística normalizada de 5.0 a 6.0' },
-      { name: '5. Tasa Histórica Valla Invicta & Tarjetas', weight: '10%', val: `${(csRate * 100).toFixed(0)}% (${p.cleanSheets || 0}/${pj} PJ)`, rp: calcRankAndPercentile(csRate, posCsRate, true), desc: 'Efectividad en mantener el arco en cero' }
+  } else if (pos === 'DEF') {
+    const allDefCs = posPool.map(x => x._defAudit?.P_VI_combinada || 0.30);
+    const allDefP_gol = posPool.map(x => x._defAudit?.P_gol_individual || 0.03);
+    const allDefXg = posPool.map(x => x.xgPerMatch !== undefined ? x.xgPerMatch : ((x.xg365 || 0) / Math.max(1, x.matches365 || 1)));
+    const allDefShots = posPool.map(x => x.shotsPerMatch !== undefined ? x.shotsPerMatch : ((x.shots365 || 0) / Math.max(1, x.matches365 || 1)));
+    const allDefGpm = posPool.map(x => (x.goals || 0) / Math.max(1, x.matchesRated || x.pj || 4));
+    const allDefCleanAvg = posPool.map(x => (x.avgRating || 6.0));
+    const allDefViRate = posPool.map(x => (x.cleanSheets || 0) / Math.max(1, x.matchesRated || x.pj || 4));
+
+    const csBadge = calcPctBadge(csProb, allDefCs, true);
+    const pGolBadge = calcPctBadge(pGol, allDefP_gol, true);
+    const xgBadge = calcPctBadge(playerXg, allDefXg, true);
+    const shotsBadge = calcPctBadge(playerShots, allDefShots, true);
+    const gpmBadge = calcPctBadge(gpm, allDefGpm, true);
+    const cleanAvgBadge = calcPctBadge(cleanAvg, allDefCleanAvg, true);
+    const viRateBadge = calcPctBadge(playerCs / pj, allDefViRate, true);
+
+    tableRows = [
+      { num: '1. P(Valla Invicta) Combinada', weight: '35%', val: `<strong>${(csProb * 100).toFixed(1)}% P(VI)</strong>`, badge: csBadge },
+      { num: '2. P(Gol) Individual Calculada', weight: '15%', val: `<strong>${(pGol * 100).toFixed(1)}% P(Gol)</strong>`, badge: pGolBadge },
+      { num: '3. xG Individual / Peligro Aéreo', weight: '10%', val: `<strong>${playerXg.toFixed(2)} xG/p</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${totalXgStr} xG Total en ${pj} PJ)</span>`, badge: xgBadge },
+      { num: '4. Tiros Individuales por Partido', weight: '10%', val: `<strong>${playerShots.toFixed(1)} tiros/p</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${totalShotsStr} tiros en ${pj} PJ)</span>`, badge: shotsBadge },
+      { num: '5. Goles Reales & GPM (Torneo)', weight: '10%', val: `<strong>${p.goals || 0} Goles (${gpm.toFixed(2)} GPM)</strong>`, badge: gpmBadge },
+      { num: '6. Vulnerabilidad Defensiva Rival', weight: '5%', val: `<strong>${rivSotAg} tiros/p</strong>`, badge: rivDefBadge },
+      { num: '7. Bonus Gran DT por Gol', weight: '5%', val: `<strong>+${bonusGol.toFixed(0)} pts Gol</strong> <em>(${ctx?.isHome ? 'Local' : 'Visitante'})</em>`, badge: bonusBadge },
+      { num: '8. Ficha Base Clarín Limpia', weight: '5%', val: `<strong>${cleanAvg.toFixed(2)} pts</strong>`, badge: cleanAvgBadge },
+      { num: '9. Fiabilidad Valla Invicta (Torneo)', weight: '5%', val: `<strong>${Math.round((playerCs / pj) * 100)}% Efectividad</strong>`, badge: viRateBadge }
     ];
 
-    formulaText = `EP = (NotaClarínLimpia * 0.65) + (P_VI_combinada * 3.2) - (RivalExpGoals * 0.50) + (TasaVI * 0.30) - Tarjetas`;
-    subFormulaCalc = `EP = (${arqAvg.toFixed(2)} * 0.65) + (${csProb.toFixed(3)} * 3.2) - (${rivalXg.toFixed(2)} * 0.50) + (${csRate.toFixed(2)} * 0.30) - ${((p.yellowCards || 0) * 0.25).toFixed(2)} = <strong>${(p.rawEP || (p.finalScore / 10)).toFixed(2)} pts</strong>`;
-  }
-  else if (pos === 'DEF') {
-    const defAudit = p._defAudit || {};
-    const csProb = defSeg ? defSeg.P_VI_combinada : 0.30;
-    const playerShots = p.shotsPerMatch !== undefined ? p.shotsPerMatch : ((p.shots365 || 0) / Math.max(1, p.matches365 || 1));
-    const playerXg = p.xgPerMatch !== undefined ? p.xgPerMatch : ((p.xg365 || 0) / Math.max(1, p.matches365 || 1));
-    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.60;
-    const bonusGol = ctx && ctx.isHome ? 9.0 : 11.0;
-    const pGol = defAudit.P_gol_individual || 0.03;
-    const pFig = defAudit.P_figura || 0.10;
-    const defAvg = defAudit.cleanNotaClarin || 5.50;
-    const pisoSol = defAudit.pisoSolido || ((defAvg * 0.70) + (csProb * 2.1));
+    epCalculado = ((cleanAvg * 0.75) + (csProb * 2.0) + (pGol * bonusGol) - ((p.yellowCards || 0) * 0.25)).toFixed(2);
+    epFormulaStr = `(${cleanAvg.toFixed(2)} × 0.75) + (${(csProb * 100).toFixed(1)}% × 2.0) + (${(pGol * 100).toFixed(1)}% × ${bonusGol})`;
+    techoExpStr = `${(cleanAvg + 2.0 + bonusGol).toFixed(1)} pts reales (Ficha + 2.0 VI + Gol +${bonusGol.toFixed(0)})`;
 
-    blocks = [
-      { name: '1. Piso Sólido: P(Valla Invicta) [100% Idéntica al ARQ]', weight: '40%', val: `${(csProb * 100).toFixed(1)}% P(VI) | ${pisoSol.toFixed(2)} Piso`, rp: calcRankAndPercentile(csProb, posPool.map(x => (x._defAudit?.P_VI_combinada || 0.3)), true), desc: 'Solidez defensiva del club unificada para sumar +2 pts de base segura' },
-      { name: '2. Techo Picante: Peligro Goleador Real (npxG Aislado)', weight: '25%', val: `${(pGol * 100).toFixed(1)}% P(Gol) | +${bonusGol} pts`, rp: calcRankAndPercentile(pGol, posPool.map(x => (x._defAudit?.P_gol_individual || 0.02)), true), desc: 'Amenaza de gol en jugada + penales oficiales (busca bombas de 18-25 pts)' },
-      { name: '3. Potencial Ofensivo del Club (Segmento Ofensivo)', weight: '15%', val: `${(potOfensivo * 100).toFixed(0)}% Potencial`, rp: calcRankAndPercentile(potOfensivo, posPool.map(x => (x._defAudit?.offSeg?.potencialOfensivoIndex || 0.5)), true), desc: 'Cuota gol del equipo propio y vulnerabilidad rival' },
-      { name: '4. Valor del Gol Gran DT (+9 Loc / +11 Vis)', weight: '10%', val: `+${bonusGol.toFixed(0)} pts (${ctx ? (ctx.isHome ? '🏠 Local' : '✈️ Visitante') : 'Local'})`, rp: calcRankAndPercentile(bonusGol, [9, 11], true, { isRuleBonus: true }), desc: 'Reglamento Gran DT (+9 base +2 visitante)' },
-      { name: '5. P(Figura) & Ficha Clarín Limpia (5.0 a 6.0)', weight: '10%', val: `${(pFig * 100).toFixed(1)}% P(Fig) | ${defAvg.toFixed(2)} Ficha`, rp: calcRankAndPercentile(pFig, posPool.map(x => (x._defAudit?.P_figura || 0.1)), true), desc: '38% de figura si combina Gol + VI + Ficha limpia' }
+  } else if (pos === 'VOL') {
+    const allVolP_gol = posPool.map(x => x._volAudit?.P_gol_individual || 0.10);
+    const allVolXg = posPool.map(x => x.xgPerMatch !== undefined ? x.xgPerMatch : ((x.xg365 || 0) / Math.max(1, x.matches365 || 1)));
+    const allVolShots = posPool.map(x => x.shotsPerMatch !== undefined ? x.shotsPerMatch : ((x.shots365 || 0) / Math.max(1, x.matches365 || 1)));
+    const allVolGpm = posPool.map(x => (x.goals || 0) / Math.max(1, x.matchesRated || x.pj || 4));
+    const allVolCleanAvg = posPool.map(x => (x.avgRating || 5.5));
+    const allVolTotalXg = posPool.map(x => (x.xg365 || 0));
+
+    const pGolBadge = calcPctBadge(pGol, allVolP_gol, true);
+    const xgBadge = calcPctBadge(playerXg, allVolXg, true);
+    const shotsBadge = calcPctBadge(playerShots, allVolShots, true);
+    const gpmBadge = calcPctBadge(gpm, allVolGpm, true);
+    const cleanAvgBadge = calcPctBadge(cleanAvg, allVolCleanAvg, true);
+    const totalXgBadge = calcPctBadge(p.xg365 || 0, allVolTotalXg, true);
+
+    tableRows = [
+      { num: '1. P(Gol) Individual Calculada', weight: '25%', val: `<strong>${(pGol * 100).toFixed(1)}% P(Gol)</strong>`, badge: pGolBadge },
+      { num: '2. xG Individual Generado', weight: '15%', val: `<strong>${playerXg.toFixed(2)} xG/p</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${totalXgStr} xG Total en ${pj} PJ)</span>`, badge: xgBadge },
+      { num: '3. Tiros Individuales por Partido', weight: '10%', val: `<strong>${playerShots.toFixed(1)} tiros/p</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${totalShotsStr} tiros en ${pj} PJ)</span>`, badge: shotsBadge },
+      { num: '4. Goles Reales & GPM (Torneo)', weight: '10%', val: `<strong>${p.goals || 0} Goles (${gpm.toFixed(2)} GPM)</strong>`, badge: gpmBadge },
+      { num: '5. Vulnerabilidad Defensiva Rival', weight: '10%', val: `<strong>${rivSotAg} tiros/p</strong>`, badge: rivDefBadge },
+      { num: '6. Potencial Ofensivo del Club', weight: '10%', val: `<strong>${(potOf * 100).toFixed(1)}% Potencial</strong>`, badge: potOfBadge },
+      { num: '7. Bonus Gran DT por Gol', weight: '10%', val: `<strong>+${bonusGol.toFixed(0)} pts</strong> <em>(${ctx?.isHome ? 'Local' : 'Visitante'})</em>`, badge: bonusBadge },
+      { num: '8. Ficha Base Clarín Limpia', weight: '10%', val: `<strong>${cleanAvg.toFixed(2)} pts</strong>`, badge: cleanAvgBadge },
+      { num: '9. Goles Esperados Totales (365Scores)', weight: '10%', val: `<strong>${(p.xg365 || 0).toFixed(2)} xG Acumulado</strong>`, badge: totalXgBadge }
     ];
 
-    formulaText = `PisoSólido = (NotaClarínLimpia * 0.70) + (P_VI_combinada * 2.1)\nP(Gol) = (0.50 * PeligroDEF * PotOfensivo) + (0.35 * npxG) + Penales\nEP = PisoSólido + (P_gol * bonusGolDEF) + (P_figura * 4.0) - Tarjetas`;
-    subFormulaCalc = `Piso: <strong>${pisoSol.toFixed(2)} pts</strong> | P(Gol): <strong>${(pGol * 100).toFixed(1)}%</strong> | EP: (${defAvg.toFixed(2)} * 0.70) + (${csProb.toFixed(3)} * 2.1) + (${pGol.toFixed(3)} * ${bonusGol}) + (${pFig.toFixed(3)} * 4.0) - ${((p.yellowCards || 0) * 0.25).toFixed(2)} = <strong>${(p.rawEP || (p.finalScore / 10)).toFixed(2)} pts</strong>`;
-  }
-  else if (pos === 'VOL') {
-    const volAudit = p._volAudit || {};
-    const playerShots = p.shotsPerMatch !== undefined ? p.shotsPerMatch : ((p.shots365 || 0) / Math.max(1, p.matches365 || 1));
-    const playerXg = p.xgPerMatch !== undefined ? p.xgPerMatch : ((p.xg365 || 0) / Math.max(1, p.matches365 || 1));
-    const teamGoalProb = offSeg ? offSeg.teamGoalProb : 0.72;
-    const bonusGol = ctx && ctx.isHome ? 6.0 : 8.0;
-    const pGol = volAudit.P_gol_individual || 0.15;
-    const pFig = volAudit.P_figura || 0.15;
-    const volAvg = volAudit.cleanNotaClarin || 5.50;
-    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.60;
+    epCalculado = ((cleanAvg * 0.72) + (pGol * bonusGol) - ((p.yellowCards || 0) * 0.25)).toFixed(2);
+    epFormulaStr = `(${cleanAvg.toFixed(2)} × 0.72) + (${(pGol * 100).toFixed(1)}% × ${bonusGol})`;
+    techoExpStr = `${(cleanAvg + bonusGol).toFixed(1)} pts reales (Ficha + Gol +${bonusGol.toFixed(0)})`;
 
-    blocks = [
-      { name: '1. Segmento Ofensivo del Club (Cuota Gol Bet365)', weight: '35%', val: `${(teamGoalProb * 100).toFixed(0)}% P(Gol Eq) | ${(potOfensivo * 100).toFixed(0)}% Pot`, rp: calcRankAndPercentile(potOfensivo, posPool.map(x => (x._volAudit?.offSeg?.potencialOfensivoIndex || 0.5)), true), desc: 'Cuota de gol del club, tiros proyectados y rival' },
-      { name: '2. Amenaza Individual de Gol (npxG Aislado)', weight: '25%', val: `${(pGol * 100).toFixed(1)}% P(Gol) | ${playerXg.toFixed(2)} npxG`, rp: calcRankAndPercentile(pGol, posPool.map(x => (x._volAudit?.P_gol_individual || 0.05)), true), desc: 'Peligro individual de juego abierto sin penales' },
-      { name: '3. Tiros por Partido del Volante (365Scores)', weight: '15%', val: `${playerShots.toFixed(2)} tiros/p`, rp: calcRankAndPercentile(playerShots, posShots, true), desc: 'Volumen individual de remates en 365Scores' },
-      { name: '4. Valor del Gol Gran DT (+6 Loc / +8 Vis)', weight: '15%', val: `+${bonusGol.toFixed(0)} pts (${ctx ? (ctx.isHome ? '🏠 Local' : '✈️ Visitante') : 'Local'})`, rp: calcRankAndPercentile(bonusGol, [6, 8], true, { isRuleBonus: true }), desc: 'Reglamento Gran DT (+6 base +2 visitante)' },
-      { name: '5. P(Figura) & Ficha Clarín Limpia (5.0 a 6.0)', weight: '10%', val: `${(pFig * 100).toFixed(1)}% P(Fig) | ${volAvg.toFixed(2)} Ficha`, rp: calcRankAndPercentile(pFig, posPool.map(x => (x._volAudit?.P_figura || 0.15)), true), desc: 'Probabilidad de figura escalada con victoria Bet365' }
+  } else {
+    const allDelP_gol = posPool.map(x => x._delAudit?.P_gol_individual || 0.15);
+    const allDelXg = posPool.map(x => x.xgPerMatch !== undefined ? x.xgPerMatch : ((x.xg365 || 0) / Math.max(1, x.matches365 || 1)));
+    const allDelShots = posPool.map(x => x.shotsPerMatch !== undefined ? x.shotsPerMatch : ((x.shots365 || 0) / Math.max(1, x.matches365 || 1)));
+    const allDelGpm = posPool.map(x => (x.goals || 0) / Math.max(1, x.matchesRated || x.pj || 4));
+    const allDelCleanAvg = posPool.map(x => (x.avgRating || 6.0));
+    const allDelGoals = posPool.map(x => (x.goals || 0));
+
+    const pGolBadge = calcPctBadge(pGol, allDelP_gol, true);
+    const xgBadge = calcPctBadge(playerXg, allDelXg, true);
+    const shotsBadge = calcPctBadge(playerShots, allDelShots, true);
+    const gpmBadge = calcPctBadge(gpm, allDelGpm, true);
+    const cleanAvgBadge = calcPctBadge(cleanAvg, allDelCleanAvg, true);
+    const goalsBadge = calcPctBadge(p.goals || 0, allDelGoals, true);
+
+    tableRows = [
+      { num: '1. P(Gol) Individual Calculada', weight: '30%', val: `<strong>${(pGol * 100).toFixed(1)}% P(Gol)</strong>`, badge: pGolBadge },
+      { num: '2. xG Individual Generado', weight: '15%', val: `<strong>${playerXg.toFixed(2)} xG/p</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${totalXgStr} xG Total en ${pj} PJ)</span>`, badge: xgBadge },
+      { num: '3. Tiros Individuales por Partido', weight: '10%', val: `<strong>${playerShots.toFixed(1)} tiros/p</strong> <span style="font-size:0.80rem;color:var(--text-muted);display:block;">(${totalShotsStr} tiros en ${pj} PJ)</span>`, badge: shotsBadge },
+      { num: '4. Goles Reales & GPM (Torneo)', weight: '10%', val: `<strong>${p.goals || 0} Goles (${gpm.toFixed(2)} GPM)</strong>`, badge: gpmBadge },
+      { num: '5. Vulnerabilidad Defensiva Rival', weight: '15%', val: `<strong>${rivSotAg} tiros/p</strong>`, badge: rivDefBadge },
+      { num: '6. Potencial Ofensivo del Club', weight: '10%', val: `<strong>${(potOf * 100).toFixed(1)}% Potencial</strong>`, badge: potOfBadge },
+      { num: '7. Bonus Gran DT por Gol', weight: '10%', val: `<strong>+${bonusGol.toFixed(0)} pts</strong> <em>(${ctx?.isHome ? 'Local' : 'Visitante'})</em>`, badge: bonusBadge },
+      { num: '8. Ficha Base Clarín Limpia', weight: '5%', val: `<strong>${cleanAvg.toFixed(2)} pts</strong>`, badge: cleanAvgBadge },
+      { num: '9. Goles Concretados en Torneo', weight: '5%', val: `<strong>${p.goals || 0} Goles Oficiales</strong>`, badge: goalsBadge }
     ];
 
-    formulaText = `P(Gol) = (0.50 * PeligroVOL * PotOfensivo) + (0.35 * npxG) + Penales\nEP = (NotaClarínLimpia * 0.65) + (P_gol * bonusGolVOL) + (P_figura * 4.0) - Tarjetas`;
-    subFormulaCalc = `P(Gol): <strong>${(pGol * 100).toFixed(1)}%</strong> | Ficha: <strong>${volAvg.toFixed(2)}</strong> | EP: (${volAvg.toFixed(2)} * 0.65) + (${pGol.toFixed(3)} * ${bonusGol}) + (${pFig.toFixed(3)} * 4.0) - ${((p.yellowCards || 0) * 0.25).toFixed(2)} = <strong>${(p.rawEP || (p.finalScore / 10)).toFixed(2)} pts</strong>`;
-  }
-  else if (pos === 'DEL') {
-    const playerXg = p.xgPerMatch !== undefined ? p.xgPerMatch : ((p.xg365 || 0) / Math.max(1, p.matches365 || 1));
-    const playerShots = p.shotsPerMatch !== undefined ? p.shotsPerMatch : ((p.shots365 || 0) / Math.max(1, p.matches365 || 1));
-    const teamGoalProb = offSeg ? offSeg.teamGoalProb : 0.72;
-    const teamExpG = offSeg ? offSeg.teamExpGoals : 1.20;
-    const bonusGol = ctx && ctx.isHome ? 4.0 : 6.0;
-    const delAudit = p._delAudit || {};
-    const pGol = delAudit.P_gol_individual || 0.30;
-    const pFig = delAudit.P_figura || 0.20;
-    const delAvg = delAudit.cleanNotaClarin || 5.50;
-    const potOfensivo = offSeg ? offSeg.potencialOfensivoIndex : 0.60;
-
-    blocks = [
-      { name: '1. Segmento Ofensivo del Club (Cuota Gol Bet365)', weight: '35%', val: `${(teamGoalProb * 100).toFixed(0)}% P(Gol) | ${teamExpG.toFixed(2)} xG Eq`, rp: calcRankAndPercentile(potOfensivo, posPool.map(x => (x._delAudit?.offSeg?.potencialOfensivoIndex || 0.5)), true), desc: 'Cuota de gol del club, xG proyectado del partido y probabilidad de victoria' },
-      { name: '2. Amenaza Individual de Gol (npxG Aislado + Tiros)', weight: '30%', val: `${(pGol * 100).toFixed(1)}% P(Gol) | ${playerXg.toFixed(2)} npxG`, rp: calcRankAndPercentile(pGol, posPool.map(x => (x._delAudit?.P_gol_individual || 0.2)), true), desc: 'Peligro individual de juego abierto sin penales + penales oficiales' },
-      { name: '3. Vulnerabilidad Defensiva Rival en su Condición', weight: '15%', val: `${(offSeg && offSeg.scoreRivalDefWeakness ? (offSeg.scoreRivalDefWeakness * 100).toFixed(0) : 60)}% Fragilidad`, rp: calcRankAndPercentile(offSeg?.scoreRivalDefWeakness || 0.5, posPool.map(x => (x._delAudit?.offSeg?.scoreRivalDefWeakness || 0.5)), true), desc: 'Tiros concedidos y goles recibidos por el rival L/V' },
-      { name: '4. Valor del Gol Gran DT (+4 Loc / +6 Vis)', weight: '10%', val: `+${bonusGol.toFixed(0)} pts (${ctx ? (ctx.isHome ? '🏠 Local' : '✈️ Visitante') : 'Local'})`, rp: calcRankAndPercentile(bonusGol, [4, 6], true, { isRuleBonus: true }), desc: 'Reglamento Gran DT (+4 base +2 visitante)' },
-      { name: '5. P(Figura Clarín +4 pts) [40.7% son DEL]', weight: '10%', val: `${(pFig * 100).toFixed(1)}% P(Fig) | ${delAvg.toFixed(2)} Ficha`, rp: calcRankAndPercentile(pFig, posPool.map(x => (x._delAudit?.P_figura || 0.2)), true), desc: 'Puesto #1 en figuras de toda la Liga + Ficha limpia' }
-    ];
-
-    formulaText = `P(Gol) = (0.50 * PeligroDEL * PotOfensivo) + (0.35 * npxG) + Penales\nEP = (NotaClarínLimpia * 0.65) + (P_gol * bonusGolDEL) + (P_figura * 4.0) - Tarjetas`;
-    subFormulaCalc = `P(Gol): <strong>${(pGol * 100).toFixed(1)}%</strong> | Ficha: <strong>${delAvg.toFixed(2)}</strong> | EP: (${delAvg.toFixed(2)} * 0.65) + (${pGol.toFixed(3)} * ${bonusGol}) + (${pFig.toFixed(3)} * 4.0) - ${((p.yellowCards || 0) * 0.25).toFixed(2)} = <strong>${(p.rawEP || (p.finalScore / 10)).toFixed(2)} pts</strong>`;
+    epCalculado = ((cleanAvg * 0.72) + (pGol * bonusGol) - ((p.yellowCards || 0) * 0.25)).toFixed(2);
+    epFormulaStr = `(${cleanAvg.toFixed(2)} × 0.72) + (${(pGol * 100).toFixed(1)}% × ${bonusGol})`;
+    techoExpStr = `${(cleanAvg + bonusGol).toFixed(1)} pts reales (Ficha + Gol +${bonusGol.toFixed(0)})`;
   }
 
-  // Renderizar la tabla de bloques y percentiles
   let rowsHtml = '';
-  blocks.forEach((b, idx) => {
+  tableRows.forEach((r, idx) => {
+    const bg = idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
     rowsHtml += `
-      <tr style="border-bottom:1px solid rgba(255,255,255,0.06);background:${idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'};">
-        <td style="padding:10px 12px;vertical-align:middle;">
-          <strong style="color:var(--text-main);font-size:0.88rem;">${b.name}</strong>
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">${b.desc}</div>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);background:${bg};">
+        <td style="padding:12px 14px;vertical-align:middle;font-weight:700;color:var(--text-main);font-size:0.92rem;">
+          ${r.num}
         </td>
-        <td class="text-center" style="padding:10px 8px;vertical-align:middle;">
-          <span style="background:rgba(255,255,255,0.08);color:var(--primary);font-weight:700;padding:3px 8px;border-radius:4px;font-size:0.8rem;">${b.weight}</span>
+        <td style="padding:12px 14px;vertical-align:middle;text-align:center;font-weight:800;color:#94a3b8;font-size:0.92rem;">
+          ${r.weight}
         </td>
-        <td class="text-center" style="padding:10px 8px;vertical-align:middle;">
-          <strong style="color:#ffffff;font-size:0.92rem;">${b.val}</strong>
+        <td style="padding:12px 14px;vertical-align:middle;color:#ffffff;font-size:0.94rem;">
+          ${r.val}
         </td>
-        <td class="text-center" style="padding:10px 8px;vertical-align:middle;">
-          <span style="font-weight:800;font-size:0.92rem;color:${b.rp.badgeColor};">${b.rp.rankStr}</span>
-        </td>
-        <td style="padding:10px 12px;vertical-align:middle;min-width:140px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span style="font-size:0.78rem;font-weight:700;color:${b.rp.badgeColor};background:${b.rp.badgeBg};padding:2px 6px;border-radius:4px;">${b.rp.pctStr}</span>
-            <span style="font-size:0.75rem;color:var(--text-muted);">${b.rp.pct}%</span>
-          </div>
-          <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
-            <div style="width:${b.rp.pct}%;height:100%;background:${b.rp.badgeColor};border-radius:3px;"></div>
-          </div>
+        <td style="padding:12px 14px;vertical-align:middle;color:#ffffff;font-size:0.92rem;">
+          ${r.badge}
         </td>
       </tr>
     `;
   });
 
-  const overallPosRank = calcRankAndPercentile(p.finalScore, posPool.map(x => {
-    const c = getFixtureContext(x.team);
-    const s = calculateScoreDT(x, c, posPool);
-    return s.rawEP ? (s.rawEP * 10) : 50;
-  }), true);
-
-  // Generar HTML de las Tarjetas de Segmento (Defensivo / Ofensivo)
-  let segmentCardHtml = '';
-  if (pos === 'ARQ' || pos === 'DEF') {
-    const pVi = defSeg ? (defSeg.P_VI_combinada * 100).toFixed(1) : '30.0';
-    const csMercado = defSeg ? (defSeg.cleanSheetProb * 100).toFixed(0) : '30';
-    const rivExpG = defSeg ? defSeg.rivalExpGoals.toFixed(2) : '1.10';
-    const mySotAg = defSeg ? defSeg.mySotAgainst.toFixed(1) : '4.5';
-    const rivSotF = defSeg ? defSeg.rivalSotFor.toFixed(1) : '4.0';
-
-    segmentCardHtml += `
-      <div style="background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.3);border-radius:10px;padding:12px 16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <strong style="color:#60a5fa;font-size:0.92rem;letter-spacing:0.3px;">🛡️ SEGMENTO DEFENSIVO DEL CLUB [FECHA 5]</strong>
-          <span style="background:rgba(37,99,235,0.25);color:#93c5fd;font-size:0.75rem;padding:2px 8px;border-radius:4px;font-weight:700;">100% IDÉNTICO PARA ARQ Y DEF</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;font-size:0.82rem;">
-          <div><span style="color:var(--text-muted);">P(VI) Combinada:</span> <strong style="color:#10b981;font-size:0.95rem;">${pVi}%</strong></div>
-          <div><span style="color:var(--text-muted);">VI Mercado Bet365:</span> <strong style="color:#ffffff;">${csMercado}%</strong></div>
-          <div><span style="color:var(--text-muted);">xG Rival Match:</span> <strong style="color:#ffffff;">${rivExpG} xG</strong></div>
-          <div><span style="color:var(--text-muted);">Tiros Concedidos L/V:</span> <strong style="color:#ffffff;">${mySotAg}/p</strong></div>
-          <div><span style="color:var(--text-muted);">Tiros Rival L/V:</span> <strong style="color:#ffffff;">${rivSotF}/p</strong></div>
-        </div>
-      </div>
-    `;
-  }
-
-  if (pos === 'DEF' || pos === 'VOL' || pos === 'DEL') {
-    const potOf = offSeg ? (offSeg.potencialOfensivoIndex * 100).toFixed(1) : '60.0';
-    const golProb = offSeg ? (offSeg.teamGoalProb * 100).toFixed(0) : '70';
-    const golOdds = offSeg ? offSeg.teamGoalOdds.toFixed(2) : '1.35';
-    const expG = offSeg ? offSeg.teamExpGoals.toFixed(2) : '1.20';
-    const mySotF = offSeg ? offSeg.mySotFor.toFixed(1) : '4.5';
-    const rivSotAg = offSeg ? offSeg.rivalSotAg.toFixed(1) : '4.5';
-
-    segmentCardHtml += `
-      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:12px 16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <strong style="color:#f87171;font-size:0.92rem;letter-spacing:0.3px;">⚽ SEGMENTO OFENSIVO DEL CLUB [FECHA 5]</strong>
-          <span style="background:rgba(239,68,68,0.25);color:#fca5a5;font-size:0.75rem;padding:2px 8px;border-radius:4px;font-weight:700;">PODER DE FUEGO & DESBORDE</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:8px;font-size:0.82rem;">
-          <div><span style="color:var(--text-muted);">Potencial Ofensivo:</span> <strong style="color:#f59e0b;font-size:0.95rem;">${potOf}%</strong></div>
-          <div><span style="color:var(--text-muted);">Cuota Gol Bet365:</span> <strong style="color:#ffffff;">${golOdds} (${golProb}%)</strong></div>
-          <div><span style="color:var(--text-muted);">xG Club Match:</span> <strong style="color:#ffffff;">${expG} xG</strong></div>
-          <div><span style="color:var(--text-muted);">Tiros a Favor L/V:</span> <strong style="color:#ffffff;">${mySotF}/p</strong></div>
-          <div><span style="color:var(--text-muted);">Tiros Concedidos Rival:</span> <strong style="color:#ffffff;">${rivSotAg}/p</strong></div>
-        </div>
-      </div>
-    `;
-  }
-
   const html = `
-    <div style="display:flex;flex-direction:column;gap:12px;color:var(--text-main);">
+    <div style="display:flex;flex-direction:column;gap:16px;">
       
-      <!-- ENCABEZADO DE RESUMEN EJECUTIVO -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:12px 16px;">
-        <div>
-          <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;">Jugador & Puesto</div>
-          <div style="font-size:1.1rem;font-weight:800;color:var(--primary);">${p.name} <span class="badge-pos badge-${pos.toLowerCase()}">${pos}</span></div>
-          <div style="font-size:0.8rem;color:var(--text-muted);">${p.team}</div>
+      <!-- TABLA PERCENTILADA OFICIAL DE 4 COLUMNAS UNIVERSAL [${pos}] -->
+      <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.3);">
+        <table style="width:100%;border-collapse:collapse;font-size:0.92rem;text-align:left;">
+          <thead>
+            <tr style="background:rgba(255,255,255,0.08);border-bottom:2px solid var(--border-color);">
+              <th style="padding:14px 14px;font-weight:800;font-size:0.93rem;color:var(--text-main);width:32%;">
+                Métrica Oficial Evaluada
+              </th>
+              <th style="padding:14px 14px;font-weight:800;font-size:0.93rem;color:var(--text-muted);text-align:center;width:12%;">
+                Peso %
+              </th>
+              <th style="padding:14px 14px;font-weight:800;font-size:0.98rem;color:#10b981;width:28%;">
+                🟢 ${p.name.split(',')[0]} (${p.team})
+              </th>
+              <th style="padding:14px 14px;font-weight:800;font-size:0.93rem;color:#38bdf8;width:28%;">
+                Percentil / Puesto Liga
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RESUMEN FINAL DEL SCORE DT & DESGLOSE -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:14px 16px;">
+          <div style="font-size:0.80rem;color:#94a3b8;font-weight:700;text-transform:uppercase;margin-bottom:4px;">🧮 Desglose Matemático Gran DT</div>
+          <div style="font-size:0.92rem;color:#ffffff;">
+            <strong>EP =</strong> ${epFormulaStr} = <strong style="color:#10b981;">${epCalculado} pts</strong>
+          </div>
+          <div style="font-size:0.82rem;color:#38bdf8;margin-top:4px;">
+            🚀 Techo Explosivo: <strong>${techoExpStr}</strong>
+          </div>
         </div>
-        <div>
-          <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;">Próximo Cruce (Fecha 5)</div>
-          <div style="font-size:1.0rem;font-weight:700;">${ctx ? (ctx.isHome ? '🏠 vs ' + ctx.rival : '✈️ @ ' + ctx.rival) : 'Sin fixture'}</div>
-          <div style="font-size:0.8rem;color:var(--success);">${ctx && ctx.isRealOdds ? '🏆 Cuotas Bet365 Oficiales' : '📊 Baseline Oficial'}</div>
-        </div>
-        <div>
-          <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;">Score DT Proyectado</div>
-          <div style="font-size:1.3rem;font-weight:900;color:var(--success);">${p.finalScore.toFixed(1)} <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">pts</span></div>
-          <div style="font-size:0.8rem;font-weight:700;color:#10b981;">Ranking: ${overallPosRank.rankStr} (${overallPosRank.pctStr})</div>
+        <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:10px;padding:14px 16px;">
+          <div style="font-size:0.80rem;color:#94a3b8;font-weight:700;text-transform:uppercase;margin-bottom:4px;">⭐ Score DT Proyectado (1 a 100)</div>
+          <div style="font-size:1.25rem;color:#10b981;font-weight:900;">
+            ⭐ ${p.finalScore.toFixed(1)} / 100 <span style="font-size:0.85rem;color:#38bdf8;font-weight:700;">(${overallPosRank.rankStr})</span>
+          </div>
+          <div style="font-size:0.82rem;color:#94a3b8;margin-top:4px;">
+            ${ctx?.isHome ? '🏠 Local' : '✈️ Visitante'} vs ${ctx?.rival || 'Rival'}
+          </div>
         </div>
       </div>
 
-      <!-- TARJETAS DE SEGMENTOS DEL CLUB -->
-      ${segmentCardHtml}
-
-      <!-- TABLA DESGLOSE OFICIAL V2 -->
-      <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;overflow:hidden;">
-        <div style="padding:10px 14px;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-weight:800;font-size:0.92rem;letter-spacing:0.3px;">📊 DESGLOSE EXACTO DEL ALGORITMO [${pos} V2]</span>
-          <span style="font-size:0.75rem;color:var(--text-muted);">100% Percentilado vs Liga Oficial</span>
+      <!-- VEREDICTO TÁCTICO -->
+      <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-color);border-radius:10px;padding:14px 16px;">
+        <div style="font-size:0.80rem;color:#94a3b8;font-weight:700;text-transform:uppercase;margin-bottom:6px;">💬 Veredicto Táctico del Algoritmo</div>
+        <div style="font-size:0.94rem;color:#ffffff;line-height:1.45;">
+          ${getTacticalVerdict()}
         </div>
-        <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
-            <thead>
-              <tr style="background:rgba(255,255,255,0.04);border-bottom:1px solid var(--border-color);color:var(--text-muted);font-size:0.75rem;text-transform:uppercase;">
-                <th style="padding:8px 12px;text-align:left;">Bloque / Métrica Evaluada</th>
-                <th style="padding:8px 8px;text-align:center;">Peso %</th>
-                <th style="padding:8px 8px;text-align:center;">Valor Medido</th>
-                <th style="padding:8px 8px;text-align:center;">Puesto / Ranking</th>
-                <th style="padding:8px 12px;text-align:left;">Percentil Liga</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- AUDITORÍA DE FÓRMULA MATEMÁTICA -->
-      <div style="background:rgba(0,0,0,0.25);border:1px solid var(--border-color);border-radius:10px;padding:12px 16px;">
-        <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;">Fórmula Matemática Aplicada [${pos} V2]</div>
-        <div style="font-family:monospace;font-size:0.82rem;color:var(--text-muted);background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:6px;margin-bottom:6px;">${formulaText}</div>
-        <div style="font-size:0.84rem;color:var(--text-main);">Cálculo Individual: ${subFormulaCalc}</div>
       </div>
 
     </div>
