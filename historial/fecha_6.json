@@ -1,0 +1,100 @@
+{
+ "fecha": 6,
+ "generado": "2026-08-21T04:00:00Z",
+ "ultimaFechaJugada": 5,
+ "reconstruida": true,
+ "nota": "Recuperada del once que se recomendo en el chat antes de que se jugara la fecha. Las fotas siguientes las genera armar.cjs sola.",
+ "esquema": "1-5-3-2",
+ "once": [
+  {
+   "nombre": "Galíndez, Hernán",
+   "pos": "ARQ",
+   "equipo": "Huracán",
+   "EP": 6.59,
+   "pJuega": 0.89,
+   "precio": 6000000
+  },
+  {
+   "nombre": "Sosa, Diego",
+   "pos": "DEF",
+   "equipo": "Instituto",
+   "EP": 7.35,
+   "pJuega": 0.86,
+   "precio": 1000000
+  },
+  {
+   "nombre": "Aguirre, Misael",
+   "pos": "DEF",
+   "equipo": "Unión",
+   "EP": 8.19,
+   "pJuega": 0.61,
+   "precio": 300000
+  },
+  {
+   "nombre": "Garay, Martín",
+   "pos": "DEF",
+   "equipo": "Tigre",
+   "EP": 6.99,
+   "pJuega": 0.84,
+   "precio": 1700000
+  },
+  {
+   "nombre": "Ferreira, Clever",
+   "pos": "DEF",
+   "equipo": "Atl. Tucumán",
+   "EP": 7.38,
+   "pJuega": 0.74,
+   "precio": 2100000
+  },
+  {
+   "nombre": "Ojeda, Sergio",
+   "pos": "DEF",
+   "equipo": "Estudiantes RC",
+   "EP": 6.96,
+   "pJuega": 0.82,
+   "precio": 1000000
+  },
+  {
+   "nombre": "Luna, Alex",
+   "pos": "VOL",
+   "equipo": "Instituto",
+   "EP": 7.95,
+   "pJuega": 0.81,
+   "precio": 3000000
+  },
+  {
+   "nombre": "Ascacíbar, Santiago",
+   "pos": "VOL",
+   "equipo": "Boca",
+   "EP": 7.81,
+   "pJuega": 0.86,
+   "precio": 6400000
+  },
+  {
+   "nombre": "Barbona, David",
+   "pos": "VOL",
+   "equipo": "Def. y Justicia",
+   "EP": 7.2,
+   "pJuega": 0.85,
+   "precio": 2900000
+  },
+  {
+   "nombre": "Marabel, Junior",
+   "pos": "DEL",
+   "equipo": "Sarmiento",
+   "EP": 6.89,
+   "pJuega": 0.85,
+   "precio": 3000000
+  },
+  {
+   "nombre": "Santos, Michael",
+   "pos": "DEL",
+   "equipo": "Ctral. Córdoba",
+   "EP": 7.05,
+   "pJuega": 0.76,
+   "precio": 3500000
+  }
+ ],
+ "ranking": {},
+ "partidos": []
+}

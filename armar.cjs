@@ -528,6 +528,41 @@ const paraApp={
   presupuesto:out.presupuesto, validacion:out.validacion, cuotas:out.cuotas
 };
 
+// ---- 9. GUARDAR LA RECOMENDACION DE ESTA FECHA ----
+// Sin esto no hay forma de saber si el motor acierta: cuando la fecha termina
+// ya no queda registro de que habia recomendado antes de que se jugara.
+// Se guarda una foto por fecha y despues backtest.cjs la compara contra los
+// puntajes reales de Planeta.
+try{
+  if(!fs.existsSync('historial')) fs.mkdirSync('historial');
+  const archivo='historial/fecha_'+out.fechaObjetivo+'.json';
+  const yaEstaba=fs.existsSync(archivo);
+  const foto={
+    fecha: out.fechaObjetivo,
+    generado: out.generado,
+    ultimaFechaJugada: out.ultimaFechaJugada,
+    // el once que recomienda el motor, con lo que espera de cada uno
+    once: out.esquema.optimo.once.map(x=>{
+      const j=[].concat(...['ARQ','DEF','VOL','DEL'].map(p=>out.rankings[p])).find(y=>y.id===x.id);
+      return j?{nombre:j.nombre,pos:j.pos,equipo:j.equipo,EP:+j.EP.toFixed(2),
+                pJuega:+j.pJuega.toFixed(2),precio:j.precio}:null;
+    }).filter(Boolean),
+    esquema: out.esquema.optimo.esquema,
+    // el top 25 de cada puesto, para poder evaluar el ranking entero y no solo el once
+    ranking: {}, 
+    partidos: out.partidos.map(m=>({local:m.local,visitante:m.visitante,
+      pGolLocal:m.pGolLocal,pGolVisitante:m.pGolVisitante,
+      pVallaLocal:m.pVallaLocal,pVallaVisitante:m.pVallaVisitante,
+      golesEsperadosLocal:m.golesEsperadosLocal,golesEsperadosVisitante:m.golesEsperadosVisitante}))
+  };
+  ['ARQ','DEF','VOL','DEL'].forEach(p=>{
+    foto.ranking[p]=out.rankings[p].slice(0,25).map(j=>({nombre:j.nombre,equipo:j.equipo,
+      EP:+j.EP.toFixed(2),pJuega:+j.pJuega.toFixed(2),ficha:+j.ficha.toFixed(2),precio:j.precio}));
+  });
+  fs.writeFileSync(archivo,JSON.stringify(foto,null,1));
+  console.log((yaEstaba?'  (actualizada) ':'  ')+'foto guardada: '+archivo+'  — sirve para el backtest cuando termine la fecha');
+}catch(e){ console.log('  no pude guardar la foto de la fecha:',e.message); }
+
 fs.writeFileSync('salida.json',JSON.stringify(out,null,1));
 fs.writeFileSync('datos.js','window.DATOS='+JSON.stringify(paraApp)+';');
 // datos.js: para que index.html lo cargue con <script> y funcione hasta con file://
