@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=1786728067794">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header class="main-header">
@@ -17,25 +17,27 @@
                 <p class="subtitle">Análisis Estadístico Avanzado y Algoritmo de Armado • <span id="lbl-status-fecha">Cargando...</span></p>
             </div>
             <div class="header-status">
-                <div class="status-badge" id="lbl-health-badge" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#10b981;font-weight:600;" title="Estado de Integridad y Solidez de los Datos">
-                    <span class="badge-icon">🛡️</span> Salud Datos: <span id="lbl-health-pct">100%</span>
-                </div>
-                <div class="status-badge" id="lbl-jornada-badge">
-                    <span class="badge-icon">📅</span> Datos: Fecha <span id="lbl-datos-fecha">-</span>
-                </div>
-                <div class="status-badge" id="lbl-global-stats">
-                    <span class="badge-icon">👥</span> - Jugadores
-                </div>
-                <div class="status-badge" style="background:linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));border:1px solid rgba(245,158,11,0.4);display:flex;align-items:center;gap:6px;">
-                    <span style="font-size:0.8rem;font-weight:700;color:#f59e0b;">🎯 Fecha Análisis:</span>
-                    <select id="analysis-round-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:6px;padding:3px 10px;font-size:0.85rem;cursor:pointer;outline:none;font-weight:800;appearance:auto;">
-                    </select>
-                </div>
-                <button class="btn btn-secondary" id="btn-open-weights" style="display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:0.8rem;background:rgba(255,255,255,0.08);border:1px solid var(--border-color);color:var(--text-main);border-radius:8px;cursor:pointer;font-weight:600;" title="Ajustar Pesos del Algoritmo y Filtro de Partidos Mínimos">
-                    ⚙️ Parámetros
+                <button class="chip chip-ok" id="lbl-health-badge" title="Tocá para ver el detalle">
+                    <span class="badge-icon">🛡️</span> Ficha reconstruida: <span id="lbl-health-pct">–</span>
                 </button>
-                <button class="btn btn-secondary" id="btn-sync-now" style="display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:0.8rem;background:linear-gradient(135deg, #2563eb, #1d4ed8);border:none;color:white;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 2px 4px rgba(0,0,0,0.2);" title="Sincronizar Planeta Gran DT, Tablas ESPN, xGScore y Cuotas">
-                    <span id="sync-icon">🔄</span> Sincronizar Datos
+                <span class="chip" id="lbl-jornada-badge">
+                    <span class="badge-icon">📅</span> Datos hasta la fecha <span id="lbl-datos-fecha">–</span>
+                </span>
+                <span class="chip" id="lbl-global-stats">
+                    <span class="badge-icon">👥</span> –
+                </span>
+                <span class="chip-sep"></span>
+                <button class="chip chip-btn chip-destacado" id="btn-open-tablero" title="Qué defensas están sólidas y cuáles vulnerables en la próxima fecha">
+                    🎯 Contexto de la fecha
+                </button>
+                <button class="chip chip-btn" id="btn-open-weights" title="Qué pesa cada término del reglamento en cada puesto">
+                    📊 Qué mide el modelo
+                </button>
+                <button class="chip chip-btn" id="btn-open-tournament" title="Tiros a favor y en contra de cada equipo, con corte local / visitante">
+                    ⚽ Equipos
+                </button>
+                <button class="chip chip-btn" id="btn-sync-now" title="Cómo se actualizan los datos">
+                    🔄 Actualizar datos
                 </button>
             </div>
         </div>
@@ -153,6 +155,7 @@
 
                 <!-- Centro de Líderes Estadísticos (Ranking Ordinal por Categoría) -->
                 <div id="view-leaders" class="p-4 flex-1" style="display: none;">
+                    <div id="leaders-nota" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;"></div>
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;background:var(--bg-card);padding:14px 18px;border-radius:12px;border:1px solid var(--border-color);">
                         <div>
                             <h2 style="font-size:1.15rem;font-weight:700;color:var(--text-main);margin:0;">📊 Líderes y Rankings Estadísticos</h2>
@@ -192,9 +195,9 @@
                                     <th>Equipo</th>
                                     <th class="text-center">Posición</th>
                                     <th class="text-center">PJ</th>
-                                    <th class="text-center" id="lbl-leader-metric-header">Valor Métrica</th>
+                                    <th class="text-center" id="lbl-leader-metric-header">Métrica (Promedio / Acumulado)</th>
                                     <th class="text-center">Top Percentil</th>
-                                    <th class="text-center">Acciones</th>
+                                    <th class="text-center">Ver</th>
                                 </tr>
                             </thead>
                             <tbody id="leaders-body">
@@ -365,6 +368,330 @@
                     </table>
                 </div>
             </div>
+    <!-- Modal Laboratorio de Backtesting & IA -->
+    <div id="backtest-modal" class="modal">
+        <div class="modal-content modal-lg" style="max-width:960px;">
+            <div class="modal-header" style="background:linear-gradient(135deg, rgba(124,58,237,0.2), rgba(109,40,217,0.05));border-bottom:1px solid rgba(124,58,237,0.3);">
+                <div>
+                    <h2 style="display:flex;align-items:center;gap:8px;margin:0;font-size:1.25rem;">
+                        <span>🔬</span> Laboratorio de Backtesting & Auto-Calibración
+                    </h2>
+                    <p style="margin:4px 0 0 0;font-size:0.80rem;color:var(--text-muted);">
+                        Simula el algoritmo en las 15 fechas del Torneo Apertura 2026 y optimiza los pesos con datos reales.
+                    </p>
+                </div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Acciones de control -->
+                <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--bg-main);padding:14px;border-radius:12px;border:1px solid var(--border-color);">
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <button class="btn btn-primary" id="btn-run-backtest" style="background:linear-gradient(135deg, #7c3aed, #6d28d9);display:flex;align-items:center;gap:6px;">
+                            <span>▶️</span> Ejecutar Simulación (15 Fechas)
+                        </button>
+                        <button class="btn btn-secondary" id="btn-optimize-weights" style="background:linear-gradient(135deg, #059669, #047857);color:white;border:none;display:flex;align-items:center;gap:6px;">
+                            <span>🤖</span> Calibrar Pesos Óptimos con IA
+                        </button>
+                    </div>
+                    <div id="backtest-status-msg" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;">
+                        Listo para simular
+                    </div>
+                </div>
+
+                <!-- Tarjetas de Métricas Globales -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:20px;" id="backtest-summary-cards">
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Promedio 11 Ideal</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#38bdf8;margin:4px 0;" id="bk-avg-pts">-- pts</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">por fecha simulada</div>
+                    </div>
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Puntos Totales Acumulados</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#10b981;margin:4px 0;" id="bk-tot-pts">-- pts</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">en 15 fechas de torneo</div>
+                    </div>
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Eficiencia vs Dream Team</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;margin:4px 0;" id="bk-eff-pct">-- %</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">del techo teórico perfecto</div>
+                    </div>
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Correlación Algoritmo</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#a855f7;margin:4px 0;" id="bk-corr-avg">r = --</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">precisión estadística</div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Resultados por Fecha -->
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-header" style="padding:10px 16px;font-size:0.90rem;font-weight:700;">
+                        📅 Rendimiento Fecha por Fecha (Torneo Apertura 2026)
+                    </div>
+                    <div class="table-responsive" style="max-height:280px;">
+                        <table class="data-table" style="font-size:0.82rem;">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th class="text-center">Puntos 11 Ideal</th>
+                                    <th class="text-center">Capitán Elegido</th>
+                                    <th class="text-center">Dream Team Máx</th>
+                                    <th class="text-center">Eficiencia</th>
+                                    <th>Aciertos Clave</th>
+                                </tr>
+                            </thead>
+                            <tbody id="backtest-rounds-body">
+                                <tr>
+                                    <td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">
+                                        Hacé clic en <strong>"Ejecutar Simulación"</strong> para procesar las 15 fechas.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Panel de Calibración IA de Pesos -->
+                <div id="calibration-results-panel" style="display:none;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.3);border-radius:12px;padding:16px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div>
+                            <h3 style="margin:0;font-size:1rem;color:#10b981;">🎯 Calibración de Pesos Completada con Éxito</h3>
+                            <p style="margin:3px 0 0 0;font-size:0.80rem;color:var(--text-muted);" id="calib-gain-text">
+                                Se obtuvo una mejora de puntos reales en el dataset histórico.
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" id="btn-apply-optimal-weights" style="background:#10b981;border:none;">
+                            ✅ Aplicar Pesos Óptimos al Algoritmo
+                        </button>
+                    </div>
+                    <div id="calib-weights-diff" style="font-size:0.82rem;font-family:monospace;background:var(--bg-main);padding:12px;border-radius:8px;border:1px solid var(--border-color);">
+                    </div>
+                </div>
+            </div>
+    <!-- Modal Centro de Auto-Aprendizaje Continuo -->
+    <div id="learning-modal" class="modal">
+        <div class="modal-content modal-lg" style="max-width:960px;">
+            <div class="modal-header" style="background:linear-gradient(135deg, rgba(2,132,199,0.2), rgba(3,105,161,0.05));border-bottom:1px solid rgba(2,132,199,0.3);">
+                <div>
+                    <h2 style="display:flex;align-items:center;gap:8px;margin:0;font-size:1.25rem;">
+                        <span>🧠</span> Centro de Auto-Aprendizaje Continuo & Aciertos
+                    </h2>
+                    <p style="margin:4px 0 0 0;font-size:0.80rem;color:var(--text-muted);">
+                        El algoritmo evalúa sus predicciones tras cada fecha jugada y calibra los pesos automáticamente.
+                    </p>
+                </div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Controles principales -->
+                <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--bg-main);padding:14px;border-radius:12px;border:1px solid var(--border-color);">
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <button class="btn btn-primary" id="btn-eval-learning" style="background:linear-gradient(135deg, #0284c7, #0369a1);display:flex;align-items:center;gap:6px;">
+                            <span>🔄</span> Evaluar Fechas Jugadas (Clausura 2026)
+                        </button>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <label style="font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                            <input type="checkbox" id="chk-auto-learning" checked style="cursor:pointer;transform:scale(1.2);">
+                            <span>Auto-Calibración en cada Sync</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Tarjetas de Rendimiento del Torneo Actual -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-bottom:20px;">
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Puntos 11 Ideal Última Fecha</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#38bdf8;margin:4px 0;" id="lr-last-pts">-- pts</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);" id="lr-last-round-lbl">Fecha 5 Clausura 2026</div>
+                    </div>
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Error Promedio (MAE)</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#10b981;margin:4px 0;" id="lr-avg-mae">-- pts</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">desviación media por jugador</div>
+                    </div>
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Acierto Valla Invicta</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#f59e0b;margin:4px 0;" id="lr-cs-acc">-- %</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">cuando P(VI) ≥ 40%</div>
+                    </div>
+                    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:14px;text-align:center;">
+                        <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">Acierto Goleadores</div>
+                        <div style="font-size:1.8rem;font-weight:800;color:#ec4899;margin:4px 0;" id="lr-goal-acc">-- %</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">cuando P(Gol) ≥ 15%</div>
+                    </div>
+                </div>
+
+                <!-- Historial de Fechas Evaluadas -->
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-header" style="padding:10px 16px;font-size:0.90rem;font-weight:700;">
+                        📋 Registro Longitudinal de Aciertos por Fecha
+                    </div>
+                    <div class="table-responsive" style="max-height:260px;">
+                        <table class="data-table" style="font-size:0.82rem;">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th class="text-center">11 Ideal (Puntos Reales)</th>
+                                    <th class="text-center">Capitán Elegido</th>
+                                    <th class="text-center">Precisión MAE</th>
+                                    <th class="text-center">Acierto VI</th>
+                                    <th class="text-center">Acierto Goles</th>
+                                </tr>
+                            </thead>
+                            <tbody id="learning-history-body">
+                                <tr>
+                                    <td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">
+                                        Presioná <strong>"Evaluar Fechas Jugadas"</strong> para cruzar predicciones con la planilla oficial.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Ajustes Aprendidos -->
+                <div id="learning-nudges-panel" style="background:rgba(2,132,199,0.08);border:1px solid rgba(2,132,199,0.3);border-radius:12px;padding:16px;">
+                    <h3 style="margin:0 0 8px 0;font-size:0.95rem;color:#0284c7;">🎯 Ajustes Adaptativos Aprendidos por la IA</h3>
+                    <div id="learning-nudges-content" style="font-size:0.82rem;color:var(--text-main);line-height:1.5;">
+                        El algoritmo está calibrando sus pesos en base a la dinámica del Torneo Clausura 2026.
+                    </div>
+                </div>
+            </div>
+    <!-- Modal Presupuesto, Cambios & Estrategia Gran DT -->
+    <div id="tournament-modal" class="modal">
+        <div class="modal-content modal-lg" style="max-width:980px;">
+            <div class="modal-header" style="background:linear-gradient(135deg, rgba(217,119,6,0.2), rgba(180,83,9,0.05));border-bottom:1px solid rgba(217,119,6,0.3);">
+                <div>
+                    <h2 style="display:flex;align-items:center;gap:8px;margin:0;font-size:1.25rem;">
+                        <span>💰</span> Optimizador de Presupuesto ($60M), Cambios & Gangas
+                    </h2>
+                    <p style="margin:4px 0 0 0;font-size:0.80rem;color:var(--text-muted);">
+                        Armá el 11 de mayor puntaje respetando el tope de $60.000.000 y calculá los 4 cambios óptimos para la fecha.
+                    </p>
+                </div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Pestañas internas del optimizador -->
+                <div style="display:flex;gap:8px;margin-bottom:16px;background:var(--bg-main);padding:6px;border-radius:10px;border:1px solid var(--border-color);">
+                    <button class="tab-btn tourney-tab-btn active" data-tab="tourney-budget" style="flex:1;">💼 11 con Presupuesto ($60M)</button>
+                    <button class="tab-btn tourney-tab-btn" data-tab="tourney-transfers" style="flex:1;">🔄 Los 4 Cambios Gran DT</button>
+                    <button class="tab-btn tourney-tab-btn" data-tab="tourney-bargains" style="flex:1;">💎 Joyas Low-Cost & Gangas</button>
+                </div>
+
+                <!-- Tab 1: Optimizador con Presupuesto -->
+                <div id="tourney-budget-tab" class="tourney-tab-content">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;background:var(--bg-card);padding:12px;border-radius:10px;border:1px solid var(--border-color);">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <label style="font-size:0.85rem;font-weight:700;">Presupuesto Límite:</label>
+                            <select id="tourney-budget-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:6px;padding:4px 10px;font-size:0.85rem;font-weight:800;">
+                                <option value="60.0">$ 60.000.000 (Reglamento Oficial Gran DT)</option>
+                                <option value="65.0">$ 65.000.000 (Con Plus de Transferencias)</option>
+                                <option value="70.0">$ 70.000.000</option>
+                                <option value="999.0">Sin Límite (Dream Team Absoluto)</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <label style="font-size:0.85rem;font-weight:700;">Estrategia:</label>
+                            <select id="tourney-strategy-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:6px;padding:4px 10px;font-size:0.85rem;font-weight:800;">
+                                <option value="solid">🛡️ Torneo General (Piso Seguro & Regularidad)</option>
+                                <option value="risky">💣 Ganar la Fecha (Techo Explosivo / 130 pts)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="btn-copy-team-clipboard" style="background:linear-gradient(135deg, #10b981, #059669);display:flex;align-items:center;gap:6px;">
+                            <span>📋</span> Copiar Equipo para Gran DT
+                        </button>
+                    </div>
+
+                    <!-- Resumen del Equipo -->
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:16px;">
+                        <div style="background:var(--bg-main);border:1px solid var(--border-color);border-radius:8px;padding:10px;text-align:center;">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">Costo Total del 11</div>
+                            <div style="font-size:1.4rem;font-weight:800;color:#f59e0b;" id="tb-cost-val">$ --</div>
+                        </div>
+                        <div style="background:var(--bg-main);border:1px solid var(--border-color);border-radius:8px;padding:10px;text-align:center;">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">Presupuesto Restante</div>
+                            <div style="font-size:1.4rem;font-weight:800;color:#10b981;" id="tb-rem-val">$ --</div>
+                        </div>
+                        <div style="background:var(--bg-main);border:1px solid var(--border-color);border-radius:8px;padding:10px;text-align:center;">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">Score DT Promedio</div>
+                            <div style="font-size:1.4rem;font-weight:800;color:#38bdf8;" id="tb-score-val">-- pts</div>
+                        </div>
+                        <div style="background:var(--bg-main);border:1px solid var(--border-color);border-radius:8px;padding:10px;text-align:center;">
+                            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">Capitán Elegido</div>
+                            <div style="font-size:1.1rem;font-weight:800;color:#ec4899;" id="tb-cap-val">👑 --</div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Jugadores Titulares -->
+                    <div class="table-responsive" style="max-height:280px;">
+                        <table class="data-table" style="font-size:0.82rem;">
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Jugador</th>
+                                    <th>Equipo</th>
+                                    <th class="text-center">Cotización</th>
+                                    <th class="text-center">Score DT</th>
+                                    <th>Rol / Amenaza</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tourney-budget-lineup-body">
+                                <tr><td colspan="6" style="text-align:center;padding:20px;">Cargando alineación óptima...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Asistente de los 4 Cambios -->
+                <div id="tourney-transfers-tab" class="tourney-tab-content" style="display:none;">
+                    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">
+                        Analiza las 4 sustituciones recomendadas para la próxima fecha sustituyendo a los jugadores con peor proyección por las opciones con mayor ganancia de puntos esperados.
+                    </p>
+                    <div class="table-responsive" style="max-height:300px;">
+                        <table class="data-table" style="font-size:0.82rem;">
+                            <thead>
+                                <tr>
+                                    <th style="color:#ef4444;">🔴 Vender (Baja Proyección)</th>
+                                    <th class="text-center">Cotización</th>
+                                    <th style="color:#10b981;">🟢 Comprar (Reemplazo Óptimo)</th>
+                                    <th class="text-center">Cotización</th>
+                                    <th class="text-center">Ganancia Neta</th>
+                                    <th>Justificación Táctica</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tourney-transfers-body">
+                                <tr><td colspan="6" style="text-align:center;padding:20px;">Calculando transferencias recomendadas...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Joyas Low-Cost & Gangas -->
+                <div id="tourney-bargains-tab" class="tourney-tab-content" style="display:none;">
+                    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">
+                        Jugadores con cotización menor a <strong>$ 2.500.000</strong> que ofrecen el mayor Score DT por peso invertido. Ideales para liberar presupuesto y fichar estrellas.
+                    </p>
+                    <div class="table-responsive" style="max-height:300px;">
+                        <table class="data-table" style="font-size:0.82rem;">
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Jugador</th>
+                                    <th>Equipo</th>
+                                    <th class="text-center">Cotización</th>
+                                    <th class="text-center">Score DT</th>
+                                    <th class="text-center">Relación Calidad/Precio</th>
+                                    <th>Motivo de Recomendación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tourney-bargains-body">
+                                <tr><td colspan="7" style="text-align:center;padding:20px;">Buscando joyas low-cost...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary close-modal">Cerrar</button>
             </div>
@@ -372,16 +699,11 @@
     </div>
 
     <!-- Scripts -->
-    <script src="data.js?v=1786728067794"></script>
-    <script src="teamsRegistry.js?v=1786728067794"></script>
-    <script src="previousTournament.js?v=1786728067794"></script>
-    <script src="dataSanitizer.js?v=1786728067794"></script>
-    <script src="algorithmEngine.js?v=1786728067794"></script>
-    <script src="app.js?v=1786728067794"></script>
-    <script>
-    if (typeof init === 'function') {
-      try { init(); } catch (e) { console.error('Fallback init error:', e); }
-    }
-    </script>
+    <!-- Motor v3: datos.js lo genera armar.js a partir de los .bat de sync.
+         El stack viejo (data.js + dataSanitizer + algorithmEngine + app.js)
+         quedo afuera: calculaba la nota Clarin con coeficientes inventados. -->
+    <script src="teamsRegistry.js"></script>
+    <script src="datos.js"></script>
+    <script src="appV3.js"></script>
 </body>
 </html>

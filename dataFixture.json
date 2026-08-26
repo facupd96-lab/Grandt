@@ -1,0 +1,1041 @@
+{
+    "generado":  "2026-08-25T21:24:07.8891165-03:00",
+    "fuente":  "365Scores",
+    "partidos":  [
+                     {
+                         "fecha":  "2026-08-09T15:00",
+                         "numeroFecha":  4,
+                         "local":  "San Lorenzo",
+                         "visitante":  "Huracán",
+                         "golesLocal":  0,
+                         "golesVisitante":  2,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-09T17:45",
+                         "numeroFecha":  4,
+                         "local":  "Gimnasia La Plata",
+                         "visitante":  "Barracas Central",
+                         "golesLocal":  2,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-09T17:45",
+                         "numeroFecha":  4,
+                         "local":  "Defensa y Justicia",
+                         "visitante":  "Newell\u0027s Old Boys",
+                         "golesLocal":  2,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-09T20:15",
+                         "numeroFecha":  4,
+                         "local":  "Argentinos Juniors",
+                         "visitante":  "Racing Club",
+                         "golesLocal":  2,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-10T19:00",
+                         "numeroFecha":  4,
+                         "local":  "Banfield",
+                         "visitante":  "Belgrano",
+                         "golesLocal":  0,
+                         "golesVisitante":  2,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-10T21:15",
+                         "numeroFecha":  4,
+                         "local":  "Unión de Santa Fe",
+                         "visitante":  "Central Córdoba SdE",
+                         "golesLocal":  1,
+                         "golesVisitante":  2,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-11T21:00",
+                         "numeroFecha":  4,
+                         "local":  "Talleres de Córdoba",
+                         "visitante":  "Lanús",
+                         "golesLocal":  0,
+                         "golesVisitante":  3,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-14T20:30",
+                         "numeroFecha":  5,
+                         "local":  "Racing Club",
+                         "visitante":  "Banfield",
+                         "golesLocal":  0,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-15T14:30",
+                         "numeroFecha":  5,
+                         "local":  "San Lorenzo",
+                         "visitante":  "Unión de Santa Fe",
+                         "golesLocal":  1,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-15T14:30",
+                         "numeroFecha":  5,
+                         "local":  "Aldosivi",
+                         "visitante":  "Tigre",
+                         "golesLocal":  0,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-15T16:45",
+                         "numeroFecha":  5,
+                         "local":  "Estudiantes de La Plata",
+                         "visitante":  "Gimnasia La Plata",
+                         "golesLocal":  4,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-15T19:00",
+                         "numeroFecha":  5,
+                         "local":  "Newell\u0027s Old Boys",
+                         "visitante":  "Deportivo Riestra",
+                         "golesLocal":  2,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-15T19:00",
+                         "numeroFecha":  5,
+                         "local":  "Belgrano",
+                         "visitante":  "Independiente Rivadavia",
+                         "golesLocal":  2,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-15T21:15",
+                         "numeroFecha":  5,
+                         "local":  "Platense",
+                         "visitante":  "Boca Juniors",
+                         "golesLocal":  1,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-16T15:00",
+                         "numeroFecha":  5,
+                         "local":  "Sarmiento Junín",
+                         "visitante":  "Huracán",
+                         "golesLocal":  2,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-16T18:00",
+                         "numeroFecha":  5,
+                         "local":  "River Plate",
+                         "visitante":  "Argentinos Juniors",
+                         "golesLocal":  2,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-16T20:15",
+                         "numeroFecha":  5,
+                         "local":  "Barracas Central",
+                         "visitante":  "Rosario Central",
+                         "golesLocal":  0,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-16T20:15",
+                         "numeroFecha":  5,
+                         "local":  "Central Córdoba SdE",
+                         "visitante":  "Instituto",
+                         "golesLocal":  0,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-17T14:45",
+                         "numeroFecha":  5,
+                         "local":  "Estudiantes RC",
+                         "visitante":  "Atlético Tucumán",
+                         "golesLocal":  0,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-17T17:00",
+                         "numeroFecha":  5,
+                         "local":  "Lanús",
+                         "visitante":  "Independiente",
+                         "golesLocal":  1,
+                         "golesVisitante":  3,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-17T19:15",
+                         "numeroFecha":  5,
+                         "local":  "Vélez Sarsfield",
+                         "visitante":  "Defensa y Justicia",
+                         "golesLocal":  1,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-17T21:30",
+                         "numeroFecha":  5,
+                         "local":  "Gimnasia de Mendoza",
+                         "visitante":  "Talleres de Córdoba",
+                         "golesLocal":  3,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-21T14:30",
+                         "numeroFecha":  6,
+                         "local":  "Aldosivi",
+                         "visitante":  "Unión de Santa Fe",
+                         "golesLocal":  1,
+                         "golesVisitante":  3,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-21T20:00",
+                         "numeroFecha":  6,
+                         "local":  "Estudiantes RC",
+                         "visitante":  "San Lorenzo",
+                         "golesLocal":  0,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-22T16:00",
+                         "numeroFecha":  6,
+                         "local":  "Gimnasia La Plata",
+                         "visitante":  "Gimnasia de Mendoza",
+                         "golesLocal":  2,
+                         "golesVisitante":  3,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-22T16:00",
+                         "numeroFecha":  6,
+                         "local":  "Atlético Tucumán",
+                         "visitante":  "Instituto",
+                         "golesLocal":  0,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-22T18:30",
+                         "numeroFecha":  6,
+                         "local":  "Independiente",
+                         "visitante":  "Independiente Rivadavia",
+                         "golesLocal":  0,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-22T21:00",
+                         "numeroFecha":  6,
+                         "local":  "Huracán",
+                         "visitante":  "Deportivo Riestra",
+                         "golesLocal":  0,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-22T21:00",
+                         "numeroFecha":  6,
+                         "local":  "Newell\u0027s Old Boys",
+                         "visitante":  "Banfield",
+                         "golesLocal":  2,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-23T14:45",
+                         "numeroFecha":  6,
+                         "local":  "Barracas Central",
+                         "visitante":  "Platense",
+                         "golesLocal":  1,
+                         "golesVisitante":  2,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-23T14:45",
+                         "numeroFecha":  6,
+                         "local":  "Sarmiento Junín",
+                         "visitante":  "Estudiantes de La Plata",
+                         "golesLocal":  2,
+                         "golesVisitante":  0,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-23T17:00",
+                         "numeroFecha":  6,
+                         "local":  "Belgrano",
+                         "visitante":  "Defensa y Justicia",
+                         "golesLocal":  1,
+                         "golesVisitante":  2,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-23T19:15",
+                         "numeroFecha":  6,
+                         "local":  "River Plate",
+                         "visitante":  "Vélez Sarsfield",
+                         "golesLocal":  2,
+                         "golesVisitante":  2,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-23T21:30",
+                         "numeroFecha":  6,
+                         "local":  "Racing Club",
+                         "visitante":  "Boca Juniors",
+                         "golesLocal":  1,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-24T19:00",
+                         "numeroFecha":  6,
+                         "local":  "Tigre",
+                         "visitante":  "Central Córdoba SdE",
+                         "golesLocal":  2,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-24T21:15",
+                         "numeroFecha":  6,
+                         "local":  "Lanús",
+                         "visitante":  "Argentinos Juniors",
+                         "golesLocal":  1,
+                         "golesVisitante":  1,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-24T21:15",
+                         "numeroFecha":  6,
+                         "local":  "Talleres de Córdoba",
+                         "visitante":  "Rosario Central",
+                         "golesLocal":  2,
+                         "golesVisitante":  2,
+                         "terminado":  true
+                     },
+                     {
+                         "fecha":  "2026-08-28T19:00",
+                         "numeroFecha":  7,
+                         "local":  "Unión de Santa Fe",
+                         "visitante":  "Sarmiento Junín",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-28T21:30",
+                         "numeroFecha":  7,
+                         "local":  "Boca Juniors",
+                         "visitante":  "Lanús",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-29T14:45",
+                         "numeroFecha":  7,
+                         "local":  "Deportivo Riestra",
+                         "visitante":  "Vélez Sarsfield",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-29T17:00",
+                         "numeroFecha":  7,
+                         "local":  "Rosario Central",
+                         "visitante":  "Gimnasia La Plata",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-29T19:00",
+                         "numeroFecha":  7,
+                         "local":  "Huracán",
+                         "visitante":  "Estudiantes RC",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-29T21:30",
+                         "numeroFecha":  7,
+                         "local":  "Atlético Tucumán",
+                         "visitante":  "Belgrano",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-29T21:30",
+                         "numeroFecha":  7,
+                         "local":  "Talleres de Córdoba",
+                         "visitante":  "Central Córdoba SdE",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-30T15:00",
+                         "numeroFecha":  7,
+                         "local":  "Banfield",
+                         "visitante":  "River Plate",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-30T17:00",
+                         "numeroFecha":  7,
+                         "local":  "Argentinos Juniors",
+                         "visitante":  "Aldosivi",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-30T19:15",
+                         "numeroFecha":  7,
+                         "local":  "Independiente",
+                         "visitante":  "Gimnasia de Mendoza",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-30T21:30",
+                         "numeroFecha":  7,
+                         "local":  "Independiente Rivadavia",
+                         "visitante":  "Racing Club",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-31T19:00",
+                         "numeroFecha":  7,
+                         "local":  "Defensa y Justicia",
+                         "visitante":  "Platense",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-31T19:00",
+                         "numeroFecha":  7,
+                         "local":  "Estudiantes de La Plata",
+                         "visitante":  "Newell\u0027s Old Boys",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-31T21:15",
+                         "numeroFecha":  7,
+                         "local":  "Tigre",
+                         "visitante":  "Barracas Central",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-08-31T21:15",
+                         "numeroFecha":  7,
+                         "local":  "Instituto",
+                         "visitante":  "San Lorenzo",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Unión de Santa Fe",
+                         "visitante":  "Instituto",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Rosario Central",
+                         "visitante":  "Newell\u0027s Old Boys",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "San Lorenzo",
+                         "visitante":  "Talleres de Córdoba",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Barracas Central",
+                         "visitante":  "Argentinos Juniors",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "River Plate",
+                         "visitante":  "Independiente Rivadavia",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Racing Club",
+                         "visitante":  "Atlético Tucumán",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Gimnasia de Mendoza",
+                         "visitante":  "Boca Juniors",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Aldosivi",
+                         "visitante":  "Banfield",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Central Córdoba SdE",
+                         "visitante":  "Independiente",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Gimnasia La Plata",
+                         "visitante":  "Tigre",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Estudiantes RC",
+                         "visitante":  "Sarmiento Junín",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Belgrano",
+                         "visitante":  "Huracán",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Vélez Sarsfield",
+                         "visitante":  "Estudiantes de La Plata",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Platense",
+                         "visitante":  "Deportivo Riestra",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-06T14:00",
+                         "numeroFecha":  8,
+                         "local":  "Lanús",
+                         "visitante":  "Defensa y Justicia",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Independiente",
+                         "visitante":  "San Lorenzo",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Atlético Tucumán",
+                         "visitante":  "River Plate",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Newell\u0027s Old Boys",
+                         "visitante":  "Vélez Sarsfield",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Argentinos Juniors",
+                         "visitante":  "Gimnasia La Plata",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Estudiantes de La Plata",
+                         "visitante":  "Platense",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Defensa y Justicia",
+                         "visitante":  "Gimnasia de Mendoza",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Tigre",
+                         "visitante":  "Rosario Central",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Banfield",
+                         "visitante":  "Barracas Central",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Sarmiento Junín",
+                         "visitante":  "Belgrano",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Huracán",
+                         "visitante":  "Racing Club",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Independiente Rivadavia",
+                         "visitante":  "Aldosivi",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Talleres de Córdoba",
+                         "visitante":  "Unión de Santa Fe",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Boca Juniors",
+                         "visitante":  "Central Córdoba SdE",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Instituto",
+                         "visitante":  "Estudiantes RC",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-13T14:00",
+                         "numeroFecha":  9,
+                         "local":  "Deportivo Riestra",
+                         "visitante":  "Lanús",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Belgrano",
+                         "visitante":  "Estudiantes RC",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Platense",
+                         "visitante":  "Newell\u0027s Old Boys",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "San Lorenzo",
+                         "visitante":  "Boca Juniors",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Racing Club",
+                         "visitante":  "Sarmiento Junín",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Central Córdoba SdE",
+                         "visitante":  "Defensa y Justicia",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Vélez Sarsfield",
+                         "visitante":  "Tigre",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Gimnasia La Plata",
+                         "visitante":  "Banfield",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Barracas Central",
+                         "visitante":  "Independiente Rivadavia",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Rosario Central",
+                         "visitante":  "Argentinos Juniors",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Gimnasia de Mendoza",
+                         "visitante":  "Deportivo Riestra",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Instituto",
+                         "visitante":  "Talleres de Córdoba",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Lanús",
+                         "visitante":  "Estudiantes de La Plata",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Aldosivi",
+                         "visitante":  "Atlético Tucumán",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "Unión de Santa Fe",
+                         "visitante":  "Independiente",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-09-20T14:00",
+                         "numeroFecha":  10,
+                         "local":  "River Plate",
+                         "visitante":  "Huracán",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Newell\u0027s Old Boys",
+                         "visitante":  "Lanús",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Estudiantes de La Plata",
+                         "visitante":  "Gimnasia de Mendoza",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Independiente Rivadavia",
+                         "visitante":  "Gimnasia La Plata",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Talleres de Córdoba",
+                         "visitante":  "Belgrano",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Huracán",
+                         "visitante":  "Aldosivi",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Deportivo Riestra",
+                         "visitante":  "Central Córdoba SdE",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Defensa y Justicia",
+                         "visitante":  "San Lorenzo",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Boca Juniors",
+                         "visitante":  "Unión de Santa Fe",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Sarmiento Junín",
+                         "visitante":  "River Plate",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Estudiantes RC",
+                         "visitante":  "Racing Club",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Independiente",
+                         "visitante":  "Instituto",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Atlético Tucumán",
+                         "visitante":  "Barracas Central",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-04T14:00",
+                         "numeroFecha":  11,
+                         "local":  "Argentinos Juniors",
+                         "visitante":  "Tigre",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-11T14:00",
+                         "numeroFecha":  12,
+                         "local":  "Racing Club",
+                         "visitante":  "Belgrano",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-18T14:00",
+                         "numeroFecha":  13,
+                         "local":  "Racing Club",
+                         "visitante":  "Independiente",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-10-25T14:00",
+                         "numeroFecha":  14,
+                         "local":  "River Plate",
+                         "visitante":  "Racing Club",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-11-01T14:00",
+                         "numeroFecha":  15,
+                         "local":  "Racing Club",
+                         "visitante":  "Aldosivi",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     },
+                     {
+                         "fecha":  "2026-11-08T14:00",
+                         "numeroFecha":  16,
+                         "local":  "Barracas Central",
+                         "visitante":  "Racing Club",
+                         "golesLocal":  null,
+                         "golesVisitante":  null,
+                         "terminado":  false
+                     }
+                 ]
+}
