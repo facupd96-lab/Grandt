@@ -116,6 +116,15 @@ function evaluateBestFormations(rankingsByPos, activeWeights, mode = 'solid') {
 
   function getCanon(t) {
     if (!t) return '';
+    // Use resolveTeam for proper alias resolution (River Plate → river, River → river, etc.)
+    if (typeof resolveTeam === 'function') {
+      const resolved = resolveTeam(t);
+      if (resolved && resolved.id) return resolved.id;
+    }
+    // Fallback: also try canonicalTeam if available
+    if (typeof canonicalTeam === 'function') {
+      return canonicalTeam(t);
+    }
     return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
   }
 

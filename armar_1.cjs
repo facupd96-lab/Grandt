@@ -7,7 +7,7 @@ const fs=require('fs'), vm=require('vm');
 // estaban en Descargas y nunca llegaron a la carpeta. Ahora la version se
 // imprime en la consola y se muestra en la cabecera de la pagina.
 // ─────────────────────────────────────────────────────────────────────────────
-const VERSION_MOTOR = 'v6 · 27/08/2026';
+const VERSION_MOTOR = 'v5 · 27/08/2026';
 const M=require('./motorV3.cjs');
 const P=JSON.parse(fs.readFileSync('dataPlaneta.json','utf8'));
 const S=JSON.parse(fs.readFileSync('data365.json','utf8'));
@@ -210,7 +210,7 @@ const CONFIRMADOS = {};
   if (!equiposOk && !sinFormato) console.log('formaciones: ninguna confirmada todavia (se publican ~1 hora antes de cada partido; conviene correr SYNC_365.bat de nuevo justo antes de cerrar el equipo)');
 })();
 
-const players=[]; let match365=0, nuncaJugaron=0, cruceNombreUnico=0;
+const players=[]; let match365=0, nuncaJugaron=0;
 P.jugadores.forEach((j,i)=>{
   const raw=norm(j.nombre), w=raw.split(' '), eq=CT(j.equipo);
   let m=idx365[raw+'@'+eq]||idx365[w.slice(1).join(' ')+' '+w[0]+'@'+eq]||null;
@@ -219,21 +219,6 @@ P.jugadores.forEach((j,i)=>{
   if(!m){const ap=w[0];
     const h=Object.values(S.jugadores).filter(x=>CT(x.equipo)===eq && norm(x.nombre).split(' ').includes(ap));
     if(h.length===1)m=h[0];}
-  // Brasileños y apodos: 365Scores los publica con UNA sola palabra ("Rick",
-  // "Michael"), y Planeta con nombre y apellido ("Lima Morais, Rick"). Sin este
-  // cruce, Rick de Talleres quedaba sin minutos, sin tiros y sin xG. Peor: su
-  // tasa de gol se calculaba con los goles de Planeta divididos por el piso de
-  // 180 minutos, o sea 2 partidos en vez de 6, y terminaba con el 64% del
-  // ataque de Talleres y primero en el ranking sin haber pateado una vez.
-  if(!m){
-    const pila = w.slice(1).concat([w[0]]);   // nombres de pila, sin el apellido
-    const h=Object.values(S.jugadores).filter(x=>{
-      if(CT(x.equipo)!==eq) return false;
-      const partes=norm(x.nombre).split(' ');
-      return partes.length===1 && pila.includes(partes[0]);
-    });
-    if(h.length===1){ m=h[0]; cruceNombreUnico++; }
-  }
   if(m)match365++;
   // Los que no jugaron un solo minuto NI tienen partidos calificados no entran.
   // La planilla nueva trae los planteles completos y un tercio nunca jugo; sin
@@ -256,7 +241,7 @@ P.jugadores.forEach((j,i)=>{
       return c.has(norm(j.nombre)) || c.has(norm((j.nombre||'').split(',').reverse().join(' ').trim())); })(),
     _m:m });
 });
-console.log('jugadores:',players.length,'(se dejaron afuera '+nuncaJugaron+' que nunca jugaron) | cruzados con 365Scores:',match365,'('+Math.round(100*match365/players.length)+'%)'+(cruceNombreUnico?'  ['+cruceNombreUnico+' cruzados por nombre de pila]':''));
+console.log('jugadores:',players.length,'(se dejaron afuera '+nuncaJugaron+' que nunca jugaron) | cruzados con 365Scores:',match365,'('+Math.round(100*match365/players.length)+'%)');
 
 // ---- 4. contexto por equipo
 const porEquipo={}; f6.forEach(m=>{
@@ -273,24 +258,11 @@ Object.values(COPAS.equipos||{}).forEach(e=>{ROT[CT(e.equipo)]=e;});
  console.log('rotacion por copas: '+Object.keys(ROT).length+' equipos cruzados'+(sinCruce?', '+sinCruce+' SIN cruzar':''));}
 const rotDe=k=>{const e=ROT[k];return e?Number(e.indiceRotacion)||0:0;};
 const notaDe=k=>{const e=ROT[k];return e?e.detalle:'';};
-// POR QUE rota, no solo cuanto. La app mostraba "COPA" en cualquier equipo con
-// indice > 0, y River aparecia con COPA despues de quedar afuera de todas: su
-// 0.4 no venia de un partido de copa por delante sino de haber jugado el
-// miercoles. Son dos cosas distintas y se deciden distinto:
-//   'guarda'   -> tiene copa ENCIMA, es probable que ponga suplentes
-//   'cansancio'-> viene de jugar hace poco, llega fundido pero pone titulares
-const motivoRot=k=>{const e=ROT[k]; if(!e) return null;
-  const ind=Number(e.indiceRotacion)||0; if(ind<=0) return null;
-  if(e.proximoEsCopa) return {tipo:'guarda', dias:Number(e.diasHastaProximo)||null,
-    torneo:e.proximoTorneo||'copa', indice:ind};
-  return {tipo:'cansancio', dias:Number(e.diasDescanso)||null,
-    torneo:e.vieneDeTorneo||'', indice:ind};};
 function getCtx(equipo){ const k=CT(equipo); const c=porEquipo[k]; if(!c)return null;
   return {esLocal:c.esLocal, rival:c.rival, odds:c.odds,
     miXg:xgDe(k,c.esLocal?'local':'visitante'), rivalXg:xgDe(c.rivalKey,c.esLocal?'visitante':'local'),
     misStandings:st[k], rivalStandings:st[c.rivalKey],
-    rotacion:rotDe(k), rotacionRival:rotDe(c.rivalKey), notaRotacion:notaDe(k),
-    motivoRotacion:motivoRot(k), motivoRotacionRival:motivoRot(c.rivalKey)}; }
+    rotacion:rotDe(k), rotacionRival:rotDe(c.rivalKey), notaRotacion:notaDe(k)}; }
 
 const sinCtx=[...new Set(players.map(p=>p.team))].filter(t=>!porEquipo[CT(t)]);
 if(sinCtx.length) console.log('equipos sin partido en fecha 6:',sinCtx.join(', '));
@@ -429,7 +401,6 @@ out.partidos = f6.map(m=>{
     tieneMercado: L? L.tieneMercado : false,
     yaJugado: YA_JUGADOS.has([kl,kv].sort().join('|')),
     rotacionLocal: rotDe(kl), rotacionVisitante: rotDe(kv),
-    motivoRotLocal: motivoRot(kl), motivoRotVisitante: motivoRot(kv),
     tirosLocal: (eq365[kl]&&eq365[kl].local.pj)? eq365[kl].local.tirosPorPartido : null,
     tirosVisitante: (eq365[kv]&&eq365[kv].visitante.pj)? eq365[kv].visitante.tirosPorPartido : null,
     tirosConcLocal: (eq365[kl]&&eq365[kl].local.pj)? eq365[kl].local.tirosConcedidosPorPartido : null,
@@ -597,7 +568,7 @@ out.equipos=Object.values(S.equipos).map(e=>({
   equipo:e.equipo,
   total:e.total, local:e.local, visitante:e.visitante,
   anomalia:anomalias[CT(e.equipo)]||null,
-  rotacion:rotDe(CT(e.equipo)), notaRotacion:notaDe(CT(e.equipo)), motivoRotacion:motivoRot(CT(e.equipo))
+  rotacion:rotDe(CT(e.equipo)), notaRotacion:notaDe(CT(e.equipo))
 }));
 
 // ---- 7a. marcar a los que jugaron sin registro en Planeta ----
@@ -616,8 +587,7 @@ if(sf) console.log('  '+sf+' jugaron pero Planeta no les registra puntaje: su fi
 // liga. Es lo que contesta "que defensor tiene el mejor contexto" sin cruzar
 // tablas a mano.
 const ctxLam={}; ['ARQ','DEF','VOL','DEL'].forEach(pos=>out.rankings[pos].forEach(x=>{
-  const k=CT(x.equipo); if(!ctxLam[k]) ctxLam[k]={lam:x.lam,pVI:x.pVI,rot:x.rotacion,rotRiv:x.rotacionRival,
-    mrot:x.motivoRotacion,mrotRiv:x.motivoRotacionRival,jug:x.partidoYaJugado};
+  const k=CT(x.equipo); if(!ctxLam[k]) ctxLam[k]={lam:x.lam,pVI:x.pVI,rot:x.rotacion,rotRiv:x.rotacionRival,jug:x.partidoYaJugado};
 }));
 out.tablero=[];
 f6.forEach(m=>{
@@ -637,8 +607,7 @@ f6.forEach(m=>{
       // lo que dice el motor (anclado al mercado)
       lamFavor:c?c.lam.lamFor:null, lamContra:c?c.lam.lamAgainst:null,
       pValla:c?c.pVI:null,
-      rotacion:c?c.rot:0, rotacionRival:c?c.rotRiv:0,
-      motivoRotacion:c?c.mrot:null, motivoRotacionRival:c?c.mrotRiv:null
+      rotacion:c?c.rot:0, rotacionRival:c?c.rotRiv:0
     });
   });
 });
@@ -701,7 +670,6 @@ const slim=x=>({id:x.id,n:x.nombre,eq:x.equipo,pos:x.pos,riv:x.rival,cond:x.cond
  ep:x.EP,epsj:x.EPsiJuega,mesp:x.minEsperados,msj:x.minSiJuega,fmin:x.fuenteMinutos,pj_:x.pJuega,sc:x.score,fi:x.ficha,pvi:x.pVI,lg:x.lamGol,pfig:x.pFigura,ta:x.tasaTA,
  piso:x.piso,techo:x.techo,perf:x.perfil||'',pe:x.pisoEquipo||null,
  rot:x.rotacion||0,rotr:x.rotacionRival||0,nrot:x.notaRotacion||'',
- mrot:x.motivoRotacion||null,mrotr:x.motivoRotacionRival||null,
  pr:x.precio,ind:x.individual,me:x.miEquipo,er:x.elRival,met:x.miEquipoTotal,ert:x.elRivalTotal,
  an:x.anomalia,anr:x.anomaliaRival, disp:x.disponibilidad, jug:x.partidoYaJugado, sf:x.sinFicha,
  des:(x.desglose||[]).map(d=>[d[0],+Number(d[1]).toFixed(2),d[2]]),

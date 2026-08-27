@@ -2,63 +2,80 @@
  * DATA SANITIZER & SAFETY GUARD FOR GRAN DT 2026
  * Enforces strict consistency rules between team statistics, official standings,
  * and individual player metrics (goals, clean sheets, matches played, xG, shots).
+ * 
+ * v2.0 — Dynamic tournament rounds, canonical standings lookup, improved xG estimation
  */
 function sanitizeAndValidateData(data) {
   if (!data || !Array.isArray(data.players)) return data;
 
-  const CURRENT_TOURNAMENT_MAX_ROUNDS = 4; // Currently played 4 rounds
+  // FIX 1: Dynamic tournament max rounds — calculated from standings data, NOT hardcoded
+  let maxPjFromStandings = 1;
+  if (data.standings) {
+    (data.standings.zonaA || []).forEach(t => { if (t.pj > maxPjFromStandings) maxPjFromStandings = t.pj; });
+    (data.standings.zonaB || []).forEach(t => { if (t.pj > maxPjFromStandings) maxPjFromStandings = t.pj; });
+  }
+  const CURRENT_TOURNAMENT_MAX_ROUNDS = Math.max(maxPjFromStandings, data.currentRound || 1);
+
   const report = {
     fixedGoals: 0,
     fixedMatches: 0,
     fixedCleanSheets: 0,
     fixedTeamNames: 0,
+    dynamicMaxRounds: CURRENT_TOURNAMENT_MAX_ROUNDS,
     warnings: []
   };
-
-  // 1. Build Team Standings Lookup
-  const standingsMap = {};
-  if (data.standings) {
-    (data.standings.zonaA || []).forEach(t => { standingsMap[t.team] = t; });
-    (data.standings.zonaB || []).forEach(t => { standingsMap[t.team] = t; });
-  }
 
   // Canonical Team Aliases Map
   const CANONICAL_ALIASES = {
     'Independiente Rivadavia': 'Independiente Rivadavia',
     'Ind. Rivadavia': 'Independiente Rivadavia',
     'Indep. R.': 'Independiente Rivadavia',
+    'CS Independiente Rivadavia': 'Independiente Rivadavia',
     'Independiente': 'Independiente',
     'Gimnasia LP': 'Gimnasia LP',
     'Gimnasia y Esgrima La Plata': 'Gimnasia LP',
+    'Gimnasia La Plata': 'Gimnasia LP',
+    'Gimnasia (LP)': 'Gimnasia LP',
     'Gimnasia M.': 'Gimnasia (M)',
     'Gimnasia de Mendoza': 'Gimnasia (M)',
+    'Gimnasia Mza': 'Gimnasia (M)',
     'Gimnasia (M)': 'Gimnasia (M)',
+    'Gimnasia Mendoza': 'Gimnasia (M)',
     'Estudiantes LP': 'Estudiantes LP',
     'Estudiantes de La Plata': 'Estudiantes LP',
     'Estudiantes (RC)': 'Estudiantes (RC)',
     'Estudiantes RC': 'Estudiantes (RC)',
     'Estudiantes de Rio Cuarto': 'Estudiantes (RC)',
+    'Estudiantes de Río Cuarto': 'Estudiantes (RC)',
     'Rosario Central': 'Rosario Central',
     'Rosario Ctral.': 'Rosario Central',
     'Rosario C.': 'Rosario Central',
     'Central Córdoba (SdE)': 'Central Córdoba (SdE)',
     'Central Córdoba': 'Central Córdoba (SdE)',
     'Central Cba. (SdE)': 'Central Córdoba (SdE)',
+    'Ctral. Córdoba': 'Central Córdoba (SdE)',
     'Central C.': 'Central Córdoba (SdE)',
+    'Central Cordoba': 'Central Córdoba (SdE)',
+    'Central Córdoba (Santiago del Estero)': 'Central Córdoba (SdE)',
     'Barracas Central': 'Barracas Central',
     'Barracas Ctral.': 'Barracas Central',
     'Barracas C.': 'Barracas Central',
     'Defensa y Justicia': 'Defensa y Justicia',
     'Def. y Justicia': 'Defensa y Justicia',
     'Def. y Jus.': 'Defensa y Justicia',
+    'Defensa Y Justicia': 'Defensa y Justicia',
     'Atlético Tucumán': 'Atlético Tucumán',
     'Atl. Tucumán': 'Atlético Tucumán',
     'Atletico T.': 'Atlético Tucumán',
+    'Atletico Tucuman': 'Atlético Tucumán',
+    'Atlético Tucuman': 'Atlético Tucumán',
     'Deportivo Riestra': 'Deportivo Riestra',
     'Dep. Riestra': 'Deportivo Riestra',
-    'Newell\'s Old Boys': 'Newell\'s',
-    'Newell\'s OB': 'Newell\'s',
-    'Newell\'s': 'Newell\'s',
+    "Newell's Old Boys": "Newell's",
+    "Newell's OB": "Newell's",
+    "Newell's": "Newell's",
+    'Newells Old Boys': "Newell's",
+    'Newells': "Newell's",
     'River Plate': 'River',
     'River Plate Buenos Aires': 'River',
     'River': 'River',
@@ -70,24 +87,36 @@ function sanitizeAndValidateData(data) {
     'Unión de Santa Fe': 'Unión',
     'Union SF': 'Unión',
     'Unión': 'Unión',
+    'Unión (Santa Fe)': 'Unión',
     'San Lorenzo de Almagro': 'San Lorenzo',
     'San Lorenzo': 'San Lorenzo',
     'Club Atlético Tigre': 'Tigre',
+    'CA Tigre BA': 'Tigre',
     'Tigre': 'Tigre',
     'Talleres de Córdoba': 'Talleres',
+    'Talleres (Córdoba)': 'Talleres',
     'Talleres C.': 'Talleres',
     'Talleres': 'Talleres',
     'CA Banfield': 'Banfield',
     'Banfield': 'Banfield',
     'CA Sarmiento': 'Sarmiento',
+    'Sarmiento de Junín': 'Sarmiento',
+    'Sarmiento (Junín)': 'Sarmiento',
     'Sarmiento': 'Sarmiento',
     'Club Atletico Huracan': 'Huracán',
+    'Atlético Huracán': 'Huracán',
     'Huracán': 'Huracán',
     'CA Aldosivi': 'Aldosivi',
+    'Aldosivi Mar del Plata': 'Aldosivi',
     'Aldosivi': 'Aldosivi',
     'Instituto Córdoba': 'Instituto',
+    'Instituto de Córdoba': 'Instituto',
+    'Instituto de Cordoba': 'Instituto',
+    'Instituto (Córdoba)': 'Instituto',
     'Instituto': 'Instituto',
     'Vélez Sarsfield': 'Vélez',
+    'Velez Sarsfield': 'Vélez',
+    'Velez Sarsfield BA': 'Vélez',
     'Vélez S.': 'Vélez',
     'Vélez': 'Vélez',
     'Lanus': 'Lanús',
@@ -95,12 +124,37 @@ function sanitizeAndValidateData(data) {
     'Argentinos Juniors': 'Argentinos',
     'Argentinos': 'Argentinos',
     'Belgrano': 'Belgrano',
-    'Platense': 'Platense'
+    'Belgrano de Córdoba': 'Belgrano',
+    'Belgrano de Cordoba': 'Belgrano',
+    'Belgrano (Córdoba)': 'Belgrano',
+    'Platense': 'Platense',
+    'San Martín (SJ)': 'San Martín (SJ)',
+    'San Martín (T)': 'San Martín (T)',
   };
 
   function getCanonical(t) {
     if (!t) return '';
     return CANONICAL_ALIASES[t] || t;
+  }
+
+  // FIX 2: Build Team Standings Lookup — index by BOTH raw name AND canonical name
+  const standingsMap = {};
+  if (data.standings) {
+    const indexTeam = (t) => {
+      standingsMap[t.team] = t;
+      const canon = getCanonical(t.team);
+      if (canon !== t.team) standingsMap[canon] = t;
+      // Also store lowercase for fuzzy matching
+      const lower = t.team.toLowerCase().trim();
+      if (!standingsMap[lower]) standingsMap[lower] = t;
+    };
+    (data.standings.zonaA || []).forEach(indexTeam);
+    (data.standings.zonaB || []).forEach(indexTeam);
+  }
+
+  // Helper to find team in standings with fallback
+  function findTeamInStandings(teamName) {
+    return standingsMap[teamName] || standingsMap[getCanonical(teamName)] || standingsMap[(teamName || '').toLowerCase().trim()] || null;
   }
 
   // 2. Track Team Sums for Clamping
@@ -114,7 +168,7 @@ function sanitizeAndValidateData(data) {
       report.fixedTeamNames++;
     }
 
-    // B. Match Count Sanity Check (Max 4 for current tournament)
+    // B. Match Count Sanity Check (dynamic based on actual tournament progress)
     if (p.matchesRated && p.matchesRated > CURRENT_TOURNAMENT_MAX_ROUNDS) {
       p.matchesRated = CURRENT_TOURNAMENT_MAX_ROUNDS;
       report.fixedMatches++;
@@ -124,18 +178,19 @@ function sanitizeAndValidateData(data) {
       report.fixedMatches++;
     }
 
-    // C. Clean Sheets Sanity Check (Max 4 for current tournament)
+    // C. Clean Sheets Sanity Check
     if (p.cleanSheets && p.cleanSheets > CURRENT_TOURNAMENT_MAX_ROUNDS) {
       p.cleanSheets = CURRENT_TOURNAMENT_MAX_ROUNDS;
       report.fixedCleanSheets++;
     }
 
     // D. Goalkeeper Goals Conceded Sanity & Fallback from Standings
-    const teamSt = standingsMap[p.team];
+    // FIX 2 APPLIED: Use findTeamInStandings instead of direct lookup
+    const teamSt = findTeamInStandings(p.team);
     const teamGF = teamSt ? teamSt.gf : CURRENT_TOURNAMENT_MAX_ROUNDS * 3;
     const teamGC = teamSt ? teamSt.gc : 0;
     const pjPlayer = Math.max(1, p.matchesRated || p.pj || 1);
-    const pjTeam = teamSt ? (teamSt.pj || 4) : 4;
+    const pjTeam = teamSt ? (teamSt.pj || CURRENT_TOURNAMENT_MAX_ROUNDS) : CURRENT_TOURNAMENT_MAX_ROUNDS;
 
     if (p.position === 'ARQ') {
       const isMissingOrZeroWithTeamGC = (p.goalsConceded === undefined || (p.goalsConceded === 0 && teamGC > 0 && (p.cleanSheets || 0) < pjPlayer));
@@ -155,87 +210,83 @@ function sanitizeAndValidateData(data) {
       report.fixedGoals++;
     }
 
-    // F. Clarín Average Rating Sanity Check (Clarín journalistic rating is between 4.0 and 7.5; if > 7.5, it is total Gran DT points average)
+    // FIX 4: Clarín Average Rating — Expanded range [4.5, 7.0]
+    // Clarín journalistic rating scale is 1-10, typically 4.0-7.5.
+    // If avgRating > 7.5, it contains Gran DT bonuses (goals, figuras) and needs cleaning.
     if (p.avgRating && p.avgRating > 7.5) {
-      const estimatedClean = Math.min(6.50, Math.max(5.20, p.avgRating - ((p.goals || 0) * (p.position === 'VOL' ? 1.5 : 1.0)) - ((p.figuras || 0) * 1.0)));
+      // Strip out goal bonuses and figura bonuses to recover pure journalistic rating
+      const goalBonusPerMatch = (p.position === 'VOL') ? 1.5 : (p.position === 'DEL') ? 1.2 : 1.0;
+      const estimatedClean = Math.min(7.00, Math.max(4.50,
+        p.avgRating - ((p.goals || 0) * goalBonusPerMatch / pjPlayer) - ((p.figuras || 0) * 1.0 / pjPlayer)
+      ));
       p.avgRating = Number(estimatedClean.toFixed(2));
     }
 
-    // G. Exact 365Scores Official Metric Calibration & Comprehensive Statistical Engine
-    const OFFICIAL_365_STATS = {
-      'Luna, Alex': { xg: 2.34, shots: 9, pj: 4 },
-      'Merentiel, Miguel': { xg: 2.24, shots: 11, pj: 4 },
-      'Arce, Alex': { xg: 2.23, shots: 11, pj: 4 },
-      'Tissera, Matías': { xg: 2.16, shots: 10, pj: 4 },
-      'Céliz, Milton': { xg: 2.08, shots: 8, pj: 4 },
-      'Marabel, Junior': { xg: 1.97, shots: 9, pj: 4 },
-      'Barbona, David': { xg: 1.88, shots: 8, pj: 4 },
-      'Módica, Agustín': { xg: 1.83, shots: 10, pj: 4 },
-      'Auzmendi, Rodrigo': { xg: 1.80, shots: 8, pj: 4 },
-      'Auzmendi, Agustín': { xg: 1.80, shots: 8, pj: 4 },
-      'Santos, Michael': { xg: 1.70, shots: 7, pj: 3 },
-      'Verón, Gastón': { xg: 1.63, shots: 9, pj: 4 },
-      'Lima Morais, Rick': { xg: 1.59, shots: 9, pj: 4 },
-      'Sepúlveda, Bruno': { xg: 1.55, shots: 8, pj: 4 },
-      'Carrillo, Guido': { xg: 1.55, shots: 7, pj: 4 },
-      'Ascacíbar, Santiago': { xg: 1.44, shots: 7, pj: 4 },
-      'Caicedo, Jordy': { xg: 1.96, shots: 11, pj: 4 },
-      'Valois, Yoshan': { xg: 1.80, shots: 10, pj: 4 },
-      'Montiel, Santiago': { xg: 1.48, shots: 8, pj: 4 },
-      'Díaz, Leandro': { xg: 1.42, shots: 7, pj: 3 },
-      'Díaz, Alexander': { xg: 1.35, shots: 7, pj: 4 },
-      'Russo, Ignacio': { xg: 1.45, shots: 8, pj: 4 },
-      'Cóccaro, Matías': { xg: 1.50, shots: 8, pj: 4 },
-      'Morales, Gonzalo': { xg: 1.30, shots: 7, pj: 4 },
-      'Passerini, Lucas': { xg: 1.25, shots: 6, pj: 4 },
-      'Campaz, Jaminton': { xg: 1.20, shots: 6, pj: 4 },
-      'Lanzini, Manuel': { xg: 1.30, shots: 7, pj: 4 },
-      'Miljevic, Matko': { xg: 1.35, shots: 8, pj: 4 },
-      'López Muñoz, Hernán': { xg: 1.40, shots: 8, pj: 4 },
-      'Mavilla, Francisco': { xg: 1.42, shots: 8, pj: 4 },
-      'Mavilla, Julián': { xg: 1.42, shots: 8, pj: 4 },
-      'Martínez, Adrián': { xg: 1.38, shots: 8, pj: 4 }
-    };
+    // FIX 3: xG/Shots — Use real 365Scores data when available, smart estimation only if missing
+    const has365Data = p.matches365 !== undefined && p.matches365 !== null && p.matches365 > 0;
+    const hasRealSofaData = p._sofascoreEnriched === true || has365Data;
 
-    const stat365 = OFFICIAL_365_STATS[p.name];
-    if (stat365) {
-      p.xg365 = stat365.xg;
-      p.shots365 = stat365.shots;
-      p.matches365 = stat365.pj;
-      p.xgPerMatch = Number((stat365.xg / stat365.pj).toFixed(3));
-      p.shotsPerMatch = Number((stat365.shots / stat365.pj).toFixed(2));
-    } else {
+    if (!hasRealSofaData && (p.xg365 === undefined || p.xg365 === null)) {
+      // Estimate xG and shots based on actual goals scored and position
+      // Uses calibrated ratios from Primera División averages:
+      // - Average xG conversion rate: ~12-15% (1 goal per 7-8 xG roughly)
+      // - Shots per xG: ~4-5 shots per 1 xG
       const goals = p.goals || 0;
       const penGoals = p.goalsPenalty || 0;
       const isPenTaker = penGoals > 0;
-      let baseShots = 0;
-      let baseXg = 0;
+      const goalsPerMatch = goals / pjPlayer;
+
+      let baseXgPerMatch = 0;
+      let baseShotsPerMatch = 0;
 
       if (p.position === 'DEL') {
-        if (goals >= 3) { baseShots = 2.60; baseXg = 0.46; }
-        else if (goals === 2) { baseShots = 2.25; baseXg = 0.36; }
-        else if (goals === 1) { baseShots = 1.80; baseXg = 0.24; }
-        else { baseShots = 1.35; baseXg = 0.14; }
+        // Delanteros: xG ≈ goalsPerMatch * 1.1 (strikers slightly underperform xG)
+        // Shots ≈ xG * 4.5
+        baseXgPerMatch = Math.max(0.10, goalsPerMatch * 1.10);
+        baseShotsPerMatch = Math.max(0.80, baseXgPerMatch * 4.5);
+        // Floor for active forwards with no goals yet
+        if (goals === 0 && pjPlayer >= 3) {
+          baseXgPerMatch = 0.12;
+          baseShotsPerMatch = 0.90;
+        }
       } else if (p.position === 'VOL') {
-        if (goals >= 2) { baseShots = 1.95; baseXg = 0.32; }
-        else if (goals === 1) { baseShots = 1.40; baseXg = 0.18; }
-        else { baseShots = 0.85; baseXg = 0.08; }
+        // Volantes: More varied — some are pure creators, some are goal threats
+        baseXgPerMatch = Math.max(0.05, goalsPerMatch * 1.20);
+        baseShotsPerMatch = Math.max(0.50, baseXgPerMatch * 4.0);
+        if (goals === 0 && pjPlayer >= 3) {
+          baseXgPerMatch = 0.06;
+          baseShotsPerMatch = 0.55;
+        }
       } else if (p.position === 'DEF') {
-        if (goals >= 1) { baseShots = 0.75; baseXg = 0.12; }
-        else { baseShots = 0.30; baseXg = 0.03; }
+        // Defensores: Low volume but important for set pieces
+        baseXgPerMatch = Math.max(0.02, goalsPerMatch * 1.30);
+        baseShotsPerMatch = Math.max(0.20, baseXgPerMatch * 3.5);
+        if (goals === 0) {
+          baseXgPerMatch = 0.02;
+          baseShotsPerMatch = 0.20;
+        }
       } else {
-        baseShots = 0; baseXg = 0;
+        // ARQ: Essentially zero
+        baseXgPerMatch = 0;
+        baseShotsPerMatch = 0;
       }
 
+      // Penalty taker bonus
       if (isPenTaker) {
-        baseXg += 0.08;
+        const penXgPerMatch = (penGoals * 0.79) / pjPlayer;
+        baseXgPerMatch += penXgPerMatch;
       }
 
-      p.shotsPerMatch = Number(baseShots.toFixed(2));
-      p.xgPerMatch = Number(baseXg.toFixed(3));
-      p.shots365 = Number((baseShots * pjPlayer).toFixed(0));
-      p.xg365 = Number((baseXg * pjPlayer).toFixed(2));
+      // Upper bounds to prevent outliers
+      baseXgPerMatch = Math.min(0.80, baseXgPerMatch);
+      baseShotsPerMatch = Math.min(4.50, baseShotsPerMatch);
+
+      p.xgPerMatch = Number(baseXgPerMatch.toFixed(3));
+      p.shotsPerMatch = Number(baseShotsPerMatch.toFixed(2));
+      p.xg365 = Number((baseXgPerMatch * pjPlayer).toFixed(2));
+      p.shots365 = Math.round(baseShotsPerMatch * pjPlayer);
       p.matches365 = pjPlayer;
+      p._xgEstimated = true; // Flag so the algorithm knows this is estimated, not real
     }
 
     teamGoalsSum[p.team] = (teamGoalsSum[p.team] || 0) + (p.goals || 0);
@@ -244,7 +295,7 @@ function sanitizeAndValidateData(data) {
   // 3. Team-Wide Goal Overload Check
   Object.keys(teamGoalsSum).forEach(t => {
     const sum = teamGoalsSum[t];
-    const teamSt = standingsMap[t];
+    const teamSt = findTeamInStandings(t);
     if (teamSt && sum > teamSt.gf) {
       report.warnings.push(`ALERTA: Suma de goles de ${t} (${sum}) supera GF (${teamSt.gf}) en tabla oficial.`);
     }
@@ -259,7 +310,7 @@ function sanitizeAndValidateData(data) {
     });
   }
 
-  console.log(`🛡️ [DATA SANITIZER] Validación completada. Correcciones: Goles=${report.fixedGoals}, PJ=${report.fixedMatches}, Vallas=${report.fixedCleanSheets}, Equipos=${report.fixedTeamNames}.`);
+  console.log(`🛡️ [DATA SANITIZER v2.0] Validación completada (Max Rondas: ${CURRENT_TOURNAMENT_MAX_ROUNDS}). Correcciones: Goles=${report.fixedGoals}, PJ=${report.fixedMatches}, Vallas=${report.fixedCleanSheets}, Equipos=${report.fixedTeamNames}.`);
   if (report.warnings.length > 0) {
     console.log('⚠️ Alertas del Sanitizer:', report.warnings);
   }

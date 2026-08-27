@@ -5,8 +5,8 @@ import axios from 'axios';
 // ═══════════════════════════════════════════════════════
 // CONFIGURACIÓN - Actualizar cada torneo
 // ═══════════════════════════════════════════════════════
-const PLANETA_GRANDT_SHEET_ID = '2PACX-1vT2BKHkgC0kJbGSHNlC3jv37qow42OcSSw89CLKvDFsWIBocEMrVwRhcwHCXg084QTzRDTphLwpjkss';
-const PLANETA_GRANDT_TORNEO_PASADO_SHEET_ID = '2PACX-1vTP7ix6p9f6B5hXlV7nmJ8OKMXNMl5c9RIWO_0rF8dez84XskFpv3lRZS1TGQbsTdW_GUtfbLsMaUTy';
+const PLANETA_GRANDT_SHEET_ID = '2PACX-1vTSCtCdSe6xW7FVnObApbhqwfLF6sOhNkVxG4yr_k3ry8Jn6yUBOisyM_mVNakwPePQFU2pUuyza4Zn';
+const PLANETA_GRANDT_TORNEO_PASADO_SHEET_ID = '2PACX-1vTAw508wWMDGajWOvAm0dbe30gipUMQHef1tk16pLIXOGjf8FHaH6B30x0W_ehikCKsN30tnKlCLiqf';
 
 // GIDs de cada pestaña de la planilla de Planeta Gran DT
 const SHEET_GIDS = {

@@ -1,5 +1,5 @@
 {
-    "generado":  "2026-08-25T21:24:07.8908885-03:00",
+    "generado":  "2026-08-27T19:00:15.3244748-03:00",
     "fuente":  "365Scores",
     "partidosDeCopa":  10,
     "equipos":  {
@@ -323,30 +323,30 @@
                                                     "partidoLiga":  "2026-08-31T19:00",
                                                     "rivalLiga":  "Newell\u0027s Old Boys",
                                                     "deLocal":  true,
-                                                    "diasDescanso":  4,
+                                                    "diasDescanso":  8.2,
                                                     "diasHastaProximo":  5.8,
                                                     "proximoEsCopa":  false,
                                                     "proximoTorneo":  "Liga Profesional",
-                                                    "vieneDeCopa":  true,
-                                                    "vieneDeTorneo":  "Copa Argentina",
+                                                    "vieneDeCopa":  false,
+                                                    "vieneDeTorneo":  "Liga Profesional",
                                                     "vieneDeViaje":  false,
-                                                    "indiceRotacion":  0.4,
-                                                    "detalle":  "viene de Copa Argentina vs Barracas Central el jue 27/08 - despues juega Liga Profesional vs Vélez Sarsfield el dom 06/09"
+                                                    "indiceRotacion":  0,
+                                                    "detalle":  "viene de Liga Profesional vs Sarmiento Junín el dom 23/08 - despues juega Liga Profesional vs Vélez Sarsfield el dom 06/09"
                                                 },
                     "Barracas Central":  {
                                              "equipo":  "Barracas Central",
                                              "partidoLiga":  "2026-08-31T21:15",
                                              "rivalLiga":  "Tigre",
                                              "deLocal":  false,
-                                             "diasDescanso":  4.1,
+                                             "diasDescanso":  8.3,
                                              "diasHastaProximo":  5.7,
                                              "proximoEsCopa":  false,
                                              "proximoTorneo":  "Liga Profesional",
-                                             "vieneDeCopa":  true,
-                                             "vieneDeTorneo":  "Copa Argentina",
+                                             "vieneDeCopa":  false,
+                                             "vieneDeTorneo":  "Liga Profesional",
                                              "vieneDeViaje":  false,
-                                             "indiceRotacion":  0.4,
-                                             "detalle":  "viene de Copa Argentina vs Estudiantes de La Plata el jue 27/08 - despues juega Liga Profesional vs Argentinos Juniors el dom 06/09"
+                                             "indiceRotacion":  0,
+                                             "detalle":  "viene de Liga Profesional vs Platense el dom 23/08 - despues juega Liga Profesional vs Argentinos Juniors el dom 06/09"
                                          },
                     "Aldosivi":  {
                                      "equipo":  "Aldosivi",
