@@ -2385,7 +2385,7 @@ const S = {
   esquema: null,
   once: [],
   capitan: null,
-  ordCol: 'ep',
+  ordCol: 'epsj',
   ordDir: -1,
   verTodos: false,
   filtrados: 0
@@ -2397,6 +2397,19 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const n1 = v => (v == null || isNaN(v)) ? 's/d' : Number(v).toFixed(1);
 const n2 = v => (v == null || isNaN(v)) ? 's/d' : Number(v).toFixed(2);
 const n3 = v => (v == null || isNaN(v)) ? 's/d' : Number(v).toFixed(3);
+// Numero corto: la cantidad de decimales depende de cuan chico es el numero.
+// 0.102 se lee 0.1, pero 0.02 no se puede redondear a 0.0 — ahi si hacen falta
+// los decimales. Regla: siempre dos cifras significativas, sin ceros de relleno.
+const nCorto = v => {
+  if (v == null || isNaN(v)) return 's/d';
+  const a = Math.abs(v);
+  if (a === 0) return '0';
+  if (a >= 10) return Number(v).toFixed(0);
+  if (a >= 1) return String(+Number(v).toFixed(1));
+  if (a >= 0.1) return String(+Number(v).toFixed(2));
+  if (a >= 0.01) return String(+Number(v).toFixed(3));
+  return String(+Number(v).toFixed(4));
+};
 const pc = v => (v == null || isNaN(v)) ? 's/d' : (v * 100).toFixed(1) + '%';
 const pc0 = v => (v == null || isNaN(v)) ? 's/d' : Math.round(v * 100) + '%';
 const plata = v => v == null ? 's/d' : '$ ' + Number(v).toLocaleString('es-AR');
@@ -2672,7 +2685,7 @@ function pintarCabecera() {
     const ok = !!D.version;
     sub.insertAdjacentHTML('beforeend',
       ` • <span title="Version del motor que genero datos.js" style="font-weight:700;color:${ok ? '#10b981' : '#ef4444'};">motor ${v}</span>` +
-      ` <span style="color:var(--text-muted);">· app v11</span>`);
+      ` <span style="color:var(--text-muted);">· app v12</span>`);
   }
   // Un solo chip de estado. El detalle (cuantos jugadores, cuantos con tiros
   // medidos, cuantas fichas cierran) esta adentro del modal que abre.
@@ -2855,10 +2868,10 @@ function abrirTablaCompleta() {
 
 // ── rankings ────────────────────────────────────────────────────────────────
 const COLS = {
-  ARQ: [['#', ''], ['Arquero', 'n'], ['Valla invicta', 'pvi'], ['Goles que le hacen', 'lamc'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']],
-  DEF: [['#', ''], ['Defensor', 'n'], ['Perfil', 'perf'], ['Valla', 'pvi'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']],
-  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']],
-  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']]
+  ARQ: [['#', ''], ['Arquero', 'n'], ['Valla invicta', 'pvi'], ['Goles que le hacen', 'lamc'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  DEF: [['#', ''], ['Defensor', 'n'], ['Perfil', 'perf'], ['Valla', 'pvi'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']]
 };
 const valorCol = (x, k) =>
   k === 'tiros' ? (x.ind ? x.ind.tirosPorPartido : null) :
@@ -2907,7 +2920,7 @@ function celda(x, k, i) {
       const c = v >= 1.6 ? '#10b981' : v >= 1.2 ? '#38bdf8' : v >= 0.95 ? 'var(--text-muted)' : '#f97316';
       return `<span title="Goles que se espera que meta SU EQUIPO en este partido, salido de las cuotas. El promedio de la liga es 1.04." style="color:${c};font-weight:700;">${n2(v)}</span>`;
     }
-    case 'lg': return `<span title="Goles esperados del jugador en este partido: su parte del ataque del equipo, por los minutos que se espera que juegue">${n2(x.lg)}</span>`;
+    case 'lg': return `<span title="Goles esperados del jugador en este partido: su parte del ataque del equipo, por los minutos que se espera que juegue">${nCorto(x.lg)}</span>`;
     case 'pvi': return pc0(x.pvi);
     case 'pj_': return pc0(x.pj_);
     case 'ctx': return (S.pos === 'ARQ' || S.pos === 'DEF') ? pc0(x.pvi) : n2(x.lam && x.lam.f);
@@ -2921,11 +2934,16 @@ function celda(x, k, i) {
     case 'pr': return `<span style="color:#f59e0b;font-weight:700;">${plata(x.pr)}</span>`;
     case 'lamc': return n2(x.lam.c);
     case 'tiros': return x.ind ? n1(x.ind.tirosPorPartido) : 's/d';
-    case 'xg': return x.ind ? n3(x.ind.xgPorPartido) : 's/d';
-    case 'fi': return n2(x.fi);
-    case 'ep': return `<span class="score-badge" title="Puntos esperados de la fecha: ya descuenta la chance de que no llegue a los 20 minutos">${n2(x.ep)}</span>`;
+    case 'xg': return x.ind ? nCorto(x.ind.xgPorPartido) : 's/d';
+    case 'fi': return n1(x.fi);
+    // El numero grande es el de SI ENTRA A LA CANCHA: cuantos puntos hace
+    // contando los minutos que se espera que juegue, sin descontar la chance de
+    // que no juegue. Esa chance la mira uno en la columna de minutos, y manana
+    // con las formaciones confirmadas deja de ser una duda.
     case 'epsj': return x.epsj == null ? '—'
-      : `<span title="Lo que rinde SI entra a la cancha. No mira si va a jugar o no — eso lo dice la columna de minutos." style="font-weight:800;color:#38bdf8;">${n2(x.epsj)}</span>`;
+      : `<span class="score-badge" title="Puntos que hace SI entra a la cancha, ya considerando cuántos minutos va a jugar. No descuenta la chance de que no juegue: eso lo mirás en la columna de minutos.">${n1(x.epsj)}</span>`;
+    case 'ep': return `<span title="Lo mismo pero descontando la chance de que no llegue a los 20 minutos que exige la ficha" style="color:var(--text-muted);">${n1(x.ep)}</span>`;
+    case 'piso': case 'techo': return n1(x[k]);
     default: return n2(x[k]);
   }
 }
@@ -2936,8 +2954,8 @@ function celda(x, k, i) {
 // 5 que jugo las seis completas, aunque por partido rinde bastante mas. Las dos
 // lecturas son correctas; lo que estaba mal era ofrecer solo una.
 const ORDENES = [
-  ['ep',   'Puntos de la fecha', 'Lo que se espera que sume, contando la chance de que no llegue a los 20 minutos'],
-  ['epsj', 'Si entra a la cancha', 'Lo que rinde cuando juega, sin mirar si va a jugar o no'],
+  ['epsj', 'Puntos si juega', 'Los puntos que hace si entra a la cancha, ya considerando cuántos minutos va a jugar. Es el orden por defecto: si no va a jugar, no lo ponés y listo'],
+  ['ep',   'Descontando que no juegue', 'Lo mismo pero multiplicado por la chance de llegar a los 20 minutos que exige la ficha'],
   ['lg',   'Amenaza de gol',      'Goles esperados del jugador en este partido'],
   ['fi',   'Ficha Clarín',        'La nota que viene sacando, limpia de bonificaciones'],
   ['ctx',  'Contexto del partido', 'Para VOL y DEL: los goles que se espera que meta su equipo. Para ARQ y DEF: la chance de valla invicta'],
@@ -3002,7 +3020,6 @@ function pintarRankings() {
   const thead = $('rankings-thead'), body = $('players-body');
   if (!thead || !body) return;
   pintarAvisoDatos();
-  pintarSelectorOrden();
   const cols = COLS[S.pos];
   thead.innerHTML = '<tr>' + cols.map(c =>
     `<th class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}" data-k="${c[1]}" style="cursor:pointer;">${c[0]}</th>`).join('') + '</tr>';
@@ -3036,6 +3053,9 @@ function pintarRankings() {
   const puestoDe = {}; const totalPuesto = universo.length;
   [...universo].sort(cmp).forEach((x, i) => { puestoDe[x.id] = i + 1; });
   S.puestoDe = puestoDe; S.totalPuesto = totalPuesto;
+  // El selector se pinta DESPUES de saber cuantos quedaron afuera: si se pinta
+  // antes muestra el numero de la vuelta anterior.
+  pintarSelectorOrden();
   lista = lista.slice().sort(cmp);
   body.innerHTML = lista.slice(0, 120).map((x, i) =>
     `<tr style="cursor:pointer;" onclick="auditar('${x.id}')">` +
@@ -3166,8 +3186,8 @@ window.auditar = function (id) {
     ${bloque('El jugador', [
       filaP('Ficha Clarín limpia', n2(x.fi), percentil(x.fi, col('fi')), `· ${ind.pj || 0} PJ`),
       filaP('Tiros por partido', n1(ind.tirosPorPartido), percentil(ind.tirosPorPartido, col('tiros')), `· ${ind.tiros || 0} en total`),
-      filaP('xG por partido', n3(ind.xgPorPartido), percentil(ind.xgPorPartido, col('xg')), `· ${n2(ind.xg)} acumulado`),
-      filaP('Goles esperados esta fecha', n3(x.lg), percentil(x.lg, pool.map(y => y.lg))),
+      filaP('xG por partido', nCorto(ind.xgPorPartido), percentil(ind.xgPorPartido, col('xg')), `· ${n2(ind.xg)} acumulado`),
+      filaP('Goles esperados esta fecha', nCorto(x.lg), percentil(x.lg, pool.map(y => y.lg))),
       fila('Goles / figuras / vallas', `${ind.goles || 0} / ${ind.figuras || 0} / ${ind.vallas || 0}`),
       filaP('Amarillas', String(ind.amarillas || 0), percentil(x.ta, pool.map(y => y.ta), false), `· ${pc0(x.ta)} por partido`),
       fila('Minutos', `${ind.minutos || 0} <span class="text-muted">(${ind.minutosPorPartido || 0}/p)</span>`),

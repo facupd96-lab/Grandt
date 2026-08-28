@@ -378,14 +378,31 @@ const out=M.correrMotor(players,getCtx,viejo.fixture);
 console.log('validacion ficha:',out.validacion.veredicto,'| media',out.validacion.media,'| fuera',out.validacion.pctFuera+'%');
 // enriquecer cada jugador con precio y contexto
 const porNombre={}; players.forEach(pl=>{porNombre[pl.name]=pl;});
-const precio={}; P.jugadores.forEach(j=>{precio[j.nombre]=j.cotizacion;});
+// COTIZACION POR NOMBRE + PUESTO + EQUIPO (arreglado 27/08).
+// Estaba indexado SOLO por nombre, y en la planilla hay 7 nombres repetidos —
+// 14 jugadores. El ultimo pisaba al anterior: "Vazquez, Franco" defensor de
+// Argentinos ($0.7M) terminaba con la cotizacion del "Vazquez, Franco" volante
+// de Belgrano ($4.8M). Con eso el motor lo veia 7 veces mas caro de lo que sale
+// y el once optimo lo descartaba por presupuesto sin motivo.
+// Los otros seis: Gutierrez Kevin, Fernandez Julian, Gonzalez Lucas,
+// Fernandez Damian, Martinez David, Gonzalez Tomas.
+const clavePrecio = j => (j.nombre||'') + '|' + (j.posicion||'') + '|' + (j.equipo||'');
+const precio={}; const precioSoloNombre={};
+P.jugadores.forEach(j=>{ precio[clavePrecio(j)]=j.cotizacion; precioSoloNombre[j.nombre]=j.cotizacion; });
+{
+  const rep={}; P.jugadores.forEach(j=>{rep[j.nombre]=(rep[j.nombre]||0)+1;});
+  const n=Object.values(rep).filter(v=>v>1).length;
+  if(n) console.log('nombres repetidos en la planilla: '+n+' (se distinguen por puesto y equipo, no se pisan las cotizaciones)');
+}
 ['ARQ','DEF','VOL','DEL'].forEach(pos=>{
   out.rankings[pos].forEach(x=>{
     const pl=porNombre[x.nombre]||{};
     const k=CT(x.equipo), c=porEquipo[k];
     const miCond = c && c.esLocal ? 'local':'visitante';
     const rivalCond = c && c.esLocal ? 'visitante':'local';
-    x.precio = precio[x.nombre] ?? null;
+    x.precio = precio[(x.nombre||'')+'|'+(x.pos||'')+'|'+(x.equipoPlaneta||x.equipo||'')]
+            ?? precio[(x.nombre||'')+'|'+(x.pos||'')+'|'+(x.equipo||'')]
+            ?? precioSoloNombre[x.nombre] ?? null;
     x.disponibilidad = disponibilidad(x.nombre);
     x.partidoYaJugado = c ? YA_JUGADOS.has([k,c.rivalKey].sort().join('|')) : false;
     x.individual = {
