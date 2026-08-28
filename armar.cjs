@@ -698,7 +698,7 @@ if(out.cuotas.vencidas){
 
 // payload compacto para la app
 const slim=x=>({id:x.id,n:x.nombre,eq:x.equipo,pos:x.pos,riv:x.rival,cond:x.condicion[0],
- ep:x.EP,epsj:x.EPsiJuega,mesp:x.minEsperados,msj:x.minSiJuega,fmin:x.fuenteMinutos,pj_:x.pJuega,sc:x.score,fi:x.ficha,pvi:x.pVI,lg:x.lamGol,pfig:x.pFigura,ta:x.tasaTA,
+ ep:x.EP,epsj:x.EPsiJuega,mesp:x.minEsperados,msj:x.minSiJuega,mest:x.minEstimados,mlog:x.minutosLog,fmin:x.fuenteMinutos,pj_:x.pJuega,sc:x.score,fi:x.ficha,pvi:x.pVI,lg:x.lamGol,pfig:x.pFigura,ta:x.tasaTA,
  piso:x.piso,techo:x.techo,perf:x.perfil||'',pe:x.pisoEquipo||null,
  rot:x.rotacion||0,rotr:x.rotacionRival||0,nrot:x.notaRotacion||'',
  mrot:x.motivoRotacion||null,mrotr:x.motivoRotacionRival||null,

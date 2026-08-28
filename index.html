@@ -1428,9 +1428,10 @@ tr.tb-jugado:hover { opacity: 1; }
     display: flex; align-items: center; gap: 5px;
 }
 .fx2-stat {
-    flex: 0 0 auto; font-size: 0.72rem; color: var(--text-muted);
-    font-variant-numeric: tabular-nums; min-width: 44px; text-align: right;
+    flex: 0 0 auto; font-size: 0.7rem; color: var(--text-muted);
+    font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap;
 }
+.fx2-row .pill-alerta { flex: 0 0 auto; }
 .fx2-odd {
     flex: 0 0 auto; min-width: 38px; text-align: right;
     font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text-main);
@@ -1490,6 +1491,15 @@ tr.tb-jugado:hover { opacity: 1; }
     font-size: 0.72rem; color: var(--text-muted); cursor: pointer; white-space: nowrap;
 }
 .orden-check input { cursor: pointer; }
+
+/* Minutos fecha por fecha en la ficha del jugador */
+.min-graf { display: flex; gap: 6px; align-items: flex-end; padding: 8px 10px;
+    background: rgba(255,255,255,0.02); border-radius: 10px; }
+.min-col { flex: 1 1 0; text-align: center; min-width: 0; }
+.min-barra { height: 40px; display: flex; align-items: flex-end; justify-content: center; }
+.min-barra i { display: block; width: 60%; border-radius: 3px 3px 0 0; }
+.min-num { font-size: 0.72rem; font-weight: 800; margin-top: 3px; }
+.min-f { font-size: 0.62rem; color: var(--text-muted); }
 
 </style>
 </head>
@@ -2662,7 +2672,7 @@ function pintarCabecera() {
     const ok = !!D.version;
     sub.insertAdjacentHTML('beforeend',
       ` • <span title="Version del motor que genero datos.js" style="font-weight:700;color:${ok ? '#10b981' : '#ef4444'};">motor ${v}</span>` +
-      ` <span style="color:var(--text-muted);">· app v7</span>`);
+      ` <span style="color:var(--text-muted);">· app v11</span>`);
   }
   // Un solo chip de estado. El detalle (cuantos jugadores, cuantos con tiros
   // medidos, cuantas fichas cierran) esta adentro del modal que abre.
@@ -2748,10 +2758,10 @@ function pintarFixture() {
   // se pegaba al borde izquierdo y el visitante al derecho, con la ultima letra
   // comida, y habia que leer en zigzag para comparar dos numeros que estan uno
   // al lado del otro.
-  const filaEquipo = (nombre, pGol, pVI, motivo, cuota, etiqueta) => `
+  const filaEquipo = (nombre, pGol, pVI, motivo, cuota, etiqueta, cuotaGol) => `
     <div class="fx2-row">
-      <span class="fx2-name">${esc(NOM(nombre))}${pillRotacion(motivo, true)}</span>
-      <span class="fx2-stat" title="Probabilidad de que convierta al menos un gol. CALCULADO por nosotros resolviendo un Poisson contra el 1X2 y el Over/Under sin margen — no es una cuota de casa.">⚽ ${pc0(pGol)}</span>
+      <span class="fx2-name">${esc(NOM(nombre))}</span>${pillRotacion(motivo, true)}
+      <span class="fx2-stat" title="Probabilidad de que convierta al menos un gol, y entre paréntesis la cuota que le corresponde. CALCULADO por nosotros resolviendo un Poisson contra el 1X2 y el Over/Under sin margen. Compará esa cuota con la que paga tu casa: si difieren mucho, avisá.">⚽ ${pc0(pGol)} <b style="color:var(--text-main);">${cuotaGol ? n2(cuotaGol) : ''}</b></span>
       <span class="fx2-stat" title="Probabilidad de valla invicta. CALCULADO igual que la anterior.">🛡️ ${pc0(pVI)}</span>
       <span class="fx2-odd" title="Cuota de mercado para ${etiqueta}">${n2(cuota)}</span>
     </div>`;
@@ -2769,8 +2779,8 @@ function pintarFixture() {
         <span>${m.yaJugado ? '<span class="fx-jugado" title="Este partido ya se jugó">JUGADO</span> ' : ''}${esc(dia)} · ${esc(hora)}</span>
         ${m.lineaTotales != null ? `<span class="fx-ou" title="Línea de goles del mercado: las casas ponen el corte en ${m.lineaTotales} goles TOTALES entre los dos equipos y pagan casi lo mismo por encima o por debajo. Cuanto más alta, más goles se esperan en el partido.">${m.lineaTotales} goles</span>` : ''}
       </div>
-      ${filaEquipo(m.local, m.pGolLocal, m.pVallaLocal, m.motivoRotLocal, m.cuotaLocal, 'que gane el local')}
-      ${filaEquipo(m.visitante, m.pGolVisitante, m.pVallaVisitante, m.motivoRotVisitante, m.cuotaVisitante, 'que gane el visitante')}
+      ${filaEquipo(m.local, m.pGolLocal, m.pVallaLocal, m.motivoRotLocal, m.cuotaLocal, 'que gane el local', m.cuotaGolLocalEstimada)}
+      ${filaEquipo(m.visitante, m.pGolVisitante, m.pVallaVisitante, m.motivoRotVisitante, m.cuotaVisitante, 'que gane el visitante', m.cuotaGolVisitanteEstimada)}
       <div class="fx-bar" title="Probabilidad real según el mercado, con el margen de la casa ya descontado: ${pc0(m.probLocal)} local · ${pc0(m.probEmpate)} empate · ${pc0(m.probVisitante)} visitante">
         <i style="width:${w(m.probLocal)};background:var(--primary);"></i>
         <i style="width:${w(m.probEmpate)};background:#64748b;"></i>
@@ -2779,7 +2789,8 @@ function pintarFixture() {
     cont.appendChild(div);
   });
   cont.insertAdjacentHTML('beforeend',
-    `<div class="fx-nota">El número de arriba a la derecha (<b>2.5 goles</b>) es la línea de las casas: cuántos goles TOTALES esperan en ese partido. Cuanto más alta, partido más abierto.
+    `<div class="fx-nota">El número en negrita al lado del <b>⚽</b> es la <b>cuota de gol</b> que sale de nuestro cálculo. Comparala con la que paga tu casa: si difieren mucho en un partido, avisame y lo miramos.
+      El número de arriba a la derecha (<b>2.5 goles</b>) es la línea de las casas: cuántos goles TOTALES esperan en ese partido. Cuanto más alta, partido más abierto.
       Las cuotas <b>1 / X / 2</b> son de mercado, promediadas entre casas y con el margen descontado.
       Lo de <b>⚽</b> y <b>🛡️</b> es cálculo nuestro: la cuota de "gol de tal equipo" no existe en el plan gratis de la API.</div>`);
 }
@@ -2846,19 +2857,30 @@ function abrirTablaCompleta() {
 const COLS = {
   ARQ: [['#', ''], ['Arquero', 'n'], ['Valla invicta', 'pvi'], ['Goles que le hacen', 'lamc'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']],
   DEF: [['#', ''], ['Defensor', 'n'], ['Perfil', 'perf'], ['Valla', 'pvi'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']],
-  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Piso', 'piso'], ['Techo', 'techo'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']],
-  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Piso', 'piso'], ['Techo', 'techo'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']]
+  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']],
+  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Si entra', 'epsj'], ['Pts fecha', 'ep']]
 };
 const valorCol = (x, k) =>
   k === 'tiros' ? (x.ind ? x.ind.tirosPorPartido : null) :
   k === 'xg' ? (x.ind ? x.ind.xgPorPartido : null) :
   k === 'lamc' ? -x.lam.c :
+  k === 'lamf' ? (x.lam ? x.lam.f : null) :
+  // El contexto se mide distinto segun el puesto: al arquero y al defensor les
+  // paga que el equipo NO reciba; al volante y al delantero, que su equipo meta.
+  k === 'ctx' ? ((S.pos === 'ARQ' || S.pos === 'DEF') ? x.pvi : (x.lam ? x.lam.f : null)) :
   k === '' ? x.sc :
   k === 'n' ? x.n : x[k];
 
 function celda(x, k, i) {
   switch (k) {
-    case '': return `<span class="text-muted">${i + 1}</span>`;
+    case '': {
+      const p = S.puestoDe ? S.puestoDe[x.id] : null;
+      if (p == null) return `<span class="text-muted">${i + 1}</span>`;
+      const destacado = p <= 10;
+      return `<span title="Puesto ${p} de ${S.totalPuesto} ${S.pos}, con el orden que tenés puesto"
+        style="font-weight:${destacado ? 800 : 600};color:${destacado ? 'var(--text-main)' : 'var(--text-muted)'};">${p}</span>
+        <span class="text-muted" style="font-size:0.62rem;display:block;">de ${S.totalPuesto}</span>`;
+    }
     // Antes esto era una sola linea de texto con los avisos pegados adentro:
     // "Talleres · Local vs Central Cordoba (SdE) · COPA · rival de copa" se
     // partia en dos renglones y las etiquetas quedaban tiradas en el medio de
@@ -2880,8 +2902,15 @@ function celda(x, k, i) {
       const c = x.perf.startsWith('SÓLIDO +') ? '#10b981' : x.perf === 'SÓLIDO' ? '#3b82f6' : x.perf === 'RIESGO GOLEADOR' ? '#f59e0b' : '#94a3b8';
       return `<span class="badge-profile" style="color:${c};border-color:${c}55;">${esc(x.perf)}</span>`;
     }
+    case 'lamf': {
+      const v = x.lam && x.lam.f; if (v == null) return '—';
+      const c = v >= 1.6 ? '#10b981' : v >= 1.2 ? '#38bdf8' : v >= 0.95 ? 'var(--text-muted)' : '#f97316';
+      return `<span title="Goles que se espera que meta SU EQUIPO en este partido, salido de las cuotas. El promedio de la liga es 1.04." style="color:${c};font-weight:700;">${n2(v)}</span>`;
+    }
+    case 'lg': return `<span title="Goles esperados del jugador en este partido: su parte del ataque del equipo, por los minutos que se espera que juegue">${n2(x.lg)}</span>`;
     case 'pvi': return pc0(x.pvi);
     case 'pj_': return pc0(x.pj_);
+    case 'ctx': return (S.pos === 'ARQ' || S.pos === 'DEF') ? pc0(x.pvi) : n2(x.lam && x.lam.f);
     case 'mesp': {
       if (x.mesp == null) return '—';
       const t = x.mesp + "'";
@@ -2911,6 +2940,7 @@ const ORDENES = [
   ['epsj', 'Si entra a la cancha', 'Lo que rinde cuando juega, sin mirar si va a jugar o no'],
   ['lg',   'Amenaza de gol',      'Goles esperados del jugador en este partido'],
   ['fi',   'Ficha Clarín',        'La nota que viene sacando, limpia de bonificaciones'],
+  ['ctx',  'Contexto del partido', 'Para VOL y DEL: los goles que se espera que meta su equipo. Para ARQ y DEF: la chance de valla invicta'],
 ];
 function pintarSelectorOrden() {
   const cont = $('orden-ranking'); if (!cont) return;
@@ -2992,11 +3022,21 @@ function pintarRankings() {
   const total = lista.length;
   if (!S.verTodos && !S.busqueda) lista = lista.filter(x => x.pj_ == null || x.pj_ >= 0.5);
   S.filtrados = total - lista.length;
-  lista = lista.slice().sort((a, b) => {
+
+  // PUESTO DE VERDAD, no el numero de fila.
+  // Buscar "Freitas" mostraba "#1 Freitas" solo porque era el unico resultado.
+  // El puesto se calcula sobre TODOS los del puesto, ordenados por el mismo
+  // criterio, asi cuando lo buscas ves si esta 8vo o 140vo.
+  const universo = D.rankings[S.pos];
+  const cmp = (a, b) => {
     const va = valorCol(a, S.ordCol), vb = valorCol(b, S.ordCol);
     if (typeof va === 'string') return -S.ordDir * String(va).localeCompare(String(vb));
     return S.ordDir * ((va ?? -1e9) - (vb ?? -1e9));
-  });
+  };
+  const puestoDe = {}; const totalPuesto = universo.length;
+  [...universo].sort(cmp).forEach((x, i) => { puestoDe[x.id] = i + 1; });
+  S.puestoDe = puestoDe; S.totalPuesto = totalPuesto;
+  lista = lista.slice().sort(cmp);
   body.innerHTML = lista.slice(0, 120).map((x, i) =>
     `<tr style="cursor:pointer;" onclick="auditar('${x.id}')">` +
     cols.map(c => `<td class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}">${celda(x, c[1], i)}</td>`).join('') +
@@ -3004,6 +3044,47 @@ function pintarRankings() {
 }
 
 // ── LA LUPITA: auditoría completa del jugador ───────────────────────────────
+
+// ── De donde salen los minutos esperados, paso por paso ─────────────────────
+// Sin esto es imposible discutir el numero: uno ve "50 minutos esperados" y no
+// sabe si el problema son los datos, el promedio, la rotacion o la formula.
+// Aca esta la cadena entera, con los minutos fecha por fecha arriba de todo.
+function bloqueMinutos(x) {
+  const log = Array.isArray(x.mlog) ? x.mlog : null;
+  if (!log || !log.length) return '';
+  const barras = log.map((m, i) => {
+    const alto = Math.max(3, Math.round(38 * Math.min(90, m) / 90));
+    const c = m === 0 ? '#ef4444' : m >= 60 ? '#10b981' : m >= 20 ? '#38bdf8' : '#f59e0b';
+    return `<div class="min-col" title="Fecha ${i + 1}: ${m} minutos">
+      <div class="min-barra"><i style="height:${alto}px;background:${c};"></i></div>
+      <div class="min-num">${m}</div><div class="min-f">f${i + 1}</div></div>`;
+  }).join('');
+  const jugadas = log.filter(m => m >= 20).length;
+  const rot = x.rot > 0;
+  return `
+    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin:16px 0 6px;">
+      De dónde salen los minutos esperados</div>
+    <div class="min-graf">${barras}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-top:8px;">
+      <tbody>
+        <tr><td style="padding:5px 10px;">Jugó 20+ minutos en</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${jugadas} de ${log.length} fechas</td></tr>
+        <tr><td style="padding:5px 10px;">Promedio pesando más las últimas${rot ? ', ya ajustado por el partido de copa' : ''}</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${x.mest != null ? x.mest + "'" : '—'}</td></tr>
+        <tr><td style="padding:5px 10px;">Chance de llegar a los 20' que exige la ficha</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${pc0(x.pj_)}</td></tr>
+        <tr><td style="padding:5px 10px;">Minutos que juega cuando entra</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${x.msj || '?'}'</td></tr>
+        <tr style="border-top:1px solid rgba(255,255,255,0.1);">
+            <td style="padding:7px 10px;font-weight:700;">Minutos esperados = chance × minutos si entra</td>
+            <td style="padding:7px 10px;text-align:right;font-weight:800;color:#38bdf8;">${x.mesp}'</td></tr>
+      </tbody>
+    </table>
+    <p class="md-p suave" style="margin-top:6px;">Medido sobre el torneo anterior: de los que jugaron 20+ minutos en
+    <b>todas</b> sus fechas previas y promedian 75+ minutos, la siguiente fecha juegan el <b>84%</b> (931 casos).
+    Un titular indiscutido se pierde 1 de cada 6 partidos. Cuando 365Scores confirme la formación, esto pasa a 97%.</p>`;
+}
+
 window.auditar = function (id) {
   const x = TODOS[id]; if (!x) return;
   const pool = D.rankings[x.pos];
@@ -3099,6 +3180,8 @@ window.auditar = function (id) {
              : `${pc0(x.pj_)} de llegar a los 20' que exige la ficha; si entra, ${x.msj || '?'}' en cancha`)
     ].join(''))}
 
+    ${bloqueMinutos(x)}
+
     ${bloque(`Su equipo ${cond} — ${esc(NOM(x.eq))}`, [
       fila('Tiros generados', n1(me.tiros), `· total ${n1(met.tiros)}`),
       fila('Tiros concedidos', n1(me.tirosConcedidos), `· total ${n1(met.tirosConcedidos)}`),
@@ -3122,9 +3205,14 @@ window.auditar = function (id) {
       fila('Goles esperados del rival', n2(x.lam.c)),
       filaP('Probabilidad de valla invicta', pc(x.pvi), percentil(x.pvi, col('pvi'))),
       fila('Gana / empata', `${pc0(x.lam.w)} / ${pc0(x.lam.d)}`),
+      // Este texto se quedo viejo: decia "55% mercado + 30% xG + 15% goles" de
+      // cuando se promediaban las tres fuentes. Se saco ese promedio hace
+      // semanas —el precio de la casa ya incorpora el xG, la forma y las
+      // lesiones, promediarlo era contar lo mismo dos veces— y desde entonces
+      // el mercado va solo, con peso 1.00.
       fila('Fuente de los goles esperados', x.lam.mk
-        ? '55% mercado + 30% xG + 15% goles reales'
-        : '65% xG + 35% goles reales <span class="text-muted">(sin cuotas)</span>')
+        ? 'Cuotas del mercado, con el margen de la casa descontado'
+        : 'Nivel del equipo por xG <span class="text-muted">(este partido no tiene cuotas)</span>')
     ].join(''))}
 
     <div style="margin-top:18px;padding:11px 14px;background:rgba(255,255,255,0.03);border-radius:10px;font-size:0.78rem;color:var(--text-muted);line-height:1.55;">
