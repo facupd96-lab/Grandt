@@ -15,9 +15,11 @@ $destino = Join-Path $carpeta '_subir_github'
 # --- Que va y por que ---
 $grupos = @(
   @{ titulo = 'LA WEB (sin esto la pagina no anda)'
-     archivos = @('index.html','styles.css','teamsRegistry.js','appV3.js','datos.js') },
+     archivos = @('index.html','datos.js') },
+  @{ titulo = 'LAS FUENTES DE LA PAGINA (index.html sale de armarlas con construir.cjs)'
+     archivos = @('index.fuente.html','styles.css','teamsRegistry.js','appV3.js','construir.cjs') },
   @{ titulo = 'EL MOTOR (para poder regenerar datos desde otra PC)'
-     archivos = @('armar.cjs','motorV3.cjs','package.json',
+     archivos = @('armar.cjs','motorV3.cjs','riesgo.cjs','package.json',
                   'ACTUALIZAR_TODO.bat','ACTUALIZAR_TODO.ps1',
                   'SYNC_PLANETA.bat','SYNC_PLANETA.ps1',
                   'SYNC_365.bat','SYNC_365.ps1',
@@ -30,7 +32,9 @@ $grupos = @(
      archivos = @('data.js','dataPlaneta.json','data365.json','data365_historico.json',
                   'dataCuotas.json','dataCopas.json','dataFixture.json') },
   @{ titulo = 'DEL REPOSITORIO'
-     archivos = @('README.md','.gitignore','PREPARAR_GITHUB.bat','PREPARAR_GITHUB.ps1') }
+     archivos = @('README.md','.gitignore','PREPARAR_GITHUB.bat','PREPARAR_GITHUB.ps1',
+                  'AUDITORIA_GOLES.md','AUDITORIA_INDEX.md','MODELO_v3.md',
+                  'QUE_MIDE_CADA_PUESTO.md','FUENTES_DE_DATOS.md','ESTADO_DE_LOS_DATOS.md') }
 )
 
 Write-Host ""

@@ -225,6 +225,8 @@ foreach ($idPartido in $idsOrdenados) {
   $minutosDelPartido = 0.0
   $probablesLocal = @()
   $probablesVisita = @()
+  $detalleLocal = @()
+  $detalleVisita = @()
   foreach ($lado in $lados) {
     $plantel = $null
     if ($lado.equipo.lineups) { $plantel = $lado.equipo.lineups.members }
@@ -284,6 +286,22 @@ foreach ($idPartido in $idsOrdenados) {
     if ($minutosDelPartido -eq 0) {
       foreach ($miembro in $plantel) {
         $anotado = Obtener-Nombre $partido $miembro
+        # Ademas del nombre guardamos lo que traiga 365Scores para distinguir
+        # TITULAR de SUPLENTE. Mientras la formacion esta "Sin confirmar" la
+        # lista son los 24-31 del plantel y no sirve para nada; cuando pasa a
+        # "Confirmado" (una hora antes del partido) son los 11 de verdad, y ahi
+        # esta la mejora mas grande que le queda al modelo: hoy los minutos
+        # esperados tienen 28 minutos de error, con la formacion confirmada
+        # tienen cero. Como no pude ver el formato de una formacion confirmada
+        # (365Scores no responde desde donde estoy), se guarda TODO lo que
+        # pueda servir y despues armar.cjs decide.
+        $detalle = New-Object PSObject
+        $detalle | Add-Member NoteProperty nombre   $anotado
+        $detalle | Add-Member NoteProperty estado   $(if ($null -ne $miembro.status) { [string]$miembro.status } else { '' })
+        $detalle | Add-Member NoteProperty titular  $(if ($null -ne $miembro.isStarter) { [bool]$miembro.isStarter } else { $null })
+        $detalle | Add-Member NoteProperty puesto   $(if ($miembro.position -and $miembro.position.name) { [string]$miembro.position.name } else { '' })
+        $detalle | Add-Member NoteProperty enCancha $(if ($null -ne $miembro.fieldPosition) { [string]$miembro.fieldPosition } else { '' })
+        if ($lado.esLocal) { $detalleLocal += $detalle } else { $detalleVisita += $detalle }
         if ($lado.esLocal) { $probablesLocal += $anotado } else { $probablesVisita += $anotado }
       }
     }
@@ -312,6 +330,8 @@ foreach ($idPartido in $idsOrdenados) {
     $aviso | Add-Member NoteProperty visitante ([string]$partido.awayCompetitor.name)
     $aviso | Add-Member NoteProperty onceLocal     $probablesLocal
     $aviso | Add-Member NoteProperty onceVisitante $probablesVisita
+    $aviso | Add-Member NoteProperty detalleLocal     $detalleLocal
+    $aviso | Add-Member NoteProperty detalleVisitante $detalleVisita
     # "Confirmado" = es el once de verdad. "Sin confirmar" + isProbable = es un
     # pronostico de 365Scores. Sirve para saber cuanto creerle a la lista.
     $aviso | Add-Member NoteProperty estadoLocal     ([string]$partido.homeCompetitor.lineups.status)
@@ -362,11 +382,38 @@ if ($conDatos -eq 0) {
 # Regla: se ordenan todas las fechas de calendario y se corta en el ultimo hueco
 # de mas de 20 dias. Todo lo posterior es el torneo en curso. Sin fechas
 # escritas a mano: sale del propio calendario.
-$fechasOrdenadas = @($cuandoPorGid.Values | ForEach-Object { try { [datetime]::Parse($_) } catch { } } | Sort-Object)
+#
+# ARREGLADO 27/08. Esta regla borro el archivo entero.
+# El 27/08 corrio y dijo "torneo en curso: arranca el 06/09/2026 (12 de 216
+# partidos)". Resultado: data365.json quedo en 1 KB, cero jugadores, cero
+# tiros, cero xG, y armar.cjs se cayo. Dos errores encadenados:
+#   1) El hueco se buscaba sobre TODAS las fechas del calendario, incluidas las
+#      de partidos que todavia no se jugaron. Un fixture futuro suelto crea un
+#      hueco falso y el corte se va al futuro.
+#   2) No habia ningun control de que el corte dejara algo razonable adentro.
+# Ahora: el hueco se busca SOLO entre partidos ya jugados (que son los unicos
+# que dicen algo del calendario real), y si el corte deja menos del 40% de esos
+# partidos, se descarta el corte y se avisa. Ante la duda, no se tira nada.
+$gidsConDatos = New-Object 'System.Collections.Generic.HashSet[string]'
+foreach ($f in $filasJugador) { [void]$gidsConDatos.Add([string]$f.gid) }
+$fechasJugadas = @()
+foreach ($clave in @($cuandoPorGid.Keys)) {
+  if (-not $gidsConDatos.Contains([string]$clave)) { continue }
+  try { $fechasJugadas += [datetime]::Parse($cuandoPorGid[$clave]) } catch { }
+}
+$fechasOrdenadas = @($fechasJugadas | Sort-Object)
 $corteTorneo = $null
-if ($fechasOrdenadas.Count -gt 3) {
+if ($fechasOrdenadas.Count -gt 20) {
   for ($i = $fechasOrdenadas.Count - 1; $i -gt 0; $i--) {
     if (($fechasOrdenadas[$i] - $fechasOrdenadas[$i-1]).TotalDays -gt 20) { $corteTorneo = $fechasOrdenadas[$i]; break }
+  }
+  if ($null -ne $corteTorneo) {
+    $quedanDentro = @($fechasOrdenadas | Where-Object { $_ -ge $corteTorneo }).Count
+    if ($quedanDentro -lt [int]($fechasOrdenadas.Count * 0.40)) {
+      Write-Host ("   OJO: el corte de torneo daba el {0} y dejaba solo {1} de {2} partidos jugados. Se descarta: se usan todos." -f `
+        $corteTorneo.ToString('dd/MM/yyyy'), $quedanDentro, $fechasOrdenadas.Count) -ForegroundColor Yellow
+      $corteTorneo = $null
+    }
   }
 }
 $gidsDelTorneo = New-Object 'System.Collections.Generic.HashSet[string]'
@@ -613,6 +660,38 @@ $resultado = [ordered]@{
 
 $textoJson = $resultado | ConvertTo-Json -Depth 8
 $rutaSalida = Join-Path $carpeta 'data365.json'
+
+# ---------------------------------------------------------------------------
+# RED DE SEGURIDAD AL ESCRIBIR (27/08)
+# ---------------------------------------------------------------------------
+# El 27/08 una corrida escribio un data365.json de 1 KB con CERO jugadores
+# encima de uno de 4,6 MB con 720. Se perdio todo: tiros, xG, minutos, tarjetas
+# y —lo peor— la lista acumulada de gameIds, que es la que permite reconstruir
+# el torneo cuando 365Scores mueve su ventana.
+#
+# Regla: si la corrida nueva trae MENOS DE LA MITAD de los jugadores que ya
+# habia, no se pisa nada. Se guarda aparte como data365_RECHAZADO.json para
+# poder mirar que paso, y el archivo bueno queda como estaba. Una corrida mala
+# no puede costar el historial.
+$jugadoresPrevios = 0
+if (Test-Path $rutaSalida) {
+  try {
+    $previo = Get-Content $rutaSalida -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($previo.cobertura -and $previo.cobertura.jugadores) { $jugadoresPrevios = [int]$previo.cobertura.jugadores }
+  } catch { $jugadoresPrevios = 0 }
+}
+if ($jugadoresPrevios -gt 20 -and $cantJugadores -lt [int]($jugadoresPrevios * 0.5)) {
+  $rutaRechazo = Join-Path $carpeta 'data365_RECHAZADO.json'
+  [System.IO.File]::WriteAllText($rutaRechazo, $textoJson, (New-Object System.Text.UTF8Encoding($false)))
+  Write-Host ""
+  Write-Host "  NO SE ESCRIBIO data365.json." -ForegroundColor Red
+  Write-Host ("  Esta corrida trajo {0} jugadores y el archivo que ya estaba tiene {1}." -f $cantJugadores, $jugadoresPrevios) -ForegroundColor Red
+  Write-Host "  Algo salio mal (365Scores cambio la ventana, se corto la red, o el corte de torneo)." -ForegroundColor Yellow
+  Write-Host "  El archivo bueno quedo intacto. Lo que bajo ahora esta en data365_RECHAZADO.json." -ForegroundColor Yellow
+  Write-Host "  Volve a correr SYNC_365.bat en un rato." -ForegroundColor Yellow
+  Write-Host ""
+  exit
+}
 [System.IO.File]::WriteAllText($rutaSalida, $textoJson, (New-Object System.Text.UTF8Encoding($false)))
 
 Write-Host "LISTO. Escrito: data365.json" -ForegroundColor Green

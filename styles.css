@@ -1418,9 +1418,10 @@ tr.tb-jugado:hover { opacity: 1; }
     display: flex; align-items: center; gap: 5px;
 }
 .fx2-stat {
-    flex: 0 0 auto; font-size: 0.72rem; color: var(--text-muted);
-    font-variant-numeric: tabular-nums; min-width: 44px; text-align: right;
+    flex: 0 0 auto; font-size: 0.7rem; color: var(--text-muted);
+    font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap;
 }
+.fx2-row .pill-alerta { flex: 0 0 auto; }
 .fx2-odd {
     flex: 0 0 auto; min-width: 38px; text-align: right;
     font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text-main);
@@ -1461,3 +1462,521 @@ tr.tb-jugado:hover { opacity: 1; }
 }
 .pill-copa { color: #f59e0b; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); }
 .pill-copa-rival { color: #10b981; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); }
+.pill-cansado { color: #a78bfa; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.35); }
+
+/* Barra para elegir por que se ordena el ranking. Antes solo se podia ordenar
+   clickeando el encabezado de una columna, cosa que nadie descubre. */
+.orden-barra {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 10px 14px 4px; border-bottom: 1px solid rgba(51,65,85,0.35);
+}
+.orden-lbl {
+    font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 800; margin-right: 4px;
+}
+.orden-btn { font-size: 0.74rem; flex: 0 0 auto; white-space: nowrap; }
+.orden-btn.active { background: var(--primary); color: #fff; }
+.orden-check {
+    display: inline-flex; align-items: center; gap: 5px; margin-left: auto;
+    font-size: 0.72rem; color: var(--text-muted); cursor: pointer; white-space: nowrap;
+}
+.orden-check input { cursor: pointer; }
+
+/* Minutos fecha por fecha en la ficha del jugador */
+.min-graf { display: flex; gap: 6px; align-items: flex-end; padding: 8px 10px;
+    background: rgba(255,255,255,0.02); border-radius: 10px; }
+.min-col { flex: 1 1 0; text-align: center; min-width: 0; }
+.min-barra { height: 40px; display: flex; align-items: flex-end; justify-content: center; }
+.min-barra i { display: block; width: 60%; border-radius: 3px 3px 0 0; }
+.min-num { font-size: 0.72rem; font-weight: 800; margin-top: 3px; }
+.min-f { font-size: 0.62rem; color: var(--text-muted); }
+.pill-penal { color: #e2e8f0; background: rgba(148,163,184,0.18); border: 1px solid rgba(148,163,184,0.45); }
+
+/* Transferido: la planilla de Gran DT ya lo pasó al club nuevo pero los
+   minutos y el xG son del club anterior. Violeta, para que no se confunda
+   con las alertas de rotación (ámbar) ni con las de disponibilidad (rojo). */
+.pill-transfer { color: #c4b5fd; background: rgba(139,92,246,0.14); border: 1px solid rgba(139,92,246,0.45); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PASADA DE DISEÑO — 30/08/2026
+   Todo lo de abajo pisa lo de arriba a proposito. Va al final para que se vea
+   de un saque que se cambio y para poder borrarlo entero si algo no gusta.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ---- 1. TARJETA DE PARTIDO ----
+   El defecto de siempre: nombre, pill de rotacion, gol, valla y cuota en una
+   sola linea de 320px. "Sarmiento" quedaba en "Sarmi..." y Lanus se salia del
+   cuadro. Ahora cada equipo ocupa dos renglones: arriba el nombre (con la
+   fila entera para el, y si no entra baja a dos lineas en vez de recortarse)
+   con la cuota anclada a la derecha, y abajo los numeros del equipo.        */
+.fx2-card {
+    padding: 0.7rem 0.85rem;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.45);
+}
+.fx2-team { padding: 3px 0; }
+.fx2-team + .fx2-team { border-top: 1px dashed rgba(51, 65, 85, 0.5); }
+.fx2-row {
+    display: flex; align-items: baseline; gap: 6px;
+    padding: 0; font-size: 0.86rem;
+}
+.fx2-name {
+    flex: 1 1 auto; min-width: 0;
+    white-space: normal; overflow: visible; text-overflow: clip;
+    line-height: 1.2;
+    font-weight: 700; color: var(--text-main);
+    display: block;
+}
+.fx2-sub {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 1px;
+}
+.fx2-sub .fx2-stat {
+    font-size: 0.68rem; color: var(--text-muted);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+    cursor: help;
+}
+.fx2-sub .fx2-stat b { color: var(--text-main); font-weight: 800; }
+.fx2-row .pill-alerta { flex: 0 0 auto; align-self: center; }
+.fx2-odd {
+    flex: 0 0 auto; min-width: 40px; text-align: right;
+    font-weight: 800; font-variant-numeric: tabular-nums;
+    font-family: 'Outfit', sans-serif; color: var(--text-main);
+}
+.fx2-head { margin-bottom: 7px; }
+.fx-bar { margin-top: 8px; }
+.fx2-foot { font-size: 0.65rem; line-height: 1.35; }
+
+/* ---- 2. PESTAÑAS ----
+   Cada puesto con su color, el mismo que ya usa la app en los rankings y en
+   la cancha del mejor 11. Asi la pantalla dice de que puesto estas mirando
+   sin leer una palabra, que es como se lee el Gran DT.                     */
+.main-tabs { gap: 0.4rem; }
+.tab-btn {
+    position: relative;
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.01em;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease;
+}
+.tab-btn:active { transform: translateY(1px); }
+.tab-btn.active { box-shadow: none; }
+.tab-btn[data-tab="ARQ"].active { background: var(--pos-arq); border-color: var(--pos-arq); color: #fff; }
+.tab-btn[data-tab="DEF"].active { background: var(--pos-def); border-color: var(--pos-def); color: #fff; }
+.tab-btn[data-tab="VOL"].active { background: var(--pos-vol); border-color: var(--pos-vol); color: #06251a; }
+.tab-btn[data-tab="DEL"].active { background: var(--pos-del); border-color: var(--pos-del); color: #fff; }
+.tab-btn[data-tab="LEADERS"].active { background: var(--gdt-yellow); border-color: var(--gdt-yellow); color: #1a1400; }
+.tab-btn[data-tab="ARQ"]:not(.active):hover { border-color: var(--pos-arq); color: var(--pos-arq); }
+.tab-btn[data-tab="DEF"]:not(.active):hover { border-color: var(--pos-def); color: var(--pos-def); }
+.tab-btn[data-tab="VOL"]:not(.active):hover { border-color: var(--pos-vol); color: var(--pos-vol); }
+.tab-btn[data-tab="DEL"]:not(.active):hover { border-color: var(--pos-del); color: var(--pos-del); }
+
+/* La tabla entra con una transicion corta al cambiar de puesto. Sin esto el
+   cambio es instantaneo y no se nota que la lista se rehizo entera.        */
+@keyframes gdtEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+#view-rankings.gdt-entra tbody tr { animation: gdtEntra .22s ease both; }
+#view-rankings.gdt-entra tbody tr:nth-child(1) { animation-delay: 0ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(2) { animation-delay: 18ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(3) { animation-delay: 36ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(4) { animation-delay: 54ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(5) { animation-delay: 72ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(n+6) { animation-delay: 88ms; }
+@media (prefers-reduced-motion: reduce) {
+    #view-rankings.gdt-entra tbody tr { animation: none; }
+}
+
+/* ---- 3. FILAS DEL RANKING ----
+   Una barrita del color del puesto a la izquierda de los diez primeros: es
+   la unica marca que separa "candidato" de "resto de la lista" de un vistazo. */
+#view-rankings .data-table tbody tr { position: relative; }
+#view-rankings .data-table tbody tr td:first-child { position: relative; }
+#view-rankings .data-table tbody tr.fila-top td:first-child::before {
+    content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px;
+    border-radius: 3px; background: var(--acento-puesto, var(--primary));
+}
+#view-rankings[data-pos="ARQ"] { --acento-puesto: var(--pos-arq); }
+#view-rankings[data-pos="DEF"] { --acento-puesto: var(--pos-def); }
+#view-rankings[data-pos="VOL"] { --acento-puesto: var(--pos-vol); }
+#view-rankings[data-pos="DEL"] { --acento-puesto: var(--pos-del); }
+.data-table tbody tr:hover { background: rgba(255, 255, 255, 0.035); }
+
+/* ---- 4. CABECERA ----
+   Franja amarilla en vez de roja (es el acento del Gran DT) y un degrade
+   suave para que la cabecera no sea un rectangulo plano.                   */
+.main-header {
+    background: linear-gradient(180deg, var(--gdt-navy-header) 0%, #0a1b33 100%);
+    border-bottom: 3px solid var(--gdt-yellow);
+}
+.gdt-badge {
+    background: var(--gdt-yellow); color: #1a1400;
+    font-weight: 800; letter-spacing: 0.04em;
+}
+
+/* ---- 5. FIXTURE: cada partido, una tarjeta de verdad ---- */
+.fixture-list { padding: 6px; }
+.fx2-card {
+    background: rgba(255, 255, 255, 0.022);
+    border: 1px solid rgba(51, 65, 85, 0.55);
+    border-radius: var(--radius-md);
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+}
+.fx2-card:last-child { margin-bottom: 0; }
+.fx2-card:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--border-light); }
+.fx-ou { background: rgba(255, 204, 0, 0.12); color: var(--gdt-yellow); border: 1px solid rgba(255, 204, 0, 0.3); }
+
+/* ---- 6. POSICIONES: que entren los nombres largos ----
+   "Defensa y Ju..." e "Independien..." se cortaban porque la celda del equipo
+   competia con PJ, PTS y FORMA en 300px. Se le saca aire a las columnas de
+   numeros, que no lo necesitan.                                            */
+.standings-table td, .standings-table th { padding: 6px 3px; }
+.standings-table td:nth-child(2) { max-width: none; }
+.standings-table .team-badge-pill {
+    white-space: normal; overflow: visible; text-overflow: clip;
+    line-height: 1.15; display: inline-block;
+}
+#standings-body td:nth-child(2) { max-width: none; }
+#standings-body .team-badge-pill {
+    overflow: visible; text-overflow: clip; white-space: normal; line-height: 1.15;
+}
+
+/* ---- 7. LA CANCHA DEL MEJOR 11 ----
+   Las cuatro lineas se apretaban arriba y abajo quedaba medio campo vacio, y
+   los nombres largos se cortaban en "Cristian Tarra...". Ahora las lineas se
+   reparten el alto de la cancha y la ficha es un poco mas ancha, con el
+   nombre en dos renglones si hace falta.                                    */
+.best11-grid {
+    justify-content: space-around;
+    min-height: 400px;
+    gap: 0.35rem;
+}
+.pitch-row { gap: 0.55rem; }
+.gdt-card-badge { width: 104px; padding: 4px 4px 3px; }
+.gdt-player-name {
+    white-space: normal; overflow: visible; text-overflow: clip;
+    font-size: 0.68rem; line-height: 1.12; min-height: 1.9em;
+    display: flex; align-items: center; justify-content: center;
+}
+.gdt-player-team { font-size: 0.55rem; }
+.pitch-row { gap: 1.4rem; }
+.gdt-card-badge { width: 112px; }
+.gdt-player-team { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.1; }
+
+/* La cotizacion se partia en dos renglones ("$" arriba y "1.200.000" abajo).
+   Las celdas de numeros no se parten nunca; la del nombre si.              */
+#players-body td { white-space: nowrap; }
+#players-body td:nth-child(2) { white-space: normal; }
+
+/* ---- 8. ORDEN EN LOS TITULOS DE COLUMNA ----
+   Reemplaza la barra "ORDENAR POR", que repetia lo que ya hacia el titulo. */
+.col-ordenable { position: relative; }
+.col-ordenable:hover { color: var(--text-main); }
+.col-ordenada { color: var(--text-main) !important; }
+.orden-flecha { font-size: 0.6em; margin-left: 4px; vertical-align: middle; color: var(--primary); }
+.orden-lbl { font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.03em; }
+/* Ritmo por 90 calculado sobre pocos minutos: se muestra, pero apagado. */
+.ritmo-flojo { color: var(--text-muted); border-bottom: 1px dotted var(--border-light); cursor: help; }
+
+/* Referencia al pie de la tabla de rankings. */
+.tabla-referencia {
+    font-size: 0.72rem; line-height: 1.5; color: var(--text-muted);
+    padding: 12px 16px; border-top: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.015);
+}
+.tabla-referencia b { color: var(--text-main); font-weight: 700; }
+
+/* Selector de club en la barra de la tabla. */
+.select-equipo {
+    background: var(--bg-main); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-pill);
+    padding: 0.5rem 0.85rem; font-size: 0.82rem; font-weight: 600;
+    font-family: 'Outfit', sans-serif; cursor: pointer; outline: none;
+    max-width: 190px;
+}
+.select-equipo:hover { border-color: var(--border-light); }
+.select-equipo:focus { border-color: var(--primary); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PASADA DE ESTRUCTURA — 31/08/2026
+   El problema no era el color: era que todo entraba a la fuerza en una sola
+   pantalla de alto fijo. El fixture apretado en 320px, las posiciones abajo
+   con los nombres cortados, los rankings peleando por lo que sobraba y cero
+   lugar para moverse. Ahora cada cosa tiene su pantalla, a lo ancho, y la
+   pagina scrollea como cualquier pagina.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ---- 1. FUERA LA JAULA ---- */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.75rem 1.5rem 4rem;
+    display: block;
+    height: auto;
+}
+.seccion { animation: gdtEntra .2s ease both; }
+.seccion[hidden] { display: none !important; }
+body { overflow-y: auto; }
+
+/* ---- 2. NAVEGACION ---- */
+.nav-secciones {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(7, 21, 41, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+}
+.nav-wrap {
+    max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+    display: flex; gap: 2px; overflow-x: auto;
+}
+.nav-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 0.9rem; font-weight: 600;
+    padding: 0.95rem 1.1rem;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: color .15s ease, border-color .15s ease;
+}
+.nav-btn:hover { color: var(--text-main); }
+.nav-btn.active { color: var(--gdt-yellow); border-bottom-color: var(--gdt-yellow); }
+
+/* ---- 3. LA FECHA ---- */
+.fecha-hero {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 2rem; flex-wrap: wrap;
+    padding: 0 0 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.75rem;
+}
+.fecha-eyebrow { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+.fecha-hero h1 {
+    font-family: 'Outfit', sans-serif; font-size: 3.2rem; font-weight: 800;
+    line-height: 1; letter-spacing: -0.02em; margin: 4px 0 6px;
+}
+.fecha-hero p { color: var(--text-muted); font-size: 0.95rem; }
+.fecha-cierre { text-align: right; }
+.fecha-cierre-lbl { font-size: 0.78rem; color: var(--text-muted); }
+.fecha-cierre-val {
+    font-family: 'Outfit', sans-serif; font-size: 2.1rem; font-weight: 800;
+    color: var(--gdt-yellow); line-height: 1.1;
+}
+.fecha-cierre.cerrado .fecha-cierre-val { color: var(--danger); font-size: 1.6rem; }
+.fecha-cierre-sub { font-size: 0.76rem; color: var(--text-muted); max-width: 340px; margin-left: auto; }
+
+.tarjetas-aviso {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.9rem; margin-bottom: 1.75rem;
+}
+.aviso-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-left: 3px solid var(--border-light);
+    border-radius: var(--radius-md); padding: 1rem 1.1rem;
+}
+.aviso-card p { font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0; line-height: 1.45; }
+.aviso-top { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.aviso-top b { font-family: 'Outfit', sans-serif; font-weight: 700; }
+.aviso-peligro { border-left-color: var(--danger); }
+.aviso-atencion { border-left-color: var(--warning); }
+.aviso-info { border-left-color: #8b5cf6; }
+.aviso-ok { border-left-color: var(--success); }
+.aviso-lista { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; align-items: center; }
+.chip-jug {
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill); padding: 3px 9px; cursor: pointer;
+    color: var(--text-main); font-size: 0.75rem; font-weight: 600; font-family: inherit;
+}
+.chip-jug span { color: var(--text-muted); font-weight: 500; }
+.chip-jug:hover { border-color: var(--border-light); background: rgba(255,255,255,0.1); }
+
+.fecha-acciones { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; }
+
+.grilla-puestos {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.1rem;
+}
+.col-puesto {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg); padding: 1.1rem;
+}
+.col-puesto h3 {
+    font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700;
+    margin-bottom: 0.75rem; padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--acento, var(--primary));
+}
+.col-puesto.pos-arq { --acento: var(--pos-arq); }
+.col-puesto.pos-def { --acento: var(--pos-def); }
+.col-puesto.pos-vol { --acento: var(--pos-vol); }
+.col-puesto.pos-del { --acento: var(--pos-del); }
+.tarjeta-jug {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    background: none; border: none; border-radius: var(--radius-sm);
+    padding: 9px 6px; cursor: pointer; text-align: left; font-family: inherit;
+    color: var(--text-main);
+}
+.tarjeta-jug + .tarjeta-jug { border-top: 1px solid rgba(51,65,85,0.4); }
+.tarjeta-jug:hover { background: rgba(255,255,255,0.04); }
+.tj-puesto {
+    flex: 0 0 22px; text-align: center; font-family: 'Outfit', sans-serif;
+    font-weight: 800; color: var(--acento, var(--primary)); font-size: 1rem;
+}
+.tj-datos { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.tj-nombre { font-weight: 700; font-size: 0.9rem; }
+.tj-sub { font-size: 0.72rem; color: var(--text-muted); }
+.tj-pts {
+    flex: 0 0 auto; font-family: 'Outfit', sans-serif; font-weight: 800;
+    font-size: 1.05rem; color: var(--text-main);
+}
+.ver-todos-puesto {
+    width: 100%; margin-top: 10px; background: none; cursor: pointer;
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    color: var(--text-muted); font-family: inherit; font-size: 0.76rem;
+    font-weight: 600; padding: 7px;
+}
+.ver-todos-puesto:hover { color: var(--text-main); border-color: var(--border-light); }
+
+/* ---- 4. PARTIDOS Y POSICIONES A LO ANCHO ---- */
+#sec-fixture .card, #sec-posiciones .card { max-width: 100%; }
+.fx-banda {
+    background: linear-gradient(90deg, var(--gdt-green-dark), var(--gdt-green-light));
+    color: #fff; font-family: 'Outfit', sans-serif; font-weight: 700;
+    font-size: 0.82rem; letter-spacing: 0.06em;
+    padding: 0.65rem 1.1rem; margin: 0 -6px;
+}
+.fx-banda:first-child { margin-top: -6px; }
+#sec-fixture .fx2-card { padding: 1rem 1.25rem; margin: 0; border-radius: 0; background: none; border-left: none; border-right: none; }
+#sec-fixture .fx2-card:hover { background: rgba(255,255,255,0.03); }
+#sec-fixture .fx2-row { font-size: 1rem; }
+#sec-fixture .fx2-name { font-size: 1.05rem; }
+#sec-fixture .fx2-odd { font-size: 1.1rem; min-width: 56px; }
+#sec-fixture .fx2-sub .fx2-stat { font-size: 0.78rem; }
+#sec-fixture .fixture-list { max-height: none; overflow: visible; }
+#sec-posiciones .standings-table td,
+#sec-posiciones .standings-table th { padding: 0.85rem 0.75rem; font-size: 0.92rem; }
+#sec-posiciones .standings-table .team-badge-pill { font-size: 0.95rem; }
+#sec-posiciones .standings-wrap { max-height: none; }
+
+/* ---- 5. MAS AIRE EN LA TABLA DE JUGADORES ---- */
+#view-rankings .data-table td { padding: 0.95rem 0.85rem; }
+#view-rankings .data-table th { padding: 0.85rem; }
+#sec-jugadores .card { border-radius: var(--radius-lg); }
+.main-toolbar { padding: 1.1rem 1.25rem; }
+
+@media (max-width: 900px) {
+    .fecha-hero h1 { font-size: 2.2rem; }
+    .fecha-cierre { text-align: left; }
+    .fecha-cierre-sub { margin-left: 0; }
+}
+
+/* Tabla de posiciones a lo ancho: el nombre a la izquierda como en cualquier
+   tabla de posiciones, y el puesto en un circulo. */
+#sec-posiciones .standings-table td:nth-child(2) { text-align: left; }
+#sec-posiciones .standings-table th:nth-child(2) { text-align: left; }
+#sec-posiciones .standings-table .team-badge-pill { padding-left: 0; font-weight: 700; }
+.pos-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.07); color: var(--text-muted);
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.8rem;
+}
+.pos-badge.pos-arriba { background: var(--primary); color: #fff; }
+/* Los interruptores de zona y de local/visitante no tienen por que ocupar
+   toda la pantalla ahora que la pantalla es ancha. */
+#sec-posiciones .standings-tabs { display: inline-flex; width: auto; }
+#sec-posiciones .standings-tabs-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; margin-bottom: 1rem; }
+#sec-posiciones .tab-pill, #sec-posiciones .tab-pill-sm { flex: 0 0 auto; padding-left: 1.1rem; padding-right: 1.1rem; }
+/* El mejor 11 es la accion principal de la app: vive en la barra de arriba y
+   se llega desde cualquier pantalla, no escondido dentro de una tabla. */
+.nav-cta { margin-left: auto; align-self: center; padding: 0.5rem 1.1rem; font-size: 0.85rem; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BARRA UNICA — 31/08/2026
+   Se reemplazan la cabecera vieja y la barra de secciones por una sola.
+   Fuera: la pelota, el badge PRO, la bajada de "Analisis Estadistico
+   Avanzado", el sello de version y los cuatro chips siempre a la vista.
+   Todo eso pasa al menu de los tres puntos, que es donde va lo que se mira
+   una vez por semana.
+   ══════════════════════════════════════════════════════════════════════════ */
+.main-header, .header-container, .header-status, .header-title, .subtitle { display: none !important; }
+
+.barra {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(9, 20, 37, 0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+}
+.barra-wrap {
+    max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.75rem;
+    height: 58px;
+}
+
+/* Marca: una placa con las iniciales y el nombre en voz baja. Sin emoji y sin
+   badge: el protagonista de la pantalla es "Fecha 7", no el logo. */
+.marca { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
+.marca-tile {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--gdt-yellow); color: #10203a;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.82rem;
+    letter-spacing: -0.02em;
+}
+.marca-nom {
+    font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.95rem;
+    color: var(--text-main); letter-spacing: -0.01em;
+}
+
+.barra .nav-secciones {
+    position: static; background: none; backdrop-filter: none;
+    border: none; flex: 1 1 auto; min-width: 0;
+    display: flex; gap: 2px; overflow-x: auto;
+}
+.barra .nav-btn { padding: 0 0.9rem; height: 58px; font-size: 0.88rem; }
+
+.barra-acciones { display: flex; align-items: center; gap: 0.7rem; flex: 0 0 auto; }
+.barra-fecha {
+    font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+    padding: 3px 9px; border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill); cursor: help; white-space: nowrap;
+}
+.barra-fecha-alerta { color: var(--danger); border-color: rgba(239,68,68,0.4); }
+.nav-cta { margin: 0; padding: 0.45rem 1rem; font-size: 0.83rem; }
+.btn-mas {
+    background: none; border: 1px solid var(--border-color); cursor: pointer;
+    color: var(--text-muted); border-radius: var(--radius-sm);
+    width: 32px; height: 30px; font-size: 1.1rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-mas:hover, .btn-mas.abierto { color: var(--text-main); border-color: var(--border-light); }
+
+.menu-mas {
+    position: absolute; right: max(1.5rem, calc(50% - 640px + 1.5rem)); top: 54px;
+    width: 320px; padding: 6px;
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius-md); box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+}
+.menu-mas[hidden] { display: none; }
+.menu-item {
+    display: block; width: 100%; text-align: left; cursor: pointer;
+    background: none; border: none; border-radius: var(--radius-sm);
+    padding: 9px 11px; color: var(--text-main);
+    font-family: inherit; font-size: 0.88rem; font-weight: 600;
+}
+.menu-item small {
+    display: block; font-weight: 400; font-size: 0.74rem;
+    color: var(--text-muted); margin-top: 2px; line-height: 1.35;
+}
+.menu-item:hover { background: rgba(255,255,255,0.06); }
+.menu-sep { height: 1px; background: var(--border-color); margin: 5px 8px; }
+
+/* Enlace de contexto dentro de la pantalla de la fecha. Antes habia dos
+   botones grandes repitiendo lo que ya esta en la barra de arriba. */
+.fecha-acciones { margin-bottom: 1.75rem; }
+.link-ctx {
+    background: none; border: none; cursor: pointer; padding: 0;
+    color: var(--primary); font-family: inherit; font-size: 0.88rem; font-weight: 600;
+}
+.link-ctx:hover { color: #60a5fa; text-decoration: underline; }
+
+@media (max-width: 1000px) {
+    .marca-nom { display: none; }
+    .barra-fecha { display: none; }
+}

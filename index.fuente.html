@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Gran DT Analyzer Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+    // ANTI-CACHE. Chrome se guarda datos.js y appV3.js y despues muestra datos
+    // de hace tres dias: aparecen jugadores que el motor ya saco, el once
+    // arriesgado no existe, y parece que la app estuviera rota. Cargando todo
+    // con una marca de tiempo distinta cada vez, siempre lee el archivo nuevo.
+    document.write('<link rel="stylesheet" href="styles.css?v=' + Date.now() + '">');
+    </script>
+    <noscript><link rel="stylesheet" href="styles.css"></noscript>
+</head>
+<body>
+    <!-- UNA SOLA BARRA.
+         Antes habia dos: una cabecera con el logo, una bajada larga y cinco
+         chips, y abajo otra con las secciones. Entre las dos ocupaban 130px
+         de alto para decir cosas que casi nunca se miran. Ahora es una sola
+         barra: la marca, las secciones, el boton principal, y todo lo demas
+         adentro del menu de los tres puntos. -->
+    <header class="barra">
+        <div class="barra-wrap">
+            <div class="marca">
+                <span class="marca-tile">DT</span>
+                <span class="marca-nom">Gran DT</span>
+            </div>
+
+            <nav class="nav-secciones">
+                <button class="nav-btn active" data-sec="fecha">La fecha</button>
+                <button class="nav-btn" data-sec="jugadores">Jugadores</button>
+                <button class="nav-btn" data-sec="fixture">Partidos</button>
+                <button class="nav-btn" data-sec="posiciones">Posiciones</button>
+                <button class="nav-btn" data-sec="lideres">Líderes</button>
+            </nav>
+
+            <div class="barra-acciones">
+                <span class="barra-fecha" id="lbl-status-fecha"></span>
+                <button class="btn btn-success nav-cta" id="btn-mejor-11">Mejor 11</button>
+                <button class="btn-mas" id="btn-menu" title="Más">⋯</button>
+            </div>
+        </div>
+
+        <div class="menu-mas" id="menu-mas" hidden>
+            <button class="menu-item" id="btn-open-tablero">
+                Contexto de la fecha
+                <small>Qué defensas están sólidas y dónde se convierte</small>
+            </button>
+            <button class="menu-item" id="btn-open-tournament">
+                Equipos
+                <small>Tiros a favor y en contra, con corte de local y visitante</small>
+            </button>
+            <button class="menu-item" id="btn-open-weights">
+                Qué mide el modelo
+                <small>Cuánto pesa cada término del reglamento en cada puesto</small>
+            </button>
+            <div class="menu-sep"></div>
+            <button class="menu-item" id="lbl-health-badge">
+                Estado de los datos · <span id="lbl-health-pct">–</span>
+                <small>Última fecha jugada: <span id="lbl-datos-fecha">–</span> · <span id="lbl-version"></span></small>
+            </button>
+            <button class="menu-item" id="btn-sync-now">
+                Actualizar datos
+                <small>Cómo se traen los datos nuevos</small>
+            </button>
+            <span id="lbl-global-stats" hidden></span>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <section class="seccion" id="sec-fecha">
+            <div id="pantalla-fecha"></div>
+        </section>
+
+        <section class="seccion" id="sec-jugadores" hidden>
+            <div class="card">
+                <div class="main-toolbar">
+                    <div class="main-tabs">
+                        <button class="tab-btn active" data-tab="ARQ">🧤 ARQ</button>
+                        <button class="tab-btn" data-tab="DEF">🛡️ DEF</button>
+                        <button class="tab-btn" data-tab="VOL">⚡ VOL</button>
+                        <button class="tab-btn" data-tab="DEL">🎯 DEL</button>
+                                            </div>
+                    
+                    <div class="toolbar-actions">
+                        <!-- Filtro por club. Sirve para lo de todas las fechas:
+                             "quiero ver a los defensores de Banfield" sin tener
+                             que acordarse de los nombres uno por uno. -->
+                        <select id="filtro-equipo" class="select-equipo" title="Ver sólo los jugadores de un club">
+                            <option value="">Todos los equipos</option>
+                        </select>
+                        <div class="search-box">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" id="search-input" placeholder="Buscar jugador o equipo...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rankings Content -->
+                <div id="orden-ranking" class="orden-barra"></div>
+                <div id="view-rankings" class="table-responsive flex-1">
+                    <table class="data-table">
+                        <thead id="rankings-thead">
+                            <!-- Generado dinámicamente según posición por app.js -->
+                        </thead>
+                        <tbody id="players-body">
+                            <!-- Generado dinámicamente por app.js -->
+                            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Cargando jugadores...</td></tr>
+                        </tbody>
+                    </table>
+                    <!-- Referencia de la tabla. Sin esto, el gris con puntitos de
+                         Tiros/90 y xG/90 es una marca que nadie sabe que significa. -->
+                    <div class="tabla-referencia">
+                        <b>Tiros/90</b> y <b>xG/90</b> son por cada 90 minutos <b>en la cancha</b>, no por partido.
+                        El xG va <b>sin los penales</b>: un penal pateado vale 0.79 y no dice nada de si el jugador genera juego.
+                        <span class="ritmo-flojo">Los que están en gris con puntitos</span> salen de menos de 180 minutos jugados —
+                        dos partidos— y ahí el ritmo por 90 es poco confiable, así que el modelo lo achica.
+                        Pasá el mouse por encima de cualquier número para ver la cuenta.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="seccion" id="sec-fixture" hidden>
+            <!-- Fixture Deportivo -->
+            <div class="card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1.25rem;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <h2 style="font-size:0.95rem;margin:0;">📅 Fixture</h2>
+                        <button id="btn-open-odds-modal" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;" title="Ajustar Cuotas Manualmente de las casas de apuestas">⚙️</button>
+                    </div>
+                    <select id="fixture-round-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:3px 6px;font-size:0.75rem;cursor:pointer;outline:none;">
+                    </select>
+                </div>
+                <div class="card-body p-0">
+                    <div class="fixture-list" id="fixture-list">
+                        <!-- Generado dinámicamente por app.js -->
+                        <div style="padding:20px;text-align:center;color:var(--text-muted);">Cargando fixture...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="seccion" id="sec-posiciones" hidden>
+            <!-- Posiciones -->
+            <div class="card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 1rem;">
+                    <h2 style="font-size:0.95rem;margin:0;">🏆 Posiciones</h2>
+                    <button class="btn btn-secondary" id="btn-open-full-standings" style="padding:3px 8px;font-size:0.75rem;background:rgba(255,255,255,0.08);border:1px solid var(--border-color);" title="Ver Tabla Completa con Goles y Estadísticas">🔍 Completa</button>
+                </div>
+                <div class="card-body">
+                    <div class="standings-tabs-container">
+                        <div class="standings-tabs">
+                            <button class="tab-pill standings-zona-btn active" data-zona="zonaA">Zona A</button>
+                            <button class="tab-pill standings-zona-btn" data-zona="zonaB">Zona B</button>
+                        </div>
+                        <div class="standings-tabs filter-tabs" id="standings-filter">
+                            <button class="tab-pill-sm standings-filter-btn active" data-filter="all">Todos</button>
+                            <button class="tab-pill-sm standings-filter-btn" data-filter="home">Local</button>
+                            <button class="tab-pill-sm standings-filter-btn" data-filter="away">Visitante</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive standings-wrap" style="overflow-x:hidden;">
+                        <table class="standings-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:52px;" class="text-center">#</th>
+                                    <th>Equipo</th>
+                                    <th class="text-center">PTS</th>
+                                    <th class="text-center">PJ</th>
+                                    <th class="text-center">G</th>
+                                    <th class="text-center">E</th>
+                                    <th class="text-center">P</th>
+                                    <th class="text-center">GF</th>
+                                    <th class="text-center">GC</th>
+                                    <th class="text-center">DIF</th>
+                                    <th class="text-center">Forma</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standings-body">
+                                <!-- Generado dinámicamente por app.js -->
+                                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Cargando posiciones...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="seccion" id="sec-lideres" hidden>
+            <!-- Centro de Líderes Estadísticos (Ranking Ordinal por Categoría) -->
+                <div id="view-leaders" class="p-4" >
+                    <div id="leaders-nota" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;background:var(--bg-card);padding:14px 18px;border-radius:12px;border:1px solid var(--border-color);">
+                        <div>
+                            <h2 style="font-size:1.15rem;font-weight:700;color:var(--text-main);margin:0;">📊 Líderes y Rankings Estadísticos</h2>
+                            <p style="font-size:0.8rem;color:var(--text-muted);margin:2px 0 0 0;">Ranking ordinal por categoría de juego y posición</p>
+                        </div>
+                        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                            <div>
+                                <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px;font-weight:600;">Categoría:</label>
+                                <select id="leaders-cat-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:0.85rem;font-weight:700;outline:none;cursor:pointer;">
+                                    <option value="xgPerMatch_noPen">📈 xG Generado / Partido</option>
+                                    <option value="shotsPerMatch">🎯 Tiros / Partido</option>
+                                    <option value="goalsPerMatch">⚽ Goles / Partido</option>
+                                    <option value="avgRating">📰 Promedio Ficha Clarín</option>
+                                    <option value="cleanSheets">🧤 Vallas Invictas Totales</option>
+                                    <option value="yellowCards">🟨 Tarjetas Amarillas</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px;font-weight:600;">Posición:</label>
+                                <select id="leaders-pos-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:0.85rem;font-weight:700;outline:none;cursor:pointer;">
+                                    <option value="ALL">Todas las Posiciones</option>
+                                    <option value="ARQ">🧤 Arqueros</option>
+                                    <option value="DEF">🛡️ Defensores</option>
+                                    <option value="VOL">🪄 Volantes</option>
+                                    <option value="DEL">🎯 Delanteros</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:60px;" class="text-center"># Rank</th>
+                                    <th>Jugador</th>
+                                    <th>Equipo</th>
+                                    <th class="text-center">Posición</th>
+                                    <th class="text-center">PJ</th>
+                                    <th class="text-center" id="lbl-leader-metric-header">Métrica (Promedio / Acumulado)</th>
+                                    <th class="text-center">Top Percentil</th>
+                                    <th class="text-center">Ver</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaders-body">
+                                <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Cargando líderes estadísticos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </section>
+
+    </div>
+
+    <!-- Modals -->
+    <!-- Modal Auditoría -->
+    <div id="audit-modal" class="modal">
+        <div class="modal-content modal-lg" style="max-width: 820px; width: 95vw;">
+            <div class="modal-header">
+                <h2 id="audit-title">Auditoría de Score DT</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="audit-body" style="padding: 1.25rem;">
+                <p>Cargando detalles...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mejor 11 -->
+    <div id="best11-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>🌟 Mejor 11 Recomendado</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <!-- Banner de Formación Recomendada y Capitán Ideal dentro del Modal -->
+            <div id="formation-recommendation-banner" style="background:linear-gradient(135deg, rgba(37,99,235,0.12), rgba(16,185,129,0.12));border-bottom:1px solid rgba(59,130,246,0.3);padding:6px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:1.1rem;">📋</span>
+                    <div>
+                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;">ALGORITMO ÓPTIMO</div>
+                        <div style="font-size:0.88rem;font-weight:800;color:var(--text-main);" id="lbl-rec-formation">Calculando...</div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:4px;background:rgba(15,23,42,0.6);padding:2px;border-radius:6px;border:1px solid var(--border-color);">
+                        <button class="btn-strategy-mode active" id="btn-mode-solid" style="background:var(--primary);color:#fff;border:none;border-radius:4px;padding:3px 8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🛡️ Sólido</button>
+                        <button class="btn-strategy-mode" id="btn-mode-risky" style="background:transparent;color:var(--text-muted);border:none;border-radius:4px;padding:3px 8px;font-size:0.75rem;font-weight:700;cursor:pointer;">🚀 Arriesgado</button>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:0.68rem;color:var(--text-muted);font-weight:700;">👑 CAPITÁN RECOMENDADO</div>
+                        <div style="font-size:0.82rem;font-weight:700;color:#f59e0b;" id="lbl-rec-captain">-</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;">
+                        <label style="font-size:0.75rem;font-weight:600;color:var(--text-muted);">Formación:</label>
+                        <select id="select-active-formation" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:6px;padding:2px 6px;font-size:0.8rem;font-weight:800;outline:none;cursor:pointer;">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body bg-pitch">
+                <div class="best11-grid" id="pitch-layout">
+                    <!-- Generado dinámicamente por app.js -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div style="flex:1;text-align:left;">
+                    <span style="font-size:14px;color:var(--text-muted);">Puntaje Esperado del Equipo: <strong id="best11-total-score" style="color:var(--success);font-size:18px;">-</strong></span>
+                </div>
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Parámetros y Pesos del Algoritmo -->
+    <div id="weights-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="pos-weights-label">⚙️ Parámetros del Algoritmo: 🛡️ DEF</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Selector de Posición dentro del Modal de Parámetros -->
+                <div style="display:flex;gap:8px;margin-bottom:16px;background:var(--bg-main);padding:6px;border-radius:10px;border:1px solid var(--border-color);">
+                    <button class="tab-btn modal-pos-weight-btn" data-pos="ARQ" style="flex:1;">🧤 ARQ</button>
+                    <button class="tab-btn modal-pos-weight-btn active" data-pos="DEF" style="flex:1;">🛡️ DEF</button>
+                    <button class="tab-btn modal-pos-weight-btn" data-pos="VOL" style="flex:1;">⚡ VOL</button>
+                    <button class="tab-btn modal-pos-weight-btn" data-pos="DEL" style="flex:1;">🎯 DEL</button>
+                </div>
+
+                <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">Ajusta la importancia porcentual de cada métrica para recalcular el Score DT en tiempo real.</p>
+                <div id="weights-container" class="weights-grid">
+                    <!-- Generado dinámicamente por app.js -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary close-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Base de Datos por Equipo -->
+    <div id="team-detail-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="team-detail-title">⚽ Base de Datos por Equipo</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="team-detail-body">
+                <p>Cargando información del equipo...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tabla de Posiciones Completa -->
+    <div id="full-standings-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>🏆 Tabla de Posiciones Completa (LPF 2026)</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+                    <div class="standings-tabs">
+                        <button class="tab-pill full-standings-zona-btn active" data-zona="zonaA">Zona A</button>
+                        <button class="tab-pill full-standings-zona-btn" data-zona="zonaB">Zona B</button>
+                    </div>
+                    <div class="standings-tabs filter-tabs">
+                        <button class="tab-pill-sm full-standings-filter-btn active" data-filter="all">Todos</button>
+                        <button class="tab-pill-sm full-standings-filter-btn" data-filter="home">Local</button>
+                        <button class="tab-pill-sm full-standings-filter-btn" data-filter="away">Visitante</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width:40px;">#</th>
+                                <th>Equipo</th>
+                                <th class="text-center">PJ</th>
+                                <th class="text-center">PG</th>
+                                <th class="text-center">PE</th>
+                                <th class="text-center">PP</th>
+                                <th class="text-center">GF</th>
+                                <th class="text-center">GC</th>
+                                <th class="text-center">DIF</th>
+                                <th class="text-center">PTS</th>
+                                <th class="text-center">Forma</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-standings-body">
+                            <!-- Generado dinámicamente por app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+      var v = Date.now();
+      ['teamsRegistry.js', 'datos.js', 'appV3.js'].forEach(function (f) {
+        document.write('<script src="' + f + '?v=' + v + '"><\/script>');
+      });
+    })();
+    </script>
+</body>
+</html>

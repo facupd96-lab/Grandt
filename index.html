@@ -1500,46 +1500,610 @@ tr.tb-jugado:hover { opacity: 1; }
 .min-barra i { display: block; width: 60%; border-radius: 3px 3px 0 0; }
 .min-num { font-size: 0.72rem; font-weight: 800; margin-top: 3px; }
 .min-f { font-size: 0.62rem; color: var(--text-muted); }
+.pill-penal { color: #e2e8f0; background: rgba(148,163,184,0.18); border: 1px solid rgba(148,163,184,0.45); }
+
+/* Transferido: la planilla de Gran DT ya lo pasó al club nuevo pero los
+   minutos y el xG son del club anterior. Violeta, para que no se confunda
+   con las alertas de rotación (ámbar) ni con las de disponibilidad (rojo). */
+.pill-transfer { color: #c4b5fd; background: rgba(139,92,246,0.14); border: 1px solid rgba(139,92,246,0.45); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PASADA DE DISEÑO — 30/08/2026
+   Todo lo de abajo pisa lo de arriba a proposito. Va al final para que se vea
+   de un saque que se cambio y para poder borrarlo entero si algo no gusta.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ---- 1. TARJETA DE PARTIDO ----
+   El defecto de siempre: nombre, pill de rotacion, gol, valla y cuota en una
+   sola linea de 320px. "Sarmiento" quedaba en "Sarmi..." y Lanus se salia del
+   cuadro. Ahora cada equipo ocupa dos renglones: arriba el nombre (con la
+   fila entera para el, y si no entra baja a dos lineas en vez de recortarse)
+   con la cuota anclada a la derecha, y abajo los numeros del equipo.        */
+.fx2-card {
+    padding: 0.7rem 0.85rem;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.45);
+}
+.fx2-team { padding: 3px 0; }
+.fx2-team + .fx2-team { border-top: 1px dashed rgba(51, 65, 85, 0.5); }
+.fx2-row {
+    display: flex; align-items: baseline; gap: 6px;
+    padding: 0; font-size: 0.86rem;
+}
+.fx2-name {
+    flex: 1 1 auto; min-width: 0;
+    white-space: normal; overflow: visible; text-overflow: clip;
+    line-height: 1.2;
+    font-weight: 700; color: var(--text-main);
+    display: block;
+}
+.fx2-sub {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 1px;
+}
+.fx2-sub .fx2-stat {
+    font-size: 0.68rem; color: var(--text-muted);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+    cursor: help;
+}
+.fx2-sub .fx2-stat b { color: var(--text-main); font-weight: 800; }
+.fx2-row .pill-alerta { flex: 0 0 auto; align-self: center; }
+.fx2-odd {
+    flex: 0 0 auto; min-width: 40px; text-align: right;
+    font-weight: 800; font-variant-numeric: tabular-nums;
+    font-family: 'Outfit', sans-serif; color: var(--text-main);
+}
+.fx2-head { margin-bottom: 7px; }
+.fx-bar { margin-top: 8px; }
+.fx2-foot { font-size: 0.65rem; line-height: 1.35; }
+
+/* ---- 2. PESTAÑAS ----
+   Cada puesto con su color, el mismo que ya usa la app en los rankings y en
+   la cancha del mejor 11. Asi la pantalla dice de que puesto estas mirando
+   sin leer una palabra, que es como se lee el Gran DT.                     */
+.main-tabs { gap: 0.4rem; }
+.tab-btn {
+    position: relative;
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.01em;
+    transition: background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease;
+}
+.tab-btn:active { transform: translateY(1px); }
+.tab-btn.active { box-shadow: none; }
+.tab-btn[data-tab="ARQ"].active { background: var(--pos-arq); border-color: var(--pos-arq); color: #fff; }
+.tab-btn[data-tab="DEF"].active { background: var(--pos-def); border-color: var(--pos-def); color: #fff; }
+.tab-btn[data-tab="VOL"].active { background: var(--pos-vol); border-color: var(--pos-vol); color: #06251a; }
+.tab-btn[data-tab="DEL"].active { background: var(--pos-del); border-color: var(--pos-del); color: #fff; }
+.tab-btn[data-tab="LEADERS"].active { background: var(--gdt-yellow); border-color: var(--gdt-yellow); color: #1a1400; }
+.tab-btn[data-tab="ARQ"]:not(.active):hover { border-color: var(--pos-arq); color: var(--pos-arq); }
+.tab-btn[data-tab="DEF"]:not(.active):hover { border-color: var(--pos-def); color: var(--pos-def); }
+.tab-btn[data-tab="VOL"]:not(.active):hover { border-color: var(--pos-vol); color: var(--pos-vol); }
+.tab-btn[data-tab="DEL"]:not(.active):hover { border-color: var(--pos-del); color: var(--pos-del); }
+
+/* La tabla entra con una transicion corta al cambiar de puesto. Sin esto el
+   cambio es instantaneo y no se nota que la lista se rehizo entera.        */
+@keyframes gdtEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+#view-rankings.gdt-entra tbody tr { animation: gdtEntra .22s ease both; }
+#view-rankings.gdt-entra tbody tr:nth-child(1) { animation-delay: 0ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(2) { animation-delay: 18ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(3) { animation-delay: 36ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(4) { animation-delay: 54ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(5) { animation-delay: 72ms; }
+#view-rankings.gdt-entra tbody tr:nth-child(n+6) { animation-delay: 88ms; }
+@media (prefers-reduced-motion: reduce) {
+    #view-rankings.gdt-entra tbody tr { animation: none; }
+}
+
+/* ---- 3. FILAS DEL RANKING ----
+   Una barrita del color del puesto a la izquierda de los diez primeros: es
+   la unica marca que separa "candidato" de "resto de la lista" de un vistazo. */
+#view-rankings .data-table tbody tr { position: relative; }
+#view-rankings .data-table tbody tr td:first-child { position: relative; }
+#view-rankings .data-table tbody tr.fila-top td:first-child::before {
+    content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px;
+    border-radius: 3px; background: var(--acento-puesto, var(--primary));
+}
+#view-rankings[data-pos="ARQ"] { --acento-puesto: var(--pos-arq); }
+#view-rankings[data-pos="DEF"] { --acento-puesto: var(--pos-def); }
+#view-rankings[data-pos="VOL"] { --acento-puesto: var(--pos-vol); }
+#view-rankings[data-pos="DEL"] { --acento-puesto: var(--pos-del); }
+.data-table tbody tr:hover { background: rgba(255, 255, 255, 0.035); }
+
+/* ---- 4. CABECERA ----
+   Franja amarilla en vez de roja (es el acento del Gran DT) y un degrade
+   suave para que la cabecera no sea un rectangulo plano.                   */
+.main-header {
+    background: linear-gradient(180deg, var(--gdt-navy-header) 0%, #0a1b33 100%);
+    border-bottom: 3px solid var(--gdt-yellow);
+}
+.gdt-badge {
+    background: var(--gdt-yellow); color: #1a1400;
+    font-weight: 800; letter-spacing: 0.04em;
+}
+
+/* ---- 5. FIXTURE: cada partido, una tarjeta de verdad ---- */
+.fixture-list { padding: 6px; }
+.fx2-card {
+    background: rgba(255, 255, 255, 0.022);
+    border: 1px solid rgba(51, 65, 85, 0.55);
+    border-radius: var(--radius-md);
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+}
+.fx2-card:last-child { margin-bottom: 0; }
+.fx2-card:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--border-light); }
+.fx-ou { background: rgba(255, 204, 0, 0.12); color: var(--gdt-yellow); border: 1px solid rgba(255, 204, 0, 0.3); }
+
+/* ---- 6. POSICIONES: que entren los nombres largos ----
+   "Defensa y Ju..." e "Independien..." se cortaban porque la celda del equipo
+   competia con PJ, PTS y FORMA en 300px. Se le saca aire a las columnas de
+   numeros, que no lo necesitan.                                            */
+.standings-table td, .standings-table th { padding: 6px 3px; }
+.standings-table td:nth-child(2) { max-width: none; }
+.standings-table .team-badge-pill {
+    white-space: normal; overflow: visible; text-overflow: clip;
+    line-height: 1.15; display: inline-block;
+}
+#standings-body td:nth-child(2) { max-width: none; }
+#standings-body .team-badge-pill {
+    overflow: visible; text-overflow: clip; white-space: normal; line-height: 1.15;
+}
+
+/* ---- 7. LA CANCHA DEL MEJOR 11 ----
+   Las cuatro lineas se apretaban arriba y abajo quedaba medio campo vacio, y
+   los nombres largos se cortaban en "Cristian Tarra...". Ahora las lineas se
+   reparten el alto de la cancha y la ficha es un poco mas ancha, con el
+   nombre en dos renglones si hace falta.                                    */
+.best11-grid {
+    justify-content: space-around;
+    min-height: 400px;
+    gap: 0.35rem;
+}
+.pitch-row { gap: 0.55rem; }
+.gdt-card-badge { width: 104px; padding: 4px 4px 3px; }
+.gdt-player-name {
+    white-space: normal; overflow: visible; text-overflow: clip;
+    font-size: 0.68rem; line-height: 1.12; min-height: 1.9em;
+    display: flex; align-items: center; justify-content: center;
+}
+.gdt-player-team { font-size: 0.55rem; }
+.pitch-row { gap: 1.4rem; }
+.gdt-card-badge { width: 112px; }
+.gdt-player-team { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.1; }
+
+/* La cotizacion se partia en dos renglones ("$" arriba y "1.200.000" abajo).
+   Las celdas de numeros no se parten nunca; la del nombre si.              */
+#players-body td { white-space: nowrap; }
+#players-body td:nth-child(2) { white-space: normal; }
+
+/* ---- 8. ORDEN EN LOS TITULOS DE COLUMNA ----
+   Reemplaza la barra "ORDENAR POR", que repetia lo que ya hacia el titulo. */
+.col-ordenable { position: relative; }
+.col-ordenable:hover { color: var(--text-main); }
+.col-ordenada { color: var(--text-main) !important; }
+.orden-flecha { font-size: 0.6em; margin-left: 4px; vertical-align: middle; color: var(--primary); }
+.orden-lbl { font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.03em; }
+/* Ritmo por 90 calculado sobre pocos minutos: se muestra, pero apagado. */
+.ritmo-flojo { color: var(--text-muted); border-bottom: 1px dotted var(--border-light); cursor: help; }
+
+/* Referencia al pie de la tabla de rankings. */
+.tabla-referencia {
+    font-size: 0.72rem; line-height: 1.5; color: var(--text-muted);
+    padding: 12px 16px; border-top: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.015);
+}
+.tabla-referencia b { color: var(--text-main); font-weight: 700; }
+
+/* Selector de club en la barra de la tabla. */
+.select-equipo {
+    background: var(--bg-main); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-pill);
+    padding: 0.5rem 0.85rem; font-size: 0.82rem; font-weight: 600;
+    font-family: 'Outfit', sans-serif; cursor: pointer; outline: none;
+    max-width: 190px;
+}
+.select-equipo:hover { border-color: var(--border-light); }
+.select-equipo:focus { border-color: var(--primary); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PASADA DE ESTRUCTURA — 31/08/2026
+   El problema no era el color: era que todo entraba a la fuerza en una sola
+   pantalla de alto fijo. El fixture apretado en 320px, las posiciones abajo
+   con los nombres cortados, los rankings peleando por lo que sobraba y cero
+   lugar para moverse. Ahora cada cosa tiene su pantalla, a lo ancho, y la
+   pagina scrollea como cualquier pagina.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ---- 1. FUERA LA JAULA ---- */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.75rem 1.5rem 4rem;
+    display: block;
+    height: auto;
+}
+.seccion { animation: gdtEntra .2s ease both; }
+.seccion[hidden] { display: none !important; }
+body { overflow-y: auto; }
+
+/* ---- 2. NAVEGACION ---- */
+.nav-secciones {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(7, 21, 41, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+}
+.nav-wrap {
+    max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+    display: flex; gap: 2px; overflow-x: auto;
+}
+.nav-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 0.9rem; font-weight: 600;
+    padding: 0.95rem 1.1rem;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: color .15s ease, border-color .15s ease;
+}
+.nav-btn:hover { color: var(--text-main); }
+.nav-btn.active { color: var(--gdt-yellow); border-bottom-color: var(--gdt-yellow); }
+
+/* ---- 3. LA FECHA ---- */
+.fecha-hero {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 2rem; flex-wrap: wrap;
+    padding: 0 0 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.75rem;
+}
+.fecha-eyebrow { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+.fecha-hero h1 {
+    font-family: 'Outfit', sans-serif; font-size: 3.2rem; font-weight: 800;
+    line-height: 1; letter-spacing: -0.02em; margin: 4px 0 6px;
+}
+.fecha-hero p { color: var(--text-muted); font-size: 0.95rem; }
+.fecha-cierre { text-align: right; }
+.fecha-cierre-lbl { font-size: 0.78rem; color: var(--text-muted); }
+.fecha-cierre-val {
+    font-family: 'Outfit', sans-serif; font-size: 2.1rem; font-weight: 800;
+    color: var(--gdt-yellow); line-height: 1.1;
+}
+.fecha-cierre.cerrado .fecha-cierre-val { color: var(--danger); font-size: 1.6rem; }
+.fecha-cierre-sub { font-size: 0.76rem; color: var(--text-muted); max-width: 340px; margin-left: auto; }
+
+.tarjetas-aviso {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.9rem; margin-bottom: 1.75rem;
+}
+.aviso-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-left: 3px solid var(--border-light);
+    border-radius: var(--radius-md); padding: 1rem 1.1rem;
+}
+.aviso-card p { font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0; line-height: 1.45; }
+.aviso-top { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+.aviso-top b { font-family: 'Outfit', sans-serif; font-weight: 700; }
+.aviso-peligro { border-left-color: var(--danger); }
+.aviso-atencion { border-left-color: var(--warning); }
+.aviso-info { border-left-color: #8b5cf6; }
+.aviso-ok { border-left-color: var(--success); }
+.aviso-lista { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; align-items: center; }
+.chip-jug {
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill); padding: 3px 9px; cursor: pointer;
+    color: var(--text-main); font-size: 0.75rem; font-weight: 600; font-family: inherit;
+}
+.chip-jug span { color: var(--text-muted); font-weight: 500; }
+.chip-jug:hover { border-color: var(--border-light); background: rgba(255,255,255,0.1); }
+
+.fecha-acciones { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; }
+
+.grilla-puestos {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.1rem;
+}
+.col-puesto {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg); padding: 1.1rem;
+}
+.col-puesto h3 {
+    font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700;
+    margin-bottom: 0.75rem; padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--acento, var(--primary));
+}
+.col-puesto.pos-arq { --acento: var(--pos-arq); }
+.col-puesto.pos-def { --acento: var(--pos-def); }
+.col-puesto.pos-vol { --acento: var(--pos-vol); }
+.col-puesto.pos-del { --acento: var(--pos-del); }
+.tarjeta-jug {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    background: none; border: none; border-radius: var(--radius-sm);
+    padding: 9px 6px; cursor: pointer; text-align: left; font-family: inherit;
+    color: var(--text-main);
+}
+.tarjeta-jug + .tarjeta-jug { border-top: 1px solid rgba(51,65,85,0.4); }
+.tarjeta-jug:hover { background: rgba(255,255,255,0.04); }
+.tj-puesto {
+    flex: 0 0 22px; text-align: center; font-family: 'Outfit', sans-serif;
+    font-weight: 800; color: var(--acento, var(--primary)); font-size: 1rem;
+}
+.tj-datos { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.tj-nombre { font-weight: 700; font-size: 0.9rem; }
+.tj-sub { font-size: 0.72rem; color: var(--text-muted); }
+.tj-pts {
+    flex: 0 0 auto; font-family: 'Outfit', sans-serif; font-weight: 800;
+    font-size: 1.05rem; color: var(--text-main);
+}
+.ver-todos-puesto {
+    width: 100%; margin-top: 10px; background: none; cursor: pointer;
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    color: var(--text-muted); font-family: inherit; font-size: 0.76rem;
+    font-weight: 600; padding: 7px;
+}
+.ver-todos-puesto:hover { color: var(--text-main); border-color: var(--border-light); }
+
+/* ---- 4. PARTIDOS Y POSICIONES A LO ANCHO ---- */
+#sec-fixture .card, #sec-posiciones .card { max-width: 100%; }
+.fx-banda {
+    background: linear-gradient(90deg, var(--gdt-green-dark), var(--gdt-green-light));
+    color: #fff; font-family: 'Outfit', sans-serif; font-weight: 700;
+    font-size: 0.82rem; letter-spacing: 0.06em;
+    padding: 0.65rem 1.1rem; margin: 0 -6px;
+}
+.fx-banda:first-child { margin-top: -6px; }
+#sec-fixture .fx2-card { padding: 1rem 1.25rem; margin: 0; border-radius: 0; background: none; border-left: none; border-right: none; }
+#sec-fixture .fx2-card:hover { background: rgba(255,255,255,0.03); }
+#sec-fixture .fx2-row { font-size: 1rem; }
+#sec-fixture .fx2-name { font-size: 1.05rem; }
+#sec-fixture .fx2-odd { font-size: 1.1rem; min-width: 56px; }
+#sec-fixture .fx2-sub .fx2-stat { font-size: 0.78rem; }
+#sec-fixture .fixture-list { max-height: none; overflow: visible; }
+#sec-posiciones .standings-table td,
+#sec-posiciones .standings-table th { padding: 0.85rem 0.75rem; font-size: 0.92rem; }
+#sec-posiciones .standings-table .team-badge-pill { font-size: 0.95rem; }
+#sec-posiciones .standings-wrap { max-height: none; }
+
+/* ---- 5. MAS AIRE EN LA TABLA DE JUGADORES ---- */
+#view-rankings .data-table td { padding: 0.95rem 0.85rem; }
+#view-rankings .data-table th { padding: 0.85rem; }
+#sec-jugadores .card { border-radius: var(--radius-lg); }
+.main-toolbar { padding: 1.1rem 1.25rem; }
+
+@media (max-width: 900px) {
+    .fecha-hero h1 { font-size: 2.2rem; }
+    .fecha-cierre { text-align: left; }
+    .fecha-cierre-sub { margin-left: 0; }
+}
+
+/* Tabla de posiciones a lo ancho: el nombre a la izquierda como en cualquier
+   tabla de posiciones, y el puesto en un circulo. */
+#sec-posiciones .standings-table td:nth-child(2) { text-align: left; }
+#sec-posiciones .standings-table th:nth-child(2) { text-align: left; }
+#sec-posiciones .standings-table .team-badge-pill { padding-left: 0; font-weight: 700; }
+.pos-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.07); color: var(--text-muted);
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.8rem;
+}
+.pos-badge.pos-arriba { background: var(--primary); color: #fff; }
+/* Los interruptores de zona y de local/visitante no tienen por que ocupar
+   toda la pantalla ahora que la pantalla es ancha. */
+#sec-posiciones .standings-tabs { display: inline-flex; width: auto; }
+#sec-posiciones .standings-tabs-container { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; margin-bottom: 1rem; }
+#sec-posiciones .tab-pill, #sec-posiciones .tab-pill-sm { flex: 0 0 auto; padding-left: 1.1rem; padding-right: 1.1rem; }
+/* El mejor 11 es la accion principal de la app: vive en la barra de arriba y
+   se llega desde cualquier pantalla, no escondido dentro de una tabla. */
+.nav-cta { margin-left: auto; align-self: center; padding: 0.5rem 1.1rem; font-size: 0.85rem; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BARRA UNICA — 31/08/2026
+   Se reemplazan la cabecera vieja y la barra de secciones por una sola.
+   Fuera: la pelota, el badge PRO, la bajada de "Analisis Estadistico
+   Avanzado", el sello de version y los cuatro chips siempre a la vista.
+   Todo eso pasa al menu de los tres puntos, que es donde va lo que se mira
+   una vez por semana.
+   ══════════════════════════════════════════════════════════════════════════ */
+.main-header, .header-container, .header-status, .header-title, .subtitle { display: none !important; }
+
+.barra {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(9, 20, 37, 0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+}
+.barra-wrap {
+    max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.75rem;
+    height: 58px;
+}
+
+/* Marca: una placa con las iniciales y el nombre en voz baja. Sin emoji y sin
+   badge: el protagonista de la pantalla es "Fecha 7", no el logo. */
+.marca { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
+.marca-tile {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--gdt-yellow); color: #10203a;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.82rem;
+    letter-spacing: -0.02em;
+}
+.marca-nom {
+    font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.95rem;
+    color: var(--text-main); letter-spacing: -0.01em;
+}
+
+.barra .nav-secciones {
+    position: static; background: none; backdrop-filter: none;
+    border: none; flex: 1 1 auto; min-width: 0;
+    display: flex; gap: 2px; overflow-x: auto;
+}
+.barra .nav-btn { padding: 0 0.9rem; height: 58px; font-size: 0.88rem; }
+
+.barra-acciones { display: flex; align-items: center; gap: 0.7rem; flex: 0 0 auto; }
+.barra-fecha {
+    font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
+    padding: 3px 9px; border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill); cursor: help; white-space: nowrap;
+}
+.barra-fecha-alerta { color: var(--danger); border-color: rgba(239,68,68,0.4); }
+.nav-cta { margin: 0; padding: 0.45rem 1rem; font-size: 0.83rem; }
+.btn-mas {
+    background: none; border: 1px solid var(--border-color); cursor: pointer;
+    color: var(--text-muted); border-radius: var(--radius-sm);
+    width: 32px; height: 30px; font-size: 1.1rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-mas:hover, .btn-mas.abierto { color: var(--text-main); border-color: var(--border-light); }
+
+.menu-mas {
+    position: absolute; right: max(1.5rem, calc(50% - 640px + 1.5rem)); top: 54px;
+    width: 320px; padding: 6px;
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius-md); box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+}
+.menu-mas[hidden] { display: none; }
+.menu-item {
+    display: block; width: 100%; text-align: left; cursor: pointer;
+    background: none; border: none; border-radius: var(--radius-sm);
+    padding: 9px 11px; color: var(--text-main);
+    font-family: inherit; font-size: 0.88rem; font-weight: 600;
+}
+.menu-item small {
+    display: block; font-weight: 400; font-size: 0.74rem;
+    color: var(--text-muted); margin-top: 2px; line-height: 1.35;
+}
+.menu-item:hover { background: rgba(255,255,255,0.06); }
+.menu-sep { height: 1px; background: var(--border-color); margin: 5px 8px; }
+
+/* Enlace de contexto dentro de la pantalla de la fecha. Antes habia dos
+   botones grandes repitiendo lo que ya esta en la barra de arriba. */
+.fecha-acciones { margin-bottom: 1.75rem; }
+.link-ctx {
+    background: none; border: none; cursor: pointer; padding: 0;
+    color: var(--primary); font-family: inherit; font-size: 0.88rem; font-weight: 600;
+}
+.link-ctx:hover { color: #60a5fa; text-decoration: underline; }
+
+@media (max-width: 1000px) {
+    .marca-nom { display: none; }
+    .barra-fecha { display: none; }
+}
 
 </style>
 </head>
 <body>
-    <header class="main-header">
-        <div class="header-container">
-            <div class="header-title">
-                <h1>⚽ GRAN DT <span class="gdt-badge">PRO</span></h1>
-                <p class="subtitle">Análisis Estadístico Avanzado y Algoritmo de Armado • <span id="lbl-status-fecha">Cargando...</span></p>
+    <!-- UNA SOLA BARRA.
+         Antes habia dos: una cabecera con el logo, una bajada larga y cinco
+         chips, y abajo otra con las secciones. Entre las dos ocupaban 130px
+         de alto para decir cosas que casi nunca se miran. Ahora es una sola
+         barra: la marca, las secciones, el boton principal, y todo lo demas
+         adentro del menu de los tres puntos. -->
+    <header class="barra">
+        <div class="barra-wrap">
+            <div class="marca">
+                <span class="marca-tile">DT</span>
+                <span class="marca-nom">Gran DT</span>
             </div>
-            <div class="header-status">
-                <!-- Tres chips de control de datos ocupaban media cabecera y decian
-                     lo mismo: que los datos estan bien. Ahora es UNO solo, que se
-                     abre y muestra el detalle completo. Los numeros no se
-                     perdieron: estan adentro. -->
-                <button class="chip chip-ok" id="lbl-health-badge" title="Estado de los datos — tocá para ver el detalle">
-                    <span class="badge-icon">🛡️</span> Datos <span id="lbl-health-pct">–</span>
-                    <span class="text-muted" style="font-weight:600;">· fecha <span id="lbl-datos-fecha">–</span></span>
-                </button>
-                <span class="chip" id="lbl-global-stats" style="display:none;"></span>
-                <span class="chip-sep"></span>
-                <button class="chip chip-btn chip-destacado" id="btn-open-tablero" title="Qué defensas están sólidas y cuáles vulnerables en la próxima fecha">
-                    🎯 Contexto de la fecha
-                </button>
-                <button class="chip chip-btn" id="btn-open-weights" title="Qué pesa cada término del reglamento en cada puesto">
-                    📊 Qué mide el modelo
-                </button>
-                <button class="chip chip-btn" id="btn-open-tournament" title="Tiros a favor y en contra de cada equipo, con corte local / visitante">
-                    ⚽ Equipos
-                </button>
-                <button class="chip chip-btn" id="btn-sync-now" title="Cómo se actualizan los datos">
-                    🔄 Actualizar datos
-                </button>
+
+            <nav class="nav-secciones">
+                <button class="nav-btn active" data-sec="fecha">La fecha</button>
+                <button class="nav-btn" data-sec="jugadores">Jugadores</button>
+                <button class="nav-btn" data-sec="fixture">Partidos</button>
+                <button class="nav-btn" data-sec="posiciones">Posiciones</button>
+                <button class="nav-btn" data-sec="lideres">Líderes</button>
+            </nav>
+
+            <div class="barra-acciones">
+                <span class="barra-fecha" id="lbl-status-fecha"></span>
+                <button class="btn btn-success nav-cta" id="btn-mejor-11">Mejor 11</button>
+                <button class="btn-mas" id="btn-menu" title="Más">⋯</button>
             </div>
+        </div>
+
+        <div class="menu-mas" id="menu-mas" hidden>
+            <button class="menu-item" id="btn-open-tablero">
+                Contexto de la fecha
+                <small>Qué defensas están sólidas y dónde se convierte</small>
+            </button>
+            <button class="menu-item" id="btn-open-tournament">
+                Equipos
+                <small>Tiros a favor y en contra, con corte de local y visitante</small>
+            </button>
+            <button class="menu-item" id="btn-open-weights">
+                Qué mide el modelo
+                <small>Cuánto pesa cada término del reglamento en cada puesto</small>
+            </button>
+            <div class="menu-sep"></div>
+            <button class="menu-item" id="lbl-health-badge">
+                Estado de los datos · <span id="lbl-health-pct">–</span>
+                <small>Última fecha jugada: <span id="lbl-datos-fecha">–</span> · <span id="lbl-version"></span></small>
+            </button>
+            <button class="menu-item" id="btn-sync-now">
+                Actualizar datos
+                <small>Cómo se traen los datos nuevos</small>
+            </button>
+            <span id="lbl-global-stats" hidden></span>
         </div>
     </header>
 
-    <div class="container dashboard-grid">
-        <!-- Sidebar Column -->
-        <aside class="sidebar">
+    <div class="container">
+
+        <section class="seccion" id="sec-fecha">
+            <div id="pantalla-fecha"></div>
+        </section>
+
+        <section class="seccion" id="sec-jugadores" hidden>
+            <div class="card">
+                <div class="main-toolbar">
+                    <div class="main-tabs">
+                        <button class="tab-btn active" data-tab="ARQ">🧤 ARQ</button>
+                        <button class="tab-btn" data-tab="DEF">🛡️ DEF</button>
+                        <button class="tab-btn" data-tab="VOL">⚡ VOL</button>
+                        <button class="tab-btn" data-tab="DEL">🎯 DEL</button>
+                                            </div>
+                    
+                    <div class="toolbar-actions">
+                        <!-- Filtro por club. Sirve para lo de todas las fechas:
+                             "quiero ver a los defensores de Banfield" sin tener
+                             que acordarse de los nombres uno por uno. -->
+                        <select id="filtro-equipo" class="select-equipo" title="Ver sólo los jugadores de un club">
+                            <option value="">Todos los equipos</option>
+                        </select>
+                        <div class="search-box">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" id="search-input" placeholder="Buscar jugador o equipo...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rankings Content -->
+                <div id="orden-ranking" class="orden-barra"></div>
+                <div id="view-rankings" class="table-responsive flex-1">
+                    <table class="data-table">
+                        <thead id="rankings-thead">
+                            <!-- Generado dinámicamente según posición por app.js -->
+                        </thead>
+                        <tbody id="players-body">
+                            <!-- Generado dinámicamente por app.js -->
+                            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Cargando jugadores...</td></tr>
+                        </tbody>
+                    </table>
+                    <!-- Referencia de la tabla. Sin esto, el gris con puntitos de
+                         Tiros/90 y xG/90 es una marca que nadie sabe que significa. -->
+                    <div class="tabla-referencia">
+                        <b>Tiros/90</b> y <b>xG/90</b> son por cada 90 minutos <b>en la cancha</b>, no por partido.
+                        El xG va <b>sin los penales</b>: un penal pateado vale 0.79 y no dice nada de si el jugador genera juego.
+                        <span class="ritmo-flojo">Los que están en gris con puntitos</span> salen de menos de 180 minutos jugados —
+                        dos partidos— y ahí el ritmo por 90 es poco confiable, así que el modelo lo achica.
+                        Pasá el mouse por encima de cualquier número para ver la cuenta.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="seccion" id="sec-fixture" hidden>
             <!-- Fixture Deportivo -->
             <div class="card">
                 <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1.25rem;">
@@ -1557,7 +2121,9 @@ tr.tb-jugado:hover { opacity: 1; }
                     </div>
                 </div>
             </div>
+        </section>
 
+        <section class="seccion" id="sec-posiciones" hidden>
             <!-- Posiciones -->
             <div class="card">
                 <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 1rem;">
@@ -1581,10 +2147,16 @@ tr.tb-jugado:hover { opacity: 1; }
                         <table class="standings-table">
                             <thead>
                                 <tr>
-                                    <th style="width:25px;" class="text-center">#</th>
+                                    <th style="width:52px;" class="text-center">#</th>
                                     <th>Equipo</th>
-                                    <th class="text-center">PJ</th>
                                     <th class="text-center">PTS</th>
+                                    <th class="text-center">PJ</th>
+                                    <th class="text-center">G</th>
+                                    <th class="text-center">E</th>
+                                    <th class="text-center">P</th>
+                                    <th class="text-center">GF</th>
+                                    <th class="text-center">GC</th>
+                                    <th class="text-center">DIF</th>
                                     <th class="text-center">Forma</th>
                                 </tr>
                             </thead>
@@ -1596,48 +2168,11 @@ tr.tb-jugado:hover { opacity: 1; }
                     </div>
                 </div>
             </div>
+        </section>
 
-        </aside>
-
-        <!-- Main Column -->
-        <main class="main-content">
-            <div class="card h-full flex-col">
-                <div class="main-toolbar">
-                    <div class="main-tabs">
-                        <button class="tab-btn active" data-tab="ARQ">🧤 ARQ</button>
-                        <button class="tab-btn" data-tab="DEF">🛡️ DEF</button>
-                        <button class="tab-btn" data-tab="VOL">⚡ VOL</button>
-                        <button class="tab-btn" data-tab="DEL">🎯 DEL</button>
-                        <button class="tab-btn leaders-tab" data-tab="LEADERS">📊 Líderes</button>
-                    </div>
-                    
-                    <div class="toolbar-actions">
-                        <div class="search-box">
-                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <input type="text" id="search-input" placeholder="Buscar jugador o equipo...">
-                        </div>
-                        <button class="btn btn-success" id="btn-mejor-11">
-                            🌟 Mejor 11
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Rankings Content -->
-                <div id="orden-ranking" class="orden-barra"></div>
-                <div id="view-rankings" class="table-responsive flex-1">
-                    <table class="data-table">
-                        <thead id="rankings-thead">
-                            <!-- Generado dinámicamente según posición por app.js -->
-                        </thead>
-                        <tbody id="players-body">
-                            <!-- Generado dinámicamente por app.js -->
-                            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Cargando jugadores...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Centro de Líderes Estadísticos (Ranking Ordinal por Categoría) -->
-                <div id="view-leaders" class="p-4 flex-1" style="display: none;">
+        <section class="seccion" id="sec-lideres" hidden>
+            <!-- Centro de Líderes Estadísticos (Ranking Ordinal por Categoría) -->
+                <div id="view-leaders" class="p-4" >
                     <div id="leaders-nota" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;"></div>
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;background:var(--bg-card);padding:14px 18px;border-radius:12px;border:1px solid var(--border-color);">
                         <div>
@@ -1689,7 +2224,8 @@ tr.tb-jugado:hover { opacity: 1; }
                         </table>
                     </div>
                 </div>
-        </main>
+        </section>
+
     </div>
 
     <!-- Modals -->
@@ -2380,6 +2916,7 @@ const D = window.DATOS || null;
 const S = {
   pos: 'ARQ',
   busqueda: '',
+  equipo: '',            // filtro por club, vacio = todos
   zona: 'todos',
   filtroTabla: 'all',
   esquema: null,
@@ -2531,24 +3068,163 @@ function iniciar() {
   pintarTabla();
   pintarRankings();
   pintarLideres();
+  pintarPantallaFecha();
+}
+
+// ── navegacion por secciones ────────────────────────────────────────────────
+// Cada pantalla a lo ancho, en vez de todo apretado a la vez.
+function mostrarSeccion(sec) {
+  document.querySelectorAll('.seccion').forEach(el => { el.hidden = (el.id !== 'sec-' + sec); });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (sec === 'jugadores') pintarRankings();
+  if (sec === 'fecha') pintarPantallaFecha();
+}
+
+// ── LA FECHA: la pantalla que faltaba ──────────────────────────────────────
+// La app era un explorador de tablas, y el trabajo de verdad es cerrar un once
+// antes de que arranque la fecha. Esto pone adelante lo que decide: cuanto
+// falta para el cierre, que se rompio desde la ultima vez que miraste, y los
+// tres mejores de cada puesto. Las tablas quedan para discutir un caso.
+function pintarPantallaFecha() {
+  const cont = $('pantalla-fecha'); if (!cont || !D) return;
+  const partidos = (D.partidos || []).slice().sort((a, b) => new Date(a.cuando) - new Date(b.cuando));
+  const primero = partidos.length ? new Date(partidos[0].cuando) : null;
+  const ultimo = partidos.length ? new Date(partidos[partidos.length - 1].cuando) : null;
+  const fmtDia = d => d.toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: '2-digit' });
+  const fmtHora = d => d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+  // Cuenta regresiva al cierre. En Gran DT los cambios cierran cuando arranca
+  // el primer partido de la fecha, asi que el cierre no es un dato aparte: es
+  // el horario del primer partido.
+  let cierre = '';
+  if (primero) {
+    const faltan = primero - new Date();
+    if (faltan > 0) {
+      const h = Math.floor(faltan / 3600000), m = Math.floor((faltan % 3600000) / 60000);
+      cierre = `<div class="fecha-cierre">
+        <div class="fecha-cierre-lbl">Cierran los cambios en</div>
+        <div class="fecha-cierre-val">${h >= 24 ? Math.floor(h / 24) + 'd ' + (h % 24) + 'h' : h + 'h ' + m + 'min'}</div>
+        <div class="fecha-cierre-sub">${esc(fmtDia(primero))} · ${esc(fmtHora(primero))}, cuando arranca ${esc(NOM(partidos[0].local))} – ${esc(NOM(partidos[0].visitante))}</div>
+      </div>`;
+    } else {
+      cierre = `<div class="fecha-cierre cerrado">
+        <div class="fecha-cierre-lbl">La fecha ya arrancó</div>
+        <div class="fecha-cierre-val">cerrada</div>
+        <div class="fecha-cierre-sub">Lo que ves es de referencia: los cambios de esta fecha ya no se pueden hacer</div>
+      </div>`;
+    }
+  }
+
+  // Lo que cambió y hay que mirar antes de cerrar el equipo.
+  const todos = ['ARQ', 'DEF', 'VOL', 'DEL'].flatMap(p => (D.rankings[p] || []).map(x => ({ ...x, _pos: p })));
+  const juegan = todos.filter(x => x.pj_ == null || x.pj_ >= 0.5);
+  const susp = juegan.filter(x => x.disp && x.disp.suspendido);
+  const alBorde = juegan.filter(x => x.disp && !x.disp.suspendido && x.disp.aUnaDeSuspension);
+  const transf = juegan.filter(x => x.tr);
+  const confirmados = juegan.filter(x => x.fmin === 'confirmado').length;
+
+  const listaCorta = arr => arr.slice(0, 6).map(x =>
+    `<button class="chip-jug" onclick="auditar('${x.id}')">${esc(nombreCorto(x.n))} <span>${esc(NOM(x.eq))}</span></button>`).join('')
+    + (arr.length > 6 ? `<span class="text-muted" style="font-size:0.75rem;">y ${arr.length - 6} más</span>` : '');
+
+  const avisos = [];
+  if (susp.length) avisos.push(['🟥', 'Suspendidos', `${susp.length} jugador${susp.length > 1 ? 'es' : ''} con roja que no juega${susp.length > 1 ? 'n' : ''} esta fecha`, listaCorta(susp), 'peligro']);
+  if (alBorde.length) avisos.push(['🟨', 'A una amarilla de la suspensión', `Si ven otra, se pierden la fecha que viene`, listaCorta(alBorde), 'atencion']);
+  if (transf.length) avisos.push(['⇄', 'Cambiaron de club', `Sus minutos y su xG son del club anterior`, listaCorta(transf), 'info']);
+  if (confirmados) avisos.push(['✅', 'Formaciones confirmadas', `${confirmados} jugadores con el once ya publicado: para ellos los minutos no son estimación`, '', 'ok']);
+
+  // Los tres mejores de cada puesto, que es con lo que uno arranca a armar.
+  const NOMBRE_POS = { ARQ: 'Arqueros', DEF: 'Defensores', VOL: 'Volantes', DEL: 'Delanteros' };
+  const columnas = ['ARQ', 'DEF', 'VOL', 'DEL'].map(pos => {
+    const top = (D.rankings[pos] || [])
+      .filter(x => x.pj_ == null || x.pj_ >= 0.5)
+      .slice().sort((a, b) => (b.epsj ?? -1) - (a.epsj ?? -1)).slice(0, 3);
+    return `<div class="col-puesto pos-${pos.toLowerCase()}">
+      <h3>${NOMBRE_POS[pos]}</h3>
+      ${top.map((x, i) => `<button class="tarjeta-jug" onclick="auditar('${x.id}')">
+          <span class="tj-puesto">${i + 1}</span>
+          <span class="tj-datos">
+            <span class="tj-nombre">${esc(nombreCorto(x.n))}</span>
+            <span class="tj-sub">${esc(NOM(x.eq))} · ${x.cond === 'L' ? 'L' : 'V'} vs ${esc(NOM(x.riv))} · ${x.mesp}'</span>
+          </span>
+          <span class="tj-pts">${n1(x.epsj)}</span>
+        </button>`).join('')}
+      <button class="ver-todos-puesto" data-ir-puesto="${pos}">Ver los ${(D.rankings[pos] || []).length} ${NOMBRE_POS[pos].toLowerCase()}</button>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = `
+    <div class="fecha-hero">
+      <div class="fecha-hero-txt">
+        <div class="fecha-eyebrow">Torneo Clausura</div>
+        <h1>Fecha ${D.fechaObjetivo ?? '–'}</h1>
+        <p>${partidos.length} partidos${primero && ultimo ? ` · del ${esc(fmtDia(primero))} al ${esc(fmtDia(ultimo))}` : ''}</p>
+      </div>
+      ${cierre}
+    </div>
+
+    ${avisos.length ? `<div class="tarjetas-aviso">${avisos.map(([ic, tit, txt, lista, tipo]) => `
+      <div class="aviso-card aviso-${tipo}">
+        <div class="aviso-top"><span class="aviso-ic">${ic}</span><b>${tit}</b></div>
+        <p>${txt}</p>
+        ${lista ? `<div class="aviso-lista">${lista}</div>` : ''}
+      </div>`).join('')}</div>` : ''}
+
+    <div class="fecha-acciones">
+      <button class="link-ctx" id="btn-ctx-desde-fecha">Ver el contexto de los ${partidos.length} partidos de la fecha →</button>
+    </div>
+
+    <div class="grilla-puestos">${columnas}</div>`;
+
+  const bc = $('btn-ctx-desde-fecha'); if (bc) bc.onclick = () => { const o = $('btn-open-tablero'); if (o) o.click(); };
+  cont.querySelectorAll('[data-ir-puesto]').forEach(b => b.onclick = () => {
+    S.pos = b.dataset.irPuesto;
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(z => z.classList.toggle('active', z.dataset.tab === S.pos));
+    mostrarSeccion('jugadores');
+  });
 }
 
 function eventos() {
+  // Menu de los tres puntos: lo que se usa una vez cada tanto no tiene por que
+  // estar siempre a la vista.
+  const btnMas = $('btn-menu'), menuMas = $('menu-mas');
+  if (btnMas && menuMas) {
+    btnMas.onclick = e => { e.stopPropagation(); menuMas.hidden = !menuMas.hidden; btnMas.classList.toggle('abierto', !menuMas.hidden); };
+    document.addEventListener('click', e => {
+      if (!menuMas.hidden && !menuMas.contains(e.target) && e.target !== btnMas) { menuMas.hidden = true; btnMas.classList.remove('abierto'); }
+    });
+    menuMas.querySelectorAll('.menu-item').forEach(b => b.addEventListener('click', () => { menuMas.hidden = true; btnMas.classList.remove('abierto'); }));
+  }
+  document.querySelectorAll('.nav-btn[data-sec]').forEach(b => b.onclick = () => mostrarSeccion(b.dataset.sec));
   document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.onclick = () => {
     document.querySelectorAll('.tab-btn[data-tab]').forEach(z => z.classList.remove('active'));
     b.classList.add('active');
     const t = b.dataset.tab;
-    if (t === 'LEADERS') {
-      $('view-rankings').style.display = 'none';
-      $('view-leaders').style.display = '';
-    } else {
-      $('view-rankings').style.display = '';
-      $('view-leaders').style.display = 'none';
-      S.pos = t; S.ordCol = 'sc'; S.ordDir = -1;
+    {
+      // Líderes dejó de ser una pestaña de esta tabla: ahora es una sección
+      // propia del menú de arriba. Acá ya no hay nada que esconder.
+      // Antes cambiar de puesto reseteaba el orden a 'sc', que ni siquiera es
+      // uno de los botones de la barra: elegias "Amenaza de gol" en DEF,
+      // pasabas a DEL y la barra quedaba sin ninguno marcado y la tabla
+      // ordenada por otra cosa. El orden que elegiste se respeta.
+      S.pos = t;
       pintarRankings();
     }
   });
-  const q = $('search-input'); if (q) q.oninput = () => { S.busqueda = q.value.toLowerCase().trim(); pintarRankings(); };
+  const q = $('search-input'); if (q) q.oninput = () => { S.busqueda = sinTildes(q.value.trim()); pintarRankings(); };
+  // Filtro por club. La lista sale de los jugadores que hay de verdad en el
+  // ranking, no de una lista fija de 30 nombres escrita a mano: si un club no
+  // tiene a nadie cargado, no aparece.
+  const selEq = $('filtro-equipo');
+  if (selEq) {
+    const equipos = [...new Set(['ARQ','DEF','VOL','DEL']
+      .flatMap(p => (D.rankings[p] || []).map(x => x.eq)))]
+      .sort((a, b) => NOM(a).localeCompare(NOM(b), 'es'));
+    selEq.innerHTML = '<option value="">Todos los equipos</option>' +
+      equipos.map(e => `<option value="${esc(e)}">${esc(NOM(e))}</option>`).join('');
+    selEq.onchange = () => { S.equipo = selEq.value; pintarRankings(); };
+  }
   document.querySelectorAll('.standings-zona-btn').forEach(b => b.onclick = () => {
     document.querySelectorAll('.standings-zona-btn').forEach(z => z.classList.remove('active'));
     b.classList.add('active'); pintarTabla();
@@ -2669,23 +3345,26 @@ function pintarCabecera() {
   const totJug = ['ARQ', 'DEF', 'VOL', 'DEL'].reduce((a, p) => a + D.rankings[p].length, 0);
   const conTiros = Object.values(TODOS).filter(x => x.ind && x.ind.tiros > 0).length;
   const c = D.cuotas || {};
+  // En la barra va lo corto. El detalle completo queda en el globito: la
+  // cabecera decia "Analisis Estadistico Avanzado y Algoritmo de Armado ·
+  // Fecha 7 · 15 de 15 partidos por jugarse · motor v10 · 30/08/2026 · app
+  // v19" y eso no se lee, se saltea.
   const st = $('lbl-status-fecha');
   if (st) {
-    st.textContent = `Fecha ${D.fechaObjetivo || ''} · ${c.pendientes != null ? `${c.pendientes} de ${D.partidos.length} partidos por jugarse` : `${D.partidos.length} partidos`}`;
-    st.style.color = c.vencidas ? 'var(--danger)' : '';
-    if (c.vencidas) st.textContent = `Fecha ${D.fechaObjetivo} YA JUGADA — hay que actualizar las cuotas`;
+    st.textContent = `Fecha ${D.fechaObjetivo || ''}`;
+    st.title = c.pendientes != null
+      ? `${c.pendientes} de ${D.partidos.length} partidos por jugarse`
+      : `${D.partidos.length} partidos`;
+    st.classList.toggle('barra-fecha-alerta', !!c.vencidas);
+    if (c.vencidas) { st.textContent = `Fecha ${D.fechaObjetivo} ya jugada`; st.title = 'Hay que actualizar las cuotas'; }
   }
   const df = $('lbl-datos-fecha'); if (df) df.textContent = String(D.ultimaFechaJugada || 5);
   // Version que genero estos datos. Si no dice la que esperas, los archivos
   // nuevos no llegaron a la carpeta y estas mirando una version vieja.
-  const sub = document.querySelector('.subtitle');
-  if (sub && !sub.dataset.ver) {
-    sub.dataset.ver = '1';
+  const lv = $('lbl-version');
+  if (lv) {
     const v = D.version || 'sin sello (motor viejo)';
-    const ok = !!D.version;
-    sub.insertAdjacentHTML('beforeend',
-      ` • <span title="Version del motor que genero datos.js" style="font-weight:700;color:${ok ? '#10b981' : '#ef4444'};">motor ${v}</span>` +
-      ` <span style="color:var(--text-muted);">· app v12</span>`);
+    lv.innerHTML = `<b style="color:${D.version ? '#10b981' : '#ef4444'};">motor ${esc(v)}</b> · app v20`;
   }
   // Un solo chip de estado. El detalle (cuantos jugadores, cuantos con tiros
   // medidos, cuantas fichas cierran) esta adentro del modal que abre.
@@ -2771,25 +3450,47 @@ function pintarFixture() {
   // se pegaba al borde izquierdo y el visitante al derecho, con la ultima letra
   // comida, y habia que leer en zigzag para comparar dos numeros que estan uno
   // al lado del otro.
+  // Dos renglones por equipo. Antes iba todo en uno solo — nombre, pill de
+  // rotacion, gol, valla y cuota — y en 320px de barra lateral el nombre se
+  // comia: "Sarmi...", "Lanus" afuera del cuadro. Ahora el nombre tiene la
+  // fila entera (y puede ocupar dos renglones si hace falta, sin recortarse)
+  // con la cuota 1X2 anclada a la derecha, y los numeros del equipo van
+  // debajo, chiquitos y alineados.
   const filaEquipo = (nombre, pGol, pVI, motivo, cuota, etiqueta, cuotaGol) => `
-    <div class="fx2-row">
-      <span class="fx2-name">${esc(NOM(nombre))}</span>${pillRotacion(motivo, true)}
-      <span class="fx2-stat" title="Probabilidad de que convierta al menos un gol, y entre paréntesis la cuota que le corresponde. CALCULADO por nosotros resolviendo un Poisson contra el 1X2 y el Over/Under sin margen. Compará esa cuota con la que paga tu casa: si difieren mucho, avisá.">⚽ ${pc0(pGol)} <b style="color:var(--text-main);">${cuotaGol ? n2(cuotaGol) : ''}</b></span>
-      <span class="fx2-stat" title="Probabilidad de valla invicta. CALCULADO igual que la anterior.">🛡️ ${pc0(pVI)}</span>
-      <span class="fx2-odd" title="Cuota de mercado para ${etiqueta}">${n2(cuota)}</span>
+    <div class="fx2-team">
+      <div class="fx2-row">
+        <span class="fx2-name">${esc(NOM(nombre))}</span>${pillRotacion(motivo, true)}
+        <span class="fx2-odd" title="Cuota de mercado para ${etiqueta}">${n2(cuota)}</span>
+      </div>
+      <div class="fx2-sub">
+        <span class="fx2-stat" title="Probabilidad de que convierta al menos un gol, y al lado la cuota que le corresponde. CALCULADO por nosotros resolviendo un Poisson contra el 1X2 y el Over/Under sin margen. Compará esa cuota con la que paga tu casa: si difieren mucho, avisá.">⚽ ${pc0(pGol)}${cuotaGol ? ` <b>${n2(cuotaGol)}</b>` : ''}</span>
+        <span class="fx2-stat" title="Probabilidad de que le dejen la valla invicta. CALCULADO igual que la anterior.">🛡️ ${pc0(pVI)}</span>
+      </div>
     </div>`;
 
-  D.partidos.forEach(m => {
+  // Agrupado por dia, con una banda por jornada. Un chorizo de quince tarjetas
+  // iguales no deja ver que el viernes hay dos partidos y el sabado cinco.
+  let diaAnterior = null;
+  [...D.partidos].sort((a, b) => new Date(a.cuando) - new Date(b.cuando)).forEach(m => {
+    const d = new Date(m.cuando);
+    const claveDia = d.toDateString();
+    if (claveDia !== diaAnterior) {
+      diaAnterior = claveDia;
+      const banda = document.createElement('div');
+      banda.className = 'fx-banda';
+      banda.textContent = d.toLocaleDateString('es-AR',
+        { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+      cont.appendChild(banda);
+    }
     const div = document.createElement('div');
     div.className = 'fx2-card' + (m.yaJugado ? ' fx-pasado' : '');
-    const d = new Date(m.cuando);
     const dia = d.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace(/-/g, '/');
     const hora = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
     const t = (m.probLocal || 0) + (m.probEmpate || 0) + (m.probVisitante || 0) || 1;
     const w = v => (100 * (v || 0) / t).toFixed(1) + '%';
     div.innerHTML = `
       <div class="fx2-head">
-        <span>${m.yaJugado ? '<span class="fx-jugado" title="Este partido ya se jugó">JUGADO</span> ' : ''}${esc(dia)} · ${esc(hora)}</span>
+        <span>${m.yaJugado ? '<span class="fx-jugado" title="Este partido ya se jugó">JUGADO</span> ' : ''}${esc(hora)}</span>
         ${m.lineaTotales != null ? `<span class="fx-ou" title="Línea de goles del mercado: las casas ponen el corte en ${m.lineaTotales} goles TOTALES entre los dos equipos y pagan casi lo mismo por encima o por debajo. Cuanto más alta, más goles se esperan en el partido.">${m.lineaTotales} goles</span>` : ''}
       </div>
       ${filaEquipo(m.local, m.pGolLocal, m.pVallaLocal, m.motivoRotLocal, m.cuotaLocal, 'que gane el local', m.cuotaGolLocalEstimada)}
@@ -2828,12 +3529,21 @@ function pintarTabla() {
     const c = r === 'G' ? '#10b981' : r === 'E' ? '#94a3b8' : '#ef4444';
     return `<span class="result-dot" style="background:${c};" title="${r === 'G' ? 'Ganó' : r === 'E' ? 'Empató' : 'Perdió'}"></span>`;
   };
+  // La tabla vivia apretada en la barra lateral y solo entraban PJ, PTS y la
+  // forma. Ahora que tiene la pantalla entera se muestra completa, como
+  // cualquier tabla de posiciones: ganados, empatados, perdidos y goles.
   body.innerHTML = filas.map((t, i) => `
-    <tr style="cursor:pointer;" onclick="verEquipo('${esc(t.equipo)}')" title="${esc(NOM(t.equipo))}: ${t.pg}G ${t.pe}E ${t.pp}P · ${t.gf}:${t.gc}">
-      <td class="text-center text-muted">${i + 1}</td>
+    <tr style="cursor:pointer;" onclick="verEquipo('${esc(t.equipo)}')" title="Ver el detalle de ${esc(NOM(t.equipo))}">
+      <td class="text-center"><span class="pos-badge${i < 4 ? ' pos-arriba' : ''}">${i + 1}</span></td>
       <td><span class="team-badge-pill">${esc(NOM(t.equipo))}</span></td>
+      <td class="text-center" style="font-weight:800;font-size:1.02rem;">${t.pts}</td>
       <td class="text-center">${t.pj}</td>
-      <td class="text-center" style="font-weight:800;">${t.pts}</td>
+      <td class="text-center">${t.pg}</td>
+      <td class="text-center">${t.pe}</td>
+      <td class="text-center">${t.pp}</td>
+      <td class="text-center">${t.gf}</td>
+      <td class="text-center">${t.gc}</td>
+      <td class="text-center" style="color:${t.dif > 0 ? 'var(--success)' : t.dif < 0 ? 'var(--danger)' : 'var(--text-muted)'};">${t.dif > 0 ? '+' : ''}${t.dif}</td>
       <td class="text-center"><span class="form-dots">${(t.forma || []).map(punto).join('')}</span></td>
     </tr>`).join('');
 }
@@ -2869,13 +3579,28 @@ function abrirTablaCompleta() {
 // ── rankings ────────────────────────────────────────────────────────────────
 const COLS = {
   ARQ: [['#', ''], ['Arquero', 'n'], ['Valla invicta', 'pvi'], ['Goles que le hacen', 'lamc'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
-  DEF: [['#', ''], ['Defensor', 'n'], ['Perfil', 'perf'], ['Valla', 'pvi'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
-  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
-  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']]
+  DEF: [['#', ''], ['Defensor', 'n'], ['Perfil', 'perf'], ['Valla', 'pvi'], ['Tiros/90', 'tiros'], ['xG/90', 'xg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/90', 'tiros'], ['xG/90', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/90', 'tiros'], ['xG/90', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']]
 };
+// Ordenar por lo MISMO que se muestra. Cuando la columna paso a ser por 90
+// minutos, el orden seguia usando el valor por partido: la tabla mostraba
+// 5.5, 4.0, 4.3 hacia abajo y parecia rota.
+// El xG de aca tiene que ser EL MISMO que muestra la celda: el de sin penales.
+// Cuando la columna paso a descontar los penales me olvide de tocar esto, asi
+// que la tabla ordenaba por el xG crudo y mostraba el limpio: Alex Luna
+// (0.58 crudo con un penal, 0.43 limpio) quedaba arriba de Maroni (0.47 sin
+// penales). Los numeros de la columna bajaban y subian sin sentido.
+const ritmo90 = (x, campo) => {
+  const i = x.ind; if (!i || !i.minutos) return null;
+  const total = campo === 'tiros' ? (i.tiros || 0)
+                                  : (x.xgT != null ? x.xgT : (i.xg || 0));
+  return total / (i.minutos / 90);
+};
+const sinTildes = t => (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const valorCol = (x, k) =>
-  k === 'tiros' ? (x.ind ? x.ind.tirosPorPartido : null) :
-  k === 'xg' ? (x.ind ? x.ind.xgPorPartido : null) :
+  k === 'tiros' ? ritmo90(x, 'tiros') :
+  k === 'xg' ? ritmo90(x, 'xg') :
   k === 'lamc' ? -x.lam.c :
   k === 'lamf' ? (x.lam ? x.lam.f : null) :
   // El contexto se mide distinto segun el puesto: al arquero y al defensor les
@@ -2888,7 +3613,8 @@ function celda(x, k, i) {
   switch (k) {
     case '': {
       const p = S.puestoDe ? S.puestoDe[x.id] : null;
-      if (p == null) return `<span class="text-muted">${i + 1}</span>`;
+      // Fuera del corte: no tiene puesto porque no compite con los que juegan.
+      if (p == null) return `<span class="text-muted" title="No entra en el ranking: es más probable que no llegue a los 20 minutos que exige la ficha. Marcá «ver también los que casi no juegan» para meterlo en la cuenta.">—</span>`;
       const destacado = p <= 10;
       return `<span title="Puesto ${p} de ${S.totalPuesto} ${S.pos}, con el orden que tenés puesto"
         style="font-weight:${destacado ? 800 : 600};color:${destacado ? 'var(--text-main)' : 'var(--text-muted)'};">${p}</span>
@@ -2901,6 +3627,14 @@ function celda(x, k, i) {
     // etiquetas abajo en su propia fila.
     case 'n': {
       const etq = [];
+      // El que patea los penales del equipo. Un penal convertido paga 3 fijos
+      // (+2 de visitante) y es la unica fuente de gol que no depende del juego.
+      if (x.pen > 0) etq.push(`<span class="pill-alerta pill-penal" title="Pateó ${x.pen} penal${x.pen > 1 ? 'es' : ''} en el torneo: ${x.penC} convertido${x.penC === 1 ? '' : 's'}${x.penE ? ', ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : ''}. Es el pateador del equipo.">⚫ PENALES ${x.pen}</span>`);
+      // Transferido en el mercado: la planilla de Gran DT ya lo pasó al club
+      // nuevo, pero los minutos, los tiros y el xG que le mostramos los hizo en
+      // el club anterior. Sirven para saber si es titular, pero no dicen nada
+      // de cómo lo va a usar el DT nuevo.
+      if (x.tr) etq.push(`<span class="pill-alerta pill-transfer" title="Pasó de ${esc(x.tr.desde)} a ${esc(x.tr.hacia)}. Los ${x.tr.min} minutos, los tiros y el xG que ves los hizo en ${esc(x.tr.desde)}: todavía no hay datos suyos en el club nuevo.">⇄ TRANSFERIDO</span>`);
       if (x.mrot) etq.push(pillRotacion(x.mrot));
       else if (x.rot > 0) etq.push(`<span class="pill-alerta pill-copa">ROTA</span>`);
       if (x.mrotr) etq.push(`<span class="pill-alerta pill-copa-rival" title="Al rival le pasa esto: ${x.mrotr.tipo === 'guarda' ? 'juega copa en ' + x.mrotr.dias + ' días' : 'viene de jugar hace ' + x.mrotr.dias + ' días'}">RIVAL ${x.mrotr.tipo === 'guarda' ? 'CON COPA' : 'CANSADO'}</span>`);
@@ -2933,8 +3667,17 @@ function celda(x, k, i) {
     }
     case 'pr': return `<span style="color:#f59e0b;font-weight:700;">${plata(x.pr)}</span>`;
     case 'lamc': return n2(x.lam.c);
-    case 'tiros': return x.ind ? n1(x.ind.tirosPorPartido) : 's/d';
-    case 'xg': return x.ind ? nCorto(x.ind.xgPorPartido) : 's/d';
+    // POR 90 MINUTOS EN LA CANCHA, no por partido.
+    // "Tiros/p" dividia por partidos jugados. Un 9 que vuelve de una lesion y
+    // entro 20 minutos tres veces mostraba 1 tiro por partido, cuando su ritmo
+    // real es 4.5 por 90. El motor SIEMPRE dividio por minutos; era la tabla la
+    // que mostraba otra cosa, asi que en pantalla parecia flojo un jugador que
+    // el algoritmo veia bien. El globito aclara de donde sale y, cuando el
+    // motor lo achica por tener pocos minutos, con que numero se queda.
+    case 'tiros': return por90(x, 'tiros', 't90', v => n1(v));
+    // Dos decimales y listo: "0.0021 de xG por 90" es precision falsa, y con
+    // cuatro decimales la columna deja de leerse de un vistazo.
+    case 'xg':    return por90(x, 'xg',    'x90', v => String(+Number(v).toFixed(2)));
     case 'fi': return n1(x.fi);
     // El numero grande es el de SI ENTRA A LA CANCHA: cuantos puntos hace
     // contando los minutos que se espera que juegue, sin descontar la chance de
@@ -2953,27 +3696,63 @@ function celda(x, k, i) {
 // Di Maria se perdio UNA fecha de seis y por eso caia al puesto 30 detras de un
 // 5 que jugo las seis completas, aunque por partido rinde bastante mas. Las dos
 // lecturas son correctas; lo que estaba mal era ofrecer solo una.
-const ORDENES = [
-  ['epsj', 'Puntos si juega', 'Los puntos que hace si entra a la cancha, ya considerando cuántos minutos va a jugar. Es el orden por defecto: si no va a jugar, no lo ponés y listo'],
-  ['ep',   'Descontando que no juegue', 'Lo mismo pero multiplicado por la chance de llegar a los 20 minutos que exige la ficha'],
-  ['lg',   'Amenaza de gol',      'Goles esperados del jugador en este partido'],
-  ['fi',   'Ficha Clarín',        'La nota que viene sacando, limpia de bonificaciones'],
-  ['ctx',  'Contexto del partido', 'Para VOL y DEL: los goles que se espera que meta su equipo. Para ARQ y DEF: la chance de valla invicta'],
-];
+// Ritmo por 90 minutos jugados. Si tiene pocos minutos el numero crudo se
+// dispara (9 minutos por partido y un tiro = 10 tiros por 90), asi que se
+// muestra apagado y el globito dice con cuanto se queda el modelo.
+function por90(x, campo, campoMotor, fmt) {
+  const i = x.ind; if (!i) return 's/d';
+  const min = i.minutos || 0;
+  if (!min) return '<span class="text-muted" title="No cruzó con 365Scores: no tenemos sus minutos.">s/d</span>';
+  // El xG que se muestra es el MISMO que usa el modelo: sin penales.
+  // Un penal pateado vale 0.79 de xG y no dice nada de si el tipo genera juego.
+  // Módica mostraba 0.79 de xG/90 con dos penales encima; el modelo lo veía en
+  // 0.50. Que la tabla diga una cosa y el ranking use otra fue el problema
+  // original de esta columna.
+  const total = campo === 'tiros' ? (i.tiros || 0) : (x.xgT != null ? x.xgT : (i.xg || 0));
+  const crudo = total / (min / 90);
+  const delMotor = x[campoMotor];
+  const flojo = min < 180;
+  const partes = [];
+  partes.push(campo === 'tiros'
+    ? `${total} tiros en ${min} minutos`
+    : `${total} de xG en ${min} minutos`);
+  if (campo === 'xg' && x.pen > 0 && x.xgT != null && i.xg != null)
+    partes.push(`ya sin los ${x.pen} penal${x.pen > 1 ? 'es' : ''} que pateó (${i.xg} crudo − ${(i.xg - x.xgT).toFixed(2)})`);
+  if (flojo) partes.push('menos de 180 minutos: con tan poca cancha el ritmo por 90 es poco confiable, por eso va en gris');
+  if (delMotor != null && Math.abs(delMotor - crudo) > 0.05)
+    partes.push(`el modelo lo achica a ${fmt(delMotor)} por 90`);
+  return `<span class="${flojo ? 'ritmo-flojo' : ''}" title="${esc(partes.join('. ') + '.')}">${fmt(crudo)}</span>`;
+}
+
+// AYUDAS DE CADA COLUMNA. Antes habia una barra "ORDENAR POR" con cinco
+// botones (Puntos si juega / Descontado / Amenaza de gol / Ficha / Contexto) y
+// resulta que CUATRO de esos cinco ya son columnas de la tabla, y los titulos
+// de la tabla ya ordenan al tocarlos. Era la misma funcion dos veces, una al
+// lado de la otra. Se va la barra; el orden se toca en el titulo, con la
+// flecha marcando por cual esta ordenado y la explicacion en el globito.
+const AYUDA_COL = {
+  epsj: 'Los puntos que hace si entra a la cancha, ya considerando cuántos minutos va a jugar. Es el orden por defecto: si no va a jugar, no lo ponés y listo',
+  ep:   'Lo mismo, multiplicado por la chance de llegar a los 20 minutos que exige la ficha',
+  lg:   'Goles esperados de ESTE jugador en ESTE partido',
+  lamf: 'Goles esperados de su equipo en este partido',
+  fi:   'La nota del 1 al 10 que viene sacando, limpia de bonificaciones',
+  pvi:  'Chance de que su equipo termine el partido sin recibir goles',
+  mesp: 'Minutos esperados = chance de jugar × minutos que juega cuando entra',
+  tiros: 'Tiros por cada 90 minutos EN LA CANCHA, no por partido',
+  xg:   'Goles esperados por cada 90 minutos EN LA CANCHA, no por partido',
+  pr:   'Lo que cuesta en el Gran DT',
+  gc:   'Goles que se espera que le hagan a su equipo',
+};
 function pintarSelectorOrden() {
   const cont = $('orden-ranking'); if (!cont) return;
   const hayEpsj = !!((D.rankings.VOL || [])[0] || {}).epsj;
-  const lista = ORDENES.filter(([k]) => k !== 'epsj' || hayEpsj);
   if (!hayEpsj && S.ordCol === 'epsj') S.ordCol = 'ep';
-  cont.innerHTML = '<span class="orden-lbl">Ordenar por</span>' + lista.map(([k, t, ay]) =>
-    `<button class="tab-pill-sm orden-btn${S.ordCol === k ? ' active' : ''}" data-ord="${k}" title="${esc(ay)}">${t}</button>`).join('') +
-    `<label class="orden-check" title="Por defecto se ocultan los que tienen menos del 50% de chance de llegar a los 20 minutos que exige la ficha. Rinden bien por minuto, pero no juegan.">
+  cont.innerHTML =
+    `<span class="orden-lbl">Tocá el título de una columna para ordenar por esa</span>
+     <label class="orden-check" title="Por defecto se ocultan los que tienen menos del 50% de chance de llegar a los 20 minutos que exige la ficha. Rinden bien por minuto, pero no juegan.">
        <input type="checkbox" id="chk-ver-todos"${S.verTodos ? ' checked' : ''}>
        <span>ver también los que casi no juegan${S.filtrados ? ` (${S.filtrados})` : ''}</span>
      </label>`;
-  cont.querySelectorAll('[data-ord]').forEach(b => b.onclick = () => {
-    S.ordCol = b.dataset.ord; S.ordDir = -1; pintarRankings();
-  });
   const chk = $('chk-ver-todos');
   if (chk) chk.onchange = () => { S.verTodos = chk.checked; pintarRankings(); };
 }
@@ -2985,7 +3764,7 @@ function pintarSelectorOrden() {
 // anterior, lo dice. Antes el sello no servia para esto: cuando arregle el
 // cruce de nombres (Rick) no le subi la version al motor, asi que el viejo y el
 // nuevo decian los dos "v5" y no habia forma de distinguirlos mirando la app.
-const MOTOR_NECESARIO = 6;
+const MOTOR_NECESARIO = 10;
 function versionMotor() {
   const m = String(D.version || '').match(/v(\d+)/);
   return m ? +m[1] : 0;
@@ -3021,8 +3800,13 @@ function pintarRankings() {
   if (!thead || !body) return;
   pintarAvisoDatos();
   const cols = COLS[S.pos];
-  thead.innerHTML = '<tr>' + cols.map(c =>
-    `<th class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}" data-k="${c[1]}" style="cursor:pointer;">${c[0]}</th>`).join('') + '</tr>';
+  thead.innerHTML = '<tr>' + cols.map(c => {
+    const act = S.ordCol === c[1];
+    const flecha = act ? `<span class="orden-flecha">${S.ordDir === -1 ? '▼' : '▲'}</span>` : '';
+    return `<th class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}${act ? ' col-ordenada' : ''}${c[1] ? ' col-ordenable' : ''}"
+      data-k="${c[1]}" title="${esc(AYUDA_COL[c[1]] || 'Tocá para ordenar por esta columna')}"
+      style="cursor:pointer;">${c[0]}${flecha}</th>`;
+  }).join('') + '</tr>';
   thead.querySelectorAll('th').forEach(th => th.onclick = () => {
     const k = th.dataset.k;
     if (S.ordCol === k) S.ordDir *= -1; else { S.ordCol = k; S.ordDir = -1; }
@@ -3034,8 +3818,11 @@ function pintarRankings() {
   // regla es la del reglamento, no un numero inventado: se muestran los que es
   // mas probable que jueguen los 20 minutos que exige la ficha que lo contrario.
   // Los demas siguen estando, con el interruptor de al lado.
+  // Buscar "veron" no encontraba a "Verón, Gastón": comparaba con los acentos
+  // puestos. Se comparan los dos lados sin acentos.
   let lista = D.rankings[S.pos].filter(x =>
-    !S.busqueda || x.n.toLowerCase().includes(S.busqueda) || x.eq.toLowerCase().includes(S.busqueda));
+    (!S.equipo || x.eq === S.equipo) &&
+    (!S.busqueda || sinTildes(x.n).includes(S.busqueda) || sinTildes(x.eq).includes(S.busqueda)));
   const total = lista.length;
   if (!S.verTodos && !S.busqueda) lista = lista.filter(x => x.pj_ == null || x.pj_ >= 0.5);
   S.filtrados = total - lista.length;
@@ -3044,7 +3831,16 @@ function pintarRankings() {
   // Buscar "Freitas" mostraba "#1 Freitas" solo porque era el unico resultado.
   // El puesto se calcula sobre TODOS los del puesto, ordenados por el mismo
   // criterio, asi cuando lo buscas ves si esta 8vo o 140vo.
-  const universo = D.rankings[S.pos];
+  // EL UNIVERSO DEL PUESTO ES EL MISMO QUE SE MUESTRA.
+  // Antes el puesto se calculaba sobre TODOS los del puesto y la tabla ocultaba
+  // a los que casi no juegan: ordenando por "puntos si juega" la lista mostraba
+  // 1, 3, 4... porque el 2 era alguien que entra 15 minutos y esta escondido.
+  // Y como ese orden es el que trepa a los de pocos minutos, los agujeros
+  // aparecian ahi y desaparecian al ordenar por "descontado". El puesto ahora
+  // se cuenta sobre los candidatos de verdad: numeracion sin huecos.
+  const universo = (!S.verTodos)
+    ? D.rankings[S.pos].filter(x => x.pj_ == null || x.pj_ >= 0.5)
+    : D.rankings[S.pos];
   const cmp = (a, b) => {
     const va = valorCol(a, S.ordCol), vb = valorCol(b, S.ordCol);
     if (typeof va === 'string') return -S.ordDir * String(va).localeCompare(String(vb));
@@ -3057,10 +3853,26 @@ function pintarRankings() {
   // antes muestra el numero de la vuelta anterior.
   pintarSelectorOrden();
   lista = lista.slice().sort(cmp);
+  if (!lista.length) {
+    const quien = S.equipo ? NOM(S.equipo) : 'ese filtro';
+    body.innerHTML = `<tr><td colspan="${cols.length}" style="text-align:center;color:var(--text-muted);padding:26px;">
+      No hay ${S.pos === 'ARQ' ? 'arqueros' : S.pos === 'DEF' ? 'defensores' : S.pos === 'VOL' ? 'volantes' : 'delanteros'} de ${esc(quien)} que entren en el corte.
+      ${S.filtrados ? `Hay ${S.filtrados} que quedaron afuera por chance de jugar: marcá «ver también los que casi no juegan».` : ''}</td></tr>`;
+  } else
   body.innerHTML = lista.slice(0, 120).map((x, i) =>
-    `<tr style="cursor:pointer;" onclick="auditar('${x.id}')">` +
+    `<tr class="${(S.puestoDe[x.id] || 99) <= 10 ? 'fila-top' : ''}" style="cursor:pointer;" onclick="auditar('${x.id}')">` +
     cols.map(c => `<td class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}">${celda(x, c[1], i)}</td>`).join('') +
     '</tr>').join('');
+  // El puesto pinta el acento de las diez primeras filas y la tabla entra con
+  // una animacion corta, para que se note que la lista se rehizo entera y no
+  // que cambiaron dos numeros sueltos.
+  const cont = $('view-rankings');
+  if (cont) {
+    cont.dataset.pos = S.pos;
+    cont.classList.remove('gdt-entra');
+    void cont.offsetWidth;          // fuerza el reflow: si no, la animacion no se repite
+    cont.classList.add('gdt-entra');
+  }
 }
 
 // ── LA LUPITA: auditoría completa del jugador ───────────────────────────────
@@ -3189,6 +4001,10 @@ window.auditar = function (id) {
       filaP('xG por partido', nCorto(ind.xgPorPartido), percentil(ind.xgPorPartido, col('xg')), `· ${n2(ind.xg)} acumulado`),
       filaP('Goles esperados esta fecha', nCorto(x.lg), percentil(x.lg, pool.map(y => y.lg))),
       fila('Goles / figuras / vallas', `${ind.goles || 0} / ${ind.figuras || 0} / ${ind.vallas || 0}`),
+      (x.pen > 0
+        ? fila('Penales pateados', `${x.pen}`,
+            `${x.penC} convertido${x.penC === 1 ? '' : 's'}${x.penE ? ' · ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : ''} — es el pateador del equipo`)
+        : ''),
       filaP('Amarillas', String(ind.amarillas || 0), percentil(x.ta, pool.map(y => y.ta), false), `· ${pc0(x.ta)} por partido`),
       fila('Minutos', `${ind.minutos || 0} <span class="text-muted">(${ind.minutosPorPartido || 0}/p)</span>`),
       fila('Titularidad', ind.titularidad != null ? pc0(ind.titularidad) : 's/d', 'partidos con 60+ min'),

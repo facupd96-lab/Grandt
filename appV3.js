@@ -11,13 +11,16 @@ const D = window.DATOS || null;
 const S = {
   pos: 'ARQ',
   busqueda: '',
+  equipo: '',            // filtro por club, vacio = todos
   zona: 'todos',
   filtroTabla: 'all',
   esquema: null,
   once: [],
   capitan: null,
-  ordCol: 'sc',
-  ordDir: -1
+  ordCol: 'epsj',
+  ordDir: -1,
+  verTodos: false,
+  filtrados: 0
 };
 
 // ── utilidades ──────────────────────────────────────────────────────────────
@@ -26,6 +29,19 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const n1 = v => (v == null || isNaN(v)) ? 's/d' : Number(v).toFixed(1);
 const n2 = v => (v == null || isNaN(v)) ? 's/d' : Number(v).toFixed(2);
 const n3 = v => (v == null || isNaN(v)) ? 's/d' : Number(v).toFixed(3);
+// Numero corto: la cantidad de decimales depende de cuan chico es el numero.
+// 0.102 se lee 0.1, pero 0.02 no se puede redondear a 0.0 — ahi si hacen falta
+// los decimales. Regla: siempre dos cifras significativas, sin ceros de relleno.
+const nCorto = v => {
+  if (v == null || isNaN(v)) return 's/d';
+  const a = Math.abs(v);
+  if (a === 0) return '0';
+  if (a >= 10) return Number(v).toFixed(0);
+  if (a >= 1) return String(+Number(v).toFixed(1));
+  if (a >= 0.1) return String(+Number(v).toFixed(2));
+  if (a >= 0.01) return String(+Number(v).toFixed(3));
+  return String(+Number(v).toFixed(4));
+};
 const pc = v => (v == null || isNaN(v)) ? 's/d' : (v * 100).toFixed(1) + '%';
 const pc0 = v => (v == null || isNaN(v)) ? 's/d' : Math.round(v * 100) + '%';
 const plata = v => v == null ? 's/d' : '$ ' + Number(v).toLocaleString('es-AR');
@@ -113,8 +129,12 @@ function badgePct(pctObj) {
   const { p, puesto, total, top } = pctObj;
   const color = p >= 85 ? '#10b981' : p >= 60 ? '#38bdf8' : p >= 35 ? '#94a3b8' : '#f97316';
   const bg = p >= 85 ? 'rgba(16,185,129,0.14)' : p >= 60 ? 'rgba(56,189,248,0.14)' : p >= 35 ? 'rgba(148,163,184,0.12)' : 'rgba(249,115,22,0.14)';
-  return `<span style="display:inline-block;background:${bg};color:${color};border-radius:6px;padding:2px 8px;font-weight:800;font-size:0.8rem;">P${p}</span>
-          <span style="color:var(--text-muted);font-size:0.78rem;margin-left:6px;">(Top ${top}% · #${puesto}/${total})</span>`;
+  // Antes decia "P100 (Top 1% · #1/530)": tres formas de decir lo mismo, una al
+  // lado de la otra. Queda el puesto, que es lo unico que se lee de un vistazo,
+  // y el percentil pasa al tooltip.
+  return `<span title="Percentil ${p} — mejor que el ${p}% de los medidos"
+    style="display:inline-block;background:${bg};color:${color};border-radius:6px;padding:2px 8px;font-weight:800;font-size:0.8rem;">#${puesto}</span>
+    <span style="color:var(--text-muted);font-size:0.74rem;margin-left:5px;">de ${total}</span>`;
 }
 
 // ── arranque ────────────────────────────────────────────────────────────────
@@ -143,24 +163,163 @@ function iniciar() {
   pintarTabla();
   pintarRankings();
   pintarLideres();
+  pintarPantallaFecha();
+}
+
+// ── navegacion por secciones ────────────────────────────────────────────────
+// Cada pantalla a lo ancho, en vez de todo apretado a la vez.
+function mostrarSeccion(sec) {
+  document.querySelectorAll('.seccion').forEach(el => { el.hidden = (el.id !== 'sec-' + sec); });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (sec === 'jugadores') pintarRankings();
+  if (sec === 'fecha') pintarPantallaFecha();
+}
+
+// ── LA FECHA: la pantalla que faltaba ──────────────────────────────────────
+// La app era un explorador de tablas, y el trabajo de verdad es cerrar un once
+// antes de que arranque la fecha. Esto pone adelante lo que decide: cuanto
+// falta para el cierre, que se rompio desde la ultima vez que miraste, y los
+// tres mejores de cada puesto. Las tablas quedan para discutir un caso.
+function pintarPantallaFecha() {
+  const cont = $('pantalla-fecha'); if (!cont || !D) return;
+  const partidos = (D.partidos || []).slice().sort((a, b) => new Date(a.cuando) - new Date(b.cuando));
+  const primero = partidos.length ? new Date(partidos[0].cuando) : null;
+  const ultimo = partidos.length ? new Date(partidos[partidos.length - 1].cuando) : null;
+  const fmtDia = d => d.toLocaleDateString('es-AR', { weekday: 'long', day: '2-digit', month: '2-digit' });
+  const fmtHora = d => d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+  // Cuenta regresiva al cierre. En Gran DT los cambios cierran cuando arranca
+  // el primer partido de la fecha, asi que el cierre no es un dato aparte: es
+  // el horario del primer partido.
+  let cierre = '';
+  if (primero) {
+    const faltan = primero - new Date();
+    if (faltan > 0) {
+      const h = Math.floor(faltan / 3600000), m = Math.floor((faltan % 3600000) / 60000);
+      cierre = `<div class="fecha-cierre">
+        <div class="fecha-cierre-lbl">Cierran los cambios en</div>
+        <div class="fecha-cierre-val">${h >= 24 ? Math.floor(h / 24) + 'd ' + (h % 24) + 'h' : h + 'h ' + m + 'min'}</div>
+        <div class="fecha-cierre-sub">${esc(fmtDia(primero))} · ${esc(fmtHora(primero))}, cuando arranca ${esc(NOM(partidos[0].local))} – ${esc(NOM(partidos[0].visitante))}</div>
+      </div>`;
+    } else {
+      cierre = `<div class="fecha-cierre cerrado">
+        <div class="fecha-cierre-lbl">La fecha ya arrancó</div>
+        <div class="fecha-cierre-val">cerrada</div>
+        <div class="fecha-cierre-sub">Lo que ves es de referencia: los cambios de esta fecha ya no se pueden hacer</div>
+      </div>`;
+    }
+  }
+
+  // Lo que cambió y hay que mirar antes de cerrar el equipo.
+  const todos = ['ARQ', 'DEF', 'VOL', 'DEL'].flatMap(p => (D.rankings[p] || []).map(x => ({ ...x, _pos: p })));
+  const juegan = todos.filter(x => x.pj_ == null || x.pj_ >= 0.5);
+  const susp = juegan.filter(x => x.disp && x.disp.suspendido);
+  const alBorde = juegan.filter(x => x.disp && !x.disp.suspendido && x.disp.aUnaDeSuspension);
+  const transf = juegan.filter(x => x.tr);
+  const confirmados = juegan.filter(x => x.fmin === 'confirmado').length;
+
+  const listaCorta = arr => arr.slice(0, 6).map(x =>
+    `<button class="chip-jug" onclick="auditar('${x.id}')">${esc(nombreCorto(x.n))} <span>${esc(NOM(x.eq))}</span></button>`).join('')
+    + (arr.length > 6 ? `<span class="text-muted" style="font-size:0.75rem;">y ${arr.length - 6} más</span>` : '');
+
+  const avisos = [];
+  if (susp.length) avisos.push(['🟥', 'Suspendidos', `${susp.length} jugador${susp.length > 1 ? 'es' : ''} con roja que no juega${susp.length > 1 ? 'n' : ''} esta fecha`, listaCorta(susp), 'peligro']);
+  if (alBorde.length) avisos.push(['🟨', 'A una amarilla de la suspensión', `Si ven otra, se pierden la fecha que viene`, listaCorta(alBorde), 'atencion']);
+  if (transf.length) avisos.push(['⇄', 'Cambiaron de club', `Sus minutos y su xG son del club anterior`, listaCorta(transf), 'info']);
+  if (confirmados) avisos.push(['✅', 'Formaciones confirmadas', `${confirmados} jugadores con el once ya publicado: para ellos los minutos no son estimación`, '', 'ok']);
+
+  // Los tres mejores de cada puesto, que es con lo que uno arranca a armar.
+  const NOMBRE_POS = { ARQ: 'Arqueros', DEF: 'Defensores', VOL: 'Volantes', DEL: 'Delanteros' };
+  const columnas = ['ARQ', 'DEF', 'VOL', 'DEL'].map(pos => {
+    const top = (D.rankings[pos] || [])
+      .filter(x => x.pj_ == null || x.pj_ >= 0.5)
+      .slice().sort((a, b) => (b.epsj ?? -1) - (a.epsj ?? -1)).slice(0, 3);
+    return `<div class="col-puesto pos-${pos.toLowerCase()}">
+      <h3>${NOMBRE_POS[pos]}</h3>
+      ${top.map((x, i) => `<button class="tarjeta-jug" onclick="auditar('${x.id}')">
+          <span class="tj-puesto">${i + 1}</span>
+          <span class="tj-datos">
+            <span class="tj-nombre">${esc(nombreCorto(x.n))}</span>
+            <span class="tj-sub">${esc(NOM(x.eq))} · ${x.cond === 'L' ? 'L' : 'V'} vs ${esc(NOM(x.riv))} · ${x.mesp}'</span>
+          </span>
+          <span class="tj-pts">${n1(x.epsj)}</span>
+        </button>`).join('')}
+      <button class="ver-todos-puesto" data-ir-puesto="${pos}">Ver los ${(D.rankings[pos] || []).length} ${NOMBRE_POS[pos].toLowerCase()}</button>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = `
+    <div class="fecha-hero">
+      <div class="fecha-hero-txt">
+        <div class="fecha-eyebrow">Torneo Clausura</div>
+        <h1>Fecha ${D.fechaObjetivo ?? '–'}</h1>
+        <p>${partidos.length} partidos${primero && ultimo ? ` · del ${esc(fmtDia(primero))} al ${esc(fmtDia(ultimo))}` : ''}</p>
+      </div>
+      ${cierre}
+    </div>
+
+    ${avisos.length ? `<div class="tarjetas-aviso">${avisos.map(([ic, tit, txt, lista, tipo]) => `
+      <div class="aviso-card aviso-${tipo}">
+        <div class="aviso-top"><span class="aviso-ic">${ic}</span><b>${tit}</b></div>
+        <p>${txt}</p>
+        ${lista ? `<div class="aviso-lista">${lista}</div>` : ''}
+      </div>`).join('')}</div>` : ''}
+
+    <div class="fecha-acciones">
+      <button class="link-ctx" id="btn-ctx-desde-fecha">Ver el contexto de los ${partidos.length} partidos de la fecha →</button>
+    </div>
+
+    <div class="grilla-puestos">${columnas}</div>`;
+
+  const bc = $('btn-ctx-desde-fecha'); if (bc) bc.onclick = () => { const o = $('btn-open-tablero'); if (o) o.click(); };
+  cont.querySelectorAll('[data-ir-puesto]').forEach(b => b.onclick = () => {
+    S.pos = b.dataset.irPuesto;
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(z => z.classList.toggle('active', z.dataset.tab === S.pos));
+    mostrarSeccion('jugadores');
+  });
 }
 
 function eventos() {
+  // Menu de los tres puntos: lo que se usa una vez cada tanto no tiene por que
+  // estar siempre a la vista.
+  const btnMas = $('btn-menu'), menuMas = $('menu-mas');
+  if (btnMas && menuMas) {
+    btnMas.onclick = e => { e.stopPropagation(); menuMas.hidden = !menuMas.hidden; btnMas.classList.toggle('abierto', !menuMas.hidden); };
+    document.addEventListener('click', e => {
+      if (!menuMas.hidden && !menuMas.contains(e.target) && e.target !== btnMas) { menuMas.hidden = true; btnMas.classList.remove('abierto'); }
+    });
+    menuMas.querySelectorAll('.menu-item').forEach(b => b.addEventListener('click', () => { menuMas.hidden = true; btnMas.classList.remove('abierto'); }));
+  }
+  document.querySelectorAll('.nav-btn[data-sec]').forEach(b => b.onclick = () => mostrarSeccion(b.dataset.sec));
   document.querySelectorAll('.tab-btn[data-tab]').forEach(b => b.onclick = () => {
     document.querySelectorAll('.tab-btn[data-tab]').forEach(z => z.classList.remove('active'));
     b.classList.add('active');
     const t = b.dataset.tab;
-    if (t === 'LEADERS') {
-      $('view-rankings').style.display = 'none';
-      $('view-leaders').style.display = '';
-    } else {
-      $('view-rankings').style.display = '';
-      $('view-leaders').style.display = 'none';
-      S.pos = t; S.ordCol = 'sc'; S.ordDir = -1;
+    {
+      // Líderes dejó de ser una pestaña de esta tabla: ahora es una sección
+      // propia del menú de arriba. Acá ya no hay nada que esconder.
+      // Antes cambiar de puesto reseteaba el orden a 'sc', que ni siquiera es
+      // uno de los botones de la barra: elegias "Amenaza de gol" en DEF,
+      // pasabas a DEL y la barra quedaba sin ninguno marcado y la tabla
+      // ordenada por otra cosa. El orden que elegiste se respeta.
+      S.pos = t;
       pintarRankings();
     }
   });
-  const q = $('search-input'); if (q) q.oninput = () => { S.busqueda = q.value.toLowerCase().trim(); pintarRankings(); };
+  const q = $('search-input'); if (q) q.oninput = () => { S.busqueda = sinTildes(q.value.trim()); pintarRankings(); };
+  // Filtro por club. La lista sale de los jugadores que hay de verdad en el
+  // ranking, no de una lista fija de 30 nombres escrita a mano: si un club no
+  // tiene a nadie cargado, no aparece.
+  const selEq = $('filtro-equipo');
+  if (selEq) {
+    const equipos = [...new Set(['ARQ','DEF','VOL','DEL']
+      .flatMap(p => (D.rankings[p] || []).map(x => x.eq)))]
+      .sort((a, b) => NOM(a).localeCompare(NOM(b), 'es'));
+    selEq.innerHTML = '<option value="">Todos los equipos</option>' +
+      equipos.map(e => `<option value="${esc(e)}">${esc(NOM(e))}</option>`).join('');
+    selEq.onchange = () => { S.equipo = selEq.value; pintarRankings(); };
+  }
   document.querySelectorAll('.standings-zona-btn').forEach(b => b.onclick = () => {
     document.querySelectorAll('.standings-zona-btn').forEach(z => z.classList.remove('active'));
     b.classList.add('active'); pintarTabla();
@@ -175,6 +334,12 @@ function eventos() {
   const bo = $('btn-open-odds-modal'); if (bo) bo.onclick = () => abrirEquipos();
   const btr = $('btn-open-tournament'); if (btr) btr.onclick = abrirEquipos;
   const sel = $('select-active-formation'); if (sel) sel.onchange = () => cambiarEsquema(sel.value);
+  // Estos dos botones venian de la version vieja y no hacian NADA: se pintaba
+  // "Solido" activo y listo. Ahora si cambian el once.
+  const bSol = $('btn-mode-solid'), br = $('btn-mode-risky');
+  if (bSol) bSol.onclick = () => cambiarEsquema(D.esquema.optimo.esquema);
+  if (br) br.onclick = () => { if (D.arriesgado) cambiarEsquema('__riesgo');
+    else modalTexto('Once arriesgado', 'Todavia no esta calculado. Hay que correr ACTUALIZAR_TODO.bat de nuevo para que se genere.'); };
   const bh = $('lbl-health-badge'); if (bh) bh.onclick = abrirSalud;
   const bt2 = $('btn-open-tablero'); if (bt2) bt2.onclick = abrirTablero;
   ['btn-open-backtest', 'btn-open-learning'].forEach(id => {
@@ -225,6 +390,34 @@ function modalTexto(titulo, html) {
   abrirModal('modal-generico');
 }
 
+
+// ── Etiqueta de rotacion ────────────────────────────────────────────────────
+// Antes cualquier equipo con indice > 0 mostraba "COPA". River quedo afuera de
+// todas las copas y seguia apareciendo con COPA: su indice venia de haber
+// jugado el miercoles, no de tener copa por delante. Son dos cosas distintas y
+// se leen distinto — el que guarda gente pone suplentes, el que llega cansado
+// pone titulares fundidos.
+
+// El esquema se guarda como "1-4-3-3" porque adentro incluye al arquero, pero
+// nadie dice "uno cuatro tres tres". Para mostrar se le saca el 1 de adelante.
+function esquemaLindo(e) {
+  if (!e || typeof e !== 'string') return e || '';
+  return e.replace(/^1-/, '');
+}
+
+function pillRotacion(m, chico) {
+  if (!m) return '';
+  const num = v => v == null ? '?' : (v == Math.round(v) ? v : v.toFixed(1));
+  if (m.tipo === 'guarda') {
+    const d = num(m.dias);
+    const t = `Juega ${m.torneo} en ${d} días: es probable que ponga suplentes en la liga`;
+    return `<span class="pill-alerta pill-copa" title="${esc(t)}">${chico ? '🏆 ' + d + 'd' : 'COPA en ' + d + ' días'}</span>`;
+  }
+  const d = num(m.dias);
+  const t = `Vino de jugar ${m.torneo} hace ${d} días. Llega con poco descanso, pero no necesariamente rota`;
+  return `<span class="pill-alerta pill-cansado" title="${esc(t)}">${chico ? '😴 ' + d + 'd' : d + ' días de descanso'}</span>`;
+}
+
 function abrirModal(id) {
   const m = $(id); if (!m) return;
   zModal += 10; m.style.zIndex = zModal;
@@ -247,24 +440,41 @@ function pintarCabecera() {
   const totJug = ['ARQ', 'DEF', 'VOL', 'DEL'].reduce((a, p) => a + D.rankings[p].length, 0);
   const conTiros = Object.values(TODOS).filter(x => x.ind && x.ind.tiros > 0).length;
   const c = D.cuotas || {};
+  // En la barra va lo corto. El detalle completo queda en el globito: la
+  // cabecera decia "Analisis Estadistico Avanzado y Algoritmo de Armado ·
+  // Fecha 7 · 15 de 15 partidos por jugarse · motor v10 · 30/08/2026 · app
+  // v19" y eso no se lee, se saltea.
   const st = $('lbl-status-fecha');
   if (st) {
-    st.textContent = `Fecha ${D.fechaObjetivo || ''} · ${c.pendientes != null ? `${c.pendientes} de ${D.partidos.length} partidos por jugarse` : `${D.partidos.length} partidos`}`;
-    st.style.color = c.vencidas ? 'var(--danger)' : '';
-    if (c.vencidas) st.textContent = `Fecha ${D.fechaObjetivo} YA JUGADA — hay que actualizar las cuotas`;
+    st.textContent = `Fecha ${D.fechaObjetivo || ''}`;
+    st.title = c.pendientes != null
+      ? `${c.pendientes} de ${D.partidos.length} partidos por jugarse`
+      : `${D.partidos.length} partidos`;
+    st.classList.toggle('barra-fecha-alerta', !!c.vencidas);
+    if (c.vencidas) { st.textContent = `Fecha ${D.fechaObjetivo} ya jugada`; st.title = 'Hay que actualizar las cuotas'; }
   }
   const df = $('lbl-datos-fecha'); if (df) df.textContent = String(D.ultimaFechaJugada || 5);
-  const gs = $('lbl-global-stats');
-  if (gs) gs.innerHTML = `<span class="badge-icon">👥</span> ${totJug} jugadores · <span>${conTiros}</span> con tiros medidos`;
+  // Version que genero estos datos. Si no dice la que esperas, los archivos
+  // nuevos no llegaron a la carpeta y estas mirando una version vieja.
+  const lv = $('lbl-version');
+  if (lv) {
+    const v = D.version || 'sin sello (motor viejo)';
+    lv.innerHTML = `<b style="color:${D.version ? '#10b981' : '#ef4444'};">motor ${esc(v)}</b> · app v20`;
+  }
+  // Un solo chip de estado. El detalle (cuantos jugadores, cuantos con tiros
+  // medidos, cuantas fichas cierran) esta adentro del modal que abre.
   const v = D.validacion || {};
+  const fueraPct = v.pctFuera || 0;
   const hp = $('lbl-health-pct');
-  if (hp) hp.textContent = `${(v.total || 0) - (v.fuera || 0)}/${v.total || 0}`;
+  if (hp) hp.textContent = fueraPct <= 2 ? 'OK' : `${100 - Math.round(fueraPct)}%`;
   const hb = $('lbl-health-badge');
   if (hb) {
-    hb.title = `${(v.total || 0) - (v.fuera || 0)} de ${v.total || 0} fichas reconstruidas caen dentro del 1-10 de Clarín. Tocá para ver los ${v.fuera || 0} casos que no.`;
-    hb.classList.toggle('chip-ok', (v.pctFuera || 0) <= 8);
-    hb.classList.toggle('chip-alerta', (v.pctFuera || 0) > 8);
+    hb.title = `${totJug} jugadores en el análisis, ${conTiros} con tiros medidos. ` +
+      `${(v.total || 0) - (v.fuera || 0)} de ${v.total || 0} fichas reconstruidas caen dentro del 1-10 de Clarín. Tocá para el detalle.`;
+    hb.classList.toggle('chip-ok', fueraPct <= 8);
+    hb.classList.toggle('chip-alerta', fueraPct > 8);
   }
+  window.__COBERTURA = { totJug, conTiros };
 }
 
 // ── fixture ─────────────────────────────────────────────────────────────────
@@ -293,18 +503,25 @@ function pintarFixture() {
     const lista = FXC.filter(m => m.numeroFecha === num)
       .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
     if (!lista.length) { cont.innerHTML = '<div style="padding:14px;color:var(--text-muted);font-size:0.8rem;">Sin partidos en esa fecha.</div>'; return; }
+    // Una FILA POR EQUIPO. El grid "1fr auto 1fr" con los nombres alineados a
+    // los bordes tiraba a Boca contra el margen izquierdo y a Lanus contra el
+    // derecho, y en 320px de barra lateral "Independiente Rivadavia" se cortaba
+    // en "Independiente ...". Asi los nombres arrancan todos en la misma
+    // columna, se leen de un vistazo y no hay nada que recortar.
     lista.forEach(m => {
       const div = document.createElement('div');
-      div.className = 'fixture-match-card';
-      const centro = m.terminado
-        ? `<span class="fixture-score">${m.golesLocal} - ${m.golesVisitante}</span>`
-        : `<span class="fixture-score" style="font-size:0.7rem;color:var(--text-muted);">${fechaCorta(m.fecha).split(' ')[0]}</span>`;
-      const zona = m.zona === 'INT' ? ' · interzonal' : (m.zona ? ' · zona ' + m.zona : '');
-      div.innerHTML = `<div class="fixture-match-main">
-        <span class="fixture-team home">${esc(NOM(m.local))}</span>
-        ${centro}
-        <span class="fixture-team away">${esc(NOM(m.visitante))}</span></div>
-        <div style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin-top:2px;">${fechaCorta(m.fecha)}${zona}</div>`;
+      div.className = 'fx2-card';
+      const zona = m.zona === 'INT' ? 'interzonal' : (m.zona ? 'zona ' + m.zona : '');
+      const gl = m.golesLocal, gv = m.golesVisitante;
+      const fila = (nombre, goles, gana) => `
+        <div class="fx2-row${gana ? ' fx2-gana' : ''}">
+          <span class="fx2-name">${esc(NOM(nombre))}</span>
+          <span class="fx2-goals">${m.terminado ? goles : ''}</span>
+        </div>`;
+      div.innerHTML =
+        fila(m.local, gl, m.terminado && gl > gv) +
+        fila(m.visitante, gv, m.terminado && gv > gl) +
+        `<div class="fx2-foot">${fechaCorta(m.fecha)}${zona ? ' · ' + zona : ''}${m.terminado ? '' : ' · por jugar'}</div>`;
       cont.appendChild(div);
     });
     return;
@@ -323,39 +540,67 @@ function pintarFixture() {
       <i style="width:${w(m.probEmpate)};background:#64748b;"></i>
       <i style="width:${w(m.probVisitante)};background:var(--warning);"></i></div>`;
   };
-  const lado = (nombre, pGol, pVI, rot, alinear) => `
-    <div class="fx-side ${alinear}">
-      <div class="fx-name">${esc(NOM(nombre))}</div>
-      <div class="fx-nums">
-        <span title="Probabilidad de que convierta al menos un gol. CALCULADO por nosotros resolviendo un Poisson contra el 1X2 y el Over/Under sin margen — no es una cuota de casa.">⚽ ${pc0(pGol)}</span>
-        <span title="Probabilidad de valla invicta. CALCULADO igual que la anterior.">🛡️ ${pc0(pVI)}</span>
-        ${rot > 0 ? `<span class="fx-rot" title="${rot >= 0.6 ? 'Muy probable que ponga suplentes' : 'Puede rotar'} — indice de rotacion ${rot}">COPA</span>` : ''}
+  // Misma idea que arriba: una fila por equipo, el nombre siempre a la
+  // izquierda y los numeros de ese equipo alineados en columna. Antes el local
+  // se pegaba al borde izquierdo y el visitante al derecho, con la ultima letra
+  // comida, y habia que leer en zigzag para comparar dos numeros que estan uno
+  // al lado del otro.
+  // Dos renglones por equipo. Antes iba todo en uno solo — nombre, pill de
+  // rotacion, gol, valla y cuota — y en 320px de barra lateral el nombre se
+  // comia: "Sarmi...", "Lanus" afuera del cuadro. Ahora el nombre tiene la
+  // fila entera (y puede ocupar dos renglones si hace falta, sin recortarse)
+  // con la cuota 1X2 anclada a la derecha, y los numeros del equipo van
+  // debajo, chiquitos y alineados.
+  const filaEquipo = (nombre, pGol, pVI, motivo, cuota, etiqueta, cuotaGol) => `
+    <div class="fx2-team">
+      <div class="fx2-row">
+        <span class="fx2-name">${esc(NOM(nombre))}</span>${pillRotacion(motivo, true)}
+        <span class="fx2-odd" title="Cuota de mercado para ${etiqueta}">${n2(cuota)}</span>
+      </div>
+      <div class="fx2-sub">
+        <span class="fx2-stat" title="Probabilidad de que convierta al menos un gol, y al lado la cuota que le corresponde. CALCULADO por nosotros resolviendo un Poisson contra el 1X2 y el Over/Under sin margen. Compará esa cuota con la que paga tu casa: si difieren mucho, avisá.">⚽ ${pc0(pGol)}${cuotaGol ? ` <b>${n2(cuotaGol)}</b>` : ''}</span>
+        <span class="fx2-stat" title="Probabilidad de que le dejen la valla invicta. CALCULADO igual que la anterior.">🛡️ ${pc0(pVI)}</span>
       </div>
     </div>`;
 
-  D.partidos.forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'fx-card' + (m.yaJugado ? ' fx-pasado' : '');
+  // Agrupado por dia, con una banda por jornada. Un chorizo de quince tarjetas
+  // iguales no deja ver que el viernes hay dos partidos y el sabado cinco.
+  let diaAnterior = null;
+  [...D.partidos].sort((a, b) => new Date(a.cuando) - new Date(b.cuando)).forEach(m => {
     const d = new Date(m.cuando);
+    const claveDia = d.toDateString();
+    if (claveDia !== diaAnterior) {
+      diaAnterior = claveDia;
+      const banda = document.createElement('div');
+      banda.className = 'fx-banda';
+      banda.textContent = d.toLocaleDateString('es-AR',
+        { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+      cont.appendChild(banda);
+    }
+    const div = document.createElement('div');
+    div.className = 'fx2-card' + (m.yaJugado ? ' fx-pasado' : '');
     const dia = d.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace(/-/g, '/');
     const hora = d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const t = (m.probLocal || 0) + (m.probEmpate || 0) + (m.probVisitante || 0) || 1;
+    const w = v => (100 * (v || 0) / t).toFixed(1) + '%';
     div.innerHTML = `
-      <div class="fx-when">${m.yaJugado ? '<span class="fx-jugado" title="Este partido ya se jugó">JUGADO</span> ' : ''}${esc(dia)} · ${esc(hora)}${m.lineaTotales != null ? `<span class="fx-ou" title="Linea de goles del mercado">O/U ${m.lineaTotales}</span>` : ''}</div>
-      <div class="fx-teams">
-        ${lado(m.local, m.pGolLocal, m.pVallaLocal, m.rotacionLocal, 'izq')}
-        <div class="fx-vs">vs</div>
-        ${lado(m.visitante, m.pGolVisitante, m.pVallaVisitante, m.rotacionVisitante, 'der')}
+      <div class="fx2-head">
+        <span>${m.yaJugado ? '<span class="fx-jugado" title="Este partido ya se jugó">JUGADO</span> ' : ''}${esc(hora)}</span>
+        ${m.lineaTotales != null ? `<span class="fx-ou" title="Línea de goles del mercado: las casas ponen el corte en ${m.lineaTotales} goles TOTALES entre los dos equipos y pagan casi lo mismo por encima o por debajo. Cuanto más alta, más goles se esperan en el partido.">${m.lineaTotales} goles</span>` : ''}
       </div>
-      ${barra(m)}
-      <div class="fx-odds">
-        <span title="Cuota de victoria local (promedio de casas)">1 <b>${n2(m.cuotaLocal)}</b></span>
-        <span title="Cuota de empate">X <b>${n2(m.cuotaEmpate)}</b></span>
-        <span title="Cuota de victoria visitante">2 <b>${n2(m.cuotaVisitante)}</b></span>
-      </div>`;
+      ${filaEquipo(m.local, m.pGolLocal, m.pVallaLocal, m.motivoRotLocal, m.cuotaLocal, 'que gane el local', m.cuotaGolLocalEstimada)}
+      ${filaEquipo(m.visitante, m.pGolVisitante, m.pVallaVisitante, m.motivoRotVisitante, m.cuotaVisitante, 'que gane el visitante', m.cuotaGolVisitanteEstimada)}
+      <div class="fx-bar" title="Probabilidad real según el mercado, con el margen de la casa ya descontado: ${pc0(m.probLocal)} local · ${pc0(m.probEmpate)} empate · ${pc0(m.probVisitante)} visitante">
+        <i style="width:${w(m.probLocal)};background:var(--primary);"></i>
+        <i style="width:${w(m.probEmpate)};background:#64748b;"></i>
+        <i style="width:${w(m.probVisitante)};background:var(--warning);"></i></div>
+      <div class="fx2-foot">local ${pc0(m.probLocal)} · empate ${pc0(m.probEmpate)} (paga ${n2(m.cuotaEmpate)}) · visitante ${pc0(m.probVisitante)}</div>`;
     cont.appendChild(div);
   });
   cont.insertAdjacentHTML('beforeend',
-    `<div class="fx-nota">Las cuotas <b>1 / X / 2</b> y la línea O/U son de mercado, promediadas entre casas y con el margen descontado.
+    `<div class="fx-nota">El número en negrita al lado del <b>⚽</b> es la <b>cuota de gol</b> que sale de nuestro cálculo. Comparala con la que paga tu casa: si difieren mucho en un partido, avisame y lo miramos.
+      El número de arriba a la derecha (<b>2.5 goles</b>) es la línea de las casas: cuántos goles TOTALES esperan en ese partido. Cuanto más alta, partido más abierto.
+      Las cuotas <b>1 / X / 2</b> son de mercado, promediadas entre casas y con el margen descontado.
       Lo de <b>⚽</b> y <b>🛡️</b> es cálculo nuestro: la cuota de "gol de tal equipo" no existe en el plan gratis de la API.</div>`);
 }
 
@@ -379,12 +624,21 @@ function pintarTabla() {
     const c = r === 'G' ? '#10b981' : r === 'E' ? '#94a3b8' : '#ef4444';
     return `<span class="result-dot" style="background:${c};" title="${r === 'G' ? 'Ganó' : r === 'E' ? 'Empató' : 'Perdió'}"></span>`;
   };
+  // La tabla vivia apretada en la barra lateral y solo entraban PJ, PTS y la
+  // forma. Ahora que tiene la pantalla entera se muestra completa, como
+  // cualquier tabla de posiciones: ganados, empatados, perdidos y goles.
   body.innerHTML = filas.map((t, i) => `
-    <tr style="cursor:pointer;" onclick="verEquipo('${esc(t.equipo)}')" title="${esc(NOM(t.equipo))}: ${t.pg}G ${t.pe}E ${t.pp}P · ${t.gf}:${t.gc}">
-      <td class="text-center text-muted">${i + 1}</td>
+    <tr style="cursor:pointer;" onclick="verEquipo('${esc(t.equipo)}')" title="Ver el detalle de ${esc(NOM(t.equipo))}">
+      <td class="text-center"><span class="pos-badge${i < 4 ? ' pos-arriba' : ''}">${i + 1}</span></td>
       <td><span class="team-badge-pill">${esc(NOM(t.equipo))}</span></td>
+      <td class="text-center" style="font-weight:800;font-size:1.02rem;">${t.pts}</td>
       <td class="text-center">${t.pj}</td>
-      <td class="text-center" style="font-weight:800;">${t.pts}</td>
+      <td class="text-center">${t.pg}</td>
+      <td class="text-center">${t.pe}</td>
+      <td class="text-center">${t.pp}</td>
+      <td class="text-center">${t.gf}</td>
+      <td class="text-center">${t.gc}</td>
+      <td class="text-center" style="color:${t.dif > 0 ? 'var(--success)' : t.dif < 0 ? 'var(--danger)' : 'var(--text-muted)'};">${t.dif > 0 ? '+' : ''}${t.dif}</td>
       <td class="text-center"><span class="form-dots">${(t.forma || []).map(punto).join('')}</span></td>
     </tr>`).join('');
 }
@@ -419,65 +673,345 @@ function abrirTablaCompleta() {
 
 // ── rankings ────────────────────────────────────────────────────────────────
 const COLS = {
-  ARQ: [['#', ''], ['Arquero', 'n'], ['Valla invicta', 'pvi'], ['Goles que le hacen', 'lamc'], ['Ficha', 'fi'], ['Juega', 'pj_'], ['Cotización', 'pr'], ['Pts esperados', 'ep']],
-  DEF: [['#', ''], ['Defensor', 'n'], ['Perfil', 'perf'], ['Valla', 'pvi'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Ficha', 'fi'], ['Juega', 'pj_'], ['Cotización', 'pr'], ['Pts esperados', 'ep']],
-  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Piso', 'piso'], ['Techo', 'techo'], ['Ficha', 'fi'], ['Juega', 'pj_'], ['Cotización', 'pr'], ['Pts esperados', 'ep']],
-  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/p', 'tiros'], ['xG/p', 'xg'], ['Piso', 'piso'], ['Techo', 'techo'], ['Ficha', 'fi'], ['Juega', 'pj_'], ['Cotización', 'pr'], ['Pts esperados', 'ep']]
+  ARQ: [['#', ''], ['Arquero', 'n'], ['Valla invicta', 'pvi'], ['Goles que le hacen', 'lamc'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  DEF: [['#', ''], ['Defensor', 'n'], ['Perfil', 'perf'], ['Valla', 'pvi'], ['Tiros/90', 'tiros'], ['xG/90', 'xg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  VOL: [['#', ''], ['Volante', 'n'], ['Tiros/90', 'tiros'], ['xG/90', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']],
+  DEL: [['#', ''], ['Delantero', 'n'], ['Tiros/90', 'tiros'], ['xG/90', 'xg'], ['Gol del equipo', 'lamf'], ['Su gol', 'lg'], ['Ficha', 'fi'], ['Min. esp.', 'mesp'], ['Cotización', 'pr'], ['Descontado', 'ep'], ['PUNTOS', 'epsj']]
 };
+// Ordenar por lo MISMO que se muestra. Cuando la columna paso a ser por 90
+// minutos, el orden seguia usando el valor por partido: la tabla mostraba
+// 5.5, 4.0, 4.3 hacia abajo y parecia rota.
+// El xG de aca tiene que ser EL MISMO que muestra la celda: el de sin penales.
+// Cuando la columna paso a descontar los penales me olvide de tocar esto, asi
+// que la tabla ordenaba por el xG crudo y mostraba el limpio: Alex Luna
+// (0.58 crudo con un penal, 0.43 limpio) quedaba arriba de Maroni (0.47 sin
+// penales). Los numeros de la columna bajaban y subian sin sentido.
+const ritmo90 = (x, campo) => {
+  const i = x.ind; if (!i || !i.minutos) return null;
+  const total = campo === 'tiros' ? (i.tiros || 0)
+                                  : (x.xgT != null ? x.xgT : (i.xg || 0));
+  return total / (i.minutos / 90);
+};
+const sinTildes = t => (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const valorCol = (x, k) =>
-  k === 'tiros' ? (x.ind ? x.ind.tirosPorPartido : null) :
-  k === 'xg' ? (x.ind ? x.ind.xgPorPartido : null) :
+  k === 'tiros' ? ritmo90(x, 'tiros') :
+  k === 'xg' ? ritmo90(x, 'xg') :
   k === 'lamc' ? -x.lam.c :
+  k === 'lamf' ? (x.lam ? x.lam.f : null) :
+  // El contexto se mide distinto segun el puesto: al arquero y al defensor les
+  // paga que el equipo NO reciba; al volante y al delantero, que su equipo meta.
+  k === 'ctx' ? ((S.pos === 'ARQ' || S.pos === 'DEF') ? x.pvi : (x.lam ? x.lam.f : null)) :
   k === '' ? x.sc :
   k === 'n' ? x.n : x[k];
 
 function celda(x, k, i) {
   switch (k) {
-    case '': return `<span class="text-muted">${i + 1}</span>`;
-    case 'n': return `<div class="player-info"><div class="player-name">${esc(nombreCorto(x.n))} ${pintarAvisos(x)}</div>
-      <div class="player-sub">${esc(NOM(x.eq))} · ${x.cond === 'L' ? 'Local' : 'Visitante'} vs ${esc(NOM(x.riv))}
-      ${x.rot > 0 ? '<span style="color:#f59e0b;font-weight:700;"> · COPA</span>' : ''}
-      ${x.rotr > 0 ? '<span style="color:#10b981;font-weight:700;"> · rival de copa</span>' : ''}</div></div>`;
+    case '': {
+      const p = S.puestoDe ? S.puestoDe[x.id] : null;
+      // Fuera del corte: no tiene puesto porque no compite con los que juegan.
+      if (p == null) return `<span class="text-muted" title="No entra en el ranking: es más probable que no llegue a los 20 minutos que exige la ficha. Marcá «ver también los que casi no juegan» para meterlo en la cuenta.">—</span>`;
+      const destacado = p <= 10;
+      return `<span title="Puesto ${p} de ${S.totalPuesto} ${S.pos}, con el orden que tenés puesto"
+        style="font-weight:${destacado ? 800 : 600};color:${destacado ? 'var(--text-main)' : 'var(--text-muted)'};">${p}</span>
+        <span class="text-muted" style="font-size:0.62rem;display:block;">de ${S.totalPuesto}</span>`;
+    }
+    // Antes esto era una sola linea de texto con los avisos pegados adentro:
+    // "Talleres · Local vs Central Cordoba (SdE) · COPA · rival de copa" se
+    // partia en dos renglones y las etiquetas quedaban tiradas en el medio de
+    // la celda. Ahora el partido va en su renglon, sin cortarse, y las
+    // etiquetas abajo en su propia fila.
+    case 'n': {
+      const etq = [];
+      // El que patea los penales del equipo. Un penal convertido paga 3 fijos
+      // (+2 de visitante) y es la unica fuente de gol que no depende del juego.
+      if (x.pen > 0) etq.push(`<span class="pill-alerta pill-penal" title="Pateó ${x.pen} penal${x.pen > 1 ? 'es' : ''} en el torneo: ${x.penC} convertido${x.penC === 1 ? '' : 's'}${x.penE ? ', ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : ''}. Es el pateador del equipo.">⚫ PENALES ${x.pen}</span>`);
+      // Transferido en el mercado: la planilla de Gran DT ya lo pasó al club
+      // nuevo, pero los minutos, los tiros y el xG que le mostramos los hizo en
+      // el club anterior. Sirven para saber si es titular, pero no dicen nada
+      // de cómo lo va a usar el DT nuevo.
+      if (x.tr) etq.push(`<span class="pill-alerta pill-transfer" title="Pasó de ${esc(x.tr.desde)} a ${esc(x.tr.hacia)}. Los ${x.tr.min} minutos, los tiros y el xG que ves los hizo en ${esc(x.tr.desde)}: todavía no hay datos suyos en el club nuevo.">⇄ TRANSFERIDO</span>`);
+      if (x.mrot) etq.push(pillRotacion(x.mrot));
+      else if (x.rot > 0) etq.push(`<span class="pill-alerta pill-copa">ROTA</span>`);
+      if (x.mrotr) etq.push(`<span class="pill-alerta pill-copa-rival" title="Al rival le pasa esto: ${x.mrotr.tipo === 'guarda' ? 'juega copa en ' + x.mrotr.dias + ' días' : 'viene de jugar hace ' + x.mrotr.dias + ' días'}">RIVAL ${x.mrotr.tipo === 'guarda' ? 'CON COPA' : 'CANSADO'}</span>`);
+      const avisos = pintarAvisos(x);
+      return `<div class="player-info">
+        <div class="player-name">${esc(nombreCorto(x.n))}</div>
+        <div class="player-sub">${esc(NOM(x.eq))} · ${x.cond === 'L' ? 'L' : 'V'} vs ${esc(NOM(x.riv))}</div>
+        ${(etq.length || avisos.trim()) ? `<div class="player-tags">${avisos}${etq.join('')}</div>` : ''}
+      </div>`;
+    }
     case 'perf': {
       const c = x.perf.startsWith('SÓLIDO +') ? '#10b981' : x.perf === 'SÓLIDO' ? '#3b82f6' : x.perf === 'RIESGO GOLEADOR' ? '#f59e0b' : '#94a3b8';
       return `<span class="badge-profile" style="color:${c};border-color:${c}55;">${esc(x.perf)}</span>`;
     }
+    case 'lamf': {
+      const v = x.lam && x.lam.f; if (v == null) return '—';
+      const c = v >= 1.6 ? '#10b981' : v >= 1.2 ? '#38bdf8' : v >= 0.95 ? 'var(--text-muted)' : '#f97316';
+      return `<span title="Goles que se espera que meta SU EQUIPO en este partido, salido de las cuotas. El promedio de la liga es 1.04." style="color:${c};font-weight:700;">${n2(v)}</span>`;
+    }
+    case 'lg': return `<span title="Goles esperados del jugador en este partido: su parte del ataque del equipo, por los minutos que se espera que juegue">${nCorto(x.lg)}</span>`;
     case 'pvi': return pc0(x.pvi);
     case 'pj_': return pc0(x.pj_);
+    case 'ctx': return (S.pos === 'ARQ' || S.pos === 'DEF') ? pc0(x.pvi) : n2(x.lam && x.lam.f);
+    case 'mesp': {
+      if (x.mesp == null) return '—';
+      const t = x.mesp + "'";
+      if (x.fmin === 'once confirmado') return `<span style="color:#10b981;font-weight:800;" title="Formación confirmada: es titular">✓ ${t}</span>`;
+      if (x.fmin === 'al banco (once confirmado)') return `<span style="color:#ef4444;" title="Formación confirmada: va al banco">banco</span>`;
+      return t;
+    }
     case 'pr': return `<span style="color:#f59e0b;font-weight:700;">${plata(x.pr)}</span>`;
     case 'lamc': return n2(x.lam.c);
-    case 'tiros': return x.ind ? n1(x.ind.tirosPorPartido) : 's/d';
-    case 'xg': return x.ind ? n3(x.ind.xgPorPartido) : 's/d';
-    case 'fi': return n2(x.fi);
-    case 'ep': return `<span class="score-badge">${n2(x.ep)}</span>`;
+    // POR 90 MINUTOS EN LA CANCHA, no por partido.
+    // "Tiros/p" dividia por partidos jugados. Un 9 que vuelve de una lesion y
+    // entro 20 minutos tres veces mostraba 1 tiro por partido, cuando su ritmo
+    // real es 4.5 por 90. El motor SIEMPRE dividio por minutos; era la tabla la
+    // que mostraba otra cosa, asi que en pantalla parecia flojo un jugador que
+    // el algoritmo veia bien. El globito aclara de donde sale y, cuando el
+    // motor lo achica por tener pocos minutos, con que numero se queda.
+    case 'tiros': return por90(x, 'tiros', 't90', v => n1(v));
+    // Dos decimales y listo: "0.0021 de xG por 90" es precision falsa, y con
+    // cuatro decimales la columna deja de leerse de un vistazo.
+    case 'xg':    return por90(x, 'xg',    'x90', v => String(+Number(v).toFixed(2)));
+    case 'fi': return n1(x.fi);
+    // El numero grande es el de SI ENTRA A LA CANCHA: cuantos puntos hace
+    // contando los minutos que se espera que juegue, sin descontar la chance de
+    // que no juegue. Esa chance la mira uno en la columna de minutos, y manana
+    // con las formaciones confirmadas deja de ser una duda.
+    case 'epsj': return x.epsj == null ? '—'
+      : `<span class="score-badge" title="Puntos que hace SI entra a la cancha, ya considerando cuántos minutos va a jugar. No descuenta la chance de que no juegue: eso lo mirás en la columna de minutos.">${n1(x.epsj)}</span>`;
+    case 'ep': return `<span title="Lo mismo pero descontando la chance de que no llegue a los 20 minutos que exige la ficha" style="color:var(--text-muted);">${n1(x.ep)}</span>`;
+    case 'piso': case 'techo': return n1(x[k]);
     default: return n2(x[k]);
   }
 }
+// Dos preguntas distintas que la app mezclaba en un solo numero:
+//   "cuanto suma esta fecha"  -> descuenta la chance de que no juegue
+//   "que tan bueno es"        -> no la descuenta
+// Di Maria se perdio UNA fecha de seis y por eso caia al puesto 30 detras de un
+// 5 que jugo las seis completas, aunque por partido rinde bastante mas. Las dos
+// lecturas son correctas; lo que estaba mal era ofrecer solo una.
+// Ritmo por 90 minutos jugados. Si tiene pocos minutos el numero crudo se
+// dispara (9 minutos por partido y un tiro = 10 tiros por 90), asi que se
+// muestra apagado y el globito dice con cuanto se queda el modelo.
+function por90(x, campo, campoMotor, fmt) {
+  const i = x.ind; if (!i) return 's/d';
+  const min = i.minutos || 0;
+  if (!min) return '<span class="text-muted" title="No cruzó con 365Scores: no tenemos sus minutos.">s/d</span>';
+  // El xG que se muestra es el MISMO que usa el modelo: sin penales.
+  // Un penal pateado vale 0.79 de xG y no dice nada de si el tipo genera juego.
+  // Módica mostraba 0.79 de xG/90 con dos penales encima; el modelo lo veía en
+  // 0.50. Que la tabla diga una cosa y el ranking use otra fue el problema
+  // original de esta columna.
+  const total = campo === 'tiros' ? (i.tiros || 0) : (x.xgT != null ? x.xgT : (i.xg || 0));
+  const crudo = total / (min / 90);
+  const delMotor = x[campoMotor];
+  const flojo = min < 180;
+  const partes = [];
+  partes.push(campo === 'tiros'
+    ? `${total} tiros en ${min} minutos`
+    : `${total} de xG en ${min} minutos`);
+  if (campo === 'xg' && x.pen > 0 && x.xgT != null && i.xg != null)
+    partes.push(`ya sin los ${x.pen} penal${x.pen > 1 ? 'es' : ''} que pateó (${i.xg} crudo − ${(i.xg - x.xgT).toFixed(2)})`);
+  if (flojo) partes.push('menos de 180 minutos: con tan poca cancha el ritmo por 90 es poco confiable, por eso va en gris');
+  if (delMotor != null && Math.abs(delMotor - crudo) > 0.05)
+    partes.push(`el modelo lo achica a ${fmt(delMotor)} por 90`);
+  return `<span class="${flojo ? 'ritmo-flojo' : ''}" title="${esc(partes.join('. ') + '.')}">${fmt(crudo)}</span>`;
+}
+
+// AYUDAS DE CADA COLUMNA. Antes habia una barra "ORDENAR POR" con cinco
+// botones (Puntos si juega / Descontado / Amenaza de gol / Ficha / Contexto) y
+// resulta que CUATRO de esos cinco ya son columnas de la tabla, y los titulos
+// de la tabla ya ordenan al tocarlos. Era la misma funcion dos veces, una al
+// lado de la otra. Se va la barra; el orden se toca en el titulo, con la
+// flecha marcando por cual esta ordenado y la explicacion en el globito.
+const AYUDA_COL = {
+  epsj: 'Los puntos que hace si entra a la cancha, ya considerando cuántos minutos va a jugar. Es el orden por defecto: si no va a jugar, no lo ponés y listo',
+  ep:   'Lo mismo, multiplicado por la chance de llegar a los 20 minutos que exige la ficha',
+  lg:   'Goles esperados de ESTE jugador en ESTE partido',
+  lamf: 'Goles esperados de su equipo en este partido',
+  fi:   'La nota del 1 al 10 que viene sacando, limpia de bonificaciones',
+  pvi:  'Chance de que su equipo termine el partido sin recibir goles',
+  mesp: 'Minutos esperados = chance de jugar × minutos que juega cuando entra',
+  tiros: 'Tiros por cada 90 minutos EN LA CANCHA, no por partido',
+  xg:   'Goles esperados por cada 90 minutos EN LA CANCHA, no por partido',
+  pr:   'Lo que cuesta en el Gran DT',
+  gc:   'Goles que se espera que le hagan a su equipo',
+};
+function pintarSelectorOrden() {
+  const cont = $('orden-ranking'); if (!cont) return;
+  const hayEpsj = !!((D.rankings.VOL || [])[0] || {}).epsj;
+  if (!hayEpsj && S.ordCol === 'epsj') S.ordCol = 'ep';
+  cont.innerHTML =
+    `<span class="orden-lbl">Tocá el título de una columna para ordenar por esa</span>
+     <label class="orden-check" title="Por defecto se ocultan los que tienen menos del 50% de chance de llegar a los 20 minutos que exige la ficha. Rinden bien por minuto, pero no juegan.">
+       <input type="checkbox" id="chk-ver-todos"${S.verTodos ? ' checked' : ''}>
+       <span>ver también los que casi no juegan${S.filtrados ? ` (${S.filtrados})` : ''}</span>
+     </label>`;
+  const chk = $('chk-ver-todos');
+  if (chk) chk.onchange = () => { S.verTodos = chk.checked; pintarRankings(); };
+}
+
+// Chequeo de que datos.js este al dia. Cuando falta un campo la pagina no se
+// rompe —muestra un guion y sigue— y eso es peor que romperse: parece que el
+// cambio no se hubiera aplicado. Antes de callarse, avisa.
+// La pagina sabe con que version del motor fue hecha. Si datos.js viene de una
+// anterior, lo dice. Antes el sello no servia para esto: cuando arregle el
+// cruce de nombres (Rick) no le subi la version al motor, asi que el viejo y el
+// nuevo decian los dos "v5" y no habia forma de distinguirlos mirando la app.
+const MOTOR_NECESARIO = 10;
+function versionMotor() {
+  const m = String(D.version || '').match(/v(\d+)/);
+  return m ? +m[1] : 0;
+}
+function faltanCampos() {
+  const uno = (D.rankings && D.rankings.VOL && D.rankings.VOL[0]) || null;
+  if (!uno) return [];
+  const falta = [];
+  if (versionMotor() < MOTOR_NECESARIO)
+    falta.push(`el motor es <b>${D.version || 'sin sello'}</b> y esta página necesita <b>v${MOTOR_NECESARIO}</b>`);
+  if (uno.epsj == null) falta.push('los puntos "si entra a la cancha"');
+  if (uno.mesp == null) falta.push('los minutos esperados');
+  if (!D.arriesgado)    falta.push('el once arriesgado');
+  return falta;
+}
+function pintarAvisoDatos() {
+  const falta = faltanCampos();
+  const prev = $('aviso-datos-viejos'); if (prev) prev.remove();
+  if (!falta.length) return;
+  const cont = $('orden-ranking'); if (!cont || !cont.parentNode) return;
+  const div = document.createElement('div');
+  div.id = 'aviso-datos-viejos';
+  div.style.cssText = 'margin:10px 14px;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.12);' +
+    'border:1px solid rgba(239,68,68,0.4);color:#fca5a5;font-size:0.82rem;line-height:1.5;';
+  div.innerHTML = `<b>datos.js está viejo:</b> ${falta.join(' · ')}.
+    La página es nueva pero los datos no. Copiá <code>armar.cjs</code> y <code>motorV3.cjs</code>
+    a la carpeta Grandt, corré <b>ACTUALIZAR_TODO.bat</b> y recargá con Ctrl+F5.`;
+  cont.parentNode.insertBefore(div, cont);
+}
+
 function pintarRankings() {
   const thead = $('rankings-thead'), body = $('players-body');
   if (!thead || !body) return;
+  pintarAvisoDatos();
   const cols = COLS[S.pos];
-  thead.innerHTML = '<tr>' + cols.map(c =>
-    `<th class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}" data-k="${c[1]}" style="cursor:pointer;">${c[0]}</th>`).join('') + '</tr>';
+  thead.innerHTML = '<tr>' + cols.map(c => {
+    const act = S.ordCol === c[1];
+    const flecha = act ? `<span class="orden-flecha">${S.ordDir === -1 ? '▼' : '▲'}</span>` : '';
+    return `<th class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}${act ? ' col-ordenada' : ''}${c[1] ? ' col-ordenable' : ''}"
+      data-k="${c[1]}" title="${esc(AYUDA_COL[c[1]] || 'Tocá para ordenar por esta columna')}"
+      style="cursor:pointer;">${c[0]}${flecha}</th>`;
+  }).join('') + '</tr>';
   thead.querySelectorAll('th').forEach(th => th.onclick = () => {
     const k = th.dataset.k;
     if (S.ordCol === k) S.ordDir *= -1; else { S.ordCol = k; S.ordDir = -1; }
     pintarRankings();
   });
+  // FILTRO DE CANDIDATOS REALES.
+  // Ordenar por "si entra a la cancha" sin filtrar pone primero al que no juega:
+  // el que entra 7 minutos rinde muy bien POR MINUTO y no sirve para nada. La
+  // regla es la del reglamento, no un numero inventado: se muestran los que es
+  // mas probable que jueguen los 20 minutos que exige la ficha que lo contrario.
+  // Los demas siguen estando, con el interruptor de al lado.
+  // Buscar "veron" no encontraba a "Verón, Gastón": comparaba con los acentos
+  // puestos. Se comparan los dos lados sin acentos.
   let lista = D.rankings[S.pos].filter(x =>
-    !S.busqueda || x.n.toLowerCase().includes(S.busqueda) || x.eq.toLowerCase().includes(S.busqueda));
-  lista = lista.slice().sort((a, b) => {
+    (!S.equipo || x.eq === S.equipo) &&
+    (!S.busqueda || sinTildes(x.n).includes(S.busqueda) || sinTildes(x.eq).includes(S.busqueda)));
+  const total = lista.length;
+  if (!S.verTodos && !S.busqueda) lista = lista.filter(x => x.pj_ == null || x.pj_ >= 0.5);
+  S.filtrados = total - lista.length;
+
+  // PUESTO DE VERDAD, no el numero de fila.
+  // Buscar "Freitas" mostraba "#1 Freitas" solo porque era el unico resultado.
+  // El puesto se calcula sobre TODOS los del puesto, ordenados por el mismo
+  // criterio, asi cuando lo buscas ves si esta 8vo o 140vo.
+  // EL UNIVERSO DEL PUESTO ES EL MISMO QUE SE MUESTRA.
+  // Antes el puesto se calculaba sobre TODOS los del puesto y la tabla ocultaba
+  // a los que casi no juegan: ordenando por "puntos si juega" la lista mostraba
+  // 1, 3, 4... porque el 2 era alguien que entra 15 minutos y esta escondido.
+  // Y como ese orden es el que trepa a los de pocos minutos, los agujeros
+  // aparecian ahi y desaparecian al ordenar por "descontado". El puesto ahora
+  // se cuenta sobre los candidatos de verdad: numeracion sin huecos.
+  const universo = (!S.verTodos)
+    ? D.rankings[S.pos].filter(x => x.pj_ == null || x.pj_ >= 0.5)
+    : D.rankings[S.pos];
+  const cmp = (a, b) => {
     const va = valorCol(a, S.ordCol), vb = valorCol(b, S.ordCol);
     if (typeof va === 'string') return -S.ordDir * String(va).localeCompare(String(vb));
     return S.ordDir * ((va ?? -1e9) - (vb ?? -1e9));
-  });
+  };
+  const puestoDe = {}; const totalPuesto = universo.length;
+  [...universo].sort(cmp).forEach((x, i) => { puestoDe[x.id] = i + 1; });
+  S.puestoDe = puestoDe; S.totalPuesto = totalPuesto;
+  // El selector se pinta DESPUES de saber cuantos quedaron afuera: si se pinta
+  // antes muestra el numero de la vuelta anterior.
+  pintarSelectorOrden();
+  lista = lista.slice().sort(cmp);
+  if (!lista.length) {
+    const quien = S.equipo ? NOM(S.equipo) : 'ese filtro';
+    body.innerHTML = `<tr><td colspan="${cols.length}" style="text-align:center;color:var(--text-muted);padding:26px;">
+      No hay ${S.pos === 'ARQ' ? 'arqueros' : S.pos === 'DEF' ? 'defensores' : S.pos === 'VOL' ? 'volantes' : 'delanteros'} de ${esc(quien)} que entren en el corte.
+      ${S.filtrados ? `Hay ${S.filtrados} que quedaron afuera por chance de jugar: marcá «ver también los que casi no juegan».` : ''}</td></tr>`;
+  } else
   body.innerHTML = lista.slice(0, 120).map((x, i) =>
-    `<tr style="cursor:pointer;" onclick="auditar('${x.id}')">` +
+    `<tr class="${(S.puestoDe[x.id] || 99) <= 10 ? 'fila-top' : ''}" style="cursor:pointer;" onclick="auditar('${x.id}')">` +
     cols.map(c => `<td class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}">${celda(x, c[1], i)}</td>`).join('') +
     '</tr>').join('');
+  // El puesto pinta el acento de las diez primeras filas y la tabla entra con
+  // una animacion corta, para que se note que la lista se rehizo entera y no
+  // que cambiaron dos numeros sueltos.
+  const cont = $('view-rankings');
+  if (cont) {
+    cont.dataset.pos = S.pos;
+    cont.classList.remove('gdt-entra');
+    void cont.offsetWidth;          // fuerza el reflow: si no, la animacion no se repite
+    cont.classList.add('gdt-entra');
+  }
 }
 
 // ── LA LUPITA: auditoría completa del jugador ───────────────────────────────
+
+// ── De donde salen los minutos esperados, paso por paso ─────────────────────
+// Sin esto es imposible discutir el numero: uno ve "50 minutos esperados" y no
+// sabe si el problema son los datos, el promedio, la rotacion o la formula.
+// Aca esta la cadena entera, con los minutos fecha por fecha arriba de todo.
+function bloqueMinutos(x) {
+  const log = Array.isArray(x.mlog) ? x.mlog : null;
+  if (!log || !log.length) return '';
+  const barras = log.map((m, i) => {
+    const alto = Math.max(3, Math.round(38 * Math.min(90, m) / 90));
+    const c = m === 0 ? '#ef4444' : m >= 60 ? '#10b981' : m >= 20 ? '#38bdf8' : '#f59e0b';
+    return `<div class="min-col" title="Fecha ${i + 1}: ${m} minutos">
+      <div class="min-barra"><i style="height:${alto}px;background:${c};"></i></div>
+      <div class="min-num">${m}</div><div class="min-f">f${i + 1}</div></div>`;
+  }).join('');
+  const jugadas = log.filter(m => m >= 20).length;
+  const rot = x.rot > 0;
+  return `
+    <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin:16px 0 6px;">
+      De dónde salen los minutos esperados</div>
+    <div class="min-graf">${barras}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-top:8px;">
+      <tbody>
+        <tr><td style="padding:5px 10px;">Jugó 20+ minutos en</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${jugadas} de ${log.length} fechas</td></tr>
+        <tr><td style="padding:5px 10px;">Promedio pesando más las últimas${rot ? ', ya ajustado por el partido de copa' : ''}</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${x.mest != null ? x.mest + "'" : '—'}</td></tr>
+        <tr><td style="padding:5px 10px;">Chance de llegar a los 20' que exige la ficha</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${pc0(x.pj_)}</td></tr>
+        <tr><td style="padding:5px 10px;">Minutos que juega cuando entra</td>
+            <td style="padding:5px 10px;text-align:right;font-weight:700;">${x.msj || '?'}'</td></tr>
+        <tr style="border-top:1px solid rgba(255,255,255,0.1);">
+            <td style="padding:7px 10px;font-weight:700;">Minutos esperados = chance × minutos si entra</td>
+            <td style="padding:7px 10px;text-align:right;font-weight:800;color:#38bdf8;">${x.mesp}'</td></tr>
+      </tbody>
+    </table>
+    <p class="md-p suave" style="margin-top:6px;">Medido sobre el torneo anterior: de los que jugaron 20+ minutos en
+    <b>todas</b> sus fechas previas y promedian 75+ minutos, la siguiente fecha juegan el <b>84%</b> (931 casos).
+    Un titular indiscutido se pierde 1 de cada 6 partidos. Cuando 365Scores confirme la formación, esto pasa a 97%.</p>`;
+}
+
 window.auditar = function (id) {
   const x = TODOS[id]; if (!x) return;
   const pool = D.rankings[x.pos];
@@ -533,7 +1067,8 @@ window.auditar = function (id) {
       </div>
       <div style="text-align:right;">
         <div style="font-size:2rem;font-weight:800;color:#38bdf8;line-height:1;">${n2(x.ep)}</div>
-        <div class="text-muted" style="font-size:0.76rem;">puntos esperados si juega</div>
+        <div class="text-muted" style="font-size:0.76rem;">puntos esperados en la fecha</div>
+        <div class="text-muted" style="font-size:0.72rem;">${x.epsj != null ? n2(x.epsj) + ' si entra a la cancha' : ''}</div>
         <div style="font-size:0.8rem;margin-top:4px;">${badgePct(percentil(x.ep, col('ep')))}</div>
       </div>
     </div>
@@ -558,14 +1093,25 @@ window.auditar = function (id) {
     ${bloque('El jugador', [
       filaP('Ficha Clarín limpia', n2(x.fi), percentil(x.fi, col('fi')), `· ${ind.pj || 0} PJ`),
       filaP('Tiros por partido', n1(ind.tirosPorPartido), percentil(ind.tirosPorPartido, col('tiros')), `· ${ind.tiros || 0} en total`),
-      filaP('xG por partido', n3(ind.xgPorPartido), percentil(ind.xgPorPartido, col('xg')), `· ${n2(ind.xg)} acumulado`),
-      filaP('Goles esperados esta fecha', n3(x.lg), percentil(x.lg, pool.map(y => y.lg))),
+      filaP('xG por partido', nCorto(ind.xgPorPartido), percentil(ind.xgPorPartido, col('xg')), `· ${n2(ind.xg)} acumulado`),
+      filaP('Goles esperados esta fecha', nCorto(x.lg), percentil(x.lg, pool.map(y => y.lg))),
       fila('Goles / figuras / vallas', `${ind.goles || 0} / ${ind.figuras || 0} / ${ind.vallas || 0}`),
+      (x.pen > 0
+        ? fila('Penales pateados', `${x.pen}`,
+            `${x.penC} convertido${x.penC === 1 ? '' : 's'}${x.penE ? ' · ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : ''} — es el pateador del equipo`)
+        : ''),
       filaP('Amarillas', String(ind.amarillas || 0), percentil(x.ta, pool.map(y => y.ta), false), `· ${pc0(x.ta)} por partido`),
       fila('Minutos', `${ind.minutos || 0} <span class="text-muted">(${ind.minutosPorPartido || 0}/p)</span>`),
       fila('Titularidad', ind.titularidad != null ? pc0(ind.titularidad) : 's/d', 'partidos con 60+ min'),
-      fila('Chance de jugar', pc0(x.pj_), 'dato, no descuenta puntos')
+      fila('Minutos esperados', (x.mesp != null ? x.mesp + "'" : '—'),
+           x.fmin === 'once confirmado'
+             ? `ES TITULAR — formación confirmada por 365Scores. Se espera que juegue ${x.msj}'`
+             : x.fmin === 'al banco (once confirmado)'
+             ? `AL BANCO — su equipo confirmó el once y no está. Si entra, ~30' y cobra ficha igual`
+             : `${pc0(x.pj_)} de llegar a los 20' que exige la ficha; si entra, ${x.msj || '?'}' en cancha`)
     ].join(''))}
+
+    ${bloqueMinutos(x)}
 
     ${bloque(`Su equipo ${cond} — ${esc(NOM(x.eq))}`, [
       fila('Tiros generados', n1(me.tiros), `· total ${n1(met.tiros)}`),
@@ -590,9 +1136,14 @@ window.auditar = function (id) {
       fila('Goles esperados del rival', n2(x.lam.c)),
       filaP('Probabilidad de valla invicta', pc(x.pvi), percentil(x.pvi, col('pvi'))),
       fila('Gana / empata', `${pc0(x.lam.w)} / ${pc0(x.lam.d)}`),
+      // Este texto se quedo viejo: decia "55% mercado + 30% xG + 15% goles" de
+      // cuando se promediaban las tres fuentes. Se saco ese promedio hace
+      // semanas —el precio de la casa ya incorpora el xG, la forma y las
+      // lesiones, promediarlo era contar lo mismo dos veces— y desde entonces
+      // el mercado va solo, con peso 1.00.
       fila('Fuente de los goles esperados', x.lam.mk
-        ? '55% mercado + 30% xG + 15% goles reales'
-        : '65% xG + 35% goles reales <span class="text-muted">(sin cuotas)</span>')
+        ? 'Cuotas del mercado, con el margen de la casa descontado'
+        : 'Nivel del equipo por xG <span class="text-muted">(este partido no tiene cuotas)</span>')
     ].join(''))}
 
     <div style="margin-top:18px;padding:11px 14px;background:rgba(255,255,255,0.03);border-radius:10px;font-size:0.78rem;color:var(--text-muted);line-height:1.55;">
@@ -622,6 +1173,11 @@ function costoOnce() {
   return { c, sd };
 }
 function cambiarEsquema(e) {
+  // El once arriesgado no es un esquema mas: es otro problema de optimizacion.
+  // Maximiza la chance de hacer una fecha enorme en vez del promedio.
+  if (e === '__riesgo' && D.arriesgado) {
+    S.esquema = '__riesgo'; S.once = D.arriesgado.ids.slice(); pintarOnce(); return;
+  }
   const b = D.esquema.todos.find(x => x.e === e || x.esquema === e);
   if (!b) return;
   S.esquema = e; S.once = (b.ids || b.once.map(z => z.id)).slice();
@@ -640,7 +1196,9 @@ function pintarOnce() {
   const sel = $('select-active-formation');
   if (sel) {
     if (!sel.dataset.listo) {
-      sel.innerHTML = D.esquema.todos.map(e => `<option value="${e.e || e.esquema}">${e.e || e.esquema}</option>`).join('');
+      const ops = D.esquema.todos.map(e => `<option value="${e.e || e.esquema}">${esquemaLindo(e.e || e.esquema)}</option>`);
+      if (D.arriesgado) ops.unshift(`<option value="__riesgo">🚀 ARRIESGADO (${esquemaLindo(D.arriesgado.esquema)})</option>`);
+      sel.innerHTML = ops.join('');
       sel.dataset.listo = '1';
     }
     sel.value = S.esquema;
@@ -656,8 +1214,14 @@ function pintarOnce() {
     const row = document.createElement('div'); row.className = 'pitch-row';
     arr.forEach(p => {
       const cap = p.id === S.capitan;
+      // Los dos onces comparten 8 de 11. Si no se marca cual cambia, apretar
+      // "Arriesgado" parece que no hiciera nada.
+      const otro = S.esquema === '__riesgo'
+        ? D.esquema.optimo.once.map(z => z.id)
+        : (D.arriesgado ? D.arriesgado.ids : null);
+      const distinto = otro && !otro.includes(p.id);
       const card = document.createElement('div');
-      card.className = 'gdt-card-badge' + (cap ? ' captain' : '');
+      card.className = 'gdt-card-badge' + (cap ? ' captain' : '') + (distinto ? ' gdt-distinto' : '');
       card.title = `${p.n} (${p.eq}) — ${plata(p.pr)}`;
       card.innerHTML = `
         <div class="gdt-card-icons">
@@ -676,10 +1240,51 @@ function pintarOnce() {
   });
   cont.appendChild(grid); pitch.appendChild(cont);
 
+  // Comparacion de las dos distribuciones simuladas. El once de siempre maximiza
+  // el promedio; el arriesgado maximiza la chance de una fecha enorme.
+  if (D.arriesgado && D.arriesgado.dist) {
+    const A = D.arriesgado, esR = S.esquema === '__riesgo';
+    const fila = (n, d, on) => `<tr style="${on ? 'background:rgba(56,189,248,0.10);font-weight:700;' : ''}">
+        <td style="padding:5px 10px;">${n}</td>
+        <td style="padding:5px 10px;text-align:right;">${d.media.toFixed(1)}</td>
+        <td style="padding:5px 10px;text-align:right;">${d.p99.toFixed(0)}</td>
+        <td style="padding:5px 10px;text-align:right;">${(100 * d.p100).toFixed(1)}%</td>
+        <td style="padding:5px 10px;text-align:right;">${(100 * d.p120).toFixed(2)}%</td>
+        <td style="padding:5px 10px;text-align:right;">${(100 * d.p140).toFixed(3)}%</td>
+        <td style="padding:5px 10px;text-align:right;">${(100 * d.p160).toFixed(3)}%</td></tr>`;
+    const caja = document.createElement('div');
+    caja.style.cssText = 'margin-top:14px;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 4px;';
+    caja.innerHTML = `
+      <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);font-weight:700;padding:0 10px 6px;">
+        ${(A.sims || 0).toLocaleString('es-AR')} fechas simuladas</div>
+      <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+        <thead><tr style="color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;">
+          <th style="padding:4px 10px;text-align:left;">Once</th><th style="padding:4px 10px;text-align:right;">Promedio</th>
+          <th style="padding:4px 10px;text-align:right;">1 de cada 100</th><th style="padding:4px 10px;text-align:right;">≥100</th>
+          <th style="padding:4px 10px;text-align:right;">≥120</th><th style="padding:4px 10px;text-align:right;">≥140</th>
+          <th style="padding:4px 10px;text-align:right;">≥160</th></tr></thead>
+        <tbody>${A.conservador ? fila('El de siempre', A.conservador, !esR) : ''}${fila('⚡ Arriesgado', A.dist, esR)}</tbody>
+      </table>
+      <div class="text-muted" style="font-size:0.72rem;padding:8px 10px 0;line-height:1.45;">
+        El arriesgado busca el mejor once para tu fecha 1 de cada 200, no para el promedio.
+        Ojo: la ganancia es real pero chica — los jugadores con más gol ya son los de mayor
+        puntaje esperado, así que no queda mucho para canjear. Apilar compañeros de equipo se
+        probó y empeora la cola. El gol de oro no está simulado: el techo real es algo más alto.</div>`;
+    pitch.appendChild(caja);
+  }
+
   const t = totalOnce(), { c, sd } = costoOnce();
   const el = $('best11-total-score');
   if (el) el.innerHTML = `${n1(t)} pts <span style="font-size:0.8rem;color:var(--text-muted);font-weight:500;">· ${c ? '$' + (c / 1e6).toFixed(1) + 'M' : 's/d'} de $65M${sd ? ` (${sd} sin cotización)` : ''}</span>`;
-  const lf = $('lbl-rec-formation'); if (lf) lf.textContent = S.esquema;
+  const lf = $('lbl-rec-formation');
+  const esR = S.esquema === '__riesgo';
+  if (lf) lf.textContent = esR ? '🚀 ARRIESGADO · ' + esquemaLindo(D.arriesgado ? D.arriesgado.esquema : '') : '🛡️ ' + esquemaLindo(S.esquema);
+  const bs = $('btn-mode-solid'), br = $('btn-mode-risky');
+  const prende = (b, on) => { if (!b) return;
+    b.style.background = on ? 'var(--primary)' : 'transparent';
+    b.style.color = on ? '#fff' : 'var(--text-muted)';
+    b.classList.toggle('active', on); };
+  prende(bs, !esR); prende(br, esR);
   const lc = $('lbl-rec-captain');
   const cap = TODOS[S.capitan];
   if (lc) lc.textContent = cap ? `${nombreCorto(cap.n)} (${cap.eq}) · ficha ${n2(cap.fi)} → duplica a ${n2(cap.fi * 2)}` : '-';
@@ -694,7 +1299,7 @@ window.abrirCambio = function (id) {
       <td><div class="player-name">${esc(nombreCorto(x.n))}</div>
           <div class="player-sub">${esc(NOM(x.eq))} · ${x.cond === 'L' ? 'L' : 'V'} vs ${esc(NOM(x.riv))}</div></td>
       <td class="text-center text-muted">${plata(x.pr)}</td>
-      <td class="text-center">${pc0(x.pj_)}</td>
+      <td class="text-center">${x.mesp != null ? x.mesp + "'" : '—'}</td>
       <td class="text-center"><span class="score-badge">${n2(x.ep)}</span></td>
     </tr>`).join('')}</tbody></table>`;
   abrirModal('team-detail-modal');
@@ -767,10 +1372,20 @@ function abrirEquipos() {
   $('team-detail-title').innerHTML = '⚽ Equipos: quién genera y quién recibe';
   const eqs = (D.equipos || []).slice().sort((a, b) => b.total.tirosConcedidosPorPartido - a.total.tirosConcedidosPorPartido);
   const liga = D.liga || {};
+  // Antes esto leia liga.locTiros y liga.visTiros, que NUNCA existieron: el
+  // motor guarda xG, no tiros. La pagina mostraba "s/d tiros de local".
+  // Se promedian los equipos, que es de donde salia el numero igual.
+  const medias = (() => {
+    let l = 0, v = 0, n = 0;
+    eqs.forEach(e => { l += (e.local && e.local.tirosPorPartido) || 0;
+                       v += (e.visitante && e.visitante.tirosPorPartido) || 0; n++; });
+    return n ? { loc: l / n, vis: v / n } : { loc: null, vis: null };
+  })();
   body.innerHTML = `
     <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">
       Todo medido sobre los partidos jugados, 365Scores. El promedio de la liga es
-      <strong>${n1(liga.locTiros)} tiros de local</strong> y <strong>${n1(liga.visTiros)} de visitante</strong>.
+      <strong>${n1(medias.loc)} tiros de local</strong> y <strong>${n1(medias.vis)} de visitante</strong>,
+      y un equipo genera <strong>${n2(liga.locXg)}</strong> de xG en casa contra <strong>${n2(liga.visXg)}</strong> afuera.
       Ojo con los partidos por condición: con 2 o 3 no se puede concluir nada de un equipo puntual.
     </div>
     <div class="table-responsive"><table class="data-table">
@@ -783,7 +1398,7 @@ function abrirEquipos() {
       </tr></thead>
       <tbody>${eqs.map(e => `
         <tr>
-          <td><span class="team-badge-pill">${esc(NOM(e.equipo))}</span>${e.rotacion > 0 ? '<span style="color:#f59e0b;font-size:0.68rem;font-weight:800;"> COPA</span>' : ''}</td>
+          <td><span class="team-badge-pill">${esc(NOM(e.equipo))}</span> ${pillRotacion(e.motivoRotacion)}</td>
           <td class="text-center">${n1(e.total.tirosPorPartido)}
             <span class="text-muted" style="font-size:0.76rem;"> · ${n1(e.local.tirosPorPartido)} · ${n1(e.visitante.tirosPorPartido)}</span></td>
           <td class="text-center" style="font-weight:800;color:${e.total.tirosConcedidosPorPartido >= 15 ? '#ef4444' : e.total.tirosConcedidosPorPartido <= 10 ? '#10b981' : 'var(--text-main)'};">
@@ -852,9 +1467,16 @@ function abrirSalud() {
       Ficha que sale de la cuenta: <b style="color:var(--danger);">${e.cruda}</b> — imposible, la nota de Clarín va de 1 a 10.<br>
       <span style="color:var(--text-muted);">Motivo: ${esc(e.razon || '')}</span>
     </div>`).join('');
-  modalTexto('Ficha reconstruida — qué es y por qué no da 100%', `
+  const cob = window.__COBERTURA || {};
+  modalTexto('Estado de los datos', `
     <div class="md-seccion">
-      <h4>Qué mide</h4>
+      <h4>Cobertura</h4>
+      <p class="md-p"><b>${cob.totJug || '?'}</b> jugadores en el análisis (los que nunca jugaron quedan afuera),
+      de los cuales <b>${cob.conTiros || '?'}</b> tienen tiros y xG medidos por 365Scores.
+      Datos hasta la <b>fecha ${D.ultimaFechaJugada || '?'}</b>.</p>
+    </div>
+    <div class="md-seccion">
+      <h4>Qué mide la ficha reconstruida</h4>
       <p class="md-p">La planilla de Planeta Gran DT <b>no publica la nota que le puso Clarín a cada jugador</b>. Publica los puntos totales acumulados, que son la nota más los bonos: gol, figura, valla invicta, tarjetas.</p>
       <p class="md-p">Entonces la reconstruimos al revés: <b>ficha = (puntos totales − bonos conocidos) ÷ partidos calificados</b>. Si la cuenta está bien, cada resultado tiene que caer entre 1 y 10, que es el rango en el que califica Clarín. Ese es el control: <b>${ok} de ${v.total || 0}</b> caen adentro, con una media de ${n2(v.media)}.</p>
     </div>
@@ -885,10 +1507,23 @@ function abrirTablero() {
     const w = Math.max(2, Math.min(100, 100 * v / max));
     return `<div class="tb-bar"><i style="width:${w}%;background:${color};"></i></div>`;
   };
-  const nivel = v => {
-    // 1.00 = promedio de la liga. Arriba de 1 en defensa = concede mas = peor.
+  // "Su nivel" en abstracto no dice nada. Lo que interesa es si ese equipo es
+  // mejor o peor que el equipo promedio de la liga, y en cuanto. Se muestra la
+  // palabra primero y el numero como respaldo.
+  const nivel = (v, esDefensa) => {
     const pct = Math.round(100 * (v - 1));
-    return `<span style="color:${pct > 8 ? '#ef4444' : pct < -8 ? '#10b981' : 'var(--text-muted)'};font-weight:700;">${pct >= 0 ? '+' : ''}${pct}%</span>`;
+    // En DEFENSA, mas alto = concede mas = peor. En ATAQUE, mas alto = mejor.
+    const bueno = esDefensa ? pct < -8 : pct > 8;
+    const malo  = esDefensa ? pct > 8  : pct < -8;
+    const color = bueno ? '#10b981' : malo ? '#ef4444' : 'var(--text-muted)';
+    const palabra = Math.abs(pct) <= 8 ? 'del montón'
+      : esDefensa ? (pct < 0 ? 'sólida' : 'floja')
+                  : (pct > 0 ? 'peligroso' : 'inofensivo');
+    const explica = esDefensa
+      ? `Recibe ${Math.abs(pct)}% ${pct < 0 ? 'menos' : 'más'} de lo que recibe el equipo promedio de la liga`
+      : `Genera ${Math.abs(pct)}% ${pct > 0 ? 'más' : 'menos'} de lo que genera el equipo promedio de la liga`;
+    return `<span title="${explica}" style="color:${color};font-weight:700;white-space:nowrap;">${palabra}
+      <span style="font-weight:600;opacity:0.75;font-size:0.86em;">${pct >= 0 ? '+' : ''}${pct}%</span></span>`;
   };
 
   const filaDef = t => `
@@ -897,17 +1532,17 @@ function abrirTablero() {
       <td class="text-muted">vs ${esc(t.rival)}</td>
       <td class="text-center"><b>${pc0(t.pValla)}</b>${barra(t.pValla, 0.6, '#10b981')}</td>
       <td class="text-center">${n2(t.lamContra)}</td>
-      <td class="text-center">${nivel(t.miDefensa)}</td>
-      <td class="text-center">${t.rotacion > 0 ? '<span class="fx-rot">COPA</span>' : ''}</td>
+      <td class="text-center">${nivel(t.miDefensa, true)}</td>
+      <td class="text-center">${pillRotacion(t.motivoRotacion)}</td>
     </tr>`;
   const filaAtq = t => `
     <tr class="${t.yaJugado ? 'tb-jugado' : ''}">
       <td><b>${esc(t.equipo)}</b> <span class="text-muted">${t.condicion === 'L' ? 'local' : 'visita'}</span>${t.yaJugado ? ' <span class="fx-jugado">JUGADO</span>' : ''}</td>
       <td class="text-muted">vs ${esc(t.rival)}</td>
       <td class="text-center"><b>${n2(t.lamFavor)}</b>${barra(t.lamFavor, 2.2, '#eb6834')}</td>
-      <td class="text-center">${nivel(t.suDefensa)}</td>
-      <td class="text-center">${nivel(t.miAtaque)}</td>
-      <td class="text-center">${t.rotacionRival > 0 ? '<span class="fx-rot">rival de copa</span>' : ''}</td>
+      <td class="text-center">${nivel(t.suDefensa, true)}</td>
+      <td class="text-center">${nivel(t.miAtaque, false)}</td>
+      <td class="text-center">${t.motivoRotacionRival ? `<span class="pill-alerta pill-copa-rival">${t.motivoRotacionRival.tipo === 'guarda' ? 'copa en ' + t.motivoRotacionRival.dias + 'd' : t.motivoRotacionRival.dias + 'd de descanso'}</span>` : ''}</td>
     </tr>`;
 
   const tabla = (titulo, sub, cabeceras, filas, datos) => `
@@ -923,14 +1558,33 @@ function abrirTablero() {
     ${pendientes < T.length ? `<p class="md-p"><b>${pendientes / 2} de ${T.length / 2} partidos siguen por jugarse.</b> Los que ya terminaron quedan abajo y atenuados.</p>` : ''}
     ${vl ? `<p class="md-p suave">Ventaja de local en la liga, medida sobre ${vl.partidos} partidos: un equipo genera <b>${n2(vl.xgLocal)}</b> de xG jugando en casa contra <b>${n2(vl.xgVisitante)}</b> de visitante — <b>${vl.pctMas}% más</b>. Los números de abajo ya lo tienen aplicado.</p>` : ''}
     ${tabla('Dónde poner defensores y arquero',
-      'Ordenado por probabilidad de valla invicta. La columna “su nivel” compara la defensa del equipo contra el promedio de la liga sobre todos sus partidos: en verde concede menos, en rojo más.',
-      [['Equipo'], ['Partido'], ['Valla invicta', 1, 'Probabilidad de no recibir gol, calculada desde las cuotas'], ['Goles que recibe', 1, 'Goles esperados en contra'], ['Su nivel', 1, 'Defensa vs promedio de la liga'], ['', 1]],
+      'Ordenado por la chance de que el equipo termine el partido sin recibir goles. Eso es lo que le paga a un defensor (+2) y a un arquero (+3).',
+      [['Equipo'], ['Partido'],
+       ['Termina 0 en contra', 1, 'Probabilidad de valla invicta en ESTE partido, calculada desde las cuotas de las casas'],
+       ['Goles que le hacen', 1, 'Goles que se espera que reciba en ESTE partido'],
+       ['Qué tan buena es su defensa', 1, 'Compara al equipo con el equipo promedio de la liga, sobre TODOS sus partidos. No es de este partido: es cómo viene'],
+       ['Ojo con', 1, 'Poco descanso o partido de copa cerca']],
       filaDef, porDefensa)}
     ${tabla('Dónde poner delanteros y volantes',
-      'Ordenado por goles esperados del equipo. “Defensa rival” en rojo es una defensa vulnerable: ahí es donde se convierte.',
-      [['Equipo'], ['Partido'], ['Goles esperados', 1, 'Goles esperados a favor, calculados desde las cuotas'], ['Defensa rival', 1, 'Qué tan vulnerable es la defensa que enfrenta, vs el promedio de la liga'], ['Su ataque', 1, 'Ataque del equipo vs el promedio de la liga'], ['', 1]],
+      'Ordenado por cuántos goles se espera que meta el equipo en este partido. Una defensa rival “floja” es donde se convierte.',
+      [['Equipo'], ['Partido'],
+       ['Goles que va a meter', 1, 'Goles esperados a favor en ESTE partido, calculados desde las cuotas'],
+       ['Cómo está la defensa rival', 1, 'El rival comparado con el equipo promedio de la liga. Floja = concede más que el promedio'],
+       ['Cómo está su ataque', 1, 'El equipo comparado con el equipo promedio de la liga, sobre todos sus partidos'],
+       ['Ojo con el rival', 1, 'Si el rival llega cansado o guarda gente para la copa']],
       filaAtq, porAtaque)}
-    <p class="md-p suave">El nivel de cada equipo sale de todos los partidos disponibles (torneo actual + anterior), no solo de esta condición: medimos que el corte local/visitante por equipo no se traslada de un torneo al otro, pero el nivel general sí, y la ventaja de local de la liga también.</p>`);
+    <div class="md-seccion">
+      <h4>Cómo leer las dos últimas columnas</h4>
+      <p class="md-p suave">Dicen <b>cómo viene el equipo</b>, no cómo le va a ir en este partido. Se lo compara
+      con el equipo promedio de la liga sobre <b>todos</b> sus partidos: “sólida −18%” quiere decir que recibe
+      un 18% menos de lo que recibe un equipo cualquiera. Entre −8% y +8% es del montón y no dice nada.</p>
+      <p class="md-p suave">Las dos primeras columnas de cada tabla sí son <b>de este partido</b>: salen de las
+      cuotas de las casas de apuestas con el margen descontado, no de nuestro promedio. Cuando las dos cosas no
+      coinciden —una defensa sólida con pocas chances de valla invicta— es porque el rival de turno es duro.</p>
+      <p class="md-p suave">El nivel se calcula con el torneo actual más el anterior: medimos que el corte
+      local/visitante de cada equipo no se traslada de un torneo al otro, pero el nivel general sí, y la
+      ventaja de local de la liga también.</p>
+    </div>`);
 }
 
 function avisoPendiente() {

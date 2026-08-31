@@ -7,7 +7,7 @@ const fs=require('fs'), vm=require('vm');
 // estaban en Descargas y nunca llegaron a la carpeta. Ahora la version se
 // imprime en la consola y se muestra en la cabecera de la pagina.
 // ─────────────────────────────────────────────────────────────────────────────
-const VERSION_MOTOR = 'v6 · 27/08/2026';
+const VERSION_MOTOR = 'v10 · 30/08/2026';
 const M=require('./motorV3.cjs');
 const P=JSON.parse(fs.readFileSync('dataPlaneta.json','utf8'));
 const S=JSON.parse(fs.readFileSync('data365.json','utf8'));
@@ -210,30 +210,73 @@ const CONFIRMADOS = {};
   if (!equiposOk && !sinFormato) console.log('formaciones: ninguna confirmada todavia (se publican ~1 hora antes de cada partido; conviene correr SYNC_365.bat de nuevo justo antes de cerrar el equipo)');
 })();
 
-const players=[]; let match365=0, nuncaJugaron=0, cruceNombreUnico=0;
+
+// ---- 2c. CRUCE PLANETA <-> 365SCORES, EN DOS PASADAS ----
+// Primera pasada: los cruces seguros, siempre dentro del mismo equipo.
+// Segunda pasada: los TRANSFERIDOS. Gran DT actualiza la planilla cuando un
+// jugador cambia de club, pero 365Scores lo sigue listando en el equipo donde
+// jugo los partidos. Con el cruce atado al equipo, esos jugadores quedaban sin
+// minutos, sin tiros y sin xG: el motor los veia como si nunca hubieran pisado
+// una cancha. Perrotta ya es de Defensa y Justicia en la planilla y en 365
+// sigue en Banfield con 441 minutos; asi quedaba en cero.
+// La segunda pasada solo cruza si el nombre es unico de los dos lados y el
+// jugador de 365 no lo tomo nadie. Los minutos son reales, pero son del club
+// anterior, asi que se marcan y se muestran con la advertencia en la app.
+let cruceNombreUnico=0;
+const CRUCE=new Array(P.jugadores.length).fill(null);
+const TRANSFER={};
+(function(){
+  const usados=new Set();
+  P.jugadores.forEach((j,i)=>{
+    const raw=norm(j.nombre), w=raw.split(' '), eq=CT(j.equipo);
+    let m=idx365[raw+'@'+eq]||idx365[w.slice(1).join(' ')+' '+w[0]+'@'+eq]||null;
+    if(!m){const ap=w[0];
+      const h=Object.values(S.jugadores).filter(x=>CT(x.equipo)===eq && norm(x.nombre).split(' ').includes(ap));
+      if(h.length===1)m=h[0];}
+    if(!m){
+      const pila = w.slice(1).concat([w[0]]);
+      const h=Object.values(S.jugadores).filter(x=>{
+        if(CT(x.equipo)!==eq) return false;
+        const partes=norm(x.nombre).split(' ');
+        return partes.length===1 && pila.includes(partes[0]);
+      });
+      if(h.length===1){ m=h[0]; cruceNombreUnico++; }
+    }
+    if(m){ CRUCE[i]=m; usados.add(m); }
+  });
+  // indice global por nombre, sin equipo
+  const porNombre={};
+  Object.values(S.jugadores).forEach(p=>{
+    const n=norm(p.nombre); (porNombre[n]=porNombre[n]||[]).push(p);
+    const w=n.split(' ');
+    if(w.length>=2){ const inv=w.slice(1).join(' ')+' '+w[0]; (porNombre[inv]=porNombre[inv]||[]).push(p); }
+  });
+  // cuantas veces se repite cada nombre del lado de la planilla, entre los que
+  // quedaron sin cruzar: si hay dos "Gonzalez, Lucas" sueltos no se toca ninguno
+  const sueltos={};
+  P.jugadores.forEach((j,i)=>{ if(CRUCE[i]) return;
+    const n=norm(j.nombre); sueltos[n]=(sueltos[n]||0)+1; });
+  P.jugadores.forEach((j,i)=>{
+    if(CRUCE[i]) return;
+    const raw=norm(j.nombre), w=raw.split(' '), eq=CT(j.equipo);
+    if(sueltos[raw]!==1) return;
+    const cand=[...new Set((porNombre[raw]||[]).concat(porNombre[w.slice(1).join(' ')+' '+w[0]]||[]))];
+    if(cand.length!==1) return;
+    const m=cand[0];
+    if(usados.has(m)) return;
+    if(CT(m.equipo)===eq) return;
+    if(!(m.minutos>0)) return;
+    CRUCE[i]=m; usados.add(m);
+    TRANSFER['p'+i]={desde:m.equipo, hacia:j.equipo, min:m.minutos};
+  });
+  const n=Object.keys(TRANSFER).length;
+  if(n) console.log('TRANSFERIDOS: '+n+' jugadores que en la planilla ya estan en el club nuevo y en 365Scores siguen en el viejo. Se les recuperan los minutos y el xG, marcados como transferidos: '
+    + Object.values(TRANSFER).map(t=>t.desde+'->'+t.hacia).slice(0,6).join(', ') + (n>6?', ...':''));
+})();
+
+const players=[]; let match365=0, nuncaJugaron=0;
 P.jugadores.forEach((j,i)=>{
-  const raw=norm(j.nombre), w=raw.split(' '), eq=CT(j.equipo);
-  let m=idx365[raw+'@'+eq]||idx365[w.slice(1).join(' ')+' '+w[0]+'@'+eq]||null;
-  // Ultimo recurso por apellido, pero SOLO dentro del mismo equipo y si no hay
-  // ambiguedad. Fuera del equipo no se busca nunca.
-  if(!m){const ap=w[0];
-    const h=Object.values(S.jugadores).filter(x=>CT(x.equipo)===eq && norm(x.nombre).split(' ').includes(ap));
-    if(h.length===1)m=h[0];}
-  // Brasileños y apodos: 365Scores los publica con UNA sola palabra ("Rick",
-  // "Michael"), y Planeta con nombre y apellido ("Lima Morais, Rick"). Sin este
-  // cruce, Rick de Talleres quedaba sin minutos, sin tiros y sin xG. Peor: su
-  // tasa de gol se calculaba con los goles de Planeta divididos por el piso de
-  // 180 minutos, o sea 2 partidos en vez de 6, y terminaba con el 64% del
-  // ataque de Talleres y primero en el ranking sin haber pateado una vez.
-  if(!m){
-    const pila = w.slice(1).concat([w[0]]);   // nombres de pila, sin el apellido
-    const h=Object.values(S.jugadores).filter(x=>{
-      if(CT(x.equipo)!==eq) return false;
-      const partes=norm(x.nombre).split(' ');
-      return partes.length===1 && pila.includes(partes[0]);
-    });
-    if(h.length===1){ m=h[0]; cruceNombreUnico++; }
-  }
+  const m=CRUCE[i];
   if(m)match365++;
   // Los que no jugaron un solo minuto NI tienen partidos calificados no entran.
   // La planilla nueva trae los planteles completos y un tercio nunca jugo; sin
@@ -247,6 +290,7 @@ P.jugadores.forEach((j,i)=>{
     yellowCards:j.ta, redCards:j.tr, penaltiesSaved:j.pa, penaltiesMissed:j.pe, price:j.cotizacion,
     xg365:m?m.xg:0, shots365:m?m.tiros:0, matches365:m?m.partidos:0,
     minutes365:m?m.minutos:0, titularidad:m?m.titularidad:null,
+    transferido: TRANSFER['p'+i]||null,
     // Minutos fecha por fecha, con 0 en las fechas que no jugo. El motor los
     // necesita para estimar cuantos minutos va a jugar la proxima, que es
     // distinto de "juega o no juega".
@@ -715,7 +759,7 @@ if(out.cuotas.vencidas){
 
 // payload compacto para la app
 const slim=x=>({id:x.id,n:x.nombre,eq:x.equipo,pos:x.pos,riv:x.rival,cond:x.condicion[0],
- ep:x.EP,epsj:x.EPsiJuega,mesp:x.minEsperados,msj:x.minSiJuega,mest:x.minEstimados,mlog:x.minutosLog,fmin:x.fuenteMinutos,pj_:x.pJuega,sc:x.score,fi:x.ficha,pvi:x.pVI,lg:x.lamGol,pfig:x.pFigura,ta:x.tasaTA,
+ ep:x.EP,epsj:x.EPsiJuega,mesp:x.minEsperados,msj:x.minSiJuega,mest:x.minEstimados,mlog:x.minutosLog,fmin:x.fuenteMinutos,pen:x.penalesPateados,penC:x.penalesConvertidos,penE:x.penalesErrados,tr:x.transferido||null,t90:x.tiros90,x90:x.xg90,xgT:x.xgTorneo,tirT:x.tirosTorneo,pj_:x.pJuega,sc:x.score,fi:x.ficha,pvi:x.pVI,lg:x.lamGol,pfig:x.pFigura,ta:x.tasaTA,
  piso:x.piso,techo:x.techo,perf:x.perfil||'',pe:x.pisoEquipo||null,
  rot:x.rotacion||0,rotr:x.rotacionRival||0,nrot:x.notaRotacion||'',
  mrot:x.motivoRotacion||null,mrotr:x.motivoRotacionRival||null,

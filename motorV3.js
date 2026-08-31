@@ -298,33 +298,96 @@ const PRIOR_SHARE = { ARQ: 0.002, DEF: 0.030, VOL: 0.075, DEL: 0.150 };
 function amenazaIndividual(p) {
   const pj365 = Math.max(1, num(p.matches365) || num(p.matchesRated) || 1);
   const pjPgt = Math.max(1, num(p.matchesRated) || 1);
-  const pens = num(p.goalsPenalty);
-  const xg = Math.max(0, num(p.xg365) - 0.79 * pens);
+  // PENALES PATEADOS, no solo convertidos (arreglado 28/08).
+  // El xG de 365Scores le suma ~0.79 a CADA penal que el jugador patea, entre
+  // el gol y el palo. Aca se descontaba solo por los CONVERTIDOS, asi que a los
+  // que erraron uno les quedaba 0.79 de xG fantasma. En la fecha 7 eran 8
+  // jugadores: a Barbona (Defensa y Justicia) su xG bajaba de 1.97 a 1.18 —un
+  // 40% menos— y a Marcelo Torres de 0.79 a CERO, o sea que todo su xG era un
+  // penal errado. Justo el caso del que patea uno de casualidad y no es el
+  // pateador del equipo.
+  // Planeta trae las dos columnas: gp = convertidos, pe = errados.
+  const penesConv = num(p.goalsPenalty);
+  const penesPateados = penesConv + num(p.penaltiesMissed);
+  const xg = Math.max(0, num(p.xg365) - 0.79 * penesPateados);
   const tiros = num(p.shots365);
-  const golJugada = Math.max(0, num(p.goals) - pens);
-  const xg90 = xg / pj365, tiros90 = tiros / pj365, gol90 = golJugada / pjPgt;
+  const golJugada = Math.max(0, num(p.goals) - penesConv);
+  // Por 90 MINUTOS, no por partido. Y con piso de 180' en el divisor: el que
+  // entro 3 veces 12 minutos y clavo uno no proyecta 1 gol por partido.
+  // Ese piso es el que shrinkea solo a los de poca muestra, sin umbrales.
+  //
+  // OJO (arreglado 27/08): si el jugador NO cruza con 365Scores, minutes365 es
+  // 0 y el divisor cae al piso de 180', o sea 2 partidos. Pero sus GOLES salen
+  // de Planeta, que puede tener 6 fechas. Resultado: goles de 6 partidos
+  // divididos por 2 = el triple de tasa real. Asi Rick de Talleres, que ni
+  // siquiera habia cruzado, terminaba con el 64% del ataque de su equipo y
+  // primero en el ranking de delanteros con CERO tiros.
+  // Si Planeta lo califico en N partidos, jugo por lo menos 20 minutos en cada
+  // uno y en general bastante mas; 0.8 noventas por partido calificado es un
+  // piso conservador para el divisor.
+  const min365 = num(p.minutes365);
+  const nov = Math.max(180 / 90, min365 / 90, 0.8 * pjPgt);
+  const xg90 = xg / nov, tiros90 = tiros / nov, gol90 = golJugada / nov;
   const hayXg = xg > 0 || tiros > 0;
   // Continuo y monótono en tiros y xG. Sin umbrales, sin cubetas: 5 tiros da
   // más que 4 y menos que 8, siempre.
+  //
+  // PESOS: SE PROBO CAMBIARLOS Y NO SE PUDO DEMOSTRAR QUE CONVENGA (26/08).
+  // Sobre el torneo anterior (9015 filas jugador-partido) se compararon mezclas
+  // por validacion cruzada de 5 pliegues, midiendo verosimilitud fuera de
+  // muestra sobre los goles del partido siguiente:
+  //     solo tiros -0.417 | solo xG -0.426 | solo goles -0.443
+  //     xG+goles+tiros -0.403  <-- las tres juntas ganan, que es lo que ya hay
+  // Subirle el peso al gol convertido (0.15 -> 0.50) mejoraba la punta del
+  // ranking en un corte de la muestra y la empeoraba en otro: el resultado se
+  // daba vuelta segun si se exigian 6 partidos previos o 180 minutos previos.
+  // Eso es ruido de seleccion, no señal. Se dejan los pesos como estaban hasta
+  // tener otro torneo de datos. Queda anotado para no volver a probarlo a ciegas.
   const bruto = hayXg
     ? (0.62 * xg90) + (0.023 * tiros90) + (0.15 * gol90)
     : (0.55 * gol90) + PRIOR_SHARE[p.position] * 0.45;
-  const conf = hayXg ? Math.min(1, pj365 / 3) : Math.min(0.55, pjPgt / 4);
+  // Confianza MEDIDA, no inventada. Sobre el torneo anterior (6248 filas) se
+  // regresaron los goles del partido siguiente contra esta misma tasa, cortando
+  // por minutos ya jugados. La pendiente —cuanto de la tasa medida se cumple
+  // de verdad— dio, con los datos YA LIMPIOS (27/08, despues de reparar las 46
+  // filas con goles imposibles del historico):
+  //      90-270'  b=0.30      900-1400'  b=0.60
+  //     270-540'  b=0.32         1400+'   b=0.73
+  //     540-900'  b=0.57
+  // Dos lecturas: (1) ni con un torneo entero encima la tasa se cumple del todo,
+  // por eso el techo 0.70; (2) el piso NO es cero — aun con 2 partidos se cumple
+  // el 30%, por eso el piso 0.28 y no min/900 a secas, que daba 0.10 a los 90
+  // minutos y borraba del mapa a cualquier refuerzo recien llegado.
+  const conf = hayXg ? clamp(min365 / 900, 0.28, 0.70) : Math.min(0.55, pjPgt / 4);
   return { bruto: Math.max(0, bruto), conf, hayXg, xg90, tiros90, gol90,
            tirosTorneo: tiros, xgTorneo: round2(xg) };
 }
 
-function sharesDeEquipo(jugadores) {
-  const info = jugadores.map(p => ({ p, a: amenazaIndividual(p) }));
+function sharesDeEquipo(jugadores, partidosEquipo, rotacion) {
+  const info = jugadores.map(p => ({ p, a: amenazaIndividual(p),
+                                     mp: perfilMinutos(p, partidosEquipo, rotacion) }));
   const sPrior = info.reduce((s, x) => s + PRIOR_SHARE[x.p.position], 0) || 1;
   const sBruto = info.reduce((s, x) => s + x.a.bruto * x.a.conf, 0);
   const out = {};
   info.forEach(x => {
     const prior = PRIOR_SHARE[x.p.position] / sPrior;
     const medido = sBruto > 0 ? (x.a.bruto * x.a.conf) / sBruto : prior;
-    out[key(x.p)] = { share: x.a.conf * medido + (1 - x.a.conf) * prior, amenaza: x.a };
+    out[key(x.p)] = { share: x.a.conf * medido + (1 - x.a.conf) * prior,
+                      amenaza: x.a, mp: x.mp };
   });
-  const tot = Object.values(out).reduce((s, v) => s + v.share, 0) || 1;
+  // CONSERVACION DE GOLES (arreglado 26/08).
+  // Antes las cuotas se normalizaban sobre el PLANTEL ENTERO: 26 tipos en
+  // Gimnasia (M), de los cuales 15 no juegan nunca. Como despues hacemos
+  // lamGol = cuota x goles esperados del equipo, la suma de los goles de los
+  // que realmente pisan la cancha daba el 49% de los goles del equipo (mediana
+  // de los 30 equipos; entre 36% y 59%): al titular se le descontaban goles que
+  // se llevaban los del banco.
+  // Ahora se normaliza contra la suma ponderada por MINUTOS ESPERADOS, de modo
+  // que sum(cuota_i x minutosEsperados_i / 90) = 1. Es decir: los goles del
+  // equipo se reparten entre los minutos que se van a jugar, que es lo unico
+  // que tiene sentido. La cuota queda expresada por 90 minutos en cancha.
+  const tot = Object.values(out).reduce((s, v) =>
+    s + v.share * Math.max(0.02, v.mp.minEsperados / 90), 0) || 1;
   Object.values(out).forEach(v => { v.share /= tot; });
   return out;
 }
@@ -348,32 +411,96 @@ function figurasDeEquipo(jugadores, lam, shares) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 6bis. ¿VA A JUGAR? — el filtro que faltaba
-//   Recomendar al mejor defensor de un equipo no sirve si va al banco. Se estima
-//   con los minutos reales de 365Scores: qué fracción de los minutos posibles
-//   jugó, y en cuántos partidos pasó de 60 minutos.
+// 6bis. ¿CUÁNTOS MINUTOS VA A JUGAR?
+//   No alcanza con "juega o no juega". Un 9 al que le sacan a los 65' regala
+//   25 minutos de chance de gol, y eso se puede medir: sobre 6 fechas cruzadas
+//   con Planeta, los goles por cada 90 minutos EN CANCHA de un delantero son
+//   planos —0.281 si jugó 20-59', 0.213 si jugó 60-79', 0.223 si jugó 80-90'—
+//   o sea que la chance de gol es LINEAL en los minutos. Y los puntos de un
+//   delantero por fecha suben 0.026 → 0.094 → 0.125 → 0.185 → 0.256 goles
+//   según cuántos minutos venía jugando.
+//
+//   Estimador de minutos: promedio ponderado por recencia sobre las fechas del
+//   torneo (contando 0 las que no jugó) más un shrink chico. Los parámetros
+//   salen de una búsqueda de grilla sobre el torneo anterior, 10.703 filas
+//   jugador-fecha, minimizando el error cuadrático medio contra los minutos
+//   que realmente jugó después:
+//       decaimiento 0.60, k 0.5, objetivo 20'  →  RMSE 28.5'
+//   (promedio simple 31.0', último partido 33.7'). La grilla es plana cerca del
+//   óptimo: 0.7/1/30' da 28.7'. 28 minutos de error es mucho, y es la verdad:
+//   los minutos son difíciles de predecir. Por eso el resto del EP se pondera
+//   por probabilidad, no se decide con un umbral.
 // ─────────────────────────────────────────────────────────────────────────────
-function probJuega(p, partidosDelEquipo, rotacion) {
-  const pjEq = Math.max(1, partidosDelEquipo || 5);
-  const min = num(p.minutes365);
-  const pj = num(p.matches365);
-  let base;
-  if (!pj && !min) { base = 0.45; }
-  else {
-    const shareMin = Math.min(1, min / (pjEq * 90));
-    const titular = p.titularidad != null ? num(p.titularidad) : (pj ? Math.min(1, min / (pj * 75)) : 0);
-    const bruto = 0.65 * shareMin + 0.35 * titular;
-    const k = 1.2;
-    base = (bruto * pjEq + 0.45 * k) / (pjEq + k);
+const MIN_DECAY = 0.60, MIN_K = 0.5, MIN_TGT = 20;
+
+function minutosEstimados(p, partidosDelEquipo) {
+  const log = Array.isArray(p.minutosLog) ? p.minutosLog : null;
+  if (log && log.length) {
+    let n = 0, d = 0;
+    for (let i = 0; i < log.length; i++) {
+      const w = Math.pow(MIN_DECAY, log.length - 1 - i);
+      n += w * (num(log[i]) || 0); d += w;
+    }
+    return (n + MIN_K * MIN_TGT) / (d + MIN_K);
   }
-  // La rotación no elimina jugadores: reparte minutos. Achata a todo el plantel
-  // hacia el medio — el titular baja, el suplente sube.
-  // Además, en Gran DT si tu titular no juega entra tu suplente del banco, así
-  // que el costo real de la rotación es menor de lo que parece. Por eso 0.45 y
-  // no 1.0. Es un supuesto, pendiente de calibrar con fechas reales.
+  // Sin log fecha por fecha: se cae al total de minutos sobre partidos del equipo.
+  const pjEq = Math.max(1, partidosDelEquipo || 5);
+  return clamp(num(p.minutes365) / pjEq, 0, 90);
+}
+
+// P(juega los 20' que hacen falta para tener ficha). Logística ajustada sobre
+// las mismas 10.703 filas. Reproduce la tabla observada: 30'→0.39 (medido 0.36
+// y 0.51 en los tramos vecinos), 50'→0.67 (medido 0.72), 70'→0.87 (medido 0.87).
+function probFicha(minEst) {
+  return clamp(1 / (1 + Math.exp(-(-2.226 + 0.0589 * minEst))), 0.02, 0.97);
+}
+
+// Minutos que juega DADO que entra. Medido: el que viene promediando 10' juega
+// 56' cuando entra; el que promedia 72' juega 83'. Recta ajustada a esos puntos.
+function minutosSiJuega(minEst) {
+  return clamp(51.7 + 0.432 * minEst, 25, 90);
+}
+
+// La rotación por copas no elimina a nadie: reparte minutos. Achata al plantel
+// hacia el medio —el titular baja, el suplente sube—. El 0.45 sigue siendo un
+// supuesto sin calibrar; queda anotado.
+function ajustarPorRotacion(minEst, rotacion) {
   const rot = clamp(num(rotacion), 0, 1);
-  const ajustada = base + rot * 0.45 * (0.5 - base);
-  return clamp(ajustada, 0.03, 0.97);
+  return clamp(minEst + rot * 0.45 * (45 - minEst), 0, 90);
+}
+
+// Devuelve todo junto para no recalcular.
+function perfilMinutos(p, partidosDelEquipo, rotacion) {
+  const crudo = minutosEstimados(p, partidosDelEquipo);
+  const minEst = ajustarPorRotacion(crudo, rotacion);
+
+  // FORMACION CONFIRMADA. Si 365Scores ya publico el once (una hora antes del
+  // partido), no hay nada que estimar: se sabe si arranca o no. El estimador
+  // tiene 28 minutos de error cuadratico medio; esto lo lleva a cero.
+  //   confirmado === true  -> es titular. Empieza el partido. Lo unico que
+  //                           puede pasar es que lo saquen, y para eso sirve su
+  //                           historial de minutos: si viene jugando 90, juega
+  //                           90; si lo sacan siempre a los 65, sale a los 65.
+  //   confirmado === false -> su equipo confirmo y NO esta. Va al banco. Puede
+  //                           entrar igual, y si entra 20 minutos cobra ficha
+  //                           igual: por eso 0.30 y no 0. Medido sobre las 6
+  //                           fechas: el que entra desde el banco juega 30
+  //                           minutos en promedio.
+  //   confirmado === null  -> todavia no publicaron nada. Se estima como siempre.
+  if (p.confirmado === true) {
+    const siJuega = clamp(Math.max(minutosSiJuega(minEst), 0.85 * Math.max(minEst, 60)), 55, 90);
+    return { minEst: minEst, pFicha: 0.97, minSiJuega: siJuega,
+             minEsperados: 0.97 * siJuega, fuente: 'once confirmado' };
+  }
+  if (p.confirmado === false) {
+    return { minEst: minEst, pFicha: 0.30, minSiJuega: 30,
+             minEsperados: 0.30 * 30, fuente: 'al banco (once confirmado)' };
+  }
+
+  const pFicha = probFicha(minEst);
+  const siJuega = minutosSiJuega(minEst);
+  return { minEst: minEst, pFicha: pFicha, minSiJuega: siJuega,
+           minEsperados: pFicha * siJuega, fuente: 'estimado' };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -386,11 +513,23 @@ function evaluar(p, ctx, eq) {
   const share = shares[key(p)]?.share ?? PRIOR_SHARE[pos];
   const amen = shares[key(p)]?.amenaza || {};
 
+  // MINUTOS. Todo lo que depende de estar en la cancha se escala por acá.
+  const mp = shares[key(p)]?.mp || perfilMinutos(p, eq.partidosEquipo, ctx.rotacion);
+  const fracMin = mp.minSiJuega / 90;   // dado que entra, que parte del partido juega
+
   // Gol: se usa λ (goles esperados), no P(gol). Los puntos son LINEALES en
   // goles: el que puede meter dos vale el doble. Con P(gol) se aplanan.
-  const lamGol = share * lam.lamFor;
-  const esPen = num(p.goalsPenalty) > 0;
-  const tasaPen = esPen ? Math.min(0.45, num(p.goalsPenalty) / pj) : 0;
+  // La cuota esta expresada por 90 minutos en cancha, asi que se multiplica por
+  // la fraccion del partido que se espera que juegue. Medido: los goles por 90
+  // minutos en cancha no dependen de cuanto juega (0.28 / 0.21 / 0.22 segun
+  // haya jugado 20-59', 60-79' u 80-90'), o sea que la chance es lineal en los
+  // minutos. Sacar al 9 a los 65' le borra 25/90 de su chance de gol.
+  const lamGol = share * lam.lamFor * fracMin;
+  // Quien patea los penales del equipo. Tambien va por PATEADOS, no por
+  // convertidos: Barbona pateo uno y lo erro, y sigue siendo el que los patea.
+  const penesPateadosJ = num(p.goalsPenalty) + num(p.penaltiesMissed);
+  const esPen = penesPateadosJ > 0;
+  const tasaPen = esPen ? Math.min(0.45, penesPateadosJ / pj) : 0;
   const valJugada = (RG.golPorPosicion[pos] || 0) + (ctx.esLocal ? 0 : RG.bonusGolVisitante);
   const valPenal = RG.golDePenal + (ctx.esLocal ? 0 : RG.bonusGolVisitante);
   const lamPen = Math.min(lamGol * 0.55, tasaPen * 0.78);
@@ -410,30 +549,61 @@ function evaluar(p, ctx, eq) {
   const tasaTR = (num(p.redCards) + prTR * 4) / (pj + 4);
   const EP_tarj = RG.amarilla * tasaTA + RG.roja * tasaTR;
 
-  const EP = f.ficha + EP_gol + EP_vi + EP_gc + EP_fig + EP_tarj;
-  // La chance de jugar es INFORMACION, no una penalizacion: en Gran DT si tu
-  // titular no juega entra tu suplente del banco. Se muestra, no descuenta.
-  const pj_ = probJuega(p, eq.partidosEquipo, ctx.rotacion);
+  // EP SI ENTRA. La valla invicta NO se escala por minutos: el reglamento pide
+  // 20 minutos y que el equipo termine el partido sin recibir goles, no jugarlo
+  // entero. La ficha tampoco: medido, un delantero que entra 30' saca 5.35 de
+  // ficha-mas-incidencias y uno que juega 85' saca 6.86 — la diferencia esta en
+  // el gol, no en la nota. Lo que si escala es gol, figura y tarjetas.
+  const EPsiJuega = f.ficha + EP_gol + EP_vi + EP_gc + EP_fig + EP_tarj;
+
+  // EP DE LA FECHA. Pondera por la chance de llegar a los 20' que exige la
+  // ficha — NO por los minutos completos. Backtest de las fechas 2 a 6 armando
+  // el once ideal con cada criterio, con banco que reemplaza al que no juega:
+  //   sin mirar nada de esto ............................. 69.2 pts/fecha
+  //   x probabilidad binaria de jugar (puntajes Planeta) .. 74.6
+  //   x probabilidad de tener ficha (modelo de minutos) ... 77.0  <-- esta
+  //   x minutos esperados sobre 90 (todo el EP escalado) .. 74.0
+  // Escalar TODO el EP por minutos castiga de mas: medido, un delantero que
+  // entra 30' saca 5.35 puntos y uno que juega 85' saca 6.86 — la diferencia
+  // esta casi entera en el gol, no en la nota ni en la valla. Por eso los
+  // minutos multiplican solo el gol, la figura y las tarjetas.
+  const EP = mp.pFicha * EPsiJuega;
+  const pj_ = mp.pFicha;
   const EPreal = EP;
 
   return {
     id: key(p), nombre: p.name, pos, equipo: p.team, rival: ctx.rival,
     condicion: ctx.esLocal ? 'Local' : 'Visitante',
     EP: round2(EP),
+    EPsiJuega: round2(EPsiJuega),
+    minEsperados: Math.round(mp.minEsperados),
+    minSiJuega: Math.round(mp.minSiJuega),
+    minEstimados: Math.round(mp.minEst),
+    fuenteMinutos: mp.fuente || 'estimado',
+    minutosLog: Array.isArray(p.minutosLog) ? p.minutosLog.slice() : null,
     pJuega: round2(pj_),
     rotacion: round2(num(ctx.rotacion)),
     rotacionRival: round2(num(ctx.rotacionRival)),
     notaRotacion: ctx.notaRotacion || '',
+    motivoRotacion: ctx.motivoRotacion || null,
+    motivoRotacionRival: ctx.motivoRotacionRival || null,
     EPreal: round2(EPreal),
     // Piso: lo que hace si no pasa nada (ficha + valla − tarjetas).
     // Techo: lo que hace si mete gol (y arrastra la figura).
-    piso: round2(f.ficha + EP_vi + EP_gc + EP_tarj),
+    piso: round2(f.ficha + EP_vi + EP_gc + EP_tarj),   // si entra y no pasa nada
     techo: round2(f.ficha + EP_vi + EP_gc + EP_tarj + valJugada + RG.figura * 0.5),
-    conCinta: round2(EP + f.ficha),   // el capitán duplica SOLO la ficha
+    conCinta: round2(EP + mp.pFicha * f.ficha),   // el capitán duplica SOLO la ficha
     ficha: round2(f.ficha), fichaCruda: f.cruda === null ? null : round2(f.cruda), fichaOk: f.ok,
     pVI: lam.pVI, lamGol: round3(lamGol), pFigura: round3(pFig),
+    lamPen: round3(lamPen),
+    transferido: p.transferido || null,
+    penalesPateados: penesPateadosJ, penalesConvertidos: num(p.goalsPenalty),
+    penalesErrados: num(p.penaltiesMissed),
     tasaTA: round3(tasaTA), share: round3(share),
     tirosTorneo: amen.tirosTorneo ?? 0, xgTorneo: amen.xgTorneo ?? 0,
+    // Los mismos ritmos por 90 que usa el modelo, para que la tabla muestre
+    // EXACTAMENTE el numero con el que se calcula y no otro parecido.
+    tiros90: round2(amen.tiros90 ?? 0), xg90: round3(amen.xg90 ?? 0),
     tieneDato365: !!amen.hayXg,
     lam,
     desglose: [
@@ -604,9 +774,9 @@ function correrMotor(players, getCtx, fixture) {
     const ctx = getCtx(equipo);
     if (!ctx) return;
     const lam = lambdasPartido(ctx);
-    const shares = sharesDeEquipo(js);
-    const figuras = figurasDeEquipo(js, lam, shares);
     const partidosEquipo = Math.max(1, ...js.map(x => num(x.matches365) || num(x.matchesRated) || 1));
+    const shares = sharesDeEquipo(js, partidosEquipo, ctx.rotacion);
+    const figuras = figurasDeEquipo(js, lam, shares);
     eqs[equipo] = { ctx, lam, shares, figuras, partidosEquipo };
   });
 
@@ -633,6 +803,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { RG, CAL, valorEfectivoGol, recalibrarPartidos, fichaLimpia,
     bonosAcumulados, validarFichas, devig, lambdasDesdeMercado, lambdasPartido,
     amenazaIndividual, sharesDeEquipo, figurasDeEquipo, evaluar,
-    scoreARQ, scoreDEF, scoreOfensivo, mejorEsquema, correrMotor, ESQUEMAS, probJuega,
+    scoreARQ, scoreDEF, scoreOfensivo, mejorEsquema, correrMotor, ESQUEMAS, probFicha, perfilMinutos, minutosEstimados,
     suerteDefensiva };
 }

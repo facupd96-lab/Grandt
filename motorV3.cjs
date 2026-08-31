@@ -298,10 +298,20 @@ const PRIOR_SHARE = { ARQ: 0.002, DEF: 0.030, VOL: 0.075, DEL: 0.150 };
 function amenazaIndividual(p) {
   const pj365 = Math.max(1, num(p.matches365) || num(p.matchesRated) || 1);
   const pjPgt = Math.max(1, num(p.matchesRated) || 1);
-  const pens = num(p.goalsPenalty);
-  const xg = Math.max(0, num(p.xg365) - 0.79 * pens);
+  // PENALES PATEADOS, no solo convertidos (arreglado 28/08).
+  // El xG de 365Scores le suma ~0.79 a CADA penal que el jugador patea, entre
+  // el gol y el palo. Aca se descontaba solo por los CONVERTIDOS, asi que a los
+  // que erraron uno les quedaba 0.79 de xG fantasma. En la fecha 7 eran 8
+  // jugadores: a Barbona (Defensa y Justicia) su xG bajaba de 1.97 a 1.18 —un
+  // 40% menos— y a Marcelo Torres de 0.79 a CERO, o sea que todo su xG era un
+  // penal errado. Justo el caso del que patea uno de casualidad y no es el
+  // pateador del equipo.
+  // Planeta trae las dos columnas: gp = convertidos, pe = errados.
+  const penesConv = num(p.goalsPenalty);
+  const penesPateados = penesConv + num(p.penaltiesMissed);
+  const xg = Math.max(0, num(p.xg365) - 0.79 * penesPateados);
   const tiros = num(p.shots365);
-  const golJugada = Math.max(0, num(p.goals) - pens);
+  const golJugada = Math.max(0, num(p.goals) - penesConv);
   // Por 90 MINUTOS, no por partido. Y con piso de 180' en el divisor: el que
   // entro 3 veces 12 minutos y clavo uno no proyecta 1 gol por partido.
   // Ese piso es el que shrinkea solo a los de poca muestra, sin umbrales.
@@ -515,8 +525,11 @@ function evaluar(p, ctx, eq) {
   // haya jugado 20-59', 60-79' u 80-90'), o sea que la chance es lineal en los
   // minutos. Sacar al 9 a los 65' le borra 25/90 de su chance de gol.
   const lamGol = share * lam.lamFor * fracMin;
-  const esPen = num(p.goalsPenalty) > 0;
-  const tasaPen = esPen ? Math.min(0.45, num(p.goalsPenalty) / pj) : 0;
+  // Quien patea los penales del equipo. Tambien va por PATEADOS, no por
+  // convertidos: Barbona pateo uno y lo erro, y sigue siendo el que los patea.
+  const penesPateadosJ = num(p.goalsPenalty) + num(p.penaltiesMissed);
+  const esPen = penesPateadosJ > 0;
+  const tasaPen = esPen ? Math.min(0.45, penesPateadosJ / pj) : 0;
   const valJugada = (RG.golPorPosicion[pos] || 0) + (ctx.esLocal ? 0 : RG.bonusGolVisitante);
   const valPenal = RG.golDePenal + (ctx.esLocal ? 0 : RG.bonusGolVisitante);
   const lamPen = Math.min(lamGol * 0.55, tasaPen * 0.78);
@@ -567,6 +580,7 @@ function evaluar(p, ctx, eq) {
     minSiJuega: Math.round(mp.minSiJuega),
     minEstimados: Math.round(mp.minEst),
     fuenteMinutos: mp.fuente || 'estimado',
+    minutosLog: Array.isArray(p.minutosLog) ? p.minutosLog.slice() : null,
     pJuega: round2(pj_),
     rotacion: round2(num(ctx.rotacion)),
     rotacionRival: round2(num(ctx.rotacionRival)),
@@ -582,8 +596,14 @@ function evaluar(p, ctx, eq) {
     ficha: round2(f.ficha), fichaCruda: f.cruda === null ? null : round2(f.cruda), fichaOk: f.ok,
     pVI: lam.pVI, lamGol: round3(lamGol), pFigura: round3(pFig),
     lamPen: round3(lamPen),
+    transferido: p.transferido || null,
+    penalesPateados: penesPateadosJ, penalesConvertidos: num(p.goalsPenalty),
+    penalesErrados: num(p.penaltiesMissed),
     tasaTA: round3(tasaTA), share: round3(share),
     tirosTorneo: amen.tirosTorneo ?? 0, xgTorneo: amen.xgTorneo ?? 0,
+    // Los mismos ritmos por 90 que usa el modelo, para que la tabla muestre
+    // EXACTAMENTE el numero con el que se calcula y no otro parecido.
+    tiros90: round2(amen.tiros90 ?? 0), xg90: round3(amen.xg90 ?? 0),
     tieneDato365: !!amen.hayXg,
     lam,
     desglose: [
