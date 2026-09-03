@@ -90,7 +90,9 @@ $cuantos = $lista.Count
 Write-Host ("   {0} archivos quedan en el repo, {1} cambiaron desde la ultima vez." -f $cuantos, $cambian.Count) -ForegroundColor Green
 
 # control de seguridad: nada de esto tiene que estar
-$prohibidos = @('node.exe','datos.js','salida.json','SYNC_CUOTAS.ps1','clave_cuotas.txt')
+# datos.js NO esta en esta lista a proposito: es el unico archivo generado que
+# tiene que subir, porque sin el la pagina en GitHub no muestra nada (03/09).
+$prohibidos = @('node.exe','salida.json','SYNC_CUOTAS.ps1','clave_cuotas.txt')
 $colados = @()
 foreach ($f in $lista) {
   foreach ($p in $prohibidos) { if ($f -like "*$p") { $colados += $f } }

@@ -1,3 +1,7 @@
+# datos.js SI se sube, aunque sea un archivo generado: es lo unico que la
+# pagina necesita ademas de index.html, y sin el GitHub muestra el cartel rojo
+# de "no encontre datos.js". Son 2,3 MB por fecha (03/09).
+
 # datos que se rebajan solos
 data365.json
 data365_historico.json
@@ -9,7 +13,6 @@ dataFixture.json
 dataGranDT.json
 salida.json
 salida_RECHAZADA.json
-datos.js
 equipoPartido.json
 equipoPartidoFull.json
 concedidoPorPos.json
@@ -48,6 +51,11 @@ auditoria*.cjs
 # ...pero el auditor de pantallas SI va: es una herramienta, no una prueba suelta
 !auditar_pantallas.mjs
 
+# OJO: data.js NO va aca aunque parezca viejo. armar.cjs lo lee en el arranque
+# para canonizar los nombres de los 30 equipos (junto con teamsRegistry.js).
+# Sin el, armar.cjs muere con ENOENT y no se puede recalcular nada. Lo saque de
+# esta lista despues de romperlo (03/09).
+
 # versiones viejas
 app2.html
 app2.js
@@ -56,7 +64,6 @@ pagina.js
 test.js
 sync365.js
 motorV3.js
-data.js
 
 # capturas
 *.png
