@@ -35,12 +35,14 @@
                 <button class="nav-btn" data-sec="jugadores">Jugadores</button>
                 <button class="nav-btn" data-sec="fixture">Partidos</button>
                 <button class="nav-btn" data-sec="posiciones">Posiciones</button>
-                <button class="nav-btn" data-sec="lideres">Líderes</button>
+                <button class="nav-btn" data-sec="once">Mejor 11</button>
+            <button class="nav-btn" data-sec="oportunidades">Oportunidades</button>
+            <button class="nav-btn" data-sec="lideres">Líderes</button>
+            <button class="nav-btn" data-sec="datos">Datos</button>
             </nav>
 
             <div class="barra-acciones">
                 <span class="barra-fecha" id="lbl-status-fecha"></span>
-                <button class="btn btn-success nav-cta" id="btn-mejor-11">Mejor 11</button>
                 <button class="btn-mas" id="btn-menu" title="Más">⋯</button>
             </div>
         </div>
@@ -70,6 +72,12 @@
             <span id="lbl-global-stats" hidden></span>
         </div>
     </header>
+
+    <!-- Aviso de datos viejos. Va ACA, arriba de todo y fuera de las secciones:
+         antes se dibujaba adentro de la tabla de jugadores, que esta oculta
+         cuando estas en "La fecha", asi que el aviso que existe justo para
+         avisarte que datos.js quedo viejo no se veia nunca. -->
+    <div id="aviso-global"></div>
 
     <div class="container">
 
@@ -165,6 +173,7 @@
                             <button class="tab-pill-sm standings-filter-btn" data-filter="away">Visitante</button>
                         </div>
                     </div>
+                    <div class="nota-corte">Los <b>ocho primeros</b> de cada zona pasan a los octavos de final. La línea marca dónde termina la clasificación.</div>
 
                     <div class="table-responsive standings-wrap" style="overflow-x:hidden;">
                         <table class="standings-table">
@@ -193,6 +202,18 @@
             </div>
         </section>
 
+        <section class="seccion" id="sec-once" hidden>
+            <div id="pantalla-once"></div>
+        </section>
+
+        <section class="seccion" id="sec-oportunidades" hidden>
+            <div id="pantalla-oportunidades"></div>
+        </section>
+
+        <section class="seccion" id="sec-datos" hidden>
+            <div id="pantalla-datos"></div>
+        </section>
+
         <section class="seccion" id="sec-lideres" hidden>
             <!-- Centro de Líderes Estadísticos (Ranking Ordinal por Categoría) -->
                 <div id="view-leaders" class="p-4" >
@@ -206,8 +227,8 @@
                             <div>
                                 <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px;font-weight:600;">Categoría:</label>
                                 <select id="leaders-cat-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:0.85rem;font-weight:700;outline:none;cursor:pointer;">
-                                    <option value="xgPerMatch_noPen">📈 xG Generado / Partido</option>
-                                    <option value="shotsPerMatch">🎯 Tiros / Partido</option>
+                                    <option value="xgPerMatch_noPen">📈 xG generado cada 90′</option>
+                                    <option value="shotsPerMatch">🎯 Tiros cada 90′</option>
                                     <option value="goalsPerMatch">⚽ Goles / Partido</option>
                                     <option value="avgRating">📰 Promedio Ficha Clarín</option>
                                     <option value="cleanSheets">🧤 Vallas Invictas Totales</option>

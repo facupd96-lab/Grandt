@@ -201,17 +201,31 @@ function cuantosSuperan(tot, objetivo) {
 }
 function evaluarOnce(sim, filas, objetivo) { return statsDe(totalesDe(sim, filas), objetivo); }
 
-function buscarOnce(sim, esquema, objetivo, presupuesto, criterio, arranque) {
+// maxComunes: cuantos jugadores puede compartir con el once de siempre. Sin
+// esto la busqueda encuentra el once seguro con dos cambios y se queda ahi:
+// tecnicamente es el que mas cola tiene, pero no es OTRA apuesta, es la misma.
+function buscarOnce(sim, esquema, objetivo, presupuesto, criterio, arranque, idsSeguro, maxComunes) {
   const { M, N } = sim;
   const porPos = { ARQ: [], DEF: [], VOL: [], DEL: [] };
   sim.jug.forEach((j, i) => { if (porPos[j.pos]) porPos[j.pos].push({ i, j }); });
   const cupos = { ARQ: esquema[0], DEF: esquema[1], VOL: esquema[2], DEL: esquema[3] };
+  // EL POOL DECIDE MAS QUE LA BUSQUEDA. Antes eran los 25 mejores por puntos
+  // esperados mas los 25 mas explosivos, y como las dos listas se parecen, el
+  // arriesgado salia siendo el de siempre con dos cambios. Ahora entran tambien
+  // los que el ranking normal nunca va a mostrar: el que patea mucho aunque su
+  // equipo no espere goles, y el que genera xG y todavia no lo convirtio.
   const cand = {};
   for (const p in cupos) {
-    const a = [...porPos[p]].sort((x, y) => (y.j.EP || 0) - (x.j.EP || 0)).slice(0, 25);
-    const b = [...porPos[p]].sort((x, y) => criterio(y.j) - criterio(x.j)).slice(0, 25);
-    const set = new Map(); [...a, ...b].forEach(o => set.set(o.i, o)); cand[p] = [...set.values()];
+    const porEP  = [...porPos[p]].sort((x, y) => (y.j.EP || 0) - (x.j.EP || 0)).slice(0, 15);
+    const porCri = [...porPos[p]].sort((x, y) => criterio(y.j) - criterio(x.j)).slice(0, 30);
+    const porTiro= [...porPos[p]].sort((x, y) => (y.j._tiros90 || 0) - (x.j._tiros90 || 0)).slice(0, 20);
+    const porDeuda=[...porPos[p]].sort((x, y) => (y.j._deuda || 0) - (x.j._deuda || 0)).slice(0, 15);
+    const set = new Map(); [...porEP, ...porCri, ...porTiro, ...porDeuda].forEach(o => set.set(o.i, o));
+    cand[p] = [...set.values()];
   }
+  const enSeguro = idsSeguro instanceof Set ? idsSeguro : new Set();
+  const tope = maxComunes == null ? 99 : maxComunes;
+  const comunes = lista => lista.reduce((n, o) => n + (enSeguro.has(o.j.id) ? 1 : 0), 0);
   // Arranque. Se prueba desde dos lados —el once mas explosivo y el once que ya
   // recomienda el motor— porque la busqueda local se queda pegada en el primer
   // valle que encuentra. Sin esto el "arriesgado" podia salir peor que el de
@@ -229,7 +243,15 @@ function buscarOnce(sim, esquema, objetivo, presupuesto, criterio, arranque) {
   } else {
     for (const p in cupos) {
       const ord = [...cand[p]].sort((x, y) => criterio(y.j) - criterio(x.j));
-      for (let k = 0; k < cupos[p]; k++) if (ord[k]) once.push(ord[k]);
+      let puestos = 0;
+      for (const o of ord) {
+        if (puestos >= cupos[p]) break;
+        if (enSeguro.has(o.j.id) && comunes(once) >= tope) continue;
+        once.push(o); puestos++;
+      }
+      // si el cupo no se lleno por el tope, se completa con lo que haya
+      for (const o of ord) { if (puestos >= cupos[p]) break;
+        if (once.includes(o)) continue; once.push(o); puestos++; }
     }
   }
   const costo = o => o.reduce((a, x) => a + (x.j.precio || 0), 0);
@@ -259,9 +281,11 @@ function buscarOnce(sim, esquema, objetivo, presupuesto, criterio, arranque) {
       const viejo = once[k], usados = new Set(once.map(o => o.i));
       const offV = viejo.i * N;
       let mejorAlt = null, mejorNuevo = mejorC, mejorTot = null;
+      const comunesSinEste = comunes(once) - (enSeguro.has(viejo.j.id) ? 1 : 0);
       for (const alt of cand[viejo.j.pos]) {
         if (usados.has(alt.i)) continue;
         if (costo(once) - (viejo.j.precio || 0) + (alt.j.precio || 0) > presupuesto) continue;
+        if (enSeguro.has(alt.j.id) && comunesSinEste >= tope) continue;
         const offA = alt.i * N;
         for (let s = 0; s < N; s++) tmp[s] = tot[s] - M[offV + s] + M[offA + s];
         const c = cuantil(tmp, 0.995);
@@ -277,9 +301,45 @@ function armarArriesgado(rankings, opciones) {
   const o = opciones || {};
   const N = o.simulaciones || 50000;
   const presupuesto = o.presupuesto || 65000000;
-  const esquemas = o.esquemas || [[1,3,3,4],[1,3,4,3],[1,4,3,3],[1,3,5,2],[1,4,2,4],[1,4,4,2],[1,5,3,2]];
+  // LOS DIEZ ESQUEMAS, NO SIETE (03/09).
+  // Faltaban 1-4-5-1, 1-5-4-1 y 1-5-2-3, y no era un detalle: simulando los diez
+  // con los mejores de cada puesto, 1-4-5-1 es EL MEJOR para la cola —0.360% de
+  // chance de pasar los 120— contra 0.221% del 1-3-4-3 que venia eligiendo.
+  // O sea que la busqueda no podia encontrar el mejor once porque no estaba en
+  // la lista de esquemas que probaba.
+  //
+  // El patron, simulando 150.000 fechas, es la cantidad de VOLANTES y es
+  // monotono:  5 volantes -> 0.333% de media   |   4 volantes -> 0.235%
+  //            3 volantes -> 0.178%            |   2 volantes -> 0.153%
+  // La razon es del reglamento, no de esta fecha: el gol de volante paga 6 y
+  // ademas lo hace figura el 44% de las veces (4 puntos mas), o sea 7.77 en
+  // total. El del delantero paga 4 y lo hace figura el 24%: 4.95. El volante
+  // que la mete vale casi el doble que el delantero que la mete.
+  // Medido contra la realidad, un volante que convierte saca +10.54 sobre su
+  // base y un delantero +8.57.
+  const esquemas = o.esquemas || [[1,4,4,2],[1,4,3,3],[1,3,4,3],[1,4,5,1],[1,3,5,2],
+                                  [1,5,3,2],[1,3,3,4],[1,4,2,4],[1,5,2,3],[1,5,4,1]];
   const sim = simularFecha(rankings, N, o.seed);
-  const explosivo = j => (j.lamGol || 0) * (j.pJuega || 0);
+  // QUE ES "ARRIESGADO" (03/09). Antes el criterio era gol esperado x chance de
+  // jugar, que es casi lo mismo que los puntos esperados: por eso el once
+  // arriesgado salia igual al de siempre con dos cambios. Lo que hace explotar
+  // una fecha en Gran DT es el GOL —un defensor paga 9, un volante 6—, y el gol
+  // del que nadie espera. Asi que el criterio pasa a ser el gol POR 90 MINUTOS
+  // en la cancha, sin descontar la chance de jugar, mas dos cosas que el
+  // ranking normal castiga y que acá suman:
+  //   · el que patea mucho aunque el contexto no acompañe (equipo que no
+  //     espera goles): el volumen de tiro es suyo, el contexto es de hoy;
+  //   · el que genera xG y todavia no lo convirtio: le deben goles.
+  // Nada de esto dice que vaya a pasar. Dice que si pasa, paga mucho.
+  const por90 = j => Math.max(0.4, (j.minSiJuega || 60) / 90);
+  sim.jug.forEach(j => {
+    const i = j.individual || {};
+    const min = i.minutos || 0;
+    j._tiros90 = min > 90 ? (i.tiros || 0) / (min / 90) : 0;
+    j._deuda = min > 200 ? Math.max(0, (j.xgTorneo || 0) - ((i.goles || 0) - (i.golesPenal || 0))) : 0;
+    j._gol90 = (j.lamGol || 0) / por90(j);
+  });
+  const explosivo = j => (j._gol90 || 0) + 0.04 * (j._tiros90 || 0) + 0.05 * (j._deuda || 0);
 
   // Objetivo: si no lo fijan, se usa el percentil 99 del once conservador.
   let objetivo = o.objetivo;
@@ -299,20 +359,17 @@ function armarArriesgado(rankings, opciones) {
   if (refe) refe = evaluarOnce(sim, o.onceSeguro.map(j => sim.idx.get(j.id)).filter(i => i != null), objetivo);
 
   const idsSeguro = (o.onceSeguro || []).map(j => j.id);
+  // COMO MUCHO CUATRO REPETIDOS. El objetivo de esta pantalla es tener OTRA
+  // apuesta, no la misma con dos retoques: si los once salen casi iguales, el
+  // domingo los dos onces suben y bajan juntos y no sirvio de nada. Se permite
+  // compartir hasta cuatro nombres —los que son tan buenos que estan en
+  // cualquier once— y los otros siete tienen que ser distintos.
+  const setSeguro = new Set(idsSeguro);
+  const tope = o.maxComunes == null ? 4 : o.maxComunes;
   let mejor = null;
   for (const e of esquemas) {
-    for (const arranque of [null, idsSeguro]) {
-      const res = buscarOnce(sim, e, objetivo, presupuesto, explosivo, arranque);
-      if (!mejor || res.stats.p995 > mejor.stats.p995) mejor = { ...res, esquema: e.join('-') };
-    }
-  }
-  // Red de seguridad: si despues de todo el once de siempre tiene mas cola que
-  // el que encontro la busqueda, se devuelve ese y se avisa. Prometer riesgo y
-  // entregar algo peor en todas las metricas seria mentir.
-  if (refe && refe.p995 > mejor.stats.p995) {
-    mejor = { once: o.onceSeguro.slice(), stats: refe,
-              costo: o.onceSeguro.reduce((a, j) => a + (j.precio || 0), 0),
-              esquema: (o.esquemaSeguro || 'igual al de siempre'), esElMismo: true };
+    const res = buscarOnce(sim, e, objetivo, presupuesto, explosivo, null, setSeguro, tope);
+    if (!mejor || res.stats.p995 > mejor.stats.p995) mejor = { ...res, esquema: e.join('-') };
   }
   // EVALUACION FINAL FUERA DE MUESTRA. Los numeros que se muestran NO pueden
   // salir de las mismas simulaciones con las que se eligio el once: eso infla
@@ -331,9 +388,30 @@ function armarArriesgado(rankings, opciones) {
 
   // Capitan del arriesgado: el de mayor ficha, igual que siempre (duplica ficha).
   const cap = [...mejor.once].sort((a, b) => (b.ficha || 0) - (a.ficha || 0))[0];
-  return { objetivo, simulaciones: N * 3, esquema: mejor.esquema, once: mejor.once,
+  // POR QUE ESTA CADA UNO. Sin esto la pantalla es una lista de nombres raros y
+  // no hay forma de decidir si la apuesta te cierra o no.
+  const n1 = v => (v == null || isNaN(v)) ? '?' : Number(v).toFixed(1);
+  const motivo = j => {
+    const m = [];
+    if ((j._tiros90 || 0) >= 1.6) m.push(n1(j._tiros90) + ' tiros cada 90');
+    if ((j._deuda || 0) >= 0.8) m.push('le deben ' + n1(j._deuda) + ' goles');
+    if ((j.lam && j.lam.lamFor != null && j.lam.lamFor <= 1.05) && (j._tiros90 || 0) >= 1)
+      m.push('su equipo espera solo ' + n1(j.lam.lamFor) + ' goles: el volumen es suyo, el contexto no acompaña');
+    if ((j.pJuega || 0) < 0.6) m.push('juega ' + Math.round(100 * (j.pJuega || 0)) + '% de las veces: si arranca, paga');
+    if ((j.share || 0) >= 0.14 && (j.pos === 'VOL' || j.pos === 'DEL'))
+      m.push('se lleva el ' + Math.round(100 * j.share) + '% del gol de su equipo');
+    if ((j.pos === 'DEF' || j.pos === 'ARQ') && (j.pVI || 0) >= 0.3)
+      m.push(Math.round(100 * j.pVI) + '% de valla invicta, y si además la mete son ' + (j.pos === 'ARQ' ? 12 : 9) + ' puntos');
+    if (!m.length) m.push('gol esperado alto para su puesto: ' + n1(100 * (j.lamGol || 0)) + '% de chance de convertir');
+    return m;
+  };
+  const conMotivo = mejor.once.map(j => ({ ...j, porQue: motivo(j),
+    tiros90: +(j._tiros90 || 0).toFixed(2), deuda: +(j._deuda || 0).toFixed(2),
+    enElSeguro: setSeguro.has(j.id) }));
+  return { objetivo, simulaciones: N * 3, esquema: mejor.esquema, once: conMotivo,
            capitan: cap, costo: mejor.costo, dist: mejor.stats, conservador: refe,
-           esElMismo: !!mejor.esElMismo };
+           comunes: conMotivo.filter(j => j.enElSeguro).length,
+           esElMismo: false };
 }
 
 module.exports = { armarArriesgado, simularFecha, evaluarOnce, TABLA };

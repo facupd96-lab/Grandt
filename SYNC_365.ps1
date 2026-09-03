@@ -126,6 +126,26 @@ for ($siguiente = $idMaximo + 1; $siguiente -le $idMaximo + 60; $siguiente++) {
   [void]$listaIds.Add($siguiente)
 }
 
+# ── Y TAPAR LOS HUECOS DEL BLOQUE RECIENTE (03/09) ─────────────────────────
+# La lista sale de dos lados: lo que ya teniamos guardado y el calendario de
+# 365Scores, que es una VENTANA MOVIL. Un partido que el calendario no devolvio
+# el dia que corrimos el sync no entra nunca mas: no esta en el archivo, y el
+# calendario ya no lo trae. Asi perdimos cuatro partidos enteros del torneo
+# —Gimnasia LP-Barracas y Banfield-Belgrano de la 4, Racing-Banfield de la 5 y
+# Lanus-Argentinos de la 6— y con ellos los tiros y el xG de todos los que
+# jugaron. Sergio Ojeda quedaba con un gol y CERO tiros, que es imposible.
+# 365Scores tenia los datos: el que no los pedia era este script.
+# Los gameIds de un torneo son casi consecutivos, asi que se rellena el bloque
+# reciente entero. Los que ya estaban no se prueban dos veces (es un HashSet) y
+# los que no existen se descartan solos, asi que el costo son unos pocos ids.
+$desdeHueco = $idMaximo - 400
+$antesDeTapar = $listaIds.Count
+for ($hueco = $desdeHueco; $hueco -le $idMaximo; $hueco++) { [void]$listaIds.Add($hueco) }
+$tapados = $listaIds.Count - $antesDeTapar
+if ($tapados -gt 0) {
+  Write-Host ("   {0} gameIds que faltaban en el medio del bloque reciente: se agregan" -f $tapados) -ForegroundColor Yellow
+}
+
 $idsOrdenados = $listaIds | Sort-Object
 Write-Host ("   {0} gameIds a probar (esto tarda unos minutos)" -f @($idsOrdenados).Count)
 Write-Host ""
@@ -261,6 +281,34 @@ foreach ($idPartido in $idsOrdenados) {
       $nuevaFila | Add-Member NoteProperty esLocal      $lado.esLocal
       $nuevaFila | Add-Member NoteProperty rival        $lado.rival
       $nuevaFila | Add-Member NoteProperty minutos      $minutos
+      # TITULAR O SUPLENTE, DICHO POR 365SCORES (03/09).
+      # El campo status del miembro vale 1 = Starting, 2 = Substitute,
+      # 3 = Missing, 4 = Management. Hasta hoy no lo guardabamos y la unica
+      # forma de adivinarlo era "jugo 60 minutos o mas", que se equivoca con el
+      # titular al que sacan a los 55 y con el suplente que entra en el
+      # entretiempo. Lo que importa para armar el equipo es cuantos minutos
+      # juega CUANDO ARRANCA, no el promedio mezclado con los ratos de suplente.
+      $estadoEnCancha = 0
+      try { if ($null -ne $miembro.status) { $estadoEnCancha = [int]$miembro.status } } catch { }
+      $nuevaFila | Add-Member NoteProperty titular      ($estadoEnCancha -eq 1)
+      $nuevaFila | Add-Member NoteProperty estadoCancha $estadoEnCancha
+      # LA NOTA DEL PARTIDO, QUE 365SCORES SI PUBLICA (03/09).
+      # Campo "ranking" del miembro: 6.5, 8.7, etc. No lo estabamos guardando.
+      # Sirve para el termino que hoy no podemos auditar: la ficha explica entre
+      # el 32% y el 37% de lo que separa a un jugador de otro en los cuatro
+      # rankings, y es el unico grande sin forma de verificarlo.
+      # PRECISION (corregido el mismo dia): la planilla de Planeta SI trae el
+      # puntaje de Gran DT fecha por fecha, en el campo "puntajes" — con eso se
+      # puede backtestear el modelo entero, y de hecho ya se hace. Lo que NO
+      # trae es la FICHA sola de cada fecha: el puntaje ya viene con los goles,
+      # las tarjetas y la valla adentro, y de esos solo tenemos los totales del
+      # torneo, asi que no se puede despejar. Por eso hace falta esta nota.
+      # OJO: la nota de 365 NO es la ficha de Clarin. Son dos proveedores
+      # distintos y no tienen por que coincidir. Se guarda aparte, no reemplaza
+      # nada, y hasta no medir cuanto correlacionan no entra en ningun calculo.
+      $notaPartido = $null
+      try { if ($null -ne $miembro.ranking) { $notaPartido = [double]$miembro.ranking } } catch { }
+      $nuevaFila | Add-Member NoteProperty nota         $notaPartido
       $nuevaFila | Add-Member NoteProperty goles        $goles
       $nuevaFila | Add-Member NoteProperty asistencias  $asist
       $nuevaFila | Add-Member NoteProperty tiros        $tiros
@@ -492,6 +540,8 @@ foreach ($fila in $filasJugador) {
   $entradaLog | Add-Member NoteProperty vs     $fila.rival
   $entradaLog | Add-Member NoteProperty local  $fila.esLocal
   $entradaLog | Add-Member NoteProperty min    $fila.minutos
+  $entradaLog | Add-Member NoteProperty tit    $fila.titular
+  $entradaLog | Add-Member NoteProperty nota   $fila.nota
   $entradaLog | Add-Member NoteProperty tiros  $fila.tiros
   $entradaLog | Add-Member NoteProperty xg     (Redondear2 $fila.xg)
   $entradaLog | Add-Member NoteProperty goles  $fila.goles
@@ -508,8 +558,15 @@ foreach ($clave in @($acumJugadores.Keys)) {
   $registro.tirosPorPartido       = Redondear2 ($registro.tiros / $cantidad)
   $registro.tirosAlArcoPorPartido = Redondear2 ($registro.tirosAlArco / $cantidad)
   $registro.xgPorPartido          = Redondear3 ($registro.xg / $cantidad)
-  $titulares = 0
-  foreach ($entrada in $registro.log) { if ($entrada.min -ge 60) { $titulares++ } }
+  # Titularidad de verdad: cuantas veces ARRANCO, no cuantas veces jugo 60
+  # minutos. Si por lo que sea no vino el dato, se cae al criterio viejo.
+  $titulares = 0; $conDato = 0
+  foreach ($entrada in $registro.log) {
+    if ($null -ne $entrada.tit) { $conDato++; if ($entrada.tit) { $titulares++ } }
+  }
+  if ($conDato -eq 0) {
+    foreach ($entrada in $registro.log) { if ($entrada.min -ge 60) { $titulares++ } }
+  }
   $registro.titularidad = Redondear2 ($titulares / $cantidad)
   $registro.faltasPorPartido = Redondear2 ($registro.faltas / $cantidad)
   $registro.xgEvitado = Redondear2 $registro.xgEvitado
@@ -634,10 +691,15 @@ Write-Host ""
 $soloTarjetas = @($filasTarjeta | Where-Object { $_.tipo -ne 'gol' }).Count
 $soloGoles    = @($filasTarjeta | Where-Object { $_.tipo -eq 'gol' }).Count
 Write-Host ("   tarjetas leidas: {0}  ({1} jugadores)  ·  goles con minuto: {2}" -f $soloTarjetas, $acumTarjetas.Count, $soloGoles) -ForegroundColor White
-Write-Host ("   a una amarilla de la suspension: {0}" -f $aUnaDeLaSuspension.Count) -ForegroundColor Yellow
-foreach ($x in $aUnaDeLaSuspension) { Write-Host ("      {0,-26} {1,-22} {2} amarillas" -f $x.nombre, $x.equipo, $x.amarillas) -ForegroundColor DarkYellow }
-Write-Host ("   expulsados en la fecha {0}: {1}" -f $ultimaFechaVista, $suspendidos.Count) -ForegroundColor Red
-foreach ($x in $suspendidos) { Write-Host ("      {0,-26} {1,-22} roja en la fecha {2}" -f $x.nombre, $x.equipo, $x.fechaUltimaRoja) -ForegroundColor DarkYellow }
+# ESTE CONTEO NO ES EL QUE USA LA APP, Y HAY QUE DECIRLO.
+# 365Scores suma las tarjetas de todas las competencias (copas incluidas) y este
+# archivo guarda los dos torneos juntos, asi que aca salen numeros altos y fechas
+# con la numeracion vieja. La app calcula las amarillas con la planilla de Gran DT
+# y las rojas separando el torneo actual. Se deja el conteo como referencia, sin
+# la lista larga que antes hacia pensar que habia 60 jugadores al borde.
+Write-Host ("   [referencia 365Scores, todas las competencias y los dos torneos]") -ForegroundColor DarkGray
+Write-Host ("      a 4 amarillas: {0}  ·  con roja en la fecha {1} del archivo: {2}" -f $aUnaDeLaSuspension.Count, $ultimaFechaVista, $suspendidos.Count) -ForegroundColor DarkGray
+Write-Host ("      lo que vale para el juego lo calcula el motor: planilla de Gran DT para las amarillas, torneo actual para las rojas.") -ForegroundColor DarkGray
 
 $resultado = [ordered]@{
   generado      = (Get-Date).ToString('o')
@@ -722,8 +784,13 @@ if ($cantEquipos -gt 0) {
 }
 Write-Host ""
 
-Write-Host "   Top 10 en tiros por partido:" -ForegroundColor Cyan
-$mejores = $acumJugadores.Values | Sort-Object -Property tirosPorPartido -Descending | Select-Object -First 10
+Write-Host "   Top 10 en tiros por partido (archivo completo, los dos torneos juntos):" -ForegroundColor Cyan
+# Sin los jugadores que 365Scores devolvio sin nombre (id_xxxx) y pidiendo un
+# minimo de partidos, para que el top no lo encabece alguien con 1 PJ. Ojo: estos
+# totales son del archivo entero, que trae los dos torneos; el motor los separa.
+$mejores = $acumJugadores.Values |
+  Where-Object { $_.nombre -notlike 'id_*' -and [int]$_.partidos -ge 3 } |
+  Sort-Object -Property tirosPorPartido -Descending | Select-Object -First 10
 $puesto = 1
 foreach ($jugador in $mejores) {
   Write-Host ("   {0,2}. {1,-26} {2,-20} {3} tiros/p  ·  {4} xG/p  ·  {5} PJ" -f $puesto, $jugador.nombre, $jugador.equipo, $jugador.tirosPorPartido, $jugador.xgPorPartido, $jugador.partidos)

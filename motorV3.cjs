@@ -328,7 +328,20 @@ function amenazaIndividual(p) {
   const min365 = num(p.minutes365);
   const nov = Math.max(180 / 90, min365 / 90, 0.8 * pjPgt);
   const xg90 = xg / nov, tiros90 = tiros / nov, gol90 = golJugada / nov;
-  const hayXg = xg > 0 || tiros > 0;
+  // "CERO TIROS" NO ES LO MISMO QUE "NO SABEMOS" (03/09).
+  // Esta bandera decide si se usa la tasa medida o el prior del puesto, y estaba
+  // escrita como "tiene algun tiro o algun xG". Eso mete en la misma bolsa dos
+  // cosas opuestas: al que no cruzo con 365Scores (no tenemos NADA) y al que
+  // cruzo y pateo CERO veces en 483 minutos, que es una medicion durisima.
+  // Sergio Ojeda caia en la segunda: 6 partidos con 0 tiros, pero como la
+  // bandera decia "no hay dato", el motor le daba el prior de defensor mas su
+  // unico gol y lo dejaba con el 22.9% del ataque de su equipo y segundo entre
+  // los defensores. Un defensor que en 483 minutos no pateo una sola vez no se
+  // lleva un cuarto del ataque de nadie.
+  // La pregunta correcta es si TENEMOS datos, y eso son los minutos cruzados.
+  // El comentario de arriba ya decia esto ("si el jugador NO cruza con
+  // 365Scores, minutes365 es 0"); el codigo no lo implementaba.
+  const hayXg = min365 > 0;
   // Continuo y monótono en tiros y xG. Sin umbrales, sin cubetas: 5 tiros da
   // más que 4 y menos que 8, siempre.
   //
@@ -358,8 +371,53 @@ function amenazaIndividual(p) {
   // por eso el techo 0.70; (2) el piso NO es cero — aun con 2 partidos se cumple
   // el 30%, por eso el piso 0.28 y no min/900 a secas, que daba 0.10 a los 90
   // minutos y borraba del mapa a cualquier refuerzo recien llegado.
-  const conf = hayXg ? clamp(min365 / 900, 0.28, 0.70) : Math.min(0.55, pjPgt / 4);
-  return { bruto: Math.max(0, bruto), conf, hayXg, xg90, tiros90, gol90,
+  // LA CONFIANZA SE MIDE EN REMATES, NO EN MINUTOS (03/09).
+  //
+  // Sergio Ojeda tenia UN tiro en 573 minutos, de 0.9 de xG (un cabezazo solo
+  // adentro del area, que metio). Eso son 0.14 de xG/90, un ritmo altisimo para
+  // un defensor, y el modelo le creia el 64% porque la confianza salia de los
+  // minutos. Le daba el 26.5% del ataque de su equipo — la mayor cuota de gol
+  // de TODOS los defensores de la liga — construida sobre un solo remate.
+  //
+  // El error conceptual: el xG no es un conteo, es una suma de valores por
+  // remate con muchisima varianza. Un tiro de 0.9 es un caso extremo. El tamaño
+  // de muestra que corresponde no son los minutos: son los REMATES.
+  //
+  // Medido sobre 3959 cortes reales de los dos torneos (estimar con los primeros
+  // partidos, medir los goles de los que vienen). "b" es cuanto del xG/90 medido
+  // se cumple despues:
+  //     tiros vistos    b        minutos jugados    b
+  //       0-1        0.174          90-270       0.461
+  //       2-3        0.452         271-540       0.653
+  //       4-6        0.448         541-900       0.645
+  //       7-11       0.564         901-1400      0.402
+  //      12-19       0.609
+  //       20+        0.566
+  // Los remates ordenan, los minutos no ordenan nada (hasta baja al final).
+  //
+  // El caso Ojeda, aislado: 51 jugadores con 0 o 1 tiro visto y xG/90 mayor a
+  // 0.10 mostraban 0.227 de xG/90 y despues hicieron 0.074 goles/90 — POR DEBAJO
+  // del promedio de la liga (0.088). Con 7 tiros o mas y el mismo xG/90 alto:
+  // mostraban 0.285 e hicieron 0.209, casi el triple. Un ritmo alto armado con
+  // un solo remate vale menos que no saber nada.
+  //
+  // PERO EL CERO MEDIDO ES OTRA COSA. 274 casos con CERO tiros y 450 minutos o
+  // mas despues hicieron 0.004 goles/90: practicamente ninguno. Ahi la muestra
+  // SI es informativa, y son los minutos los que la miden. Si la confianza
+  // saliera solo de los remates, el que no patea nunca volveria al prior del
+  // puesto, o sea que le subiriamos la cuota por no patear.
+  //
+  // Por eso es asimetrica, y se elige afuera (en sharesDeEquipo) segun si el
+  // jugador esta por ENCIMA o por DEBAJO del prior de su puesto:
+  //   arriba del prior -> hay que probarlo con remates
+  //   abajo del prior  -> alcanza con haber jugado para creerle
+  // Medido, la asimetrica gana en las dos puntas: la mejor 5% del ranking hace
+  // 0.307 goles/90 (contra 0.283 con minutos) y la peor 10% hace 0.014 (contra
+  // 0.026 si la confianza fuera solo de remates).
+  const confTiros = 0.65 * tiros / (tiros + 1.6);   // ajustado a la tabla de arriba
+  const confMin   = clamp(min365 / 900, 0.28, 0.70);
+  const conf = hayXg ? confMin : Math.min(0.55, pjPgt / 4);   // compatibilidad
+  return { bruto: Math.max(0, bruto), conf, confTiros, confMin, hayXg, xg90, tiros90, gol90,
            tirosTorneo: tiros, xgTorneo: round2(xg) };
 }
 
@@ -367,12 +425,29 @@ function sharesDeEquipo(jugadores, partidosEquipo, rotacion) {
   const info = jugadores.map(p => ({ p, a: amenazaIndividual(p),
                                      mp: perfilMinutos(p, partidosEquipo, rotacion) }));
   const sPrior = info.reduce((s, x) => s + PRIOR_SHARE[x.p.position], 0) || 1;
-  const sBruto = info.reduce((s, x) => s + x.a.bruto * x.a.conf, 0);
+
+  // CONFIANZA ASIMETRICA (03/09). Ver la explicacion larga en amenazaIndividual.
+  // Primero se mira, sin ninguna confianza de por medio, si el jugador pinta por
+  // encima o por debajo del prior de su puesto. El que pinta ARRIBA tiene que
+  // probarlo con remates; al que pinta ABAJO le alcanza con haber jugado.
+  const sBrutoCrudo = info.reduce((s, x) => s + x.a.bruto, 0);
+  info.forEach(x => {
+    if (!x.a.hayXg) { x.conf = x.a.conf; return; }        // sin datos de 365: como antes
+    const priorRel = PRIOR_SHARE[x.p.position] / sPrior;
+    const crudoRel = sBrutoCrudo > 0 ? x.a.bruto / sBrutoCrudo : priorRel;
+    x.conf = crudoRel > priorRel ? x.a.confTiros : x.a.confMin;
+    x.a.confUsada = x.conf;
+    x.a.porQueConf = crudoRel > priorRel
+      ? `pinta arriba del promedio de su puesto: la confianza sale de sus ${x.a.tirosTorneo} remates`
+      : `pinta abajo del promedio de su puesto: la confianza sale de sus minutos`;
+  });
+
+  const sBruto = info.reduce((s, x) => s + x.a.bruto * x.conf, 0);
   const out = {};
   info.forEach(x => {
     const prior = PRIOR_SHARE[x.p.position] / sPrior;
-    const medido = sBruto > 0 ? (x.a.bruto * x.a.conf) / sBruto : prior;
-    out[key(x.p)] = { share: x.a.conf * medido + (1 - x.a.conf) * prior,
+    const medido = sBruto > 0 ? (x.a.bruto * x.conf) / sBruto : prior;
+    out[key(x.p)] = { share: x.conf * medido + (1 - x.conf) * prior,
                       amenaza: x.a, mp: x.mp };
   });
   // CONSERVACION DE GOLES (arreglado 26/08).
@@ -461,6 +536,177 @@ function minutosSiJuega(minEst) {
   return clamp(51.7 + 0.432 * minEst, 25, 90);
 }
 
+// MINUTOS CUANDO EFECTIVAMENTE JUEGA, LEIDOS DE SU LOG (03/09).
+// La recta de arriba estima los minutos "si entra" a partir del promedio que
+// INCLUYE las fechas que se perdio, y por eso achataba a los titulares fijos:
+// Franco Vazquez tiene log [0,0,90,90,90,0,90] —cuando juega, juega los 90 —
+// y le daba 76. La pregunta que importa no es "cuanto juega en promedio" sino
+// "si hoy es titular, cuanto aguanta", y eso esta en los partidos que jugo.
+// Se usa la mediana de los partidos con minutos, con mas peso a los ultimos.
+// Si jugo menos de dos partidos no hay de donde leerlo y se cae a la recta.
+// SOLO LOS PARTIDOS EN LOS QUE ARRANCO (03/09).
+// La pregunta que importa no es "cuanto juega en promedio" sino "si hoy es
+// titular, cuanto aguanta". Mezclar los ratos de suplente arruina la cuenta:
+// un titular fijo al que un domingo le dieron 15 minutos entrando queda con
+// menos minutos de los que juega de verdad. Asi que los partidos de suplente
+// NO entran. 365Scores dice quien arranco (status 1 = Starting) y eso viene en
+// el log como `tit`; si todavia no esta —hay que correr SYNC_365 una vez para
+// que aparezca— se usa el criterio viejo de 60 minutos, que le pega casi
+// siempre. Si nunca fue titular, ahi si se mira lo que jugo entrando.
+// PESO DE LA MEMORIA PARA ESTA CUENTA (03/09, medido).
+// MIN_DECAY vale 0.60 y esta calibrado para OTRA pregunta: cuantos minutos
+// promedia un jugador contando las fechas que se perdio. Para "cuanto aguanta
+// cuando arranca" ese olvido es demasiado rapido: el ultimo partido pesa 1 y el
+// anterior 0.6, asi que la mediana salta a lo que haya pasado el domingo. Con
+// eso Miljevic, que arrancó 82, 73, 72 y 90, daba 90 — un solo partido mandaba.
+// Medido sobre las 2993 veces que alguien arrancó en el torneo anterior,
+// prediciendo el partido siguiente con lo que se sabia antes:
+//     mediana 0.85 ... 4.50 minutos de error   <-- este
+//     mediana 0.90 ... 4.50
+//     mediana 0.80 ... 4.53
+//     mediana 0.60 ... 4.69   (el que teniamos)
+//     siempre 90 ..... 4.87
+//     el ultimo ...... 5.14   (el peor de todos)
+//
+// SEGUNDA MEDICION (03/09, con el dato REAL de quien arranco).
+// SYNC_365 ahora guarda el flag "tit" de 365Scores, asi que ya no hay que
+// adivinar quien fue titular por haber jugado 60 minutos o mas. Con eso se
+// rehizo la medicion sobre 5615 predicciones reales (6673 arranques de los dos
+// torneos), prediciendo cada arranque con los anteriores del mismo jugador:
+//
+//   regla                                  error   1 previo  2 previos  3  4+
+//   HIBRIDO (el de abajo) ................ 7.86     10.17     9.06    8.10  6.58
+//   mediana pond. sin arranques <25' ..... 7.99     10.17     9.87    8.10  6.58
+//   mediana pond. 0.85 ................... 8.02     10.17    10.07    8.10  6.58
+//   media simple ......................... 8.31     10.17     9.20    8.40  7.33
+//   mediana simple ....................... 8.36     10.17    11.58    8.10  6.77
+//   siempre 90 ........................... 8.81     11.30    10.26    9.44  7.28
+//   el ultimo arranque ................... 9.00     10.17    10.07    9.55  8.10
+//
+// Dos cosas que la primera medicion no podia ver:
+//
+// 1) CON DOS ARRANQUES LA MEDIANA PONDERADA ES UNA TRAMPA. Con dos valores y
+//    decay 0.85 el ultimo se lleva el 54% del peso, o sea que la mediana ES el
+//    ultimo partido — el criterio que mide PEOR de todos. Ahi conviene el
+//    promedio de los dos (9.06 contra 10.07). De tres arranques en adelante la
+//    mediana vuelve a ganar y por lejos (6.58 contra 7.33 con 4 o mas).
+//
+// 2) UN ARRANQUE CORTADO A LOS 16' NO ES EL PLAN DEL DT, ES UNA LESION O UNA
+//    ROJA. Tomarlo como "esto es lo que juega" es leer mal el partido. Sacando
+//    los arranques de menos de 25 minutos el error baja parejo.
+//
+// El decay en si casi no mueve la aguja (0.85, 0.90 y 0.95 dan lo mismo a dos
+// decimales): lo que importaba era el caso de dos arranques y los cortados.
+const DECAY_TITULAR = 0.85;
+const ARRANQUE_CORTADO = 25;   // menos que esto: lesion o roja, no plan del DT
+
+function minutosCuandoJuega(p, minEst) {
+  const log = Array.isArray(p.minutosLog) ? p.minutosLog : null;
+  if (!log || !log.length) return minutosSiJuega(minEst);
+  const det = Array.isArray(p.logDetalle) ? p.logDetalle : null;
+  const hayFlag = det && det.some(e => e && e.tit != null);
+  const arranco = (i) => {
+    const m = num(log[i]) || 0;
+    if (m <= 0) return false;
+    if (hayFlag && det[i] && det[i].tit != null) return !!det[i].tit;
+    return m >= 60;   // sin el dato: el que juega 60 o mas casi seguro arranco
+  };
+  const comoTitular = [], jugados = [];
+  for (let i = 0; i < log.length; i++) {
+    const m = num(log[i]) || 0;
+    if (m <= 0) continue;
+    const w = Math.pow(DECAY_TITULAR, log.length - 1 - i);
+    jugados.push({ m, w });
+    if (arranco(i)) comoTitular.push({ m, w });
+  }
+  // QUE MUESTRA SE USA.
+  // Si arrancó alguna vez, se miran SOLO sus arranques: los ratos de suplente
+  // no contestan "cuanto juega cuando arranca". Antes, con un solo partido de
+  // titular se caia a la mediana de TODOS sus partidos y mandaban las entradas
+  // cortas: Lucas Alario arrancó una vez y jugó los 90, y el numero salia 20
+  // porque tenia entradas de 15 y 22 minutos.
+  // Si nunca arrancó, lo unico que hay son sus entradas desde el banco, y eso
+  // SI contesta la pregunta para el: cuanto juega cuando entra.
+  const esTitular = comoTitular.length >= 1;
+  let usar = esTitular ? comoTitular : jugados;
+  if (usar.length === 0) return minutosSiJuega(minEst);
+
+  // ARRANQUES CORTADOS. Un titular que sale a los 16' se lesionó o lo echaron;
+  // no es lo que el DT tenia pensado. Se sacan del calculo, salvo que sean
+  // todos los que hay. A los suplentes no se les aplica: entrar 15 minutos es
+  // exactamente su trabajo, no un accidente.
+  if (esTitular) {
+    const enteros = usar.filter(x => x.m >= ARRANQUE_CORTADO);
+    if (enteros.length) usar = enteros;
+  }
+
+  if (usar.length === 1) return clamp(usar[0].m, 20, 90);
+  // CON DOS, EL PROMEDIO. La mediana ponderada de dos valores es el ultimo, y
+  // el ultimo es el peor predictor que hay (medido). Ver la tabla de arriba.
+  if (usar.length === 2) return clamp(Math.round((usar[0].m + usar[1].m) / 2), 20, 90);
+  // CON TRES O MAS, LA MEDIANA PONDERADA: aguanta un partido suelto raro sin
+  // mover el numero, y le gana al promedio con margen.
+  const orden = usar.slice().sort((a, b) => a.m - b.m);
+  const total = orden.reduce((s, x) => s + x.w, 0);
+  let acum = 0, mediana = orden[orden.length - 1].m;
+  for (const x of orden) { acum += x.w; if (acum >= total / 2) { mediana = x.m; break; } }
+  return clamp(mediana, 20, 90);
+}
+
+// EL PERFIL DE MINUTOS (03/09).
+// Un solo numero no contesta la pregunta que uno se hace al poner un delantero:
+// "este tipo termina los partidos o lo sacan a los 65?". Dos jugadores con
+// mediana 75 pueden ser cosas distintas: uno que juega 90-90-45 y otro que
+// juega 75-75-75. Asi que se guarda el reparto completo y los ultimos que jugo,
+// y la app muestra los numeros de verdad en vez de un promedio.
+//   completa  = 88 o mas (termino el partido)
+//   largo     = 75 a 87  (lo sacan sobre el final)
+//   medio     = 60 a 74  (lo sacan en el ultimo cuarto: pierde media hora de gol)
+//   corto     = menos de 60
+function perfilDeMinutos(p) {
+  const mins = partidosDeTitular(p);
+  const log = Array.isArray(p.minutosLog) ? p.minutosLog : [];
+  const entrando = [];
+  const det = Array.isArray(p.logDetalle) ? p.logDetalle : null;
+  const hayFlag = det && det.some(e => e && e.tit != null);
+  for (let i = 0; i < log.length; i++) {
+    const m = num(log[i]) || 0; if (m <= 0) continue;
+    const tit = (hayFlag && det[i] && det[i].tit != null) ? !!det[i].tit : m >= 60;
+    if (!tit) entrando.push(m);
+  }
+  const cuenta = (lo, hi) => mins.filter(m => m >= lo && m <= hi).length;
+  return {
+    arranques: mins.length,
+    completa: cuenta(88, 90), largo: cuenta(75, 87), medio: cuenta(60, 74), corto: cuenta(0, 59),
+    // los ultimos tres que arranco, del mas viejo al mas nuevo
+    ultimos: mins.slice(-3),
+    todos: mins,
+    entrando: entrando,
+    // arranques que se cortaron muy temprano (lesion o roja). NO entran en el
+    // numero de "si arranca, juega X" pero se muestran igual, para que no
+    // parezca que el numero ignora un partido que esta a la vista.
+    cortados: mins.filter(m => m < ARRANQUE_CORTADO),
+    pctCompleta: mins.length ? +(cuenta(88, 90) / mins.length).toFixed(2) : null,
+    fuente: hayFlag ? '365Scores dice quien arranco' : 'sin el dato de titular: se toma jugo 60 o mas'
+  };
+}
+
+// Cuantas veces arranco y cuanto jugo esas veces: es lo que se muestra al lado
+// del numero para que se pueda ver de donde sale.
+function partidosDeTitular(p) {
+  const log = Array.isArray(p.minutosLog) ? p.minutosLog : [];
+  const det = Array.isArray(p.logDetalle) ? p.logDetalle : null;
+  const hayFlag = det && det.some(e => e && e.tit != null);
+  const out = [];
+  for (let i = 0; i < log.length; i++) {
+    const m = num(log[i]) || 0;
+    if (m <= 0) continue;
+    const tit = (hayFlag && det[i] && det[i].tit != null) ? !!det[i].tit : m >= 60;
+    if (tit) out.push(m);
+  }
+  return out;
+}
+
 // La rotación por copas no elimina a nadie: reparte minutos. Achata al plantel
 // hacia el medio —el titular baja, el suplente sube—. El 0.45 sigue siendo un
 // supuesto sin calibrar; queda anotado.
@@ -488,7 +734,7 @@ function perfilMinutos(p, partidosDelEquipo, rotacion) {
   //                           minutos en promedio.
   //   confirmado === null  -> todavia no publicaron nada. Se estima como siempre.
   if (p.confirmado === true) {
-    const siJuega = clamp(Math.max(minutosSiJuega(minEst), 0.85 * Math.max(minEst, 60)), 55, 90);
+    const siJuega = clamp(Math.max(minutosCuandoJuega(p, minEst), 0.85 * Math.max(minEst, 60)), 55, 90);
     return { minEst: minEst, pFicha: 0.97, minSiJuega: siJuega,
              minEsperados: 0.97 * siJuega, fuente: 'once confirmado' };
   }
@@ -498,7 +744,7 @@ function perfilMinutos(p, partidosDelEquipo, rotacion) {
   }
 
   const pFicha = probFicha(minEst);
-  const siJuega = minutosSiJuega(minEst);
+  const siJuega = minutosCuandoJuega(p, minEst);
   return { minEst: minEst, pFicha: pFicha, minSiJuega: siJuega,
            minEsperados: pFicha * siJuega, fuente: 'estimado' };
 }
@@ -536,24 +782,69 @@ function evaluar(p, ctx, eq) {
   const lamJug = Math.max(0, lamGol - lamPen);
   const EP_gol = lamJug * valJugada + lamPen * valPenal;
 
-  const EP_vi = (RG.vallaInvicta[pos] || 0) * lam.pVI;
+  // VALLA INVICTA: CUENTA SU TIEMPO EN CANCHA, NO EL PARTIDO ENTERO (03/09).
+  // Regla del juego, confirmada por facu: el que juega mas de 20 minutos cobra
+  // la valla si NO le hicieron gol MIENTRAS ESTUVO EN LA CANCHA. Si sale a los
+  // 60 con el 0 a 0 y el equipo recibe a los 80, la cobra igual.
+  // Antes se usaba la chance de que el equipo terminara el partido sin recibir,
+  // que es lo mismo solo para el que juega los 90. Al que lo sacan lo
+  // castigaba dos veces: le bajaba el gol (bien, el gol si escala con los
+  // minutos) y ademas le bajaba la valla (mal).
+  // Los goles llegan parejo a lo largo del partido, asi que la chance de que no
+  // le hagan ninguno en sus primeros t minutos es exp(-lamAgainst x t/90).
+  // Para el que juega 90 no cambia nada; al que sale a los 65 le sube.
+  const fracVI = clamp((mp.minSiJuega || 90) / 90, 0.25, 1);
+  const pVIsuya = Math.exp(-Math.max(0.05, lam.lamAgainst) * fracVI);
+  const EP_vi = (RG.vallaInvicta[pos] || 0) * pVIsuya;
   const EP_gc = pos === 'ARQ' ? RG.golRecibidoARQ * lam.lamAgainst : 0;
 
   const pFig = figuras[key(p)] ?? 0.02;
   const EP_fig = RG.figura * pFig;
 
-  // Tarjetas con shrinkage: 1 amarilla en 4 partidos NO es "25% de tasa".
+  // TARJETAS. Con shrinkage, porque 1 amarilla en 4 partidos NO es "25% de tasa".
+  //
+  // EL PSEUDO-CONTEO ERA 4 Y ESTABA MAL (03/09, medido).
+  // Sobre 5525 cortes reales de los dos torneos (estimar la tasa con los
+  // primeros partidos, medir las amarillas de los que vienen):
+  //     k=0 (creerle todo) .......... 0.2512 de error
+  //     k=4  (el que teniamos) ...... 0.2015
+  //     k=8 ......................... 0.1940
+  //     k=10 (este) ................. ~0.193
+  //     k=12 ........................ 0.1918   <- el fondo de la curva
+  //     k=20 ........................ 0.1907
+  //     solo el prior, sin mirar al jugador .. 0.1934
+  //
+  // Lo importante de esa tabla no es cual gana: es que IGNORAR AL JUGADOR
+  // (0.1934) le ganaba a lo que teniamos (0.2015). O sea que con k=4 el
+  // historial de amarillas metia mas ruido que señal, y las tarjetas explican
+  // el 17-21% de lo que separa a un jugador de otro en el ranking. Un quinto
+  // del orden salia de ahi.
+  //
+  // Señal hay, pero mucha menos de la que suponiamos: con la tasa bien encogida,
+  // el 20% mas tarjetero saca despues 0.210 amarillas por partido y el 20% menos
+  // tarjetero 0.115, contra un promedio de 0.168. Es una diferencia real de
+  // medio punto de Gran DT por partido entre los extremos, no de dos.
+  //
+  // Se toma 10, en la parte plana de la curva y del lado conservador: entre 8 y
+  // 20 el error casi no se mueve, asi que no vale la pena afinar mas con 7
+  // fechas de torneo encima.
+  const K_TARJ = 10;
   const prTA = { ARQ: .10, DEF: .28, VOL: .26, DEL: .18 }[pos] ?? .22;
   const prTR = { ARQ: .008, DEF: .020, VOL: .014, DEL: .010 }[pos] ?? .014;
-  const tasaTA = (num(p.yellowCards) + prTA * 4) / (pj + 4);
-  const tasaTR = (num(p.redCards) + prTR * 4) / (pj + 4);
+  const tasaTA = (num(p.yellowCards) + prTA * K_TARJ) / (pj + K_TARJ);
+  const tasaTR = (num(p.redCards) + prTR * K_TARJ) / (pj + K_TARJ);
+  // NO se escala por minutos, a proposito: la tasa ya sale de SUS partidos, y
+  // si el tipo suele salir a los 65 eso ya esta adentro de su propio historial.
+  // Multiplicarla otra vez por los minutos seria contar dos veces lo mismo.
   const EP_tarj = RG.amarilla * tasaTA + RG.roja * tasaTR;
 
-  // EP SI ENTRA. La valla invicta NO se escala por minutos: el reglamento pide
-  // 20 minutos y que el equipo termine el partido sin recibir goles, no jugarlo
-  // entero. La ficha tampoco: medido, un delantero que entra 30' saca 5.35 de
+  // EP SI ENTRA. La valla SI se escala por minutos desde el 03/09: el reglamento
+  // pide 20 minutos y que no le hagan gol MIENTRAS ESTA EN LA CANCHA, no que el
+  // equipo termine el partido sin recibir. La ficha no se escala: medido, un delantero que entra 30' saca 5.35 de
   // ficha-mas-incidencias y uno que juega 85' saca 6.86 — la diferencia esta en
-  // el gol, no en la nota. Lo que si escala es gol, figura y tarjetas.
+  // el gol, no en la nota. Lo que SI escala por minutos es el gol (directo, via
+  // lamGol) y la figura (indirecto: sale de lamGol). Las tarjetas NO — el
+  // comentario decia que si y era falso (03/09): ver la razon donde se calculan.
   const EPsiJuega = f.ficha + EP_gol + EP_vi + EP_gc + EP_fig + EP_tarj;
 
   // EP DE LA FECHA. Pondera por la chance de llegar a los 20' que exige la
@@ -581,6 +872,9 @@ function evaluar(p, ctx, eq) {
     minEstimados: Math.round(mp.minEst),
     fuenteMinutos: mp.fuente || 'estimado',
     minutosLog: Array.isArray(p.minutosLog) ? p.minutosLog.slice() : null,
+    // los minutos de los partidos en los que ARRANCO, que es lo que se muestra
+    minutosDeTitular: partidosDeTitular(p),
+    perfilMin: perfilDeMinutos(p),
     pJuega: round2(pj_),
     rotacion: round2(num(ctx.rotacion)),
     rotacionRival: round2(num(ctx.rotacionRival)),
@@ -594,7 +888,7 @@ function evaluar(p, ctx, eq) {
     techo: round2(f.ficha + EP_vi + EP_gc + EP_tarj + valJugada + RG.figura * 0.5),
     conCinta: round2(EP + mp.pFicha * f.ficha),   // el capitán duplica SOLO la ficha
     ficha: round2(f.ficha), fichaCruda: f.cruda === null ? null : round2(f.cruda), fichaOk: f.ok,
-    pVI: lam.pVI, lamGol: round3(lamGol), pFigura: round3(pFig),
+    pVI: round3(pVIsuya), pVIequipo: lam.pVI, lamGol: round3(lamGol), pFigura: round3(pFig),
     lamPen: round3(lamPen),
     transferido: p.transferido || null,
     penalesPateados: penesPateadosJ, penalesConvertidos: num(p.goalsPenalty),
@@ -608,7 +902,7 @@ function evaluar(p, ctx, eq) {
     lam,
     desglose: [
       ['Ficha Clarín limpia',  round2(f.ficha), `${f.ct} PJ · cruda ${f.cruda === null ? 's/d' : round2(f.cruda)}`],
-      ['Valla invicta',        round2(EP_vi),   `${(lam.pVI * 100).toFixed(1)}% × ${RG.vallaInvicta[pos] || 0} pts`],
+      ['Valla invicta',        round2(EP_vi),   `${(pVIsuya * 100).toFixed(1)}% × ${RG.vallaInvicta[pos] || 0} pts` + (fracMin < 0.99 ? ` (sobre sus ${Math.round(mp.minSiJuega)}′, no sobre los 90)` : '')],
       ['Goles recibidos',      round2(EP_gc),   pos === 'ARQ' ? `${lam.lamAgainst} esperados × -1` : '—'],
       ['Gol propio',           round2(EP_gol),  `${round3(lamGol)} goles esperados (${(share * 100).toFixed(1)}% del ataque) × ${valJugada}`],
       ['Figura',               round2(EP_fig),  `${(pFig * 100).toFixed(1)}% × 4`],
@@ -803,6 +1097,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { RG, CAL, valorEfectivoGol, recalibrarPartidos, fichaLimpia,
     bonosAcumulados, validarFichas, devig, lambdasDesdeMercado, lambdasPartido,
     amenazaIndividual, sharesDeEquipo, figurasDeEquipo, evaluar,
-    scoreARQ, scoreDEF, scoreOfensivo, mejorEsquema, correrMotor, ESQUEMAS, probFicha, perfilMinutos, minutosEstimados,
+    scoreARQ, scoreDEF, scoreOfensivo, mejorEsquema, correrMotor, ESQUEMAS, probFicha, perfilMinutos, minutosEstimados, minutosCuandoJuega, partidosDeTitular, perfilDeMinutos,
     suerteDefensiva };
 }

@@ -22,7 +22,23 @@ if (-not $carpeta) { $carpeta = (Get-Location).Path }
 # y la nueva trae los cuatro puestos en una sola hoja. El script prueba primero
 # sin gid (una sola hoja con todo) y, si no encuentra los puestos ahi, recien
 # ahi sale a buscar hojas separadas.
+# EL ID DE LA PLANILLA VIVE EN planilla.json, NO ACA.
+# PlanetaGranDT publica una planilla NUEVA cada fecha, con otro ID. Estuvimos
+# bajando la de la fecha 6 cuando ya se habia jugado la 7, y ni nos enteramos:
+# el log decia "ultima fecha: F6" y parecia normal. Ahora el ID sale de
+# planilla.json, que se cambia en dos segundos, y si el archivo no esta se usa
+# el ultimo que conociamos.
 $idPlanilla = '2PACX-1vQWGNjh7CL09RS5jbryuvTL88q8AYF6yV5kJqmraLlASvJeyK6jYJlb8XulTFWOuEXwIOhHhVBu1CpY'
+$rutaPlanilla = Join-Path $carpeta 'planilla.json'
+if (Test-Path $rutaPlanilla) {
+  try {
+    $cfg = Get-Content $rutaPlanilla -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($cfg.id) {
+      $idPlanilla = $cfg.id
+      Write-Host ("   planilla: la de la fecha {0} (planilla.json, actualizada el {1})" -f $cfg.fecha, $cfg.actualizado) -ForegroundColor DarkGray
+    }
+  } catch { Write-Host "   OJO: planilla.json no se pudo leer, uso el ID de siempre." -ForegroundColor Yellow }
+}
 $gidsAProbar = 0..40
 $hojas = @()
 

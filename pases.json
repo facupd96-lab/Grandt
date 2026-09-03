@@ -1,0 +1,15 @@
+{
+  "_que_es": "Pases confirmados que ni la planilla de Planeta ni el ayudante de campo de Gran DT reflejan todavia. Se cargan a mano y el motor mueve al jugador al club nuevo: cambia su rival, su condicion (local/visitante) y el ataque contra el que se mide. Sus minutos, tiros y xG siguen siendo los del club viejo, porque son los unicos que hay. Borrar la entrada cuando la planilla se actualice sola.",
+  "_como_se_carga": "nombre tal cual figura en la planilla (Apellido, Nombre) · desde = club viejo, para no pisar a un homonimo · hacia = club nuevo, con el nombre que usa la planilla",
+  "actualizado": "2026-09-03",
+  "pases": [
+    {
+      "nombre": "Sepúlveda, Bruno",
+      "desde": "Banfield",
+      "hacia": "Platense",
+      "fecha": "2026-09-02",
+      "fuente": "El Argentino / Doble Amarilla / Noticias Argentinas",
+      "nota": "Rescindio con Banfield y firmo en Platense. Pasa de visitante contra Aldosivi a local contra Deportivo Riestra."
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+# datos que se rebajan solos
+data365.json
+data365_historico.json
+data365_historico.SUCIO.json
+dataPlaneta.json
+dataCuotas.json
+dataCopas.json
+dataFixture.json
+dataGranDT.json
+salida.json
+salida_RECHAZADA.json
+datos.js
+equipoPartido.json
+equipoPartidoFull.json
+concedidoPorPos.json
+posAnterior.json
+planilla_tabs/
+
+# CREDENCIALES — nunca a GitHub
+# SYNC_CUOTAS.ps1 lleva la clave de the-odds-api escrita adentro. Es lo mas
+# comodo para trabajar y lo unico que hay que cuidar es que no se suba.
+SYNC_CUOTAS.ps1
+clave_cuotas.txt
+
+# runtime
+node_modules/
+node.exe
+*.zip
+
+# scripts de una sola medicion y pruebas
+an*.cjs
+bt*.cjs
+shot*.cjs
+min[0-9]*.cjs
+fit*.cjs
+val[0-9]*.cjs
+var[0-9]*.cjs
+conf1.cjs
+dbg.cjs
+duelo.cjs
+ficha1.cjs
+pf1.cjs
+poi1.cjs
+stack*.cjs
+tmp_*.cjs
+auditoria*.cjs
+*.mjs
+# ...pero el auditor de pantallas SI va: es una herramienta, no una prueba suelta
+!auditar_pantallas.mjs
+
+# versiones viejas
+app2.html
+app2.js
+fecha6.html
+pagina.js
+test.js
+sync365.js
+motorV3.js
+data.js
+
+# capturas
+*.png
+
+# copias que deja OneDrive cuando no puede resolver un conflicto de sincronizacion
+*_1.cjs
+*_1.js
+*_1.md
+*_1.json
+*_1.ps1
+*_1.bat
+*[- ]copia*.*
+*[- ]Copy*.*
+
+# ---------------------------------------------------------------------------
+# CODIGO VIEJO, de antes del motor v3. No corre nada de esto hoy.
+# ---------------------------------------------------------------------------
+app.js
+appV3.txt
+algorithmEngine.js
+backtester.js
+dataSanitizer.js
+learningEngine.js
+previousTournament.js
+tournamentOptimizer.js
+sync.js
+armar.js
+server.js
+server.ps1
+data.json
+PREPARAR_GITHUB.bat
+PREPARAR_GITHUB.ps1
+QUE_SUBO_A_GITHUB.md
+
+# archivos de trabajo que quedaron sueltos
+*.fusionado
+Claude outputs/

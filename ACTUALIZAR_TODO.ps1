@@ -98,7 +98,12 @@ $pasos = @(
   @{ archivo = 'SYNC_PLANETA.ps1'; que = 'planilla oficial: puntos, cotizaciones, goles, tarjetas' },
   @{ archivo = 'SYNC_365.ps1';     que = 'tiros, xG y minutos por jugador, mas tarjetas con fecha' },
   @{ archivo = 'SYNC_CUOTAS.ps1';  que = 'cuotas 1X2 y Over/Under de la proxima fecha' },
-  @{ archivo = 'SYNC_COPAS.ps1';   que = 'calendario de liga y copas, fixture y rotacion' }
+  @{ archivo = 'SYNC_COPAS.ps1';   que = 'calendario de liga y copas, fixture y rotacion' },
+  # El ayudante de campo va ULTIMO a proposito: es el que mas cambia (los
+  # lesionados y las formaciones se mueven hasta una hora antes del partido),
+  # asi que conviene que sea el dato mas fresco cuando corre el motor. Ademas
+  # tarda dos segundos, se puede volver a correr solo con SYNC_GRANDT.bat.
+  @{ archivo = 'SYNC_GRANDT.ps1';  que = 'ayudante de campo: lesionados, suspendidos, ley del ex' }
 )
 
 $fallaron = @()
@@ -146,6 +151,52 @@ if (-not $node) {
     Write-Host ("   armar.js termino con codigo {0}" -f $codigo) -ForegroundColor Red
     $fallaron += 'armar'
   }
+}
+
+# ---------------------------------------------------------------------------
+# 2b. Auditoria de los datos
+#     Corre siempre, despues de armar. Busca disparates (minutos imposibles,
+#     nombres pisados, fechas mezcladas, cuotas raras) y avisa. No arregla
+#     nada: solo mira. Asi ningun error de datos depende de que alguien lo
+#     cace mirando la pantalla.
+# ---------------------------------------------------------------------------
+$auditor = Join-Path $carpeta 'auditar.cjs'
+if (Test-Path $auditor) {
+  Titulo "auditoria de los datos"
+  Push-Location $carpeta
+  & $node $auditor
+  Pop-Location
+}
+
+# ---------------------------------------------------------------------------
+# 2c. Auditoria de COHERENCIA (03/09)
+#     La de arriba mira si los datos son creibles. Esta mira otra cosa: si lo
+#     que la pantalla muestra es lo mismo que el motor calcula. Son errores
+#     distintos y el segundo es peor, porque no se ve — la tabla dice una cosa
+#     y el ranking usa otra, y uno arma el equipo con el numero equivocado.
+# ---------------------------------------------------------------------------
+$coherencia = Join-Path $carpeta 'auditar_numeros.cjs'
+if (Test-Path $coherencia) {
+  Titulo "coherencia entre la pantalla y el motor"
+  Push-Location $carpeta
+  & $node $coherencia
+  Pop-Location
+}
+
+# ---------------------------------------------------------------------------
+# 2d. Auditoria del ALGORITMO (03/09)
+#     Las dos de arriba miran los DATOS. Esta mira el PUNTAJE: que cada termino
+#     salga del reglamento (el gol lo que paga por puesto mas 2 de visitante, la
+#     valla 3 al arquero y 2 al defensor, la figura 4), que el gol escale con los
+#     minutos y la ficha no, que los minutos "si juega" sean siempre un partido
+#     real que jugo, y que no haya quedado nada colgado de un cambio anterior.
+# ---------------------------------------------------------------------------
+$algoritmo = Join-Path $carpeta 'auditar_motor.cjs'
+if (Test-Path $algoritmo) {
+  Titulo "auditoria del algoritmo"
+  Push-Location $carpeta
+  & $node $algoritmo
+  Pop-Location
 }
 
 # ---------------------------------------------------------------------------

@@ -1496,6 +1496,9 @@ tr.tb-jugado:hover { opacity: 1; }
    minutos y el xG son del club anterior. Violeta, para que no se confunda
    con las alertas de rotación (ámbar) ni con las de disponibilidad (rojo). */
 .pill-transfer { color: #c4b5fd; background: rgba(139,92,246,0.14); border: 1px solid rgba(139,92,246,0.45); }
+/* Pase cargado a mano: naranja, porque es una advertencia y no un dato de color.
+   El pase normal ya no se marca (03/09): no cambiaba ninguna decision. */
+.pill-pase { color: #fdba74; background: rgba(249,115,22,0.14); border: 1px solid rgba(249,115,22,0.5); font-weight: 800; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    PASADA DE DISEÑO — 30/08/2026
@@ -1980,3 +1983,574 @@ body { overflow-y: auto; }
     .marca-nom { display: none; }
     .barra-fecha { display: none; }
 }
+
+/* Corte de local y de visitante. Verde = está entre los 5 mejores de la liga
+   en esa condición; rojo = entre los 5 peores. No es un umbral inventado: es
+   el puesto del equipo entre los 30. */
+.pill-cond-bien { color: #34d399; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.4); }
+.pill-cond-mal  { color: #fb7185; background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.4); }
+.tb-cond { margin-top: 6px; }
+.tb-cond th { font-size: 0.62rem; padding: 6px 8px; }
+.tb-cond td { padding: 8px; font-size: 0.84rem; }
+.cond-puesto { cursor: help; border-bottom: 1px dotted var(--border-light); }
+.aviso-suave { border-left-color: var(--border-light); opacity: 0.85; }
+.chip-mas { border-style: dashed; color: var(--text-muted); }
+
+/* Datos viejos: arriba de todo, imposible de no ver. */
+.aviso-viejo {
+    max-width: 1280px; margin: 0 auto; padding: 0.85rem 1.5rem;
+    background: rgba(239,68,68,0.14); border-bottom: 2px solid var(--danger);
+    color: #fecaca; font-size: 0.86rem; line-height: 1.5;
+}
+.aviso-viejo b { color: #fff; }
+#aviso-global:empty { display: none; }
+
+/* ---- OPORTUNIDADES ---- */
+.op-hero {
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem;
+    flex-wrap: wrap; padding: 0 0 1.4rem; border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+.op-hero h1 { font-family: 'Outfit', sans-serif; font-size: 2.6rem; font-weight: 800; line-height: 1; margin: 4px 0 8px; }
+.op-hero p { color: var(--text-muted); font-size: 0.9rem; max-width: 640px; line-height: 1.5; }
+.op-hero p b { color: var(--text-main); }
+.op-controles { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+.op-controles .main-tabs { gap: 4px; }
+.op-controles .tab-btn { padding: 0.4rem 0.9rem; font-size: 0.82rem; }
+.op-salto { background: rgba(255, 204, 0, 0.05); }
+.op-flecha { color: var(--gdt-yellow); font-size: 0.72rem; font-weight: 700; margin-left: 5px; cursor: help; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA FICHA DEL JUGADOR — 02/09/2026
+   Era un chorizo de ocho tablas seguidas. Ahora tres niveles: lo que se mira
+   en dos segundos arriba, el partido de hoy al medio, y el resto plegado.
+   ══════════════════════════════════════════════════════════════════════════ */
+.ficha-cab {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color); margin-bottom: 1.1rem;
+}
+.ficha-nombre { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
+.ficha-sub { color: var(--text-muted); font-size: 0.88rem; margin-top: 3px; }
+.ficha-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.ficha-puntos { text-align: right; }
+.ficha-ep { font-family: 'Outfit', sans-serif; font-size: 2.6rem; font-weight: 800; color: #38bdf8; line-height: 1; }
+.ficha-ep-lbl { font-size: 0.76rem; color: var(--text-muted); }
+.ficha-ep-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+.ficha-ep-puesto { margin-top: 6px; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.tile {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+    border-radius: var(--radius-md); padding: 10px 12px; cursor: help;
+}
+.tile-rot { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; line-height: 1.2; }
+.tile-val { font-family: 'Outfit', sans-serif; font-size: 1.55rem; font-weight: 800; line-height: 1.15; margin: 2px 0; }
+.tile-sub { font-size: 0.7rem; color: var(--text-muted); line-height: 1.25; min-height: 1.7em; }
+.tile-pct { margin-top: 5px; }
+
+.ctx-caja {
+    margin-top: 1.1rem; padding: 1rem 1.1rem;
+    background: rgba(56,189,248,0.05); border: 1px solid rgba(56,189,248,0.22);
+    border-radius: var(--radius-lg);
+}
+.ctx-titulo { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.98rem; margin-bottom: 0.75rem; }
+.ctx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 8px; }
+.ctx-grid .tile { background: rgba(0,0,0,0.2); border-color: rgba(56,189,248,0.18); }
+.ctx-nota { font-size: 0.78rem; color: var(--warning); margin-top: 9px; }
+
+.det { margin-top: 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; }
+.det > summary {
+    cursor: pointer; padding: 11px 14px; font-weight: 600; font-size: 0.88rem;
+    background: rgba(255,255,255,0.025); list-style: none;
+}
+.det > summary::-webkit-details-marker { display: none; }
+.det > summary::before { content: '▸ '; color: var(--text-muted); }
+.det[open] > summary::before { content: '▾ '; }
+.det > summary:hover { background: rgba(255,255,255,0.05); }
+.det-cuerpo { padding: 12px 14px 16px; }
+.tb-desglose { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.tb-desglose th {
+    text-align: left; padding: 8px 12px; font-size: 0.66rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color);
+}
+.tb-desglose .fila-total { background: rgba(56,189,248,0.08); }
+.tb-desglose .fila-total td { padding: 11px 14px; }
+.ficha-pie {
+    margin-top: 1rem; padding: 11px 14px; background: rgba(255,255,255,0.03);
+    border-radius: var(--radius-md); font-size: 0.76rem; color: var(--text-muted); line-height: 1.55;
+}
+/* Cruce de condiciones: ataque propio contra defensa rival, en la condicion
+   que le toca a cada uno. Dato del torneo, no entra en el puntaje. */
+.cruce { font-size: 0.8rem; cursor: help; white-space: nowrap; }
+.cruce-on { color: var(--gdt-yellow); font-weight: 700; }
+
+/* ---- OPORTUNIDADES: nueve columnas que entran sin scroll horizontal ---- */
+.tb-op { width: 100%; table-layout: fixed; }
+/* SIN sticky. Se probo pegar el encabezado a la barra de arriba y el <th>
+   terminaba desplazado 58px hacia abajo, metido adentro de la primera fila:
+   el puesto 1 —Diego Sosa— quedaba tapado y parecia que la tabla arrancaba en
+   el 2. No vale la pena por 25 filas. */
+.tb-op thead th {
+    background: var(--bg-card); font-size: 0.62rem; line-height: 1.25; padding: 10px 6px;
+}
+.th-sub { font-weight: 500; opacity: 0.65; text-transform: none; letter-spacing: 0; }
+.tb-op td { padding: 0.7rem 0.5rem; font-size: 0.88rem; }
+.tb-op th:nth-child(1), .tb-op td:nth-child(1) { width: 42px; }
+.tb-op th:nth-child(2) { width: auto; }
+.tb-op th:nth-child(3) { width: 108px; }
+.tb-op th:nth-child(4) { width: 92px; }
+.tb-op th:nth-child(5) { width: 78px; }
+.tb-op th:nth-child(6) { width: 78px; }
+.tb-op th:nth-child(7) { width: 86px; }
+.tb-op th:nth-child(8) { width: 62px; }
+.tb-op th:nth-child(9) { width: 62px; }
+.op-am { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--gdt-yellow); }
+.op-cuenta { font-size: 0.7rem; color: var(--text-muted); line-height: 1.3; margin-top: 1px; }
+.tb-op .player-name { font-size: 0.9rem; }
+.tb-op .player-sub { font-size: 0.72rem; }
+.tb-op .cruce { font-size: 0.76rem; line-height: 1.35; display: inline-block; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MEJOR 11 — pantalla propia  (02/09/2026)
+   Era un modal apretado con la cancha comprimida. Ahora tiene la pantalla
+   entera: cancha grande, banco de cuatro suplentes y panel de alternativas.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* ACHICADO 03/09: la cancha y la ficha ocupaban una pantalla y media para
+   mostrar once nombres. Mismo contenido, dos tercios del alto. */
+.once-hero {
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem;
+    flex-wrap: wrap; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.8rem;
+}
+.once-hero h1 { font-family: 'Outfit', sans-serif; font-size: 1.9rem; font-weight: 800; line-height: 1; margin: 3px 0 6px; }
+.once-hero p { color: var(--text-muted); font-size: 0.9rem; max-width: 620px; line-height: 1.5; }
+.once-hero p b { color: var(--text-main); }
+.once-marcador { text-align: right; }
+.om-pts { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; color: var(--success); line-height: 1; }
+.om-lbl { font-size: 0.78rem; color: var(--text-muted); }
+.om-sub { font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; }
+
+.once-barra {
+    display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+    padding: 0.55rem 0.9rem; margin-bottom: 0.7rem;
+    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+}
+.once-barra .tab-btn { padding: 0.4rem 0.9rem; font-size: 0.82rem; }
+.once-capitan { display: flex; align-items: baseline; gap: 6px; font-size: 0.85rem; cursor: help; }
+.oc-lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.once-esq {
+    margin-left: auto; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.5rem;
+    color: var(--gdt-yellow); letter-spacing: 0.02em;
+}
+
+/* La cancha */
+.cancha {
+    position: relative; border-radius: var(--radius-lg); overflow: hidden;
+    background: repeating-linear-gradient(0deg, #1c5527 0 42px, #226230 42px 84px);
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.55);
+    padding: 0.9rem 0.8rem; display: flex; flex-direction: column; justify-content: space-around;
+    gap: 0.55rem; min-height: 340px;
+}
+.cancha-lineas {
+    position: absolute; inset: 14px; border: 2px solid rgba(255,255,255,0.16); border-radius: 6px;
+    pointer-events: none;
+}
+.cancha-lineas::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    border-top: 2px solid rgba(255,255,255,0.16);
+}
+.cancha-lineas::after {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 70px; height: 70px;
+    transform: translate(-50%,-50%); border: 2px solid rgba(255,255,255,0.16); border-radius: 50%;
+}
+.linea11 { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; position: relative; z-index: 2; }
+
+.ficha11 {
+    position: relative; width: 104px; padding: 6px 5px 5px;
+    background: linear-gradient(180deg, rgba(10,29,55,0.94), rgba(6,20,38,0.96));
+    border: 1px solid rgba(255,255,255,0.22); border-radius: 10px;
+    text-align: center; cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+}
+.ficha11:hover { transform: translateY(-3px); border-color: var(--gdt-yellow); box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+.ficha11.es-capitan { border-color: var(--gdt-yellow); box-shadow: 0 0 0 2px rgba(255,204,0,0.35), 0 4px 12px rgba(0,0,0,0.5); }
+.ficha11.es-distinto { outline: 2px dashed var(--warning); outline-offset: 3px; }
+.ficha11.cambiando { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.5); }
+.ficha11.vacia {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: var(--text-muted); font-weight: 700; min-height: 96px; border-style: dashed; cursor: default;
+}
+.ficha11.vacia span { font-size: 0.68rem; font-weight: 400; }
+.f11-top { position: absolute; top: -8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 4px; }
+.f11-swap {
+    width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+    background: #1e293b; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.35);
+    font-size: 0.68rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.f11-swap:hover { background: var(--primary); color: #fff; }
+.f11-cap {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--gdt-yellow); color: #1a1400;
+    font-size: 0.66rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(0,0,0,0.3);
+}
+.f11-jersey { display: flex; justify-content: center; margin: 1px 0 1px; }
+.f11-jersey svg, .f11-jersey img { width: 26px; height: 26px; }
+.f11-nombre { font-size: 0.7rem; font-weight: 700; line-height: 1.12; color: #fff; }
+.f11-eq { font-size: 0.62rem; color: #a8b6c8; line-height: 1.2; margin-top: 1px; }
+.f11-pts {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.92rem; color: var(--gdt-yellow);
+    margin-top: 2px; line-height: 1;
+}
+.f11-pts span { font-size: 0.6rem; font-weight: 600; color: #cbd5e1; }
+.f11-pie { font-size: 0.6rem; color: #94a3b8; margin-top: 2px; }
+.f11-avisos { display: flex; justify-content: center; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
+.f11-avisos span {
+    font-size: 0.56rem; font-weight: 700; padding: 1px 5px; border-radius: 999px;
+    border: 1px solid; background: rgba(0,0,0,0.35);
+}
+
+/* El banco */
+.banco {
+    margin-top: 0.7rem; padding: 0.7rem 0.9rem;
+    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+    display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+}
+.banco-lbl {
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; min-width: 160px;
+}
+.banco-lbl small { display: block; font-family: inherit; font-weight: 400; font-size: 0.72rem; color: var(--text-muted); line-height: 1.35; margin-top: 3px; }
+.banco-fichas { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+.banco .ficha11 { background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); }
+
+/* Panel de alternativas */
+.panel-cambio {
+    margin-top: 1rem; background: var(--bg-card);
+    border: 1px solid var(--primary); border-radius: var(--radius-lg); overflow: hidden;
+}
+.pc-cab {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--border-color);
+    background: rgba(37,99,235,0.08); font-size: 0.92rem;
+}
+.pc-cerrar {
+    background: none; border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    color: var(--text-muted); cursor: pointer; padding: 4px 12px; font-family: inherit; font-size: 0.8rem;
+}
+.pc-cerrar:hover { color: var(--text-main); border-color: var(--border-light); }
+.pc-lista { max-height: 420px; overflow-y: auto; }
+.pc-item {
+    display: grid; grid-template-columns: 1fr 90px 120px 90px; align-items: center; gap: 10px;
+    width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+    padding: 10px 1.1rem; color: var(--text-main); font-family: inherit;
+    border-bottom: 1px solid rgba(51,65,85,0.4);
+}
+.pc-item:hover { background: rgba(255,255,255,0.05); }
+.pc-item.pc-actual { background: rgba(56,189,248,0.08); cursor: default; }
+.pc-n { font-weight: 700; font-size: 0.9rem; }
+.pc-n small, .pc-d small, .pc-p small { display: block; font-weight: 400; font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
+.pc-d { text-align: center; font-size: 0.85rem; }
+.pc-p { text-align: right; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; }
+.pc-pie { padding: 10px 1.1rem; font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+@media (max-width: 820px) {
+    .ficha11 { width: 104px; }
+    .once-esq { margin-left: 0; }
+    .pc-item { grid-template-columns: 1fr 70px; }
+    .pc-item .pc-d { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ARREGLOS DE OPORTUNIDADES + UNA SOLA TIPOGRAFIA  (02/09/2026)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* EL ENCABEZADO SE COMIA LA FILA 1.
+   Con border-collapse:collapse, un <th> con position:sticky no reserva su
+   lugar en el flujo: el thead quedaba en y=309.39 y la primera fila en
+   y=309.56, una encima de la otra, y Diego Sosa (el puesto 1) desaparecia
+   detras del encabezado. Con border-collapse:separate el sticky se porta
+   bien y la fila 1 se ve. */
+.tb-op { border-collapse: separate; border-spacing: 0; }
+.tb-op thead th { border-bottom: 2px solid var(--border-color); box-shadow: 0 1px 0 var(--border-color); }
+.tb-op tbody td { border-bottom: 1px solid var(--border-color); }
+
+/* Encabezados que ordenan */
+.th-ord {
+    background: none; border: none; cursor: pointer; padding: 0;
+    color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit;
+}
+.th-ord:hover { color: var(--text-main); text-decoration: underline; }
+.th-ord.on { color: var(--gdt-yellow); }
+.th-subs { margin-top: 3px; display: flex; justify-content: center; align-items: center; gap: 4px; flex-wrap: wrap; }
+.th-ord.th-sub { font-size: 0.58rem; font-weight: 500; opacity: 0.75; text-transform: none; }
+.th-ord.th-sub.on { opacity: 1; }
+.th-sep { color: var(--border-light); font-size: 0.55rem; }
+
+/* El cruce, con las dos frases en criollo */
+.cruce { font-size: 0.62rem; line-height: 1.35; display: block; text-align: center; }
+.cruce-l { display: block; color: var(--text-muted); }
+.cruce-l b { color: var(--text-main); font-size: 0.82rem; }
+.cruce-on .cruce-l b { color: var(--gdt-yellow); }
+.cruce-fuego { display: block; font-size: 0.85rem; line-height: 1; }
+.tb-op th:nth-child(4) { width: 132px; }
+.tb-op th:nth-child(3) { width: 112px; }
+.tb-op th:nth-child(5), .tb-op th:nth-child(6), .tb-op th:nth-child(7) { width: 84px; }
+
+/* ---- UNA SOLA TIPOGRAFIA EN TODAS LAS PANTALLAS ----
+   Lideres venia del index viejo, con tamaños y pesos escritos a mano en el
+   HTML; Jugadores y Oportunidades usaban otros. Eran tres tipografias
+   distintas. Ahora los titulos de seccion, las tablas y las cabeceras salen
+   todos del mismo lugar. */
+#sec-lideres h2,
+#sec-oportunidades h1,
+#sec-once h1,
+#sec-fecha h1 { font-family: 'Outfit', system-ui, sans-serif; letter-spacing: -0.015em; }
+
+#sec-lideres .card-header h2,
+#sec-lideres h2 { font-size: 1.6rem !important; font-weight: 800 !important; }
+#sec-lideres p { font-size: 0.9rem !important; color: var(--text-muted) !important; }
+
+/* Todas las tablas de datos, el mismo cuerpo */
+#sec-lideres .data-table td,
+#sec-oportunidades .data-table td,
+#sec-jugadores .data-table td { font-size: 0.88rem; }
+#sec-lideres .data-table th,
+#sec-oportunidades .data-table th,
+#sec-jugadores .data-table th,
+#sec-posiciones .data-table th {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.64rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+}
+#sec-oportunidades .tb-op th { font-size: 0.62rem; }
+/* Los numeros grandes, siempre en Outfit */
+.op-am, .om-pts, .f11-pts, .tj-pts, .fecha-cierre-val, .tile-val, .ficha-ep { font-family: 'Outfit', system-ui, sans-serif; }
+/* Los selectores y botones de las tres pantallas, iguales */
+#sec-lideres select { 
+    background: var(--bg-main) !important; color: var(--text-main) !important;
+    border: 1px solid var(--border-color) !important; border-radius: var(--radius-pill) !important;
+    padding: 0.5rem 0.85rem !important; font-size: 0.82rem !important; font-weight: 600 !important;
+    font-family: 'Outfit', system-ui, sans-serif !important;
+}
+#sec-lideres label { font-size: 0.7rem !important; color: var(--text-muted) !important; font-weight: 600 !important; }
+/* El texto del cruce se salia por arriba de la columna de tiros. */
+.tb-op td { overflow: hidden; }
+.tb-op th:nth-child(4), .tb-op td:nth-child(4) { width: 150px; }
+.tb-op th:nth-child(2) { width: 24%; }
+.cruce { font-size: 0.6rem; }
+.cruce-l { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- Barra de orden de Oportunidades (reemplaza los links del encabezado) ---- */
+.barra-orden {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 0.75rem 0.9rem; margin-bottom: 0.75rem;
+    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+}
+.barra-orden .orden-lbl {
+    font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); font-weight: 700; margin-right: 4px;
+}
+.barra-orden .orden-btn {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill); color: var(--text-muted);
+    padding: 5px 11px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+.barra-orden .orden-btn:hover { color: var(--text-main); border-color: var(--border-light); }
+.barra-orden .orden-btn.active {
+    background: var(--gdt-yellow); border-color: var(--gdt-yellow); color: #1a1400;
+}
+.barra-orden .orden-btn.active .orden-flecha { color: #1a1400; }
+.orden-nota { font-size: 0.7rem; color: var(--text-muted); margin-left: auto; }
+
+/* Encabezados: etiquetas, sin links adentro. */
+.tb-op thead th { font-size: 0.64rem; padding: 11px 6px; }
+.tb-op .th-sub {
+    display: block; font-size: 0.58rem; font-weight: 500; opacity: 0.6;
+    text-transform: none; letter-spacing: 0; margin-top: 2px;
+}
+.tb-op .op-flecha { display: block; font-size: 0.66rem; margin: 2px 0 0; }
+.tb-op th:nth-child(9), .tb-op td:nth-child(9) { width: 76px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DATOS DE LA FECHA — 02/09
+   La pestaña de curiosidades, al estilo de las planillas de Planeta Gran DT.
+   Misma tipografía y mismas tarjetas que Oportunidades: el problema anterior
+   era justamente que cada pantalla parecía de otra app.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* Dos zonas: arriba las tarjetas anchas (ley del ex, once ideal) y abajo el
+   resto en columnas de verdad. Con un grid normal, una tarjeta de 32 filas al
+   lado de una de 10 dejaba media pantalla vacia; con columnas CSS las tarjetas
+   se acomodan solas y no queda hueco. */
+.datos-anchos { display: grid; gap: 16px; margin-bottom: 16px; }
+/* Compactado 03/09: cinco filas por tarjeta y un boton, y el once ideal en
+   lista en vez de once tarjetas gigantes. Antes habia que scrollear seis
+   pantallas para llegar a la ley del ex. */
+.fila-vermas > td { text-align: center; padding: 8px 0 6px !important; border: 0 !important; }
+.oi-lista { display: grid; gap: 2px; }
+.oi-fila { display: flex; align-items: baseline; gap: 8px; font-size: 0.78rem;
+           padding: 2px 0; border-bottom: 1px solid rgba(51,65,85,0.25); }
+.oi-fila .oi-pts { font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--success);
+                   min-width: 26px; font-size: 0.9rem; }
+.oi-fila .oi-nom { font-weight: 700; color: var(--text-main); }
+.oi-fila .oi-eq { margin-left: auto; font-size: 0.68rem; color: var(--text-muted); }
+.once-ideal-cab.compacto { padding: 10px 14px; gap: 18px; }
+.once-ideal-cab.compacto b { font-size: 0.95rem; }
+.once-ideal-lineas { padding: 10px 14px 4px; gap: 10px; }
+.dato-card .tb-datos td, .dato-card .tb-datos th { padding-top: 5px; padding-bottom: 5px; }
+.datos-col { column-count: 2; column-gap: 16px; }
+.datos-col .dato-card {
+    break-inside: avoid; -webkit-column-break-inside: avoid;
+    display: inline-block; width: 100%; margin: 0 0 16px;
+}
+.dato-card { overflow: hidden; }
+.dato-head { padding: 16px 18px 10px; border-bottom: 1px solid rgba(51,65,85,0.35); }
+.dato-head h2 {
+    margin: 0; font-size: 1rem; font-weight: 800; letter-spacing: -0.01em;
+    color: var(--text-main);
+}
+.dato-head p { margin: 3px 0 0; font-size: 0.76rem; color: var(--text-muted); }
+.dato-vacio {
+    padding: 22px 18px; font-size: 0.8rem; color: var(--text-muted); text-align: center;
+}
+.dato-ex { color: var(--accent, #38bdf8); }
+.tb-datos { font-size: 0.82rem; }
+.tb-datos th {
+    font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 800;
+}
+.tb-datos td { vertical-align: middle; }
+.tb-datos .player-name { font-size: 0.84rem; }
+.tb-datos .player-sub { font-size: 0.68rem; }
+.pill-ok  { color: #10b981; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); }
+.pill-mal { color: #ef4444; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); }
+
+@media (max-width: 1100px) {
+    .datos-col { column-count: 1; }
+}
+.dato-ancho { grid-column: 1 / -1; }
+.dato-ancho .tb-datos th:nth-child(3) { min-width: 150px; }
+.dato-alerta {
+    margin: 12px 14px 0; padding: 9px 12px; border-radius: 8px;
+    font-size: 0.76rem; line-height: 1.45;
+    color: #fbbf24; background: rgba(245,158,11,0.10); border: 1px solid rgba(245,158,11,0.35);
+}
+
+/* El once ideal de la fecha pasada, dentro de Datos. Se lee como una alineacion,
+   no como una tabla: linea por linea, igual que el Ayudante de campo del juego. */
+.once-ideal-cab {
+    display: flex; gap: 26px; flex-wrap: wrap;
+    padding: 14px 18px; border-bottom: 1px solid rgba(51,65,85,0.35);
+}
+.once-ideal-cab b { font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: block; }
+.oi-lbl {
+    display: block; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 800; margin-bottom: 2px;
+}
+.once-ideal-lineas { padding: 14px 18px 6px; display: grid; gap: 14px; }
+.oi-linea-tit {
+    font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 800; margin-bottom: 7px;
+}
+.oi-fichas { display: flex; gap: 10px; flex-wrap: wrap; }
+.oi-ficha {
+    flex: 1 1 130px; min-width: 130px; max-width: 200px;
+    background: rgba(148,163,184,0.06); border: 1px solid rgba(51,65,85,0.45);
+    border-radius: 10px; padding: 9px 11px; text-align: center;
+}
+.oi-pts { font-size: 1.25rem; font-weight: 800; color: var(--success); line-height: 1.1; }
+.oi-nom { font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-top: 2px; }
+.oi-eq, .oi-precio { font-size: 0.66rem; color: var(--text-muted); }
+.oi-precio { margin-top: 2px; }
+.oi-cinta {
+    display: inline-block; margin-left: 5px; width: 15px; height: 15px; line-height: 15px;
+    border-radius: 50%; background: var(--accent, #38bdf8); color: #06121f;
+    font-size: 0.6rem; font-weight: 900; vertical-align: middle;
+}
+
+/* Las bajas ya no son cuatro nombres cargados a mano: con el ayudante de campo
+   del Gran DT son setenta. Agrupadas por motivo y en columnas, entran de un
+   vistazo en vez de ser una tabla de scroll infinito. */
+.bajas-grupos { padding: 12px 16px 6px; display: grid; gap: 14px; }
+.baja-tit { font-size: 0.72rem; margin-bottom: 6px; color: var(--text-muted); }
+.baja-tit b { color: var(--text-main); }
+.baja-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 3px 14px; }
+.baja-item { font-size: 0.76rem; display: flex; justify-content: space-between; gap: 8px;
+             padding: 3px 0; border-bottom: 1px solid rgba(51,65,85,0.25); }
+.baja-item b { font-weight: 700; color: var(--text-main); }
+.baja-item span { color: var(--text-muted); font-size: 0.68rem; text-align: right; }
+.pill-duda { color: #f59e0b; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); }
+
+/* La tira de los ultimos 5 partidos de un goleador: un cuadrito por partido,
+   del mas viejo al mas nuevo, con el numero de goles adentro. Se lee de un
+   vistazo si viene metiendo o si fue todo un partido suelto. */
+.tira-goles { display: inline-flex; gap: 3px; margin-top: 5px; justify-content: center; }
+.tg {
+    width: 15px; height: 15px; border-radius: 4px; font-size: 0.6rem; font-weight: 800;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(148,163,184,0.16); color: var(--text-muted);
+}
+.tg-gol { background: rgba(16,185,129,0.85); color: #04231a; }
+.tg-no  { background: rgba(148,163,184,0.07); }
+
+/* Reparto local/visitante: una barra en vez de un porcentaje suelto. */
+.tb-casa td:last-child { width: 190px; }
+.reparto { display: flex; align-items: center; gap: 8px; }
+.reparto-barra { flex: 1; display: flex; height: 8px; border-radius: 4px; overflow: hidden;
+                 background: rgba(148,163,184,0.12); }
+.rep-l { background: var(--success, #10b981); }
+.rep-v { background: rgba(148,163,184,0.45); }
+.reparto-num { font-size: 0.74rem; font-weight: 800; min-width: 38px; text-align: right; }
+
+/* Datos que 365Scores no tiene completos. No es lo mismo "cero tiros" que "no
+   sabemos cuantos tiros": lo primero es un dato, lo segundo es un agujero. */
+.dato-roto { color: var(--danger, #ef4444); font-weight: 700; cursor: help;
+             border-bottom: 1px dashed currentColor; }
+.dato-parcial { border-bottom: 1px dotted rgba(245,158,11,0.7); cursor: help; }
+
+/* Los OCHO primeros de cada zona pasan a octavos, no los cuatro. La linea marca
+   donde termina la clasificacion. */
+.fila-corte > td { border-bottom: 2px solid var(--primary, #3b82f6) !important; }
+.nota-corte { font-size: 0.74rem; color: var(--text-muted); margin: 0 0 10px; }
+.nota-corte b { color: var(--text-main); }
+
+/* Por que esta cada uno en el arriesgado */
+.apuesta-linea { font-size: 0.78rem; line-height: 1.4; color: var(--text-muted); }
+.apuesta-linea + .apuesta-linea { margin-top: 2px; }
+
+/* Los ultimos tres partidos que ARRANCO, con el numero real. Un solo numero no
+   contesta "termina los partidos o lo sacan a los 65": estos tres si. */
+.tira-min { display: inline-flex; gap: 2px; justify-content: center; margin-top: 3px; }
+.tm {
+    min-width: 20px; padding: 0 2px; height: 14px; line-height: 14px; border-radius: 3px;
+    font-size: 0.58rem; font-weight: 800; text-align: center;
+}
+.tm-full  { background: rgba(16,185,129,0.85); color: #04231a; }
+.tm-largo { background: rgba(245,158,11,0.75); color: #241a00; }
+.tm-medio { background: rgba(148,163,184,0.30); color: #cbd5e1; }
+.tm-corto { background: rgba(239,68,68,0.55); color: #2a0606; }
+
+/* El atributo hidden pierde contra un display: grid/flex propio. Sin esto los
+   bloques que se abren con "ver mas" aparecian siempre abiertos. */
+[hidden] { display: none !important; }
+/* "Le falta un partido a 365": el numero sigue siendo real, el aviso va al lado.
+   Mostrar s/d era peor — cero tiros en 483 minutos es un dato, no un agujero. */
+.falta-mark { color: #f59e0b; font-size: 0.62rem; font-weight: 800; margin-left: 1px; }
+/* Sobre cuantos partidos esta hecho el cruce. Con 7 fechas nadie tiene mas de
+   4 en cada condicion: un "0.00 recibidos" de 3 partidos no es un dato duro. */
+.cruce-l i { font-style: normal; font-size: 0.58rem; color: var(--text-muted); opacity: 0.8; }
+
+/* Puesto en el ranking de PUNTOS, al lado del nombre en Oportunidades (03/09).
+   Esa pantalla se ordena por amenaza de gol, que es UNA pieza del puntaje. Sin
+   este numero uno puede ver a alguien primero por amenaza y suponer que es la
+   mejor eleccion, cuando en puntos va 172 de 251. */
+.op-pep { margin-left: 8px; font-size: 10px; font-weight: 700; letter-spacing: .02em;
+  padding: 1px 6px; border-radius: 999px; vertical-align: middle;
+  color: #7dd3fc; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.35); }
+.op-pep-lejos { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.40); }
+
+/* "Del gol": que parte del puntaje sale de convertir y no de la nota (03/09).
+   Verde = explosivo, gris = parejo. No es bueno ni malo: depende de si vas a
+   buscar la fecha grande o a no perderla. */
+.dg-alto { color: #34d399; font-weight: 800; }
+.dg-bajo { color: #94a3b8; }

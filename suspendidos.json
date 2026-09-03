@@ -1,0 +1,16 @@
+{
+  "_comentario": "Tarjetero de PlanetaGranDT: los que deben fechas de suspension. No esta en ninguna fuente que bajemos, asi que se carga a mano. 'fecha' es la fecha en la que EMPIEZAN a cumplir. 'fechas' es cuantas deben. Al actualizar, cambia 'fecha' y reemplaza la lista.",
+  "fecha": 7,
+  "fuente": "Tarjetero de PlanetaGranDT (a cumplir en la fecha 7)",
+  "jugadores": [
+    { "nombre": "Franco, Juan José",  "equipo": "Gimnasia de Mendoza", "fechas": 2, "motivo": "roja" },
+    { "nombre": "Caicedo, Jordy",     "equipo": "Huracán",             "fechas": 2, "motivo": "roja" },
+    { "nombre": "Sanseviero, Lucas",  "equipo": "Instituto",           "fechas": 2, "motivo": "roja" },
+    { "nombre": "Riquelme, Román",    "equipo": "Talleres",            "fechas": 2, "motivo": "roja" },
+    { "nombre": "Steimbach, Alexis",  "equipo": "Gimnasia La Plata",   "fechas": 1, "motivo": "roja" },
+    { "nombre": "Carrera, Ramiro",    "equipo": "Lanús",               "fechas": 1, "motivo": "roja" },
+    { "nombre": "Gianini, Santino",   "equipo": "Argentinos",          "fechas": 1, "motivo": "roja" },
+    { "nombre": "Duarte, Lautaro",    "equipo": "Deportivo Riestra",   "fechas": 1, "motivo": "roja" },
+    { "nombre": "Palacios, Julián",   "equipo": "Unión",               "fechas": 2, "motivo": "roja" }
+  ]
+}
