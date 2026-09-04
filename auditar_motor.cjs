@@ -61,7 +61,7 @@ let d3=0,d3b=0; T.forEach(x=>{ const v=(x.desglose||[]).find(t=>t[0]==='Valla in
   if(v && !VALLA[x.pos]) d3b++;
   if(v && VALLA[x.pos] && !cerca(v[1],(x.pVI||0)*VALLA[x.pos],0.05)) d3++; });
 d3b? P.push(d3b+' volantes o delanteros cobrando valla invicta') : OK.push('la valla invicta la cobran solo arqueros y defensores');
-d3? P.push(d3+' jugadores con la valla mal valuada') : OK.push('la valla paga 3 al arquero y 2 al defensor, por la chance de que NO le hagan gol mientras esta en la cancha');
+d3? P.push(d3+' jugadores con la valla mal valuada') : OK.push('la valla paga 3 al arquero y 2 al defensor, por la chance de que su equipo no reciba');
 
 // 4. la figura paga 4
 let d4=0; T.forEach(x=>{ const f=(x.desglose||[]).find(t=>t[0]==='Figura'); if(!f) return;
@@ -81,7 +81,7 @@ d6.length? P.push('la chance de ser figura suma mas de 1 en: '+d6.join(', ')) : 
 // 7. los minutos: el gol tiene que escalar con lo que juega, la ficha no
 let d7=0; T.forEach(x=>{ if(!x.lam||!x.minSiJuega) return;
   if(!cerca(x.lamGol,(x.share||0)*x.lam.lamFor*(x.minSiJuega/90),0.02)) d7++; });
-d7? P.push(d7+' jugadores donde el gol no escala con los minutos') : OK.push('el gol y la valla escalan con los minutos que juega; la ficha no (pide 20 minutos, no 90)');
+d7? P.push(d7+' jugadores donde el gol no escala con los minutos') : OK.push('el gol escala con los minutos que juega; la ficha y la valla no (piden 20 minutos, no 90)');
 
 // 8. los minutos "si juega" salen de partidos donde ARRANCO.
 // Ya NO se exige que el numero sea uno de sus arranques exacto: con dos

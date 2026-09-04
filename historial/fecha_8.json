@@ -1,6 +1,6 @@
 {
  "fecha": 8,
- "generado": "2026-09-03T22:47:10.143Z",
+ "generado": "2026-09-04T02:15:05.476Z",
  "ultimaFechaJugada": 7,
  "once": [
   {
@@ -15,39 +15,31 @@
    "nombre": "Vázquez, Franco",
    "pos": "DEF",
    "equipo": "Argentinos",
-   "EP": 6.61,
+   "EP": 6.55,
    "pJuega": 0.9,
    "precio": 700000
+  },
+  {
+   "nombre": "Sosa, Diego",
+   "pos": "DEF",
+   "equipo": "Instituto",
+   "EP": 6.46,
+   "pJuega": 0.91,
+   "precio": 1000000
   },
   {
    "nombre": "Álvarez, Francisco",
    "pos": "DEF",
    "equipo": "Argentinos",
-   "EP": 6.29,
+   "EP": 6.25,
    "pJuega": 0.91,
    "precio": 4500000
-  },
-  {
-   "nombre": "Ferreira, Clever",
-   "pos": "DEF",
-   "equipo": "Atl. Tucumán",
-   "EP": 6.21,
-   "pJuega": 0.91,
-   "precio": 2100000
-  },
-  {
-   "nombre": "Ascacíbar, Santiago",
-   "pos": "VOL",
-   "equipo": "Boca",
-   "EP": 6.93,
-   "pJuega": 0.9,
-   "precio": 6400000
   },
   {
    "nombre": "Miljevic, Matko",
    "pos": "VOL",
    "equipo": "Racing",
-   "EP": 6.85,
+   "EP": 7.01,
    "pJuega": 0.87,
    "precio": 4800000
   },
@@ -55,44 +47,52 @@
    "nombre": "Lencioni, Facundo",
    "pos": "VOL",
    "equipo": "Gimnasia Mza",
-   "EP": 6.44,
+   "EP": 6.55,
    "pJuega": 0.91,
    "precio": 1000000
   },
   {
-   "nombre": "Tarragona, Cristian",
-   "pos": "DEL",
-   "equipo": "Unión",
-   "EP": 6.59,
+   "nombre": "Peña Biafore, Felipe",
+   "pos": "VOL",
+   "equipo": "Lanús",
+   "EP": 6.46,
    "pJuega": 0.9,
-   "precio": 4000000
+   "precio": 2600000
+  },
+  {
+   "nombre": "Ascacíbar, Santiago",
+   "pos": "VOL",
+   "equipo": "Boca",
+   "EP": 6.3,
+   "pJuega": 0.84,
+   "precio": 6400000
   },
   {
    "nombre": "Correa, Ángel",
    "pos": "DEL",
    "equipo": "River",
-   "EP": 6.49,
-   "pJuega": 0.82,
+   "EP": 6.78,
+   "pJuega": 0.86,
    "precio": 6800000
   },
   {
-   "nombre": "Módica, Agustín",
+   "nombre": "Tarragona, Cristian",
    "pos": "DEL",
-   "equipo": "Gimnasia Mza",
-   "EP": 6.47,
-   "pJuega": 0.85,
-   "precio": 1200000
+   "equipo": "Unión",
+   "EP": 6.51,
+   "pJuega": 0.9,
+   "precio": 4000000
   },
   {
-   "nombre": "Auzmendi, Rodrigo",
+   "nombre": "Marabel, Junior",
    "pos": "DEL",
-   "equipo": "San Lorenzo",
-   "EP": 6.36,
-   "pJuega": 0.91,
-   "precio": 3200000
+   "equipo": "Sarmiento",
+   "EP": 6.41,
+   "pJuega": 0.87,
+   "precio": 3000000
   }
  ],
- "esquema": "1-3-3-4",
+ "esquema": "1-3-4-3",
  "ranking": {
   "ARQ": [
    {
@@ -106,87 +106,87 @@
    {
     "nombre": "Cambeses, Facundo",
     "equipo": "Racing",
-    "EP": 5.61,
+    "EP": 5.65,
     "pJuega": 0.91,
     "ficha": 5.65,
     "precio": 6300000
    },
    {
+    "nombre": "Losada, Nahuel",
+    "equipo": "Lanús",
+    "EP": 5.53,
+    "pJuega": 0.91,
+    "ficha": 5.45,
+    "precio": 5200000
+   },
+   {
     "nombre": "Cortés, Brayan",
     "equipo": "Argentinos",
-    "EP": 5.48,
+    "EP": 5.44,
     "pJuega": 0.91,
     "ficha": 5.45,
     "precio": 3600000
    },
    {
-    "nombre": "Marchiori, Tomás",
-    "equipo": "Vélez",
-    "EP": 5.36,
-    "pJuega": 0.87,
-    "ficha": 5.85,
-    "precio": 5500000
-   },
-   {
     "nombre": "Ledesma, Jeremías",
     "equipo": "Rosario Ctral.",
-    "EP": 5.32,
-    "pJuega": 0.84,
+    "EP": 5.44,
+    "pJuega": 0.85,
     "ficha": 5.5,
     "precio": 4600000
    },
    {
     "nombre": "Rigamonti, César",
     "equipo": "Gimnasia Mza",
-    "EP": 5.27,
+    "EP": 5.41,
     "pJuega": 0.91,
     "ficha": 5.95,
     "precio": 2000000
    },
    {
-    "nombre": "Losada, Nahuel",
-    "equipo": "Lanús",
-    "EP": 5.26,
-    "pJuega": 0.88,
-    "ficha": 5.45,
-    "precio": 5200000
-   },
-   {
-    "nombre": "Mansilla, Matías",
-    "equipo": "Unión",
-    "EP": 5.21,
-    "pJuega": 0.91,
-    "ficha": 5.65,
-    "precio": 3500000
-   },
-   {
     "nombre": "Ayala, Thyago",
     "equipo": "Sarmiento",
-    "EP": 5.2,
-    "pJuega": 0.88,
+    "EP": 5.29,
+    "pJuega": 0.9,
     "ficha": 5.81,
     "precio": 700000
    },
    {
+    "nombre": "Unsain, Ezequiel",
+    "equipo": "Talleres",
+    "EP": 5.26,
+    "pJuega": 0.91,
+    "ficha": 5.85,
+    "precio": 4800000
+   },
+   {
+    "nombre": "Marchiori, Tomás",
+    "equipo": "Vélez",
+    "EP": 5.22,
+    "pJuega": 0.85,
+    "ficha": 5.85,
+    "precio": 5500000
+   },
+   {
     "nombre": "Rey, Rodrigo",
     "equipo": "Independiente",
-    "EP": 5.16,
+    "EP": 5.13,
     "pJuega": 0.91,
     "ficha": 5.35,
     "precio": 5000000
    },
    {
-    "nombre": "Unsain, Ezequiel",
-    "equipo": "Talleres",
-    "EP": 5.13,
-    "pJuega": 0.9,
-    "ficha": 5.85,
-    "precio": 4800000
+    "nombre": "Mansilla, Matías",
+    "equipo": "Unión",
+    "EP": 5.12,
+    "pJuega": 0.91,
+    "ficha": 5.65,
+    "precio": 3500000
    },
    {
     "nombre": "Arce, Ignacio",
     "equipo": "Dep. Riestra",
-    "EP": 5.02,
+    "EP": 5.05,
     "pJuega": 0.91,
     "ficha": 5.35,
     "precio": 4800000
@@ -194,7 +194,7 @@
    {
     "nombre": "Insfrán, Nelson",
     "equipo": "Gimnasia LP",
-    "EP": 5.01,
+    "EP": 5.04,
     "pJuega": 0.91,
     "ficha": 5.35,
     "precio": 1900000
@@ -202,15 +202,39 @@
    {
     "nombre": "Beltrán, Santiago",
     "equipo": "River",
-    "EP": 4.79,
-    "pJuega": 0.88,
+    "EP": 4.95,
+    "pJuega": 0.91,
     "ficha": 4.85,
     "precio": 6200000
    },
    {
+    "nombre": "Ledesma, Marcos",
+    "equipo": "Instituto",
+    "EP": 4.92,
+    "pJuega": 0.91,
+    "ficha": 5.65,
+    "precio": 1700000
+   },
+   {
+    "nombre": "Acosta, Lucas",
+    "equipo": "Aldosivi",
+    "EP": 4.76,
+    "pJuega": 0.87,
+    "ficha": 5.36,
+    "precio": 1500000
+   },
+   {
+    "nombre": "Miño, Marcelo",
+    "equipo": "Barracas Ctral.",
+    "EP": 4.73,
+    "pJuega": 0.91,
+    "ficha": 5.45,
+    "precio": 1500000
+   },
+   {
     "nombre": "Bruera, Lucas",
     "equipo": "Estudiantes RC",
-    "EP": 4.7,
+    "EP": 4.68,
     "pJuega": 0.91,
     "ficha": 5.15,
     "precio": 2000000
@@ -218,71 +242,47 @@
    {
     "nombre": "Reinatti, Josué",
     "equipo": "Newell's",
-    "EP": 4.67,
+    "EP": 4.61,
     "pJuega": 0.91,
     "ficha": 5.85,
     "precio": 900000
    },
    {
-    "nombre": "Ledesma, Marcos",
-    "equipo": "Instituto",
-    "EP": 4.66,
-    "pJuega": 0.88,
-    "ficha": 5.65,
-    "precio": 1700000
-   },
-   {
     "nombre": "Devecchi, José",
     "equipo": "San Lorenzo",
-    "EP": 4.6,
-    "pJuega": 0.84,
+    "EP": 4.48,
+    "pJuega": 0.83,
     "ficha": 5.36,
     "precio": 2000000
    },
    {
-    "nombre": "Montero, Álvaro",
-    "equipo": "Boca",
-    "EP": 4.59,
-    "pJuega": 0.9,
-    "ficha": 5.15,
-    "precio": 4900000
-   },
-   {
-    "nombre": "Acosta, Lucas",
-    "equipo": "Aldosivi",
-    "EP": 4.51,
-    "pJuega": 0.84,
-    "ficha": 5.36,
-    "precio": 1500000
-   },
-   {
-    "nombre": "Miño, Marcelo",
-    "equipo": "Barracas Ctral.",
-    "EP": 4.51,
-    "pJuega": 0.88,
-    "ficha": 5.45,
-    "precio": 1500000
-   },
-   {
-    "nombre": "Zenobio, Felipe",
-    "equipo": "Tigre",
-    "EP": 4.49,
-    "pJuega": 0.84,
-    "ficha": 5.39,
-    "precio": 4600000
-   },
-   {
     "nombre": "Galíndez, Hernán",
     "equipo": "Huracán",
-    "EP": 4.42,
+    "EP": 4.41,
     "pJuega": 0.91,
     "ficha": 5.15,
     "precio": 6000000
    },
    {
+    "nombre": "Zenobio, Felipe",
+    "equipo": "Tigre",
+    "EP": 4.4,
+    "pJuega": 0.83,
+    "ficha": 5.39,
+    "precio": 4600000
+   },
+   {
+    "nombre": "Aguerre, Alan",
+    "equipo": "Ctral. Córdoba",
+    "EP": 4.34,
+    "pJuega": 0.87,
+    "ficha": 5.44,
+    "precio": 3500000
+   },
+   {
     "nombre": "Ingolotti, Luis",
     "equipo": "Atl. Tucumán",
-    "EP": 4.37,
+    "EP": 4.32,
     "pJuega": 0.91,
     "ficha": 5.55,
     "precio": 1500000
@@ -290,7 +290,7 @@
    {
     "nombre": "Borgogno, Matías",
     "equipo": "Def. y Justicia",
-    "EP": 4.36,
+    "EP": 4.26,
     "pJuega": 0.91,
     "ficha": 5.45,
     "precio": 2000000
@@ -300,15 +300,23 @@
    {
     "nombre": "Vázquez, Franco",
     "equipo": "Argentinos",
-    "EP": 6.61,
+    "EP": 6.55,
     "pJuega": 0.9,
     "ficha": 5.44,
     "precio": 700000
    },
    {
+    "nombre": "Sosa, Diego",
+    "equipo": "Instituto",
+    "EP": 6.46,
+    "pJuega": 0.91,
+    "ficha": 5.55,
+    "precio": 1000000
+   },
+   {
     "nombre": "Álvarez, Francisco",
     "equipo": "Argentinos",
-    "EP": 6.29,
+    "EP": 6.25,
     "pJuega": 0.91,
     "ficha": 5.85,
     "precio": 4500000
@@ -316,18 +324,10 @@
    {
     "nombre": "Ferreira, Clever",
     "equipo": "Atl. Tucumán",
-    "EP": 6.21,
+    "EP": 6.17,
     "pJuega": 0.91,
     "ficha": 5.65,
     "precio": 2100000
-   },
-   {
-    "nombre": "Sosa, Diego",
-    "equipo": "Instituto",
-    "EP": 6.17,
-    "pJuega": 0.88,
-    "ficha": 5.55,
-    "precio": 1000000
    },
    {
     "nombre": "López, Lisandro",
@@ -346,100 +346,132 @@
     "precio": 2000000
    },
    {
+    "nombre": "Otamendi, Nicolás",
+    "equipo": "River",
+    "EP": 5.82,
+    "pJuega": 0.91,
+    "ficha": 5.25,
+    "precio": 6800000
+   },
+   {
     "nombre": "Silva Torrejón, Pedro",
     "equipo": "Gimnasia LP",
-    "EP": 5.78,
+    "EP": 5.79,
     "pJuega": 0.91,
     "ficha": 5.55,
     "precio": 1000000
    },
    {
-    "nombre": "Silvero, Thiago",
-    "equipo": "Vélez",
-    "EP": 5.68,
-    "pJuega": 0.87,
-    "ficha": 5.65,
-    "precio": 1200000
-   },
-   {
-    "nombre": "Zabala, Facundo",
-    "equipo": "Independiente",
-    "EP": 5.66,
+    "nombre": "Marcich, Sasha",
+    "equipo": "Lanús",
+    "EP": 5.77,
     "pJuega": 0.91,
-    "ficha": 5.05,
-    "precio": 2800000
-   },
-   {
-    "nombre": "Blondel, Lucas",
-    "equipo": "Huracán",
-    "EP": 5.62,
-    "pJuega": 0.9,
-    "ficha": 5.15,
-    "precio": 3000000
+    "ficha": 5.35,
+    "precio": 4000000
    },
    {
     "nombre": "Cannavo, Ezequiel",
     "equipo": "Racing",
-    "EP": 5.61,
+    "EP": 5.66,
     "pJuega": 0.9,
     "ficha": 5.25,
     "precio": 1400000
    },
    {
-    "nombre": "Otamendi, Nicolás",
-    "equipo": "River",
-    "EP": 5.61,
-    "pJuega": 0.88,
-    "ficha": 5.25,
-    "precio": 6800000
-   },
-   {
     "nombre": "Orihuela, Renzo",
     "equipo": "Sarmiento",
-    "EP": 5.58,
-    "pJuega": 0.9,
+    "EP": 5.66,
+    "pJuega": 0.91,
     "ficha": 5.15,
     "precio": 1700000
    },
    {
+    "nombre": "Zabala, Facundo",
+    "equipo": "Independiente",
+    "EP": 5.65,
+    "pJuega": 0.91,
+    "ficha": 5.05,
+    "precio": 2800000
+   },
+   {
+    "nombre": "Alarcón, Fernando",
+    "equipo": "Instituto",
+    "EP": 5.65,
+    "pJuega": 0.91,
+    "ficha": 5.45,
+    "precio": 3800000
+   },
+   {
+    "nombre": "Blondel, Lucas",
+    "equipo": "Huracán",
+    "EP": 5.63,
+    "pJuega": 0.9,
+    "ficha": 5.15,
+    "precio": 3000000
+   },
+   {
+    "nombre": "Izquierdoz, Carlos",
+    "equipo": "Lanús",
+    "EP": 5.59,
+    "pJuega": 0.91,
+    "ficha": 5.39,
+    "precio": 5000000
+   },
+   {
+    "nombre": "Cerato, Giuliano",
+    "equipo": "Instituto",
+    "EP": 5.57,
+    "pJuega": 0.91,
+    "ficha": 5.35,
+    "precio": 1900000
+   },
+   {
+    "nombre": "Ávila, Gastón",
+    "equipo": "Rosario Ctral.",
+    "EP": 5.54,
+    "pJuega": 0.85,
+    "ficha": 5.17,
+    "precio": 4800000
+   },
+   {
+    "nombre": "Silvero, Thiago",
+    "equipo": "Vélez",
+    "EP": 5.53,
+    "pJuega": 0.85,
+    "ficha": 5.65,
+    "precio": 1200000
+   },
+   {
     "nombre": "Maffini, Gonzalo",
     "equipo": "Estudiantes RC",
-    "EP": 5.53,
+    "EP": 5.52,
     "pJuega": 0.91,
     "ficha": 5.39,
     "precio": 1000000
    },
    {
+    "nombre": "Suárez, Lucas",
+    "equipo": "Sarmiento",
+    "EP": 5.5,
+    "pJuega": 0.91,
+    "ficha": 5.25,
+    "precio": 1900000
+   },
+   {
     "nombre": "Vallejo, Luciano",
     "equipo": "Atl. Tucumán",
-    "EP": 5.52,
+    "EP": 5.49,
     "pJuega": 0.91,
     "ficha": 5.35,
     "precio": 300000
    },
    {
-    "nombre": "Marcich, Sasha",
-    "equipo": "Lanús",
-    "EP": 5.52,
-    "pJuega": 0.88,
-    "ficha": 5.35,
-    "precio": 4000000
-   },
-   {
-    "nombre": "Oviedo, Brandon",
-    "equipo": "Banfield",
-    "EP": 5.47,
+    "nombre": "Insaurralde, Juan Manuel",
+    "equipo": "Sarmiento",
+    "EP": 5.49,
     "pJuega": 0.9,
-    "ficha": 5.28,
-    "precio": 900000
-   },
-   {
-    "nombre": "Garay, Martín",
-    "equipo": "Tigre",
-    "EP": 5.47,
-    "pJuega": 0.85,
-    "ficha": 5.65,
-    "precio": 1700000
+    "ficha": 5.55,
+    "precio": 3500000
    },
    {
     "nombre": "Morales, Leonardo",
@@ -450,67 +482,27 @@
     "precio": 4700000
    },
    {
-    "nombre": "Blanco, Lautaro",
-    "equipo": "Boca",
-    "EP": 5.46,
-    "pJuega": 0.9,
-    "ficha": 5.35,
-    "precio": 5700000
-   },
-   {
-    "nombre": "Barrionuevo, Alan",
-    "equipo": "Tigre",
-    "EP": 5.46,
-    "pJuega": 0.91,
-    "ficha": 5.35,
-    "precio": 2200000
-   },
-   {
-    "nombre": "Ávila, Gastón",
-    "equipo": "Rosario Ctral.",
-    "EP": 5.44,
-    "pJuega": 0.84,
-    "ficha": 5.17,
-    "precio": 4800000
-   },
-   {
-    "nombre": "Ludueña, Juan Pablo",
-    "equipo": "Unión",
-    "EP": 5.43,
-    "pJuega": 0.91,
-    "ficha": 5.35,
-    "precio": 1100000
-   },
-   {
-    "nombre": "Suárez, Lucas",
-    "equipo": "Sarmiento",
-    "EP": 5.42,
-    "pJuega": 0.9,
-    "ficha": 5.25,
-    "precio": 1900000
-   },
-   {
-    "nombre": "Meriano, Nicolás",
+    "nombre": "Oviedo, Brandon",
     "equipo": "Banfield",
+    "EP": 5.43,
+    "pJuega": 0.9,
+    "ficha": 5.28,
+    "precio": 900000
+   },
+   {
+    "nombre": "Martínez, Enzo",
+    "equipo": "Gimnasia LP",
     "EP": 5.41,
     "pJuega": 0.91,
-    "ficha": 4.75,
-    "precio": 800000
+    "ficha": 5.28,
+    "precio": 1400000
    }
   ],
   "VOL": [
    {
-    "nombre": "Ascacíbar, Santiago",
-    "equipo": "Boca",
-    "EP": 6.93,
-    "pJuega": 0.9,
-    "ficha": 5.95,
-    "precio": 6400000
-   },
-   {
     "nombre": "Miljevic, Matko",
     "equipo": "Racing",
-    "EP": 6.85,
+    "EP": 7.01,
     "pJuega": 0.87,
     "ficha": 5.75,
     "precio": 4800000
@@ -518,103 +510,119 @@
    {
     "nombre": "Lencioni, Facundo",
     "equipo": "Gimnasia Mza",
-    "EP": 6.44,
+    "EP": 6.55,
     "pJuega": 0.91,
     "ficha": 6.15,
     "precio": 1000000
    },
    {
-    "nombre": "Lanzini, Manuel",
-    "equipo": "Vélez",
-    "EP": 6.21,
-    "pJuega": 0.86,
-    "ficha": 6.05,
-    "precio": 5000000
+    "nombre": "Peña Biafore, Felipe",
+    "equipo": "Lanús",
+    "EP": 6.46,
+    "pJuega": 0.9,
+    "ficha": 5.45,
+    "precio": 2600000
+   },
+   {
+    "nombre": "Ascacíbar, Santiago",
+    "equipo": "Boca",
+    "EP": 6.3,
+    "pJuega": 0.84,
+    "ficha": 5.95,
+    "precio": 6400000
    },
    {
     "nombre": "Millán, Lautaro",
     "equipo": "Independiente",
-    "EP": 6.2,
+    "EP": 6.19,
     "pJuega": 0.76,
     "ficha": 5.79,
     "precio": 1700000
    },
    {
-    "nombre": "Peña Biafore, Felipe",
-    "equipo": "Lanús",
-    "EP": 6.14,
-    "pJuega": 0.86,
-    "ficha": 5.45,
-    "precio": 2600000
-   },
-   {
     "nombre": "Alanís, Gabriel",
     "equipo": "Estudiantes RC",
-    "EP": 6.11,
+    "EP": 6.08,
     "pJuega": 0.86,
     "ficha": 5.19,
     "precio": 2000000
    },
    {
+    "nombre": "Lanzini, Manuel",
+    "equipo": "Vélez",
+    "EP": 6.03,
+    "pJuega": 0.84,
+    "ficha": 6.05,
+    "precio": 5000000
+   },
+   {
+    "nombre": "Mavilla, Julián",
+    "equipo": "Sarmiento",
+    "EP": 5.99,
+    "pJuega": 0.84,
+    "ficha": 6.06,
+    "precio": 800000
+   },
+   {
     "nombre": "Lescano, Alan",
     "equipo": "Argentinos",
-    "EP": 5.93,
+    "EP": 5.9,
     "pJuega": 0.88,
     "ficha": 5.83,
     "precio": 5400000
    },
    {
-    "nombre": "Mavilla, Julián",
-    "equipo": "Sarmiento",
-    "EP": 5.89,
-    "pJuega": 0.82,
-    "ficha": 6.06,
-    "precio": 800000
-   },
-   {
     "nombre": "Di María, Ángel",
     "equipo": "Rosario Ctral.",
-    "EP": 5.73,
-    "pJuega": 0.83,
+    "EP": 5.85,
+    "pJuega": 0.84,
     "ficha": 5.95,
     "precio": 7000000
    },
    {
+    "nombre": "Martínez, Mauricio",
+    "equipo": "Sarmiento",
+    "EP": 5.76,
+    "pJuega": 0.9,
+    "ficha": 5.72,
+    "precio": 3200000
+   },
+   {
     "nombre": "Fernández, Ignacio",
     "equipo": "Gimnasia LP",
-    "EP": 5.71,
+    "EP": 5.72,
     "pJuega": 0.9,
     "ficha": 6.15,
     "precio": 4500000
    },
    {
-    "nombre": "Martínez, Mauricio",
-    "equipo": "Sarmiento",
-    "EP": 5.67,
-    "pJuega": 0.89,
-    "ficha": 5.72,
-    "precio": 3200000
-   },
-   {
-    "nombre": "Aliendro, Rodrigo",
-    "equipo": "Vélez",
-    "EP": 5.66,
-    "pJuega": 0.87,
-    "ficha": 5.65,
-    "precio": 4000000
-   },
-   {
     "nombre": "Marcone, Iván",
     "equipo": "Independiente",
-    "EP": 5.59,
+    "EP": 5.58,
     "pJuega": 0.91,
     "ficha": 5.45,
     "precio": 4000000
    },
    {
+    "nombre": "Aliendro, Rodrigo",
+    "equipo": "Vélez",
+    "EP": 5.51,
+    "pJuega": 0.85,
+    "ficha": 5.65,
+    "precio": 4000000
+   },
+   {
+    "nombre": "Porra, Tomás",
+    "equipo": "Barracas Ctral.",
+    "EP": 5.4,
+    "pJuega": 0.9,
+    "ficha": 5.65,
+    "precio": 400000
+   },
+   {
     "nombre": "Godoy, Lautaro",
     "equipo": "Atl. Tucumán",
-    "EP": 5.4,
+    "EP": 5.39,
     "pJuega": 0.91,
     "ficha": 5.55,
     "precio": 500000
@@ -622,15 +630,23 @@
    {
     "nombre": "Barbona, David",
     "equipo": "Def. y Justicia",
-    "EP": 5.39,
+    "EP": 5.35,
     "pJuega": 0.86,
     "ficha": 5.85,
     "precio": 2900000
    },
    {
+    "nombre": "Florentín, José",
+    "equipo": "Ind. Rivadavia",
+    "EP": 5.29,
+    "pJuega": 0.88,
+    "ficha": 5.55,
+    "precio": 4000000
+   },
+   {
     "nombre": "Menossi, Lucas",
     "equipo": "Unión",
-    "EP": 5.31,
+    "EP": 5.28,
     "pJuega": 0.88,
     "ficha": 5.65,
     "precio": 3000000
@@ -638,121 +654,113 @@
    {
     "nombre": "Pérez, César",
     "equipo": "Def. y Justicia",
-    "EP": 5.25,
+    "EP": 5.19,
     "pJuega": 0.91,
     "ficha": 5.25,
     "precio": 1900000
    },
    {
+    "nombre": "Gallardo, Matías",
+    "equipo": "Instituto",
+    "EP": 5.17,
+    "pJuega": 0.88,
+    "ficha": 5.55,
+    "precio": 800000
+   },
+   {
     "nombre": "Gutiérrez, Kevin",
     "equipo": "Argentinos",
-    "EP": 5.17,
+    "EP": 5.15,
     "pJuega": 0.89,
     "ficha": 5.65,
     "precio": 4000000
    },
    {
-    "nombre": "Porra, Tomás",
-    "equipo": "Barracas Ctral.",
-    "EP": 5.17,
-    "pJuega": 0.87,
-    "ficha": 5.65,
-    "precio": 400000
-   },
-   {
     "nombre": "López Muñoz, Hernán",
     "equipo": "Argentinos",
-    "EP": 5.16,
+    "EP": 5.13,
     "pJuega": 0.72,
     "ficha": 5.61,
     "precio": 4700000
    },
    {
-    "nombre": "Florentín, José",
-    "equipo": "Ind. Rivadavia",
-    "EP": 5.08,
-    "pJuega": 0.85,
-    "ficha": 5.55,
-    "precio": 4000000
-   },
-   {
     "nombre": "Miramón, Ignacio",
     "equipo": "Gimnasia LP",
-    "EP": 5.05,
+    "EP": 5.06,
     "pJuega": 0.88,
     "ficha": 5.65,
     "precio": 3500000
    },
    {
-    "nombre": "Gallardo, Matías",
+    "nombre": "Abregú, Gustavo",
     "equipo": "Instituto",
-    "EP": 4.97,
-    "pJuega": 0.84,
-    "ficha": 5.55,
-    "precio": 800000
-   },
-   {
-    "nombre": "Saralegui, Jabes",
-    "equipo": "Tigre",
-    "EP": 4.94,
-    "pJuega": 0.81,
-    "ficha": 5.83,
-    "precio": 3400000
+    "EP": 4.96,
+    "pJuega": 0.9,
+    "ficha": 5.25,
+    "precio": 900000
    }
   ],
   "DEL": [
    {
-    "nombre": "Tarragona, Cristian",
-    "equipo": "Unión",
-    "EP": 6.59,
-    "pJuega": 0.9,
-    "ficha": 5.75,
-    "precio": 4000000
-   },
-   {
     "nombre": "Correa, Ángel",
     "equipo": "River",
-    "EP": 6.49,
-    "pJuega": 0.82,
+    "EP": 6.78,
+    "pJuega": 0.86,
     "ficha": 6.28,
     "precio": 6800000
    },
    {
     "nombre": "Módica, Agustín",
     "equipo": "Gimnasia Mza",
-    "EP": 6.47,
+    "EP": 6.59,
     "pJuega": 0.85,
     "ficha": 6.35,
     "precio": 1200000
    },
    {
-    "nombre": "Auzmendi, Rodrigo",
-    "equipo": "San Lorenzo",
-    "EP": 6.36,
-    "pJuega": 0.91,
-    "ficha": 5.45,
-    "precio": 3200000
+    "nombre": "Tarragona, Cristian",
+    "equipo": "Unión",
+    "EP": 6.51,
+    "pJuega": 0.9,
+    "ficha": 5.75,
+    "precio": 4000000
    },
    {
     "nombre": "Marabel, Junior",
     "equipo": "Sarmiento",
-    "EP": 6.3,
-    "pJuega": 0.86,
+    "EP": 6.41,
+    "pJuega": 0.87,
     "ficha": 5.55,
     "precio": 3000000
    },
    {
+    "nombre": "Auzmendi, Rodrigo",
+    "equipo": "San Lorenzo",
+    "EP": 6.23,
+    "pJuega": 0.9,
+    "ficha": 5.45,
+    "precio": 3200000
+   },
+   {
     "nombre": "Russo, Ignacio",
     "equipo": "Tigre",
-    "EP": 6.28,
-    "pJuega": 0.91,
+    "EP": 6.2,
+    "pJuega": 0.89,
     "ficha": 5.55,
     "precio": 4400000
    },
    {
+    "nombre": "Vombergar, Andrés",
+    "equipo": "Aldosivi",
+    "EP": 6.08,
+    "pJuega": 0.86,
+    "ficha": 5.06,
+    "precio": 2500000
+   },
+   {
     "nombre": "Céliz, Milton",
     "equipo": "Dep. Riestra",
-    "EP": 6.01,
+    "EP": 6.02,
     "pJuega": 0.91,
     "ficha": 5.85,
     "precio": 2000000
@@ -760,26 +768,26 @@
    {
     "nombre": "Montiel, Santiago",
     "equipo": "Independiente",
-    "EP": 5.91,
+    "EP": 5.9,
     "pJuega": 0.88,
     "ficha": 5.45,
     "precio": 4700000
    },
    {
-    "nombre": "Vombergar, Andrés",
-    "equipo": "Aldosivi",
-    "EP": 5.75,
-    "pJuega": 0.83,
-    "ficha": 5.06,
-    "precio": 2500000
+    "nombre": "Arce, Alex",
+    "equipo": "Ind. Rivadavia",
+    "EP": 5.88,
+    "pJuega": 0.86,
+    "ficha": 5.95,
+    "precio": 4900000
    },
    {
-    "nombre": "Méndez, Mauro",
-    "equipo": "Tigre",
-    "EP": 5.7,
-    "pJuega": 0.74,
-    "ficha": 5.59,
-    "precio": 3000000
+    "nombre": "Fernández, Matías",
+    "equipo": "Ind. Rivadavia",
+    "EP": 5.79,
+    "pJuega": 0.82,
+    "ficha": 6.28,
+    "precio": 4000000
    },
    {
     "nombre": "Rigoni, Emiliano",
@@ -790,28 +798,28 @@
     "precio": 4700000
    },
    {
-    "nombre": "Arce, Alex",
-    "equipo": "Ind. Rivadavia",
-    "EP": 5.64,
-    "pJuega": 0.83,
-    "ficha": 5.95,
-    "precio": 4900000
+    "nombre": "Méndez, Mauro",
+    "equipo": "Tigre",
+    "EP": 5.63,
+    "pJuega": 0.73,
+    "ficha": 5.59,
+    "precio": 3000000
+   },
+   {
+    "nombre": "Depietri, Valentín",
+    "equipo": "Talleres",
+    "EP": 5.6,
+    "pJuega": 0.8,
+    "ficha": 5.28,
+    "precio": 2400000
    },
    {
     "nombre": "Mazzantti, Walter",
     "equipo": "Newell's",
-    "EP": 5.63,
+    "EP": 5.59,
     "pJuega": 0.91,
     "ficha": 5.65,
     "precio": 4300000
-   },
-   {
-    "nombre": "Cuello, Alexis",
-    "equipo": "San Lorenzo",
-    "EP": 5.62,
-    "pJuega": 0.91,
-    "ficha": 5.25,
-    "precio": 4000000
    },
    {
     "nombre": "Cortés, Oscar",
@@ -822,84 +830,76 @@
     "precio": 2500000
    },
    {
-    "nombre": "Fernández, Matías",
-    "equipo": "Ind. Rivadavia",
-    "EP": 5.57,
-    "pJuega": 0.78,
-    "ficha": 6.28,
-    "precio": 4000000
-   },
-   {
     "nombre": "Molina, Tomás",
     "equipo": "Argentinos",
-    "EP": 5.54,
+    "EP": 5.51,
     "pJuega": 0.86,
     "ficha": 5.15,
     "precio": 4100000
    },
    {
-    "nombre": "Depietri, Valentín",
-    "equipo": "Talleres",
+    "nombre": "Cuello, Alexis",
+    "equipo": "San Lorenzo",
+    "EP": 5.51,
+    "pJuega": 0.9,
+    "ficha": 5.25,
+    "precio": 4000000
+   },
+   {
+    "nombre": "Tissera, Matías",
+    "equipo": "Instituto",
     "EP": 5.5,
-    "pJuega": 0.79,
-    "ficha": 5.28,
-    "precio": 2400000
+    "pJuega": 0.8,
+    "ficha": 5.25,
+    "precio": 1200000
    },
    {
     "nombre": "Auzmendi, Agustín",
     "equipo": "Gimnasia LP",
-    "EP": 5.46,
+    "EP": 5.48,
     "pJuega": 0.85,
     "ficha": 5.25,
     "precio": 2500000
    },
    {
+    "nombre": "Aquino, Dylan",
+    "equipo": "Lanús",
+    "EP": 5.42,
+    "pJuega": 0.78,
+    "ficha": 5.65,
+    "precio": 2900000
+   },
+   {
     "nombre": "Gutiérrez, Juan Manuel",
     "equipo": "Def. y Justicia",
-    "EP": 5.4,
+    "EP": 5.36,
     "pJuega": 0.9,
     "ficha": 5.35,
     "precio": 2000000
    },
    {
+    "nombre": "Lima Morais, Rick",
+    "equipo": "Talleres",
+    "EP": 5.29,
+    "pJuega": 0.78,
+    "ficha": 5.45,
+    "precio": 4100000
+   },
+   {
     "nombre": "Perrotta, Tiziano",
     "equipo": "Def. y Justicia",
-    "EP": 5.32,
+    "EP": 5.28,
     "pJuega": 0.84,
     "ficha": 5.72,
     "precio": 2600000
    },
    {
-    "nombre": "Flores, Leonel",
-    "equipo": "Boca",
-    "EP": 5.31,
-    "pJuega": 0.83,
-    "ficha": 5.65,
-    "precio": 500000
-   },
-   {
-    "nombre": "Tissera, Matías",
-    "equipo": "Instituto",
-    "EP": 5.27,
-    "pJuega": 0.77,
-    "ficha": 5.25,
-    "precio": 1200000
-   },
-   {
-    "nombre": "Lima Morais, Rick",
-    "equipo": "Talleres",
-    "EP": 5.2,
-    "pJuega": 0.77,
-    "ficha": 5.45,
-    "precio": 4100000
-   },
-   {
-    "nombre": "Aquino, Dylan",
-    "equipo": "Lanús",
-    "EP": 5.18,
-    "pJuega": 0.76,
-    "ficha": 5.65,
-    "precio": 2900000
+    "nombre": "Barrera, Diego",
+    "equipo": "Ctral. Córdoba",
+    "EP": 5.12,
+    "pJuega": 0.89,
+    "ficha": 5.35,
+    "precio": 800000
    }
   ]
  },
@@ -907,12 +907,12 @@
   {
    "local": "Estudiantes de Río Cuarto",
    "visitante": "Sarmiento de Junin",
-   "pGolLocal": 0.638,
-   "pGolVisitante": 0.623,
-   "pVallaLocal": 0.377,
-   "pVallaVisitante": 0.362,
-   "golesEsperadosLocal": 1.015,
-   "golesEsperadosVisitante": 0.975
+   "pGolLocal": 0.632,
+   "pGolVisitante": 0.628,
+   "pVallaLocal": 0.372,
+   "pVallaVisitante": 0.368,
+   "golesEsperadosLocal": 1,
+   "golesEsperadosVisitante": 0.99
   },
   {
    "local": "Belgrano de Cordoba",
@@ -927,132 +927,132 @@
   {
    "local": "Platense",
    "visitante": "Deportivo Riestra",
-   "pGolLocal": 0.628,
-   "pGolVisitante": 0.556,
-   "pVallaLocal": 0.444,
-   "pVallaVisitante": 0.372,
-   "golesEsperadosLocal": 0.989,
-   "golesEsperadosVisitante": 0.811
+   "pGolLocal": 0.621,
+   "pGolVisitante": 0.561,
+   "pVallaLocal": 0.438,
+   "pVallaVisitante": 0.379,
+   "golesEsperadosLocal": 0.971,
+   "golesEsperadosVisitante": 0.824
   },
   {
    "local": "Aldosivi Mar del Plata",
    "visitante": "Banfield",
-   "pGolLocal": 0.652,
-   "pGolVisitante": 0.643,
-   "pVallaLocal": 0.357,
-   "pVallaVisitante": 0.348,
-   "golesEsperadosLocal": 1.056,
-   "golesEsperadosVisitante": 1.03
+   "pGolLocal": 0.667,
+   "pGolVisitante": 0.628,
+   "pVallaLocal": 0.372,
+   "pVallaVisitante": 0.333,
+   "golesEsperadosLocal": 1.1,
+   "golesEsperadosVisitante": 0.99
   },
   {
    "local": "Gimnasia La Plata",
    "visitante": "CA Tigre BA",
-   "pGolLocal": 0.654,
-   "pGolVisitante": 0.628,
-   "pVallaLocal": 0.372,
-   "pVallaVisitante": 0.346,
-   "golesEsperadosLocal": 1.06,
-   "golesEsperadosVisitante": 0.99
+   "pGolLocal": 0.659,
+   "pGolVisitante": 0.623,
+   "pVallaLocal": 0.377,
+   "pVallaVisitante": 0.341,
+   "golesEsperadosLocal": 1.076,
+   "golesEsperadosVisitante": 0.975
   },
   {
    "local": "Gimnasia Mendoza",
    "visitante": "Boca Juniors",
-   "pGolLocal": 0.657,
-   "pGolVisitante": 0.679,
-   "pVallaLocal": 0.321,
-   "pVallaVisitante": 0.343,
-   "golesEsperadosLocal": 1.071,
-   "golesEsperadosVisitante": 1.137
+   "pGolLocal": 0.683,
+   "pGolVisitante": 0.654,
+   "pVallaLocal": 0.346,
+   "pVallaVisitante": 0.317,
+   "golesEsperadosLocal": 1.15,
+   "golesEsperadosVisitante": 1.061
   },
   {
    "local": "San Lorenzo",
    "visitante": "Talleres",
-   "pGolLocal": 0.679,
-   "pGolVisitante": 0.596,
-   "pVallaLocal": 0.404,
-   "pVallaVisitante": 0.321,
-   "golesEsperadosLocal": 1.137,
-   "golesEsperadosVisitante": 0.906
+   "pGolLocal": 0.668,
+   "pGolVisitante": 0.607,
+   "pVallaLocal": 0.393,
+   "pVallaVisitante": 0.332,
+   "golesEsperadosLocal": 1.103,
+   "golesEsperadosVisitante": 0.934
   },
   {
    "local": "Velez Sarsfield BA",
    "visitante": "Estudiantes",
-   "pGolLocal": 0.672,
-   "pGolVisitante": 0.6,
-   "pVallaLocal": 0.4,
-   "pVallaVisitante": 0.327,
-   "golesEsperadosLocal": 1.116,
-   "golesEsperadosVisitante": 0.917
+   "pGolLocal": 0.668,
+   "pGolVisitante": 0.603,
+   "pVallaLocal": 0.397,
+   "pVallaVisitante": 0.332,
+   "golesEsperadosLocal": 1.103,
+   "golesEsperadosVisitante": 0.925
   },
   {
    "local": "Rosario Central",
    "visitante": "Newells Old Boys",
-   "pGolLocal": 0.76,
-   "pGolVisitante": 0.488,
-   "pVallaLocal": 0.512,
-   "pVallaVisitante": 0.24,
-   "golesEsperadosLocal": 1.428,
-   "golesEsperadosVisitante": 0.67
+   "pGolLocal": 0.768,
+   "pGolVisitante": 0.478,
+   "pVallaLocal": 0.522,
+   "pVallaVisitante": 0.232,
+   "golesEsperadosLocal": 1.46,
+   "golesEsperadosVisitante": 0.65
   },
   {
    "local": "Central Córdoba",
    "visitante": "Independiente",
-   "pGolLocal": 0.58,
-   "pGolVisitante": 0.724,
-   "pVallaLocal": 0.276,
-   "pVallaVisitante": 0.42,
-   "golesEsperadosLocal": 0.867,
-   "golesEsperadosVisitante": 1.289
+   "pGolLocal": 0.585,
+   "pGolVisitante": 0.722,
+   "pVallaLocal": 0.278,
+   "pVallaVisitante": 0.415,
+   "golesEsperadosLocal": 0.88,
+   "golesEsperadosVisitante": 1.28
   },
   {
    "local": "Lanus",
    "visitante": "Defensa y Justicia",
-   "pGolLocal": 0.754,
-   "pGolVisitante": 0.56,
-   "pVallaLocal": 0.44,
-   "pVallaVisitante": 0.246,
-   "golesEsperadosLocal": 1.402,
-   "golesEsperadosVisitante": 0.822
+   "pGolLocal": 0.77,
+   "pGolVisitante": 0.542,
+   "pVallaLocal": 0.458,
+   "pVallaVisitante": 0.23,
+   "golesEsperadosLocal": 1.47,
+   "golesEsperadosVisitante": 0.78
   },
   {
    "local": "River Plate",
    "visitante": "Independiente Rivadavia",
    "pGolLocal": 0.779,
-   "pGolVisitante": 0.55,
-   "pVallaLocal": 0.45,
+   "pGolVisitante": 0.551,
+   "pVallaLocal": 0.449,
    "pVallaVisitante": 0.221,
-   "golesEsperadosLocal": 1.508,
-   "golesEsperadosVisitante": 0.799
+   "golesEsperadosLocal": 1.51,
+   "golesEsperadosVisitante": 0.8
   },
   {
    "local": "Racing Club",
    "visitante": "Atlético Tucuman",
-   "pGolLocal": 0.765,
-   "pGolVisitante": 0.56,
-   "pVallaLocal": 0.44,
-   "pVallaVisitante": 0.235,
-   "golesEsperadosLocal": 1.45,
-   "golesEsperadosVisitante": 0.82
+   "pGolLocal": 0.772,
+   "pGolVisitante": 0.551,
+   "pVallaLocal": 0.449,
+   "pVallaVisitante": 0.228,
+   "golesEsperadosLocal": 1.48,
+   "golesEsperadosVisitante": 0.8
   },
   {
    "local": "Barracas Central",
    "visitante": "Argentinos Juniors",
-   "pGolLocal": 0.531,
-   "pGolVisitante": 0.701,
-   "pVallaLocal": 0.299,
-   "pVallaVisitante": 0.468,
-   "golesEsperadosLocal": 0.758,
-   "golesEsperadosVisitante": 1.206
+   "pGolLocal": 0.542,
+   "pGolVisitante": 0.69,
+   "pVallaLocal": 0.31,
+   "pVallaVisitante": 0.458,
+   "golesEsperadosLocal": 0.78,
+   "golesEsperadosVisitante": 1.17
   },
   {
    "local": "Union Santa Fe",
    "visitante": "Instituto de Córdoba",
-   "pGolLocal": 0.713,
-   "pGolVisitante": 0.642,
-   "pVallaLocal": 0.358,
-   "pVallaVisitante": 0.287,
-   "golesEsperadosLocal": 1.248,
-   "golesEsperadosVisitante": 1.027
+   "pGolLocal": 0.696,
+   "pGolVisitante": 0.66,
+   "pVallaLocal": 0.34,
+   "pVallaVisitante": 0.304,
+   "golesEsperadosLocal": 1.19,
+   "golesEsperadosVisitante": 1.08
   }
  ]
 }

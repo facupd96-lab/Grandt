@@ -782,20 +782,30 @@ function evaluar(p, ctx, eq) {
   const lamJug = Math.max(0, lamGol - lamPen);
   const EP_gol = lamJug * valJugada + lamPen * valPenal;
 
-  // VALLA INVICTA: CUENTA SU TIEMPO EN CANCHA, NO EL PARTIDO ENTERO (03/09).
-  // Regla del juego, confirmada por facu: el que juega mas de 20 minutos cobra
-  // la valla si NO le hicieron gol MIENTRAS ESTUVO EN LA CANCHA. Si sale a los
-  // 60 con el 0 a 0 y el equipo recibe a los 80, la cobra igual.
-  // Antes se usaba la chance de que el equipo terminara el partido sin recibir,
-  // que es lo mismo solo para el que juega los 90. Al que lo sacan lo
-  // castigaba dos veces: le bajaba el gol (bien, el gol si escala con los
-  // minutos) y ademas le bajaba la valla (mal).
-  // Los goles llegan parejo a lo largo del partido, asi que la chance de que no
-  // le hagan ninguno en sus primeros t minutos es exp(-lamAgainst x t/90).
-  // Para el que juega 90 no cambia nada; al que sale a los 65 le sube.
-  const fracVI = clamp((mp.minSiJuega || 90) / 90, 0.25, 1);
-  const pVIsuya = Math.exp(-Math.max(0.05, lam.lamAgainst) * fracVI);
-  const EP_vi = (RG.vallaInvicta[pos] || 0) * pVIsuya;
+  // VALLA INVICTA. Vuelve a ser la chance de que el EQUIPO termine el partido
+  // sin recibir (04/09).
+  //
+  // El 03/09 lo cambie por exp(-golesEnContra x minutos/90), siguiendo la regla
+  // tal como me la explicaron: cobra la valla el que jugo 20 minutos o mas y no
+  // recibio gol MIENTRAS ESTUVO EN LA CANCHA. La formula se sigue de ahi, pero
+  // el resultado era un disparate y lo agarro facu antes que yo:
+  //
+  //   minutos que juega    valla que le dabamos    valla de su equipo
+  //     menos de 41              76%                     36%
+  //     41 a 60                  59%                     41%
+  //     61 a 79                  43%                     35%
+  //     88 a 90                  36%                     36%
+  //
+  // O sea que al que entra 20 minutos le daba MAS DEL DOBLE de valla que a su
+  // propio equipo, y mas que a un titular que juega los 90. Premiaba jugar poco.
+  // Movio 194 jugadores 8 puestos o mas, y ninguno de esos movimientos era real.
+  //
+  // La parte cierta de la regla —que al titular que sale a los 60 con el 0 a 0
+  // no hay que castigarlo— sigue en pie y hay que implementarla bien, pero no
+  // asi: hace falta medir cuantas vallas paga Gran DT de verdad a los que entran
+  // desde el banco antes de tocar esto de nuevo. Queda anotado.
+  const EP_vi = (RG.vallaInvicta[pos] || 0) * lam.pVI;
+
   const EP_gc = pos === 'ARQ' ? RG.golRecibidoARQ * lam.lamAgainst : 0;
 
   const pFig = figuras[key(p)] ?? 0.02;
@@ -838,9 +848,8 @@ function evaluar(p, ctx, eq) {
   // Multiplicarla otra vez por los minutos seria contar dos veces lo mismo.
   const EP_tarj = RG.amarilla * tasaTA + RG.roja * tasaTR;
 
-  // EP SI ENTRA. La valla SI se escala por minutos desde el 03/09: el reglamento
-  // pide 20 minutos y que no le hagan gol MIENTRAS ESTA EN LA CANCHA, no que el
-  // equipo termine el partido sin recibir. La ficha no se escala: medido, un delantero que entra 30' saca 5.35 de
+  // EP SI ENTRA. La valla NO se escala por minutos (ver arriba por que se probo
+  // y se volvio atras). La ficha tampoco: medido, un delantero que entra 30' saca 5.35 de
   // ficha-mas-incidencias y uno que juega 85' saca 6.86 — la diferencia esta en
   // el gol, no en la nota. Lo que SI escala por minutos es el gol (directo, via
   // lamGol) y la figura (indirecto: sale de lamGol). Las tarjetas NO — el
@@ -888,7 +897,7 @@ function evaluar(p, ctx, eq) {
     techo: round2(f.ficha + EP_vi + EP_gc + EP_tarj + valJugada + RG.figura * 0.5),
     conCinta: round2(EP + mp.pFicha * f.ficha),   // el capitán duplica SOLO la ficha
     ficha: round2(f.ficha), fichaCruda: f.cruda === null ? null : round2(f.cruda), fichaOk: f.ok,
-    pVI: round3(pVIsuya), pVIequipo: lam.pVI, lamGol: round3(lamGol), pFigura: round3(pFig),
+    pVI: lam.pVI, lamGol: round3(lamGol), pFigura: round3(pFig),
     lamPen: round3(lamPen),
     transferido: p.transferido || null,
     penalesPateados: penesPateadosJ, penalesConvertidos: num(p.goalsPenalty),
@@ -902,7 +911,7 @@ function evaluar(p, ctx, eq) {
     lam,
     desglose: [
       ['Ficha Clarín limpia',  round2(f.ficha), `${f.ct} PJ · cruda ${f.cruda === null ? 's/d' : round2(f.cruda)}`],
-      ['Valla invicta',        round2(EP_vi),   `${(pVIsuya * 100).toFixed(1)}% × ${RG.vallaInvicta[pos] || 0} pts` + (fracMin < 0.99 ? ` (sobre sus ${Math.round(mp.minSiJuega)}′, no sobre los 90)` : '')],
+      ['Valla invicta',        round2(EP_vi),   `${(lam.pVI * 100).toFixed(1)}% × ${RG.vallaInvicta[pos] || 0} pts`],
       ['Goles recibidos',      round2(EP_gc),   pos === 'ARQ' ? `${lam.lamAgainst} esperados × -1` : '—'],
       ['Gol propio',           round2(EP_gol),  `${round3(lamGol)} goles esperados (${(share * 100).toFixed(1)}% del ataque) × ${valJugada}`],
       ['Figura',               round2(EP_fig),  `${(pFig * 100).toFixed(1)}% × 4`],

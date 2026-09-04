@@ -458,8 +458,9 @@ function disponibilidad(nombrePlaneta, equipoPlaneta){
   // EL ESTADO DEL AYUDANTE DE CAMPO ES UN HECHO, NO UNA ESTIMACION.
   // Lo publica el propio juego: si dice Lesionado, el tipo no juega. Le gana a
   // cualquier cuenta nuestra de tarjetas y al tarjetero cargado a mano.
-  const estadoGDT = gdt && gdt.estado ? gdt.estado : null;
-  const fueraPorGDT = !!(estadoGDT && GDT_NO_JUEGA.has(estadoGDT));
+  const seFue = SE_FUERON[n] || SE_FUERON[w.slice(1).join(' ')+' '+w[0]] || null;
+  const estadoGDT = seFue ? (seFue.etiqueta||'No juega (cargado a mano)') : (gdt && gdt.estado ? gdt.estado : null);
+  const fueraPorGDT = !!seFue || !!(estadoGDT && GDT_NO_JUEGA.has(estadoGDT));
   return { amarillas:amUsar, amarillas365:am, rojas:ro, fechaUltimaRoja:ultRoja,
     tarjetero: man ? {fechas:man.fechas, motivo:man.motivo, desde:SUSPENDIDOS.fecha, fuente:SUSPENDIDOS.fuente, cumpleAca:!!cumpleAca} : null,
     fuenteAmarillas: (gdt&&gdt.amarillas!=null) ? 'ayudante de campo' : (amPlaneta!=null ? 'planilla' : '365Scores'),
@@ -472,7 +473,9 @@ function disponibilidad(nombrePlaneta, equipoPlaneta){
     enDuda: estadoGDT === 'En duda',
     posibleTitular: estadoGDT === 'Posible Titular',
     aUnaDeSuspension:(amUsar%5===4),
-    motivoBaja: fueraPorGDT ? estadoGDT
+    seFue: seFue ? seFue.motivo : null,
+    motivoBaja: seFue ? seFue.motivo
+              : fueraPorGDT ? estadoGDT
               : (cumpleAca ? 'suspendido (tarjetero)'
               : ((ro>0 && ultRoja!=null && ultRoja>=ultFechaTarj) ? 'roja en la fecha '+ultRoja : null)),
     suspendido: fueraPorGDT || !!cumpleAca || (ro>0 && ultRoja!=null && ultRoja>=ultFechaTarj) };
@@ -673,6 +676,14 @@ const TRANSFER={};
 // Se carga a mano en pases.json y se avisa fuerte, porque mientras Gran DT no
 // lo actualice el juego puede seguir tratandolo como jugador del club viejo.
 const PASES_MANUALES=[];
+// SE FUERON DEL TORNEO (04/09).
+// El pase de arriba mueve a un jugador de un club argentino a otro. Distinto es
+// el que se va al exterior: no cambia de rival, directamente no juega mas. Y la
+// planilla lo puede seguir listando semanas. Alan Lescano metio el gol del
+// triunfo en la fecha 7 y al dia siguiente lo compro Vasco da Gama; sin esto
+// seguia noveno entre los volantes y entrando a los onces.
+// Se cargan en pases.json con "hacia": "SE FUE".
+const SE_FUERON={};
 (function(){
   let raw=null;
   try{ raw=JSON.parse(fs.readFileSync('pases.json','utf8').replace(/^\uFEFF/,'')); }catch(e){ return; }
@@ -680,6 +691,25 @@ const PASES_MANUALES=[];
   if(!lista.length) return;
   lista.forEach(t=>{
     if(!t || !t.nombre || !t.hacia) return;
+    // "NO JUEGA": lesion o baja anunciada que el Ayudante de campo todavia no
+    // refleja (04/09). Modica se lesiono el 3/9 y siguio apareciendo segundo
+    // entre los delanteros. Misma maquinaria que SE FUE, distinto motivo.
+    if(String(t.hacia).toUpperCase()==='SE FUE' || String(t.hacia).toUpperCase()==='NO JUEGA'){
+      const seVa = String(t.hacia).toUpperCase()==='SE FUE';
+      const obj=norm(t.nombre), pp=(t.nombre||'').split(',');
+      const alt=pp.length>1 ? norm(pp[1]+' '+pp[0]) : null;
+      let hallado=0;
+      P.jugadores.forEach(j=>{ const n=norm(j.nombre);
+        if(n!==obj && (!alt || n!==alt)) return;
+        if(t.desde && CT(j.equipo)!==CT(t.desde)) return;
+        SE_FUERON[n]={motivo:t.nota||(seVa?('se fue a '+(t.destino||'otro pais')):'no juega esta fecha'),
+                      cuando:t.fecha||null, etiqueta: seVa?'Se fue del torneo':'No juega (cargado a mano)'};
+        if(alt) SE_FUERON[alt]=SE_FUERON[n];
+        hallado++; });
+      if(!hallado) console.log('  OJO — pases.json: no encontre a "'+t.nombre+'" para darlo de baja.');
+      else console.log((seVa?'SE FUE DEL TORNEO: ':'BAJA CARGADA A MANO: ')+t.nombre+(t.desde?' ('+t.desde+')':'')+' — '+(t.nota||'baja')+'. No entra en ningun ranking ni once.');
+      return;
+    }
     const objetivo=norm(t.nombre), partes=(t.nombre||'').split(',');
     const alterno=partes.length>1 ? norm(partes[1]+' '+partes[0]) : null;
     let encontrados=0;

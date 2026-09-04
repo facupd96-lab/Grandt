@@ -3602,7 +3602,12 @@ function avisosJugador(x) {
   if (d) {
     // El estado sale del Ayudante de campo del propio Gran DT. No es una
     // estimación nuestra: si dice Lesionado, el tipo no juega.
-    if (d.suspendido) {
+    // SE FUE DEL TORNEO (04/09). Vendido al exterior: no es una baja de una
+    // fecha, no vuelve. Va primero porque le gana a cualquier otra explicación.
+    if (d.seFue) {
+      a.push([(d.estado || 'NO JUEGA').toUpperCase(), '#ef4444', `${d.seFue} No entra en ningún once ni en las recomendaciones. Sigue en la lista porque la planilla de Planeta y el Ayudante de campo todavía lo listan en su club viejo.`]);
+    }
+    else if (d.suspendido) {
       const t = d.tarjetero;
       const porGDT = d.estado && ['Lesionado', 'Suspendido', 'Expulsado', 'No juega'].includes(d.estado);
       a.push([porGDT ? d.estado.toUpperCase() : 'SUSPENDIDO', '#ef4444',
@@ -3625,8 +3630,22 @@ function avisosJugador(x) {
     else if (d.estado) {
       const e = String(d.estado);
       const copa = /copa/i.test(e);
-      a.push([e.toUpperCase(), copa ? '#f59e0b' : '#64748b',
-        copa ? `El Gran DT lo marca como "${e}": jugó o juega por copa esta semana, así que puede ser rotado en la liga. No cambia el puntaje esperado — la decisión es tuya.`
+      // "JUEGA COPA" NO DISTINGUE ENTRE PASADO Y FUTURO (04/09).
+      // El Gran DT usa la misma etiqueta para el que YA jugó la copa —y esta
+      // semana no tiene nada más— y para el que la juega DESPUÉS de esta fecha,
+      // que es el que de verdad puede ser guardado. Son dos cosas opuestas:
+      // Lanzini venía de Copa Argentina el miércoles y después juega liga;
+      // Ascacíbar viene de lo mismo pero el martes juega Sudamericana contra
+      // São Paulo. Al primero no hay por qué bajarlo.
+      // La nota de rotación sí lo dice, así que se lee de ahí.
+      const nota = x.nrot || '';
+      const desp = /despues juega ([^-]*)/i.exec(nota);
+      const copaDespues = copa && desp && /copa|conmebol|libertadores|sudamericana/i.test(desp[1]);
+      const etq = copa ? (copaDespues ? 'COPA DESPUÉS' : 'VIENE DE COPA') : e.toUpperCase();
+      a.push([etq, copa ? (copaDespues ? '#f59e0b' : '#64748b') : '#64748b',
+        copa ? (copaDespues
+          ? `Tiene copa DESPUÉS de esta fecha: ${desp[1].trim()}. Es el caso en que lo pueden guardar. ${nota}`
+          : `Ya jugó la copa y después de esta fecha le toca liga, así que no hay motivo para que lo guarden. ${nota}`)
              : `El Gran DT lo marca como "${e}" para esta fecha. No hay nada anotado en contra: ni lesión, ni suspensión, ni duda.`]);
     }
     if (!d.suspendido && d.aUnaDeSuspension) a.push([`${d.amarillas}ª AMARILLA`, '#f59e0b', `Lleva ${d.amarillas} amarillas. A la quinta son una fecha de suspensión`]);
@@ -4090,9 +4109,16 @@ function pintarPantallaOnce() {
   const cap = TODOS[S.capitan];
   const esquemaTxt = esR ? esquemaLindo(D.arriesgado ? D.arriesgado.esquema : '') : esquemaLindo(S.esquema);
 
+  // EL SELECTOR TIENE QUE MOSTRAR EL ESQUEMA QUE SE ESTA VIENDO (04/09).
+  // En el arriesgado quedaba deshabilitado pero marcando el esquema del solido:
+  // decia "3-4-3" arriba de un once que era 4-4-2. El esquema del arriesgado lo
+  // elige la simulacion, no vos, por eso el selector sigue deshabilitado — pero
+  // ahora al menos dice la verdad.
+  const esqVista = esR ? ((D.arriesgado && D.arriesgado.esquema) || S.esquema) : S.esquema;
+  const norm11 = v => String(v || '').replace(/^1-/, '');
   const opciones = D.esquema.todos.map(e => {
     const v = e.e || e.esquema;
-    return `<option value="${v}"${!esR && S.esquema === v ? ' selected' : ''}>${esquemaLindo(v)}</option>`;
+    return `<option value="${v}"${norm11(esqVista) === norm11(v) ? ' selected' : ''}>${esquemaLindo(v)}</option>`;
   }).join('');
 
   // ── el panel de alternativas ──
