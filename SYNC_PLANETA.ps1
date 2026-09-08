@@ -30,6 +30,7 @@ if (-not $carpeta) { $carpeta = (Get-Location).Path }
 # el ultimo que conociamos.
 $idPlanilla = '2PACX-1vQWGNjh7CL09RS5jbryuvTL88q8AYF6yV5kJqmraLlASvJeyK6jYJlb8XulTFWOuEXwIOhHhVBu1CpY'
 $rutaPlanilla = Join-Path $carpeta 'planilla.json'
+$cfg = $null
 if (Test-Path $rutaPlanilla) {
   try {
     $cfg = Get-Content $rutaPlanilla -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -39,6 +40,72 @@ if (Test-Path $rutaPlanilla) {
     }
   } catch { Write-Host "   OJO: planilla.json no se pudo leer, uso el ID de siempre." -ForegroundColor Yellow }
 }
+# ---------------------------------------------------------------------------
+#  BUSCAR SOLO LA PLANILLA NUEVA  (07/09)
+#  Planeta publica una planilla nueva cada fecha, con OTRO ID, y hasta hoy habia
+#  que ir a buscar el link a mano y pegarlo aca. Eso es justo lo que hacia que
+#  actualizar dependiera de otro.
+#  No hace falta: el ID esta adentro del post "Estadisticas - A la Fecha N" del
+#  blog. Se lee el feed, se agarra el post mas nuevo, se saca el numero de fecha
+#  del titulo y el ID del cuerpo. Si es mas nuevo que el que tenemos, se cambia
+#  solo y se deja escrito en planilla.json.
+#  Si algo de esto falla, NO pasa nada: se sigue con el ID que ya estaba.
+# ---------------------------------------------------------------------------
+function Buscar-PlanillaNueva {
+  try {
+    $url = 'https://www.planetagrandt.com.ar/feeds/posts/default/-/Estad%C3%ADsticas?alt=json&max-results=3'
+    $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 40 -Headers @{ 'User-Agent' = 'Mozilla/5.0' }
+    $txt = if ($r.RawContentStream) { [System.Text.Encoding]::UTF8.GetString($r.RawContentStream.ToArray()) } else { [string]$r.Content }
+    $feed = $txt | ConvertFrom-Json
+    $mejor = $null
+    foreach ($e in $feed.feed.entry) {
+      $titulo = [string]$e.title.'$t'
+      $mf = [regex]::Match($titulo, '(?i)fecha\s*(\d+)')
+      if (-not $mf.Success) { continue }
+      $nf = [int]$mf.Groups[1].Value
+      $mi = [regex]::Match([string]$e.content.'$t', '/spreadsheets/d/e/(2PACX-[A-Za-z0-9_\-]+)')
+      if (-not $mi.Success) { continue }
+      if (-not $mejor -or $nf -gt $mejor.fecha) {
+        $mejor = [pscustomobject]@{ fecha = $nf; id = $mi.Groups[1].Value; titulo = $titulo }
+      }
+    }
+    return $mejor
+  } catch {
+    Write-Host ("   no pude mirar si hay planilla nueva: {0}" -f $_.Exception.Message) -ForegroundColor DarkYellow
+    return $null
+  }
+}
+
+$nueva = Buscar-PlanillaNueva
+if ($nueva) {
+  $fechaActual = 0
+  if ($cfg -and $cfg.fecha) { $fechaActual = [int]$cfg.fecha }
+  if ($nueva.id -eq $idPlanilla) {
+    Write-Host ("   la planilla que tenemos ES la ultima publicada ({0})" -f $nueva.titulo) -ForegroundColor DarkGray
+  } elseif ($nueva.fecha -ge $fechaActual) {
+    Write-Host ("   HAY PLANILLA NUEVA: {0}" -f $nueva.titulo) -ForegroundColor Green
+    Write-Host ("   la cambio sola. Antes: fecha {0}. Ahora: fecha {1}." -f $fechaActual, $nueva.fecha) -ForegroundColor Green
+    $idPlanilla = $nueva.id
+    try {
+      $anteriores = @()
+      if ($cfg -and $cfg.anteriores) { $anteriores = @($cfg.anteriores) }
+      if ($cfg -and $cfg.id) { $anteriores = @([pscustomobject]@{ fecha = $fechaActual; id = $cfg.id }) + $anteriores }
+      $nuevoCfg = [pscustomobject]@{
+        _comentario = 'Lo actualiza solo SYNC_PLANETA leyendo el post "Estadisticas" del blog. Si alguna vez hay que forzarlo a mano, se cambia el campo id.'
+        id = $nueva.id
+        fecha = $nueva.fecha
+        actualizado = (Get-Date).ToString('yyyy-MM-dd')
+        anteriores = @($anteriores | Select-Object -First 4)
+      }
+      $json = $nuevoCfg | ConvertTo-Json -Depth 5
+      [System.IO.File]::WriteAllText($rutaPlanilla, $json, (New-Object System.Text.UTF8Encoding($false)))
+      Write-Host "   planilla.json actualizado" -ForegroundColor DarkGray
+    } catch { Write-Host ("   ojo: no pude escribir planilla.json: {0}" -f $_.Exception.Message) -ForegroundColor Yellow }
+  } else {
+    Write-Host ("   el blog trae la fecha {0} y nosotros la {1}: me quedo con la nuestra" -f $nueva.fecha, $fechaActual) -ForegroundColor DarkGray
+  }
+}
+
 $gidsAProbar = 0..40
 $hojas = @()
 

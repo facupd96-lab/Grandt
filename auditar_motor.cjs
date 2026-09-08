@@ -44,15 +44,38 @@ d1? P.push(d1+' jugadores donde el desglose no suma el puntaje que muestra') : O
 // para no tener que reimplementar el reparto entre gol jugado y gol de penal.
 // (La version anterior comparaba contra lamGol x GOL[pos] y marcaba como error
 // a los 268 jugadores que estaban de visitante. Eran los 2 puntos del bonus.)
-let d2=0, ej2=[], d2v=0; T.forEach(x=>{ const g=(x.desglose||[]).find(t=>t[0]==='Gol propio'); if(!g) return;
-  const val=Number(String(g[2]).split('\u00d7').pop());
-  const base=GOL[x.pos], esperado=(x.lamGol||0)*val;
-  // el valor declarado tiene que ser el de la posicion, o ese mismo mas 2 de visitante
-  if(!(cerca(val,base,0.01)||cerca(val,base+2,0.01))) d2v++;
-  // y el termino tiene que valer lamGol x ese valor, salvo que patee penales
-  // (ahi una parte de lamGol se paga a 3 o a 5 y da MENOS que el valor por puesto)
-  const pateaPenales=(x.penalesPateados||0)>0 || g[1]<esperado-0.05;
-  if(!pateaPenales && !cerca(g[1],esperado,0.05)){ d2++; if(ej2.length<3) ej2.push(x.nombre+' '+g[1]+' vs '+esperado.toFixed(2)); } });
+// ACTUALIZADO (07/09). El gol se paga en DOS renglones desde que el penal es un
+// canal propio: "Gol propio" (gol de jugada, al valor del puesto) y "Gol de
+// penal" (a 3, o 5 de visitante). Antes este control asumia que el renglon del
+// gol valia lamGol x valor del puesto y marcaba 10 jugadores como rotos; el
+// roto era el control, porque lamGol es la suma de los dos canales.
+// Ahora se verifica cada renglon contra SU PROPIO texto: el primer numero del
+// pie por el valor que declara despues de la x. Asi no hay que reimplementar el
+// reparto ni hardcodear la fraccion de penales.
+let d2=0, ej2=[], d2v=0;
+const numDe=t=>{ const m=String(t).match(/-?\d+(\.\d+)?/); return m?Number(m[0]):null; };
+T.forEach(x=>{
+  const jug=(x.desglose||[]).find(t=>t[0]==='Gol propio');
+  const pen=(x.desglose||[]).find(t=>t[0]==='Gol de penal');
+  if(jug){
+    const val=Number(String(jug[2]).split('\u00d7').pop());
+    const base=GOL[x.pos];
+    if(!(cerca(val,base,0.01)||cerca(val,base+2,0.01))) d2v++;
+    const lam=numDe(jug[2]);
+    if(lam!=null && !cerca(jug[1],lam*val,0.05)){ d2++; if(ej2.length<3) ej2.push(x.nombre+' '+jug[1]+' vs '+(lam*val).toFixed(2)); }
+  }
+  if(pen){
+    const val=Number(String(pen[2]).split('\u00d7').pop());
+    // el penal paga 3 fijo, o 5 de visitante. Nunca el valor del puesto.
+    if(!(cerca(val,3,0.01)||cerca(val,5,0.01))) d2v++;
+    const lam=numDe(pen[2]);
+    if(lam!=null && !cerca(pen[1],lam*val,0.05)){ d2++; if(ej2.length<3) ej2.push(x.nombre+' (penal) '+pen[1]+' vs '+(lam*val).toFixed(2)); }
+  }
+});
+// solo el que pateo algun penal puede tener el renglon de penal
+{ const raros=T.filter(x=>(x.desglose||[]).some(t=>t[0]==='Gol de penal') && !(x.penalesPateados>0));
+  raros.length ? P.push(raros.length+' jugadores cobran gol de penal sin haber pateado ninguno')
+               : OK.push('el gol de penal lo cobra solo el que patea penales, y paga 3 (5 de visitante)'); }
 d2v? P.push(d2v+' jugadores donde el gol no se paga ni al valor del puesto ni con el bonus de visitante') : OK.push('el gol paga ARQ 12 \u00b7 DEF 9 \u00b7 VOL 6 \u00b7 DEL 4, mas 2 de visitante, en todos');
 d2? P.push(d2+' jugadores donde el gol no vale lo del reglamento: '+ej2.join(', ')) : OK.push('el termino del gol es siempre los goles esperados por el valor que declara');
 
@@ -79,8 +102,12 @@ let d6=[]; Object.entries(eq).forEach(([e,js])=>{ const s=js.reduce((a,x)=>a+(x.
 d6.length? P.push('la chance de ser figura suma mas de 1 en: '+d6.join(', ')) : OK.push('en ningun equipo las chances de ser figura suman mas de 1 (hay una figura por partido)');
 
 // 7. los minutos: el gol tiene que escalar con lo que juega, la ficha no
+// ACTUALIZADO (07/09): lamGol ya es el gol TOTAL (jugada + penal), asi que la
+// cuenta "parte del ataque x goles del equipo x minutos" da el BRUTO, del que
+// despues sale el de jugada. Los dos canales escalan con los minutos igual.
 let d7=0; T.forEach(x=>{ if(!x.lam||!x.minSiJuega) return;
-  if(!cerca(x.lamGol,(x.share||0)*x.lam.lamFor*(x.minSiJuega/90),0.02)) d7++; });
+  const bruto = x.lamGolBruto != null ? x.lamGolBruto : x.lamGol;
+  if(!cerca(bruto,(x.share||0)*x.lam.lamFor*(x.minSiJuega/90),0.02)) d7++; });
 d7? P.push(d7+' jugadores donde el gol no escala con los minutos') : OK.push('el gol escala con los minutos que juega; la ficha y la valla no (piden 20 minutos, no 90)');
 
 // 8. los minutos "si juega" salen de partidos donde ARRANCO.
@@ -107,17 +134,31 @@ d8? P.push(d8+' jugadores cuyos minutos "si juega" caen fuera de lo que jugo: '+
 d8b? A.push(d8b+' jugadores que nunca arrancaron y sin embargo se les estiman mas de 60 minutos') : OK.push('a los que nunca arrancaron no se les inventan minutos de titular');
 
 // 9. coherencia del ranking: el puntaje ordena igual que la suma de sus partes
-let d9=0; ['ARQ','DEF','VOL','DEL'].forEach(p=>{
-  const l=[...S.rankings[p]].sort((a,b)=>b.EPsiJuega-a.EPsiJuega);
-  for(let i=1;i<l.length;i++) if(l[i].EPsiJuega>l[i-1].EPsiJuega+0.001) d9++;
+// ESTE CONTROL NO CONTROLABA NADA (07/09). Ordenaba la lista y despues
+// verificaba que estuviera ordenada: pasaba siempre, por construccion. Mientras
+// tanto el ranking venia ordenado por EP (el puntaje descontado por la chance
+// de jugar) y la pantalla lo reordena por PUNTOS, que desde el 05/09 es el
+// unico numero que decide. Ahora se controla el orden REAL del payload.
+let d9=0, ej9=[]; ['ARQ','DEF','VOL','DEL'].forEach(p=>{
+  const l=S.rankings[p];
+  for(let i=1;i<l.length;i++) if(l[i].EPsiJuega > l[i-1].EPsiJuega + 0.001){ d9++; if(ej9.length<2) ej9.push(p+': '+l[i].nombre+' ('+l[i].EPsiJuega.toFixed(2)+') va despues de '+l[i-1].nombre+' ('+l[i-1].EPsiJuega.toFixed(2)+')'); }
 });
-d9? P.push('el ranking no queda ordenado por puntaje') : OK.push('los cuatro rankings quedan ordenados por puntaje si juega');
+d9? P.push(d9+' pares del ranking no vienen ordenados por PUNTOS — '+ej9.join(' / ')) : OK.push('los cuatro rankings vienen ordenados por puntaje si juega');
 
 // 10. el capitan duplica SOLO la ficha
 const cap=S.esquema.optimo.capitan;
-if(cap){ const suma=(S.esquema.optimo.once||[]).reduce((a,x)=>a+x.EP,0);
+// por PUNTOS, que es con lo que el motor arma el once desde el 07/09.
+// Antes sumaba EP y avisaba de una diferencia de 16 puntos que no existia.
+if(cap){ const suma=(S.esquema.optimo.once||[]).reduce((a,x)=>a+(x.EPsiJuega!=null?x.EPsiJuega:x.EP),0);
   if(cerca(S.esquema.optimo.total, suma+cap.ficha, 0.05)) OK.push('el capitan suma su ficha una vez mas, no el puntaje entero');
-  else A.push('el total del once no es la suma + la ficha del capitan: '+S.esquema.optimo.total+' vs '+(suma+cap.ficha).toFixed(2)); }
+  else A.push('el total del once no es la suma + la ficha del capitan: '+S.esquema.optimo.total+' vs '+(suma+cap.ficha).toFixed(2));
+  // y la cinta va al de mayor ficha ESPERADA en este partido, no al de mayor
+  // promedio historico: ganar vale 1.39 de ficha y la cinta la duplica.
+  const fc=x=>(x.fichaCapitan!=null?x.fichaCapitan:x.ficha);
+  const debe=[...(S.esquema.optimo.once||[])].sort((a,b)=>fc(b)-fc(a))[0];
+  if(debe && debe.id!==cap.id) P.push('la cinta no esta en el de mayor ficha esperada: la tiene '+cap.nombre+
+    ' ('+fc(cap).toFixed(2)+') y le corresponde a '+debe.nombre+' ('+fc(debe).toFixed(2)+')');
+  else OK.push('la cinta va al de mayor ficha esperada en este partido, no al de mejor promedio'); }
 
 // 11. rangos: nada absurdo
 const raros=T.filter(x=>x.EPsiJuega<0||x.EPsiJuega>25).length;

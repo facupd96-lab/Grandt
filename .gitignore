@@ -2,17 +2,25 @@
 # pagina necesita ademas de index.html, y sin el GitHub muestra el cartel rojo
 # de "no encontre datos.js". Son 2,3 MB por fecha (03/09).
 
-# datos que se rebajan solos
-data365.json
-data365_historico.json
-data365_historico.SUCIO.json
-dataPlaneta.json
-dataCuotas.json
-dataCopas.json
-dataFixture.json
-dataGranDT.json
+# datos que se rebajan solos.
+# REGLA GENERAL, no lista a mano (08/09). Se cortaba la subida cada vez que
+# aparecia un data*.json nuevo —paso con data365_roles.json y dataEspn.json—.
+# Ninguno de estos lo necesita la pagina publicada: son ENTRADAS del motor y
+# los rehace su sync. Lo que la pagina lee son los .js (datos.js, dataVivo.js,
+# dataHist.js, dataLiga.js), que no entran en este patron.
+# Ojo: planilla.json, pases.json y suspendidos.json NO empiezan con "data",
+# son configuracion escrita a mano y SI se suben.
+data*.json
 salida.json
 salida_RECHAZADA.json
+# el feed crudo de Planeta que baja SYNC_VIVO: se rebaja en dos segundos.
+# dataVivo.js SI se sube, igual que datos.js: es lo que hace que el Versus
+# muestre los puntajes de la fecha en la version publicada.
+# dataHist.js y dataLiga.js TAMBIEN se suben: uno trae lo que el motor esperaba
+# en las fechas anteriores (pantalla Revision) y el otro los equipos del torneo
+# de amigos. Sin dataLiga.js, el que entra a la pagina no ve ningun equipo.
+# BUILD.txt se sube: es la huella de con que archivos se armo el index.
+feedVivo.json
 equipoPartido.json
 equipoPartidoFull.json
 concedidoPorPos.json
@@ -68,13 +76,24 @@ motorV3.js
 # capturas
 *.png
 
-# copias que deja OneDrive cuando no puede resolver un conflicto de sincronizacion
+# copias que deja OneDrive cuando no puede resolver un conflicto de sincronizacion.
+# OJO: OneDrive usa GUION, no guion bajo (appV3-1.js, styles-1.css). Los
+# patrones de abajo solo tapaban los de guion bajo, asi que appV3-1.js e
+# index.fuente-1.html se estaban subiendo a GitHub (08/09).
 *_1.cjs
 *_1.js
 *_1.md
 *_1.json
 *_1.ps1
 *_1.bat
+*-1.cjs
+*-1.js
+*-1.md
+*-1.json
+*-1.ps1
+*-1.bat
+*-1.css
+*-1.html
 *[- ]copia*.*
 *[- ]Copy*.*
 

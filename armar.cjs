@@ -7,7 +7,7 @@ const fs=require('fs'), vm=require('vm');
 // estaban en Descargas y nunca llegaron a la carpeta. Ahora la version se
 // imprime en la consola y se muestra en la cabecera de la pagina.
 // ─────────────────────────────────────────────────────────────────────────────
-const VERSION_MOTOR = 'v29 · 03/09/2026';
+const VERSION_MOTOR = 'v38 · 07/09/2026';
 const M=require('./motorV3.cjs');
 
 // HUELLA DE LOS ARCHIVOS DEL MOTOR (03/09).
@@ -37,6 +37,53 @@ let HIST=null;
 try{ HIST=JSON.parse(fs.readFileSync('data365_historico.json','utf8')); }catch(e){ console.log('(sin data365_historico.json: los niveles salen solo del torneo actual)'); }
 let COPAS={equipos:{}};
 try{ COPAS=JSON.parse(fs.readFileSync('dataCopas.json','utf8')); }catch(e){ console.log('(sin dataCopas.json: no se aplica ajuste por copas)'); }
+
+// ── EL ROL REAL Y EL JUEGO AEREO (06/09) ────────────────────────────────────
+// data365_roles.json lo produce SYNC_ROLES.bat y trae, por jugador Y por
+// partido, el puesto exacto que 365Scores publica en member.formation.name
+// ("Defensa Central", "Defensa Lateral Izquierdo", "Extremo") mas los duelos
+// aereos ganados y los centros. Gran DT tiene cuatro posiciones y punto: para
+// el juego un central y un lateral son "DEF" y cobran igual.
+//
+// ESTO NO TOCA NINGUN PUNTAJE. Es informacion para mirar, y a proposito:
+//   - el rol esta verificado: 9392 de 9393 minutos coinciden con data365.json,
+//     620 equipos-partido con exactamente 1 arquero cada uno, 0 duplicados.
+//   - el juego aereo es un rasgo ESTABLE del jugador (r = 0.515 entre la
+//     primera y la segunda mitad de sus partidos, umbral 0.24).
+//   - PERO el vinculo con el gol todavia NO alcanza: los centrales que mas
+//     ganan por arriba hacen 0.047 goles/90 contra 0.026 los que menos —el
+//     doble, y monotono por cuartiles— pero son 45 goles en total y da p≈0.08.
+//     Direccional, no concluyente. Por eso NO entra al puntaje: entraria como
+//     un coeficiente inventado sobre 45 goles.
+// El cruce es por id365, no por nombre: SYNC_ROLES no trae el nombre (365 no lo
+// publica en ese bloque) y cruzar por ID es mas seguro que por nombre.
+let ROLES=null;
+try{
+  const txt=fs.readFileSync('data365_roles.json','utf8').replace(/^\uFEFF/,'');
+  const R=JSON.parse(txt);
+  const porId={};
+  (R.filas||[]).filter(f=>f.min>=45).forEach(f=>{
+    const a=porId[String(f.id365)]=porId[String(f.id365)]||{roles:{},min:0,ae:0,ce:0,pc:0,n:0,ultimos:[]};
+    a.roles[f.rol]=(a.roles[f.rol]||0)+1;
+    a.min+=f.min; a.ae+=f.aereos||0; a.ce+=f.centros||0; a.pc+=f.pasesCl||0; a.n++;
+    a.ultimos.push({gid:f.gid,rol:f.rol});
+  });
+  ROLES={};
+  Object.entries(porId).forEach(([id,a])=>{
+    // El rol se toma de los ULTIMOS CINCO partidos: un lateral reconvertido a
+    // central no puede seguir figurando de lateral por lo que hacia hace un año.
+    a.ultimos.sort((x,y)=>y.gid-x.gid);
+    const rec={}; a.ultimos.slice(0,5).forEach(x=>{ if(x.rol) rec[x.rol]=(rec[x.rol]||0)+1; });
+    const dom=Object.entries(rec).sort((x,y)=>y[1]-x[1])[0];
+    ROLES[id]={ rol: dom? dom[0] : null,
+                rolFirme: dom? +(dom[1]/Math.min(5,a.ultimos.length)).toFixed(2) : null,
+                aereos90: a.min? +(a.ae/(a.min/90)).toFixed(2) : null,
+                centros90: a.min? +(a.ce/(a.min/90)).toFixed(2) : null,
+                partidosRol: a.n };
+  });
+  console.log('ROLES — data365_roles.json: '+(R.filas||[]).length+' filas de '+R.partidos+' partidos, '+
+    Object.keys(ROLES).length+' jugadores con rol. NO toca ningun puntaje.');
+}catch(e){ console.log('(sin data365_roles.json: la tabla no muestra el rol. Corre SYNC_ROLES.bat)'); }
 // ═══════════════════════════════════════════════════════════════════════════
 // SEPARAR EL TORNEO ACTUAL DEL ANTERIOR  (02/09/2026)
 //
@@ -195,9 +242,18 @@ if(FIXTURE_FRESCO.length){
   });
   console.log('(sin dataFixture.json: la fecha objetivo sale del fixture viejo de data.js)');
 }
+// NO SE SALTA DE FECHA HASTA QUE TERMINE LA ULTIMA (07/09).
+// Antes la fecha objetivo era la primera SIN NINGUN partido jugado, asi que
+// apenas se jugaba el primer partido de la fecha el motor se mudaba a la
+// siguiente. Eso rompe lo unico que se puede hacer mientras la fecha se juega,
+// que es medir: con la fecha 8 a medio jugar uno quiere seguir viendo la 8
+// —quien rindio, quien no, si el once acerto— y no los partidos de la 9.
+// Ahora la fecha objetivo es la primera que NO ESTA COMPLETA. Se pasa a la
+// siguiente recien cuando termina el ultimo partido, que en Gran DT es
+// exactamente cuando vuelven a abrir los cambios.
 let fechaObjetivo=null;
 Object.keys(rondas).map(Number).sort((a,b)=>a-b).forEach(r=>{
-  if(fechaObjetivo===null && rondas[r].jugados===0) fechaObjetivo=r;
+  if(fechaObjetivo===null && rondas[r].jugados < rondas[r].total) fechaObjetivo=r;
 });
 // cuotas de esa fecha, cruzadas por el par de equipos
 const paresObjetivo = fechaObjetivo!==null ? rondas[fechaObjetivo].pares : null;
@@ -218,6 +274,25 @@ if(paresObjetivo){
   f6=Object.values(mejorPorPar).map(o=>o.m);
   if(antes!==f6.length) console.log('  ('+(antes-f6.length)+' partido(s) duplicado(s) en las cuotas: me quedo con el del horario del fixture)');
 }
+// LOS PARTIDOS YA JUGADOS DE LA FECHA NO PUEDEN DESAPARECER (07/09).
+// Las casas retiran la cuota apenas termina el partido. Como la fecha objetivo
+// ahora se queda puesta hasta que la fecha termine, sin esto los partidos que
+// ya se jugaron se caian de la lista y la pantalla mostraba 11 de 15. Se
+// completan desde el fixture, sin mercado: los goles esperados de esos ya no
+// salen de las cuotas sino del nivel de los equipos, que es lo que corresponde.
+if(paresObjetivo && FIXTURE_FRESCO.length){
+  const yaEstan=new Set(f6.map(m=>[CT(m.local),CT(m.visitante)].sort().join('|')));
+  const sinCuota=FIXTURE_FRESCO.filter(m=>m.numeroFecha===fechaObjetivo &&
+    !yaEstan.has([CT(m.local),CT(m.visitante)].sort().join('|')));
+  sinCuota.forEach(m=>f6.push({
+    local:m.local, visitante:m.visitante, cuando:m.fecha,
+    cuotaLocal:null, cuotaEmpate:null, cuotaVisitante:null,
+    probLocal:null, probEmpate:null, probVisitante:null,
+    margenCasa:null, lineaTotales:null, cuotaOver:null, cuotaUnder:null, probOver:null }));
+  if(sinCuota.length) console.log('  '+sinCuota.length+' partido(s) de la fecha '+fechaObjetivo+
+    ' sin cuota (la casa la retira cuando el partido termina): se agregan desde el fixture.');
+}
+
 if(!f6.length){
   // sin cruce (fixture viejo o cuotas raras): se cae al criterio anterior
   const orden=[...C.cuotas].sort((a,b)=>new Date(a.cuando)-new Date(b.cuando));
@@ -250,16 +325,20 @@ if(!f6.length){
 // En Gran DT los cambios abren recien cuando termina el ultimo partido de la
 // fecha en curso. Mientras queden partidos por jugarse de la fecha anterior,
 // no hay nada que cambiar aunque la proxima este a tres dias.
+// Con la regla nueva la fecha en curso ES la fecha objetivo: mientras le falte
+// jugar un partido el motor se queda ahi. Si ya empezo, los cambios estan
+// cerrados y lo que se ve es de referencia, para medir y no para decidir.
 let FECHA_EN_CURSO = null;
 if(FIXTURE_FRESCO.length && fechaObjetivo!=null){
-  const previa = FIXTURE_FRESCO.filter(m=>m.numeroFecha===fechaObjetivo-1);
-  const faltan = previa.filter(m=>!m.terminado);
-  if(faltan.length){
+  const esta = FIXTURE_FRESCO.filter(m=>m.numeroFecha===fechaObjetivo);
+  const faltan = esta.filter(m=>!m.terminado);
+  const jugados = esta.length - faltan.length;
+  if(esta.length && jugados > 0 && faltan.length){
     const ultimo = faltan.map(m=>new Date(m.fecha)).sort((a,b)=>b-a)[0];
-    FECHA_EN_CURSO = { numero: fechaObjetivo-1, faltan: faltan.length,
-      total: previa.length, ultimo: ultimo.toISOString() };
-    console.log('  la fecha '+FECHA_EN_CURSO.numero+' sigue en curso: faltan '+faltan.length+
-      ' de '+previa.length+' partidos. Los cambios abren cuando termine el ultimo.');
+    FECHA_EN_CURSO = { numero: fechaObjetivo, faltan: faltan.length,
+      jugados, total: esta.length, ultimo: ultimo.toISOString() };
+    console.log('  la fecha '+fechaObjetivo+' esta EN CURSO: '+jugados+' de '+esta.length+
+      ' jugados. Los cambios ya cerraron; el motor se queda en esta fecha hasta que termine el ultimo partido.');
   }
 }
 
@@ -516,8 +595,12 @@ function minutosPorFecha(m, fObj){
 function detallePorFecha(m, fObj){
   const hasta = Math.max(1, (fObj || 1) - 1);
   const out = new Array(hasta).fill(null);
+  // Se agregan xG y tiros por partido (05/09): sin el reparto fecha por fecha
+  // es imposible distinguir al que genera todas las semanas del que tuvo una
+  // tarde. Ver concentracionXG() en motorV3.cjs.
   ((m && m.log) || []).forEach(l=>{ if(l.fecha>=1 && l.fecha<=hasta)
-    out[l.fecha-1] = { min: l.min||0, tit: (l.tit==null? null : !!l.tit) }; });
+    out[l.fecha-1] = { min: l.min||0, tit: (l.tit==null? null : !!l.tit),
+                       xg: +(l.xg||0), tiros: +(l.tiros||0) }; });
   return out;
 }
 // ── CONTROL DE SANIDAD DE LOS DATOS ────────────────────────────────────────
@@ -752,6 +835,7 @@ P.jugadores.forEach((j,i)=>{
     matchesRated:j.ct, totalPoints:j.act, goals:j.gt, goalsPenalty:j.gp, goalsAway:j.gv,
     goalsGolden:j.go, goalsConceded:j.gr, ownGoals:j.ge, figuras:j.vf, cleanSheets:j.vi,
     yellowCards:j.ta, redCards:j.tr, penaltiesSaved:j.pa, penaltiesMissed:j.pe, price:j.cotizacion,
+    rol365: (ROLES&&m&&ROLES[String(m.id365)]) ? ROLES[String(m.id365)] : null,
     xg365:m?m.xg:0, shots365:m?m.tiros:0, matches365:m?m.partidos:0,
     minutes365:m?m.minutos:0, titularidad:m?m.titularidad:null,
     transferido: TRANSFER['p'+i]||null,
@@ -942,6 +1026,20 @@ const corteDe=(k,c)=>{ const o=CORTES[k]; if(!o||!o[c].pj) return null; const d=
 const anomalias={};
 Object.keys(NIVEL).forEach(k=>{anomalias[k]={ataque:0,defensa:0};});
 
+// CUANTOS PENALES PATEO CADA EQUIPO.
+// El motor lo necesita para saber que parte de los penales de su equipo patea
+// cada uno: con 1 penal de muestra nadie es "el" pateador, y sin el total del
+// equipo no hay forma de encogerlo bien.
+{
+  const porClub={};
+  players.forEach(p=>{ const k=CT(p.team);
+    porClub[k]=(porClub[k]||0)+(+p.goalsPenalty||0)+(+p.penaltiesMissed||0); });
+  players.forEach(p=>{ p._penalesEquipo = porClub[CT(p.team)] || 0; });
+  const tot=Object.values(porClub).reduce((a,b)=>a+b,0);
+  const conPen=Object.values(porClub).filter(v=>v>0).length;
+  console.log('PENALES — '+tot+' pateados en el torneo, en '+conPen+' de 30 equipos. '+
+    'El pateador cobra su parte de los penales de SU equipo, no un recorte de su gol de jugada.');
+}
 const out=M.correrMotor(players,getCtx,viejo.fixture);
 console.log('validacion ficha:',out.validacion.veredicto,'| media',out.validacion.media,'| fuera',out.validacion.pctFuera+'%');
 // enriquecer cada jugador con precio y contexto
@@ -1247,6 +1345,145 @@ out.equipos=Object.values(S.equipos).map(e=>({
   anomalia:anomalias[CT(e.equipo)]||null,
   rotacion:rotDe(CT(e.equipo)), notaRotacion:notaDe(CT(e.equipo)), motivoRotacion:motivoRot(CT(e.equipo))
 }));
+
+// ---- 7-bis. COMO SE COMPORTA CADA EQUIPO DE LOCAL Y DE VISITANTE ---------
+// Lo que se ve en la pantalla Datos. NO entra al puntaje de ningun jugador:
+// es informacion para decidir a mano, como pedia el pedido original ("quiero
+// saber como se comporta cada equipo de local y de visitante").
+//
+// DE DONDE SALE CADA COSA, porque son dos fuentes distintas y conviene decirlo:
+//   goles, puntos, tiros, tiros al arco, corners y posesion -> ESPN (dataEspn.json)
+//   xG generado y concedido                                 -> 365Scores
+// 365Scores NO publica corners ni posesion por equipo (se reviso el endpoint
+// entero: solo trae estadisticas por jugador). ESPN NO publica xG. Por eso el
+// cruce. Los 30 clubes cruzan 30/30 con CT(), verificado abajo en cada corrida.
+//
+// OJO CON LOS PARTIDOS: ESPN suele tener resultados de la fecha EN CURSO que la
+// tabla de posiciones todavia no cuenta (la tabla cierra por fecha completa).
+// Por eso se muestra el PJ de cada lado: si dice 4 y la tabla dice 3, es esto.
+out.equiposCond = null;
+try {
+  const rawEspn = fs.readFileSync('dataEspn.json','utf8').replace(/^﻿/,'');
+  const ESPN = JSON.parse(rawEspn);
+  const filas = (ESPN.filas||[]).filter(f=>f.terminado);
+  if (!filas.length) throw new Error('dataEspn.json no tiene partidos terminados');
+
+  // --- cruce de nombres: los 30 clubes de ESPN contra los nuestros ---
+  const nuestros = {}; out.tabla.forEach(t=>{ nuestros[CT(t.equipo)] = t.equipo; });
+  const clubesEspn = [...new Set(filas.map(f=>f.equipo))];
+  const sinCruzar = clubesEspn.filter(n=>!nuestros[CT(n)]);
+  if (sinCruzar.length) console.log('  OJO ESPN — no cruzan '+sinCruzar.length+' clubes: '+sinCruzar.join(', ')+
+    '. Esos equipos quedan sin corners ni posesion.');
+
+  // --- donde arranca el torneo actual ---
+  // Si el motor ya detecto el receso (INICIO_ACTUAL) se usa ese. Si no, se
+  // busca el hueco mas grande del calendario de ESPN, que es el mismo receso.
+  let corte = INICIO_ACTUAL ? INICIO_ACTUAL.toISOString().slice(0,10) : null;
+  if (!corte) {
+    const dias=[...new Set(filas.map(f=>f.cuando.slice(0,10)))].sort();
+    let mejor=0;
+    for(let i=1;i<dias.length;i++){
+      const d=(new Date(dias[i])-new Date(dias[i-1]))/86400000;
+      if(d>mejor){ mejor=d; corte=dias[i]; }
+    }
+    if(!(mejor>=30)) corte=null;
+  }
+
+  // --- xG por partido y por equipo, desde 365Scores ---
+  // S.jugadores ya quedo recortado al torneo actual y HIST al anterior, asi
+  // que sumar los dos da el ano entero sin contar nada dos veces.
+  const xgGid = {};   // gid -> { <club>: {xg, esLocal} }
+  const anota = (gid, equipo, xg, esLocal) => {
+    if(!gid || !equipo) return;
+    const g = xgGid[gid] = xgGid[gid] || {};
+    const k = CT(equipo);
+    g[k] = g[k] || {xg:0, esLocal:null};
+    g[k].xg += (+xg||0);
+    if(esLocal!=null && g[k].esLocal==null) g[k].esLocal = !!esLocal;
+  };
+  Object.values(S.jugadores).forEach(j=>{ (j.log||[]).forEach(l=>{
+    if(!l.min) return;
+    anota(l.gid, j.equipo, l.xg, l.local);
+    anota(l.gid, l.vs, 0, l.local==null?null:!l.local);
+  }); });
+  const gidsActual = new Set(Object.keys(xgGid).map(Number));
+  if (HIST && Array.isArray(HIST.filasJugador)) HIST.filasJugador.forEach(r=>{
+    if(!(r.minutos>0)) return;
+    anota(r.gid, r.equipo, r.xg, r.esLocal);
+    anota(r.gid, r.rival, 0, r.esLocal==null?null:!r.esLocal);
+  });
+  // por partido: cada equipo con su xG, el del rival, y de que lado jugo
+  const xgPorEquipo = {};
+  const vacioXg = () => ({local:{n:0,f:0,c:0}, visitante:{n:0,f:0,c:0}});
+  Object.entries(xgGid).forEach(([gid,eq])=>{
+    const ks = Object.keys(eq); if(ks.length!==2) return;
+    const esActual = gidsActual.has(+gid);
+    ks.forEach((k,i)=>{
+      const otro = ks[1-i];
+      // si no se de que lado jugo, el partido no entra: prefiero un PJ mas
+      // chico y honesto antes que meter un partido de visitante en la columna
+      // de local para que el numero quede lindo.
+      if(eq[k].esLocal==null) return;
+      const lado = eq[k].esLocal ? 'local' : 'visitante';
+      const b = xgPorEquipo[k] = xgPorEquipo[k] || {anio:vacioXg(), actual:vacioXg()};
+      b.anio[lado].n++; b.anio[lado].f += eq[k].xg; b.anio[lado].c += eq[otro].xg;
+      if(esActual){ b.actual[lado].n++; b.actual[lado].f += eq[k].xg; b.actual[lado].c += eq[otro].xg; }
+    });
+  });
+
+  // --- agregacion de ESPN, por ventana y por condicion ---
+  const porGid = {}; filas.forEach(f=>{ (porGid[f.id]=porGid[f.id]||[]).push(f); });
+  const vacio = () => ({pj:0,pg:0,pe:0,pp:0,gf:0,gc:0,pts:0,
+                        tiros:0,tirosArco:0,tirosRec:0,tirosArcoRec:0,
+                        corners:0,cornersRec:0,posesion:0,faltas:0});
+  const acum = {};   // clave -> {actual:{local,visitante}, anio:{local,visitante}}
+  Object.values(porGid).forEach(par=>{
+    if(par.length!==2) return;
+    const esActual = corte ? par[0].cuando.slice(0,10) >= corte : false;
+    [[par[0],par[1]],[par[1],par[0]]].forEach(([x,y])=>{
+      const k = CT(x.equipo); if(!nuestros[k]) return;
+      const lado = x.esLocal ? 'local' : 'visitante';
+      const b = acum[k] = acum[k] || {anio:{local:vacio(),visitante:vacio()},
+                                      actual:{local:vacio(),visitante:vacio()}};
+      const meter = s => {
+        s.pj++; s.gf += x.goles; s.gc += y.goles;
+        if(x.goles>y.goles){ s.pg++; s.pts+=3; } else if(x.goles===y.goles){ s.pe++; s.pts+=1; } else s.pp++;
+        s.tiros += (+x.totalShots||0);       s.tirosRec += (+y.totalShots||0);
+        s.tirosArco += (+x.shotsOnTarget||0);s.tirosArcoRec += (+y.shotsOnTarget||0);
+        s.corners += (+x.wonCorners||0);     s.cornersRec += (+y.wonCorners||0);
+        s.posesion += (+x.possessionPct||0); s.faltas += (+x.foulsCommitted||0);
+      };
+      meter(b.anio[lado]);
+      if(esActual) meter(b.actual[lado]);
+    });
+  });
+
+  const prom = (s) => { const n = s.pj||1; return {
+    pj:s.pj, pg:s.pg, pe:s.pe, pp:s.pp, gf:s.gf, gc:s.gc, pts:s.pts,
+    gfP:+(s.gf/n).toFixed(2), gcP:+(s.gc/n).toFixed(2),
+    tiros:+(s.tiros/n).toFixed(1), tirosRec:+(s.tirosRec/n).toFixed(1),
+    tirosArco:+(s.tirosArco/n).toFixed(1), tirosArcoRec:+(s.tirosArcoRec/n).toFixed(1),
+    corners:+(s.corners/n).toFixed(1), cornersRec:+(s.cornersRec/n).toFixed(1),
+    posesion:+(s.posesion/n).toFixed(1)
+  }; };
+
+  out.equiposCond = out.tabla.map(t=>{
+    const k = CT(t.equipo), a = acum[k], x = xgPorEquipo[k];
+    const vent = w => a ? {local:prom(a[w].local), visitante:prom(a[w].visitante)} : null;
+    const unLado = s => s && s.n ? {pj:s.n, f:+(s.f/s.n).toFixed(2), c:+(s.c/s.n).toFixed(2)} : null;
+    const xgDe = w => x ? {local:unLado(x[w].local), visitante:unLado(x[w].visitante)} : null;
+    return { equipo:t.equipo, k,
+             actual: vent('actual'), anio: vent('anio'),
+             xgActual: xgDe('actual'), xgAnio: xgDe('anio') };
+  }).filter(e=>e.actual || e.anio);
+
+  const nAct = out.equiposCond.filter(e=>e.actual && (e.actual.local.pj+e.actual.visitante.pj)>0).length;
+  console.log('ESPN — '+Object.keys(porGid).length+' partidos, '+clubesEspn.length+' clubes ('+
+    (clubesEspn.length-sinCruzar.length)+' cruzados). Corners, posesion y tiros por equipo, local y visitante: '+
+    nAct+' equipos con datos del torneo actual'+(corte?' (desde el '+corte+')':' (sin corte de torneo: solo el ano)')+'.');
+} catch(e) {
+  console.log('(sin dataEspn.json: la pantalla Datos no muestra corners ni posesion. Abri BAJAR_ESPN.html) — '+e.message);
+}
 
 // ---- 7a. marcar a los que jugaron sin registro en Planeta ----
 {let sf=0;
@@ -1566,9 +1803,54 @@ if(out.cuotas.vencidas){
   console.log('  cuotas de la fecha '+out.fechaObjetivo+': '+out.cuotas.pendientes+' partidos todavia por jugarse');
 }
 
+// ── CUANTO SE MUEVE UN PUNTAJE DE UNA FECHA ────────────────────────────────
+// Esto NO entra en ningun calculo del motor: no toca ni un ranking ni un once.
+// Es solo para el Versus, que necesita saber cuanta suerte hay adentro de una
+// fecha para poder decir quien va ganando y cuanto de eso es ventaja real.
+// Sale de los puntajes reales fecha por fecha de la planilla de Planeta
+// (F1..F18), o sea medido, no inventado. Se guarda como histograma por puesto
+// —cuantas veces salio cada valor— porque la distribucion es asimetrica: la
+// mediana es 5 y la cola derecha llega a 29. Con una campana normal el Versus
+// subestimaria las remontadas, que es justo lo que uno quiere ver el domingo.
+const VAR_PUNTOS = (()=>{
+  const h={}, n={};
+  (P.jugadores||[]).forEach(j=>{
+    const pos=j.posicion; if(!pos) return;
+    (j.puntajes||[]).forEach(v=>{
+      if(v===null||v===undefined||isNaN(v)) return;
+      const k=Math.round(v);
+      (h[pos]=h[pos]||{})[k]=(h[pos][k]||0)+1;
+      n[pos]=(n[pos]||0)+1;
+    });
+  });
+  const out={};
+  Object.keys(h).forEach(pos=>{
+    let suma=0; Object.keys(h[pos]).forEach(k=>suma+=(+k)*h[pos][k]);
+    const media=suma/n[pos];
+    let v2=0; Object.keys(h[pos]).forEach(k=>v2+=h[pos][k]*Math.pow(+k-media,2));
+    out[pos]={ n:n[pos], media:+media.toFixed(3),
+               sd:+Math.sqrt(v2/Math.max(1,n[pos]-1)).toFixed(3), h:h[pos] };
+  });
+  return out;
+})();
+{
+  const t=Object.keys(VAR_PUNTOS).map(p=>p+' '+VAR_PUNTOS[p].media.toFixed(1)+'±'+VAR_PUNTOS[p].sd.toFixed(1)).join(' · ');
+  const tot=Object.values(VAR_PUNTOS).reduce((a,x)=>a+x.n,0);
+  console.log('  variacion del puntaje por fecha (medida sobre '+tot+' fechas-jugador): '+t);
+}
+
 // payload compacto para la app
-const slim=x=>({id:x.id,n:x.nombre,eq:x.equipo,pos:x.pos,riv:x.rival,cond:x.condicion[0],
- ep:x.EP,epsj:x.EPsiJuega,mesp:x.minEsperados,msj:x.minSiJuega,mest:x.minEstimados,mlog:x.minutosLog,mtit:x.minutosDeTitular||null,pmin:x.perfilMin||null,fmin:x.fuenteMinutos,pen:x.penalesPateados,penC:x.penalesConvertidos,penE:x.penalesErrados,tr:x.transferido||null,lex:x.leyDelEx||null,dpar:x.datosParciales||false,dimp:x.datosImposibles||false,t90:x.tiros90,x90:x.xg90,xgT:x.xgTorneo,tirT:x.tirosTorneo,pj_:x.pJuega,sc:x.score,fi:x.ficha,sh:x.share,pvi:x.pVI,lg:x.lamGol,pfig:x.pFigura,ta:x.tasaTA,
+// CLAVE ESTABLE DE JUGADOR (07/09).
+// El id es 'p'+indice de fila en dataPlaneta.json, y Planeta publica una
+// PLANILLA NUEVA cada fecha, con otro orden. O sea: p171 esta semana y p171 la
+// semana que viene pueden ser dos personas distintas. Mientras todo lo que se
+// guardaba en el navegador era por fecha (los descartes, el capitan) no
+// molestaba, porque moria solo. La liga de amigos NO: esos equipos tienen que
+// seguir ahi la fecha que viene. Por eso viaja tambien esta clave, que no
+// depende del orden de ninguna planilla.
+const CLAVE_JUG = x => norm(x.nombre) + '@' + CT(x.equipo) + '@' + x.pos;
+const slim=x=>({id:x.id,k:CLAVE_JUG(x),n:x.nombre,eq:x.equipo,pos:x.pos,riv:x.rival,cond:x.condicion[0],
+ ep:x.EP,epsj:x.EPsiJuega,mesp:x.minEsperados,msj:x.minSiJuega,mest:x.minEstimados,mlog:x.minutosLog,mtit:x.minutosDeTitular||null,pmin:x.perfilMin||null,fmin:x.fuenteMinutos,pen:x.penalesPateados,penC:x.penalesConvertidos,penE:x.penalesErrados,tr:x.transferido||null,lex:x.leyDelEx||null,dpar:x.datosParciales||false,dimp:x.datosImposibles||false,t90:x.tiros90,x90:x.xg90,xgT:x.xgTorneo,tirT:x.tirosTorneo,pj_:x.pJuega,sc:x.score,fi:x.ficha,fcap:x.fichaCapitan,sh:x.share,conc:x.concXG||null,confa:x.confAmenaza,p12:x.p12,p15:x.p15,dlog:x.logDetalle||null,rol:x.rol365||null,pvi:x.pVI,lg:x.lamGol,pfig:x.pFigura,ta:x.tasaTA,
  piso:x.piso,techo:x.techo,perf:x.perfil||'',pe:x.pisoEquipo||null,
  rot:x.rotacion||0,rotr:x.rotacionRival||0,nrot:x.notaRotacion||'',
  mrot:x.motivoRotacion||null,mrotr:x.motivoRotacionRival||null,
@@ -1593,7 +1875,8 @@ const paraApp={
     dist: out.arriesgado.dist, conservador: out.arriesgado.conservador } : null,
   partidos:out.partidos, tablero:out.tablero, tabla:out.tabla, tablaZonas:out.tablaZonas, fixtureCompleto:out.fixtureCompleto,
   nombres:NOMBRES,
-  equipos:out.equipos, aportes:out.aportes, liga:out.liga,
+  varPuntos: VAR_PUNTOS,
+  equipos:out.equipos, equiposCond:out.equiposCond, aportes:out.aportes, liga:out.liga,
   presupuesto:out.presupuesto, validacion:out.validacion, cuotas:out.cuotas,
   curiosidades:out.curiosidades
 };
@@ -1629,8 +1912,49 @@ try{
     foto.ranking[p]=out.rankings[p].slice(0,25).map(j=>({nombre:j.nombre,equipo:j.equipo,
       EP:+j.EP.toFixed(2),pJuega:+j.pJuega.toFixed(2),ficha:+j.ficha.toFixed(2),precio:j.precio}));
   });
+  // TODOS, NO EL TOP 25 (08/09). El top 25 alcanzaba para el backtest del once
+  // recomendado, pero no para revisar un equipo de verdad: los amigos ponen
+  // gente que no esta en el top 25 de su puesto, y de esos no quedaba ni el
+  // esperado. Con la clave estable (nombre@club@puesto) el numero se puede
+  // volver a pegar aunque los ids se hayan corrido.
+  foto.todos = [].concat(...['ARQ','DEF','VOL','DEL'].map(p=>out.rankings[p]))
+    .map(j=>({k:CLAVE_JUG(j), EP:+j.EP.toFixed(2), pj:+j.pJuega.toFixed(2)}));
+  // el once recomendado, en claves estables: es el que hay que mostrar cuando
+  // despues se revise ESTA fecha, no el que el motor recomiende esa semana
+  {
+    const todos=[].concat(...['ARQ','DEF','VOL','DEL'].map(p=>out.rankings[p]));
+    const porId={}; todos.forEach(j=>porId[j.id]=j);
+    foto.onceK = out.esquema.optimo.once.map(x=>porId[x.id]).filter(Boolean).map(CLAVE_JUG);
+    const cap = out.esquema.optimo.capitan;
+    foto.capitanK = (cap && porId[cap.id]) ? CLAVE_JUG(porId[cap.id]) : null;
+  }
   fs.writeFileSync(archivo,JSON.stringify(foto,null,1));
-  console.log((yaEstaba?'  (actualizada) ':'  ')+'foto guardada: '+archivo+'  — sirve para el backtest cuando termine la fecha');
+  console.log((yaEstaba?'  (actualizada) ':'  ')+'foto guardada: '+archivo+
+    '  ('+foto.todos.length+' jugadores con su esperado)');
+
+  // ---- dataHist.js: lo mismo, pero para que lo lea la app ----
+  // La pantalla de Revision necesita el esperado de una fecha que ya paso, y
+  // datos.js solo tiene el de la fecha que viene. Sin este archivo, una fecha
+  // que no se llego a fotografiar en el navegador quedaba perdida.
+  const H={};
+  fs.readdirSync('historial').filter(f=>/^fecha_\d+\.json$/.test(f)).forEach(f=>{
+    try{
+      const x=JSON.parse(fs.readFileSync('historial/'+f,'utf8'));
+      if(!x || x.fecha==null) return;
+      const esp={};
+      if(Array.isArray(x.todos)) x.todos.forEach(j=>{ esp[j.k]=j.EP; });
+      H[x.fecha]={fecha:x.fecha, generado:x.generado, esquema:x.esquema||null, esperados:esp,
+                  n:Object.keys(esp).length,
+                  // el once que recomendaba el motor ESA fecha, en claves
+                  once:(x.onceK||null), capitan:(x.capitanK||null)};
+    }catch(e){}
+  });
+  // solo las ultimas 8: mas que eso es peso muerto en cada carga de la pagina
+  const cuales=Object.keys(H).map(Number).sort((a,b)=>b-a).slice(0,8);
+  const HH={}; cuales.forEach(n=>HH[n]=H[n]);
+  fs.writeFileSync('dataHist.js','window.HIST='+JSON.stringify(HH)+';');
+  console.log('  dataHist.js: '+cuales.length+' fecha(s) con el esperado de cada jugador ('+
+    (fs.statSync('dataHist.js').size/1024).toFixed(0)+' KB)');
 }catch(e){ console.log('  no pude guardar la foto de la fecha:',e.message); }
 
 out.version = VERSION_MOTOR;

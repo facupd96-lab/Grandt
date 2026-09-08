@@ -111,7 +111,18 @@ function resolverEquipo(lista, gf, gc, esLocal, s, N, M, idx, r) {
   let sumaPeso = 0;
   for (let i = 0; i < lista.length; i++) {
     const j = lista[i];
-    juega[i] = r() < (j.pJuega || 0.5) ? 1 : 0;
+    // TODOS JUEGAN, IGUAL QUE EN EL RESTO DEL MOTOR (07/09).
+    // Antes esto sorteaba pJuega y era la unica parte del programa que seguia
+    // penalizando por "capaz no juega". Consecuencia: el once solido maximiza
+    // los puntos SI JUEGA y la simulacion medía otra cosa, asi que la tabla que
+    // los compara lado a lado mostraba al arriesgado con MAS media que al
+    // solido (74.5 vs 67.4) — no porque fuera mejor, sino porque el solido
+    // estaba siendo juzgado con una vara que no es la suya. Dos herramientas
+    // optimizando funciones distintas y presentadas como comparables.
+    // La regla del proyecto es una sola: el motor asume que todos entran a la
+    // cancha y la unica penalizacion es por MINUTOS. Los que no juegan los saca
+    // uno con la ✕, y esos ya no llegan hasta aca.
+    juega[i] = 1;
     if (juega[i]) { peso[i] = Math.max(1e-6, (j.share || 0.001) * ((j.minSiJuega || 80) / 90)); sumaPeso += peso[i]; }
   }
   // Repartir los goles del equipo entre los que estan en cancha.
@@ -216,7 +227,9 @@ function buscarOnce(sim, esquema, objetivo, presupuesto, criterio, arranque, ids
   // equipo no espere goles, y el que genera xG y todavia no lo convirtio.
   const cand = {};
   for (const p in cupos) {
-    const porEP  = [...porPos[p]].sort((x, y) => (y.j.EP || 0) - (x.j.EP || 0)).slice(0, 15);
+    // por PUNTOS (lo que rinde si entra), no por EP: es la misma vara que usa el
+    // once solido y el ranking de la pantalla.
+    const porEP  = [...porPos[p]].sort((x, y) => ((y.j.EPsiJuega ?? y.j.EP) || 0) - ((x.j.EPsiJuega ?? x.j.EP) || 0)).slice(0, 15);
     const porCri = [...porPos[p]].sort((x, y) => criterio(y.j) - criterio(x.j)).slice(0, 30);
     const porTiro= [...porPos[p]].sort((x, y) => (y.j._tiros90 || 0) - (x.j._tiros90 || 0)).slice(0, 20);
     const porDeuda=[...porPos[p]].sort((x, y) => (y.j._deuda || 0) - (x.j._deuda || 0)).slice(0, 15);

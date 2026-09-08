@@ -1,149 +1,109 @@
-# Subir a GitHub
+# Subir a GitHub, y qué ve cada uno
 
-Todo lo que sigue se pega en PowerShell, parado en la carpeta `Grandt`.
-Si no sabés abrir PowerShell ahí: entrá a la carpeta, clic derecho en un lugar
-vacío → "Abrir en Terminal".
+## Cómo se sube
 
----
+Doble clic en **`SUBIR_A_GITHUB.bat`**. Eso es todo.
 
-## Los 3 comandos
+El script hace tres cosas que antes no hacía, y son las que importan:
 
-```powershell
-git rm -r --cached .
-git add -A
-git status
-```
+1. **Rehace `index.html` antes de subir.** `index.html` no es un archivo que se
+   edite: lo arma `construir.cjs` metiendo adentro `styles.css`,
+   `teamsRegistry.js` y `appV3.js`. Si no se rehace, sube el index de la última
+   vez que alguien lo armó a mano. **Esto era lo que fallaba.**
+2. **Avisa si hay dos ramas** en GitHub. Con dos ramas es fácil subir a una y
+   que la página se sirva de la otra: se ve todo viejo y no se entiende por qué.
+3. **Comprueba que subió.** Cuando termina, se baja el `index.html` publicado y
+   compara la huella con el de tu carpeta. Si no coinciden, lo dice. No hay más
+   «LISTO» de fe.
 
-El primero no borra nada de tu disco: solo le dice a git "olvidate de lo que
-tenías anotado". El segundo vuelve a anotar, ahora respetando el `.gitignore`.
-El tercero te muestra la lista para que la mires antes de confirmar.
+### El sello del build
 
-**Fijate que en esa lista NO aparezcan:** `node.exe`, `data365.json`,
-`datos.js`, `salida.json`, `SYNC_CUOTAS.ps1`, ni ningún `.png`.
+Cada `index.html` lleva adentro una huella de los cuatro archivos con los que se
+armó, tipo `805ce17c0d87 · 2026-09-08 20:07`. Se ve en el menú **⋯** de arriba a
+la derecha, abajo de todo.
 
-Si está todo bien:
+Para saber si lo publicado está al día: abrís la página, mirás ese número y lo
+comparás con el de tu carpeta (está en `BUILD.txt`). Si son iguales, es la misma
+versión. Sin discutir.
 
-```powershell
-git commit -m "Motor v29: minutos reales de titular, confianza por remates, valla por minutos en cancha"
-git push
-```
+### La caché
 
-En el `push` te va a pedir usuario y token de GitHub.
-
----
-
-## Los 57 archivos que suben
-
-**El motor (lo que hace las cuentas)**
-```
-armar.cjs
-motorV3.cjs
-riesgo.cjs
-construir.cjs
-teamsRegistry.js
-```
-
-**La app**
-```
-appV3.js
-styles.css
-index.fuente.html
-index.html
-server.cjs
-```
-
-**Los auditores**
-```
-auditar.cjs
-auditar_numeros.cjs
-auditar_motor.cjs
-auditar_pantallas.mjs
-backtest.cjs
-```
-
-**Los sync (bajan los datos)**
-```
-SYNC_365.ps1            SYNC_365.bat
-SYNC_365_HISTORICO.ps1  SYNC_365_HISTORICO.bat
-SYNC_PLANETA.ps1        SYNC_PLANETA.bat
-SYNC_COPAS.ps1          SYNC_COPAS.bat
-SYNC_GRANDT.ps1         SYNC_GRANDT.bat
-                        SYNC_CUOTAS.bat
-EXPLORAR_PLANILLA.ps1   EXPLORAR_PLANILLA.bat
-VER_STATS.ps1           VER_STATS.bat
-```
-`SYNC_CUOTAS.ps1` NO está: adentro lleva la clave de la API.
-
-**Los lanzadores**
-```
-ACTUALIZAR_TODO.ps1     ACTUALIZAR_TODO.bat
-RECALCULAR.ps1          RECALCULAR.bat
-                        AUDITAR.bat
-                        BACKTEST.bat
-                        INICIAR_SERVIDOR.bat
-                        CREAR_ENLACE_CASA.bat
-```
-
-**Datos que cargás a mano (chicos y necesarios)**
-```
-suspendidos.json
-pases.json
-planilla.json
-```
-
-**Configuración**
-```
-package.json
-package-lock.json
-vercel.json
-.gitignore
-```
-
-**Documentación**
-```
-README.md
-COMO_ACTUALIZO.md
-SUBIR_A_GITHUB.md
-MODELO_v3.md
-QUE_MIDE_CADA_PUESTO.md
-QUE_DATOS_TENEMOS.md
-FUENTES_DE_DATOS.md
-ESTADO_DE_LOS_DATOS.md
-AUDITORIA_GOLES.md
-AUDITORIA_GRANDT.md
-AUDITORIA_INDEX.md
-REVISION_APP.md
-```
-
-Más la carpeta `historial/` con las fotos de cada fecha para el backtest.
+GitHub sirve el `index.html` guardado **hasta 10 minutos**. Si subís y entrás
+enseguida, es normal ver el sello viejo. Esperá un rato y recargá con
+**Ctrl + F5**. Los otros archivos (`datos.js`, `dataVivo.js`, …) no tienen ese
+problema: la página los pide con un número distinto cada vez.
 
 ---
 
-## Lo que NO sube, y por qué
+## Qué ve cada uno: la respuesta corta
 
-| qué | por qué |
+| Pregunta | Respuesta |
 |---|---|
-| `node.exe` | 92 MB. GitHub rechaza archivos de más de 100 MB |
-| `data365.json`, `dataPlaneta.json`, `dataCuotas.json`, `dataCopas.json`, `dataFixture.json`, `dataGranDT.json`, `data365_historico.json` | 23 MB que se rebajan solos con los sync |
-| `salida.json`, `datos.js` | los genera `armar.cjs` en segundos |
-| `SYNC_CUOTAS.ps1` | lleva la clave de the-odds-api adentro |
-| los `.png` | 40 capturas de pantalla de las pruebas |
-| `app.js`, `app2.js`, `sync.js`, `armar.js`, `motorV3.js`, `algorithmEngine.js`, `backtester.js`, `learningEngine.js`, `tournamentOptimizer.js`, `dataSanitizer.js`, `previousTournament.js`, `pagina.js`, `data.js` | código viejo de antes del motor v3. No corre nada de eso |
-| `armar_1.cjs`, `motorV3_1.cjs`, `auditar_motor_1.cjs`, `QUE_SUBO_A_GITHUB_1.md` | copias que dejó OneDrive por un conflicto |
-| `node_modules/`, `planilla_tabs/`, `Claude outputs/` | carpetas de trabajo |
+| ¿Si subo mi equipo, lo ven los demás? | **Sí**, si bajás `dataLiga.js` y lo subís. |
+| ¿Si un amigo carga su equipo, lo vemos los demás? | **No.** Queda en su navegador. |
+| ¿Si alguien tilda un jugador con la ✕, se bloquea para todos? | **No.** Es sólo suyo. |
+| ¿Los puntajes de la fecha se actualizan solos? | **No.** Se actualizan cuando **vos** los subís. |
 
 ---
 
-## Podés borrar estos, no sirven para nada
+## Cómo funciona, en detalle
 
-```
-clave_cuotas.txt
-data365.json.fusionado
-armar_1.cjs
-motorV3_1.cjs
-auditar_motor_1.cjs
-QUE_SUBO_A_GITHUB_1.md
-```
+### La regla que explica todo
 
-Los `_1` son basura de OneDrive. El `.fusionado` fue el archivo con el que
-reparé data365 y ya está aplicado.
+**La página es de sólo lectura para el que entra.** GitHub sirve archivos; no
+recibe nada. Nadie más que vos puede escribir en el repositorio.
+
+Todo lo que alguien toca en la app —cargar un equipo, tildar un jugador,
+cambiar el once— se guarda en el **localStorage de su propio navegador**. Eso no
+viaja a ningún lado. Es de él, en esa computadora, en ese navegador.
+
+Lo que ven todos es lo que está **en los archivos que subiste vos**.
+
+### Los archivos que hacen que se vea algo
+
+| archivo | qué hace que se vea | quién lo genera |
+|---|---|---|
+| `index.html` | la app entera | `construir.cjs` |
+| `datos.js` | jugadores, puntajes esperados, fixture, cuotas | `ACTUALIZAR_TODO.bat` |
+| `dataVivo.js` | los puntos **reales** de la fecha que se está jugando | `SYNC_VIVO.bat` |
+| `dataHist.js` | lo que el motor esperaba en fechas anteriores (Revisión) | `RECALCULAR.bat` |
+| `dataLiga.js` | **los equipos del torneo de amigos** | el botón *Compartir* |
+
+Si `dataLiga.js` no está, el que entra ve el Torneo de amigos **vacío**, por más
+que vos tengas los siete cargados. Es el archivo que más se olvida.
+
+### Cómo publicar los equipos del torneo
+
+1. En la app: **Torneo de amigos → ⋯ → Compartir el torneo**.
+2. Poné tu nombre donde dice cómo se va a publicar tu equipo (por defecto dice
+   «El mío», que a tus amigos no les dice nada).
+3. **Bajar `dataLiga.js`** y dejá el archivo en esta carpeta.
+4. `SUBIR_A_GITHUB.bat`.
+
+Hay que repetirlo cada vez que cambie algo: un equipo nuevo, un cambio de once,
+la tabla del campeonato.
+
+### Si un amigo carga su equipo
+
+Queda **sólo en su navegador**. Para que lo vean los demás tiene que pasártelo:
+en *Compartir el torneo* hay un cuadro de texto que se copia y se pega. Vos lo
+pegás en **importar**, bajás `dataLiga.js` de nuevo y lo subís.
+
+Es incómodo, y es la única forma con una página de GitHub: para que cada uno
+suba lo suyo haría falta un servidor que reciba datos, y esto no lo es.
+
+### Lo que nunca viaja
+
+- **La ✕** («este no juega»). Es tuya, de tu navegador y de esa fecha. Si vos
+  tildás a alguien, tus amigos lo siguen viendo. Y al revés.
+- **Las fotos de Revisión.** Son de cada navegador.
+- **El equipo propio de cada uno.** Cuando publicás, tu equipo viaja como uno
+  más de la lista y con el nombre que le pusiste; a tu amigo le aparece como el
+  equipo *tuyo*, no como el suyo. El de él sigue siendo el de él.
+
+### Nadie te puede romper lo publicado
+
+Lo que cada uno edite queda en su navegador. Cuando subís una versión nueva, al
+que ya la tenía le aparece un cartel de **«hay una versión más nueva»** con un
+botón para traerla: **no se le pisa sola** lo que haya tocado. Y su propio
+equipo no se toca ni aunque acepte.

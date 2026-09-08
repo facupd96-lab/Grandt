@@ -24,19 +24,86 @@ let mal=0; T.forEach(x=>{ if(x.lamGol==null||!x.minSiJuega) return;
   if(!isFinite(app)||app<0||app>3) mal++; });
 mal? P.push(mal+' amenazas/90 fuera de rango (0 a 3)') : OK.push('las amenazas/90 caen todas entre 0 y 3');
 
-// 2. share: la suma ponderada por minutos de cada equipo tiene que dar ~1
+// 2. share: el reparto del ataque de cada equipo tiene que dar ~1
+//
+// ESTE CONTROL ESTABA MIDIENDO OTRA COSA QUE EL MOTOR (06/09).
+// Marcaba 17 de 30 equipos rotos, con Platense en 1.47 y Belgrano en 0.84, y
+// el motor estaba bien: el que habia quedado viejo era el control.
+// Sumaba TODO el plantel ponderando por minEsperados, que es el invariante que
+// usaba el motor hasta la v29. En la v30 (05/09) la normalizacion cambio a
+// proposito — se normaliza sobre el ONCE PROBABLE (los diez de campo con mas
+// minutos esperados) con los minutos que juega SI ARRANCA — porque minEsperados
+// = P(juega) x minutos y la incertidumbre sobre quien juega se comia minutos
+// que en la cancha se juegan igual (el caso Daniele/Banfield). El control se
+// quedo en la formula vieja y desde entonces gritaba en falso.
+// Un control que grita en falso es peor que no tener control: se deja de mirar.
 const porEq={}; T.forEach(x=>{ (porEq[x.equipo]=porEq[x.equipo]||[]).push(x); });
-let fuera=[]; Object.entries(porEq).forEach(([e,js])=>{
-  const s=js.reduce((a,x)=>a+(x.share||0)*Math.max(0.02,(x.minEsperados||0)/90),0);
-  if(!cerca(s,1,0.06)) fuera.push(e+' '+s.toFixed(2)); });
-fuera.length? P.push('el reparto del ataque no suma 1 en: '+fuera.join(', ')) : OK.push('el ataque de los 30 equipos se reparte entero (suma 1)');
+const onceDe = js => js.filter(x=>x.pos!=='ARQ')
+  .sort((a,b)=>(b.minEsperados||0)-(a.minEsperados||0)).slice(0,10);
+// ACTUALIZADO OTRA VEZ (07/09), y ahora el motor cambio de verdad.
+// El reparto ya NO tiene que dar 1: da la fraccion de los 900 minutos de campo
+// que cubre el once probable. Antes daba 1 sobre 851 minutos, o sea que los
+// titulares se llevaban tambien el gol de los que entran del banco.
+// ESTE CONTROL NO PUEDE REARMAR EL ONCE DEL MOTOR (07/09).
+// El auditor solo ve a los que llegaron al ranking y el motor evalua el plantel
+// entero, asi que elige otros diez y la cuenta nunca coincide exacto: marcaba a
+// Huracan como roto sin estarlo. Reimplementar el reparto aca seria peor —un
+// control que copia al codigo que audita no controla nada.
+// Lo que si es verificable, y es lo que de verdad importa, son dos cosas:
+//   1) que a nadie se le repartan MAS goles de los que el equipo va a hacer
+//      (el bug viejo, con Platense en 1.47), y
+//   2) que el factor de escala sea uno solo por equipo y este en un rango
+//      creible. Si el motor escalara distinto a dos companeros, el reparto
+//      estaria roto de una forma que no se ve en ningun numero de la pantalla.
+let fuera=[], escalasRaras=[];
+Object.entries(porEq).forEach(([e,js])=>{
+  const s=onceDe(js).reduce((a,x)=>a+(x.share||0)*Math.max(0.02,(x.minSiJuega||0)/90),0);
+  if(s>1.05) fuera.push(e+' '+s.toFixed(2));
+  const esc=[...new Set(js.map(x=>x.escalaGol).filter(v=>v!=null))];
+  if(esc.length>1) escalasRaras.push(e+' tiene '+esc.length+' escalas distintas');
+  else if(esc.length===1 && (esc[0]<0.75||esc[0]>1.001)) escalasRaras.push(e+' escala '+esc[0]);
+});
+escalasRaras.length ? P.push('el escalado del ataque esta roto en: '+escalasRaras.join(', '))
+  : OK.push('el ataque de cada equipo se escala por un solo factor, entre 0.75 y 1 (los minutos que el once cubre de los 900)');
+fuera.length? P.push('a estos equipos se les reparten MAS goles de los que van a hacer: '+fuera.join(', '))
+            : OK.push('a ningun equipo se le reparte mas gol del que va a hacer');
+
+// 2b. LOS MINUTOS DE CAMPO SON 900, SIEMPRE.
+// Lo de arriba controla que el motor haga lo que dice que hace. Esto controla
+// otra cosa: que lo que hace tenga sentido. Un equipo juega 10 x 90 = 900
+// minutos de campo en todos los partidos. Si el once probable suma menos que
+// eso, los minutos que faltan los juegan suplentes que no entran en la cuenta,
+// y al normalizar sobre el total mas chico los goles del equipo se reparten
+// enteros entre los titulares: se les regala el gol que meten los que entran.
+// El sesgo no es igual para todos, que es lo que lo hace peligroso — cambia la
+// comparacion ENTRE equipos, que es justo lo que decide a quien poner.
+{
+  const cob=Object.entries(porEq).map(([e,js])=>({e, m:onceDe(js).reduce((a,x)=>a+(x.minSiJuega||0),0)}))
+    .sort((a,b)=>a.m-b.m);
+  // ARREGLADO EN EL MOTOR (07/09): el reparto se escala por minOnce/900, asi que
+  // los minutos que el once no cubre ya NO se le regalan a los titulares. Lo que
+  // se controla ahora es que ningun plantel quede con una cobertura absurda, que
+  // seria sintoma de minutos rotos y no de rotacion.
+  const media=cob.reduce((a,c)=>a+c.m,0)/cob.length;
+  const rotos=cob.filter(c=>c.m<600 || c.m>901);
+  if(rotos.length) P.push(rotos.length+' equipo(s) con minutos del once imposibles: '+
+    rotos.map(c=>c.e+' '+Math.round(c.m)+"'").join(', ')+'. Con 10 de campo el maximo son 900.');
+  else OK.push('los minutos del once probable son creibles en los 30 equipos (media '+Math.round(media)+
+    "' de 900; el reparto del ataque ya se escala por eso)");
+}
 
 // 3. lamGol = share x goles del equipo x la fraccion de partido que juega.
 // (La primera version de este control se olvidaba de los minutos y marcaba 295
 //  jugadores como rotos; el roto era el control.)
-let d=0; T.forEach(x=>{ if(x.lamGol==null||!x.lam||!x.minSiJuega) return;
-  if(!cerca(x.lamGol, (x.share||0)*x.lam.lamFor*(x.minSiJuega/90), 0.02)) d++; });
-d? P.push(d+' jugadores donde gol esperado != parte del ataque x goles del equipo x minutos') : OK.push('el gol esperado de cada uno = su parte del ataque x los goles de su equipo x lo que juega');
+// ACTUALIZADO (07/09): lamGol ahora es el gol TOTAL (jugada + penal). El que
+// tiene que salir de "parte del ataque x goles del equipo x minutos" es el
+// bruto, y de ahi el de jugada le descuenta la fraccion de penales de la liga.
+let d=0, dj=0; T.forEach(x=>{ if(x.lamGolBruto==null||!x.lam||!x.minSiJuega) return;
+  if(!cerca(x.lamGolBruto, (x.share||0)*x.lam.lamFor*(x.minSiJuega/90), 0.02)) d++;
+  // y el total tiene que ser exactamente los dos canales sumados
+  if(x.lamJugada!=null && x.lamPen!=null && !cerca(x.lamGol, x.lamJugada+x.lamPen, 0.005)) dj++; });
+d? P.push(d+' jugadores donde el gol bruto != parte del ataque x goles del equipo x minutos') : OK.push('el gol bruto de cada uno = su parte del ataque x los goles de su equipo x lo que juega');
+dj? P.push(dj+' jugadores donde el gol total no es la suma del gol de jugada y el de penal') : OK.push('el gol que muestra la tabla es la suma exacta del gol de jugada y el de penal');
 
 // 4. minutos si juega: tiene que caer dentro de lo que jugo de titular.
 // Con dos arranques el motor usa el promedio de los dos, asi que exigir que

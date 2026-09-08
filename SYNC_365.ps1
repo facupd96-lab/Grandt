@@ -26,9 +26,37 @@ $encabezados = @{
 $tipoMinutos = 30; $tipoGoles = 27; $tipoAsist = 26
 $tipoTiros = 3;    $tipoSot = 4;    $tipoXg = 76
 
+# UN SOLO INTENTO ERA POCO (06/09).
+# Con ~800 gameIds por corrida, un timeout o un 429 de 365Scores hacia
+# desaparecer un partido ENTERO sin dejar rastro: el catch devolvia $null, el
+# partido se sumaba a "descartados" junto con los ids que directamente no
+# existen, y nadie se enteraba nunca.
+# Asi se perdio el 4633435 (fecha 1, Estudiantes RC - Tigre). Se verifico
+# contra la API: el partido esta, competitionId 72, roundNum 1, Finalizado, con
+# la formacion de los dos equipos. Pasaba todos los filtros de este script y el
+# rango de tapado de huecos lo cubria. Simplemente la llamada fallo y no se
+# reintento. Trece jugadores de esos dos clubes quedaron con un partido menos
+# de tiros y de xG, marcados en la app con un "-1".
+# Ahora: tres intentos con espera creciente, 404 no se reintenta (ese gameId no
+# existe y es la mayoria de los descartes), y si igual falla se anota el gameId
+# para avisarlo al final en vez de tragarselo.
+$script:gidsFallados = New-Object System.Collections.ArrayList
+$script:ultimoFalloFueDeRed = $false
+
 function Obtener-Json([string]$direccion) {
-  try { return Invoke-RestMethod -Uri $direccion -Headers $encabezados -TimeoutSec 25 }
-  catch { return $null }
+  $script:ultimoFalloFueDeRed = $false
+  $espera = 2
+  for ($intento = 1; $intento -le 3; $intento++) {
+    try { return Invoke-RestMethod -Uri $direccion -Headers $encabezados -TimeoutSec 25 }
+    catch {
+      $codigo = 0
+      try { $codigo = [int]$_.Exception.Response.StatusCode } catch { }
+      if ($codigo -eq 404) { return $null }          # ese gameId no existe: no hay nada que reintentar
+      if ($intento -lt 3) { Start-Sleep -Seconds $espera; $espera = $espera * 3 }
+      else { $script:ultimoFalloFueDeRed = $true }
+    }
+  }
+  return $null
 }
 
 function Obtener-Numero($miembro, [int]$tipo) {
@@ -168,7 +196,10 @@ foreach ($idPartido in $idsOrdenados) {
   }
 
   $respuesta = Obtener-Json "https://webws.365scores.com/web/game/?$queryBase&gameId=$idPartido"
-  if ($null -eq $respuesta) { $descartados++; continue }
+  if ($null -eq $respuesta) {
+    if ($script:ultimoFalloFueDeRed) { [void]$script:gidsFallados.Add($idPartido) }
+    $descartados++; continue
+  }
 
   $partido = $respuesta.game
   if ($null -eq $partido) { $partido = $respuesta }
@@ -412,6 +443,11 @@ foreach ($idPartido in $idsOrdenados) {
 Write-Host ""
 Write-Host ""
 Write-Host ("   {0} partidos jugados con datos  ·  {1} con formacion publicada sin jugar  ·  {2} descartados (ids que no existen o de otro torneo)" -f $conDatos, $noJugados, $descartados)
+if ($script:gidsFallados.Count -gt 0) {
+  Write-Host ("   OJO — {0} gameId(s) fallaron por red aun despues de tres intentos: {1}" -f $script:gidsFallados.Count, ($script:gidsFallados -join ', ')) -ForegroundColor Yellow
+  Write-Host "   Esos partidos NO entraron. A los que jugaron les van a faltar tiros y xG (la app los marca con un -1)." -ForegroundColor Yellow
+  Write-Host "   Volve a correr SYNC_365.bat: el tapado de huecos los vuelve a pedir." -ForegroundColor Yellow
+}
 Write-Host ""
 
 if ($conDatos -eq 0) {

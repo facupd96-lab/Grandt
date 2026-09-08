@@ -199,6 +199,35 @@ const susp=TODOS.filter(x=>x.disponibilidad&&x.disponibilidad.suspendido).length
 const tr=TODOS.filter(x=>x.transferido).length;
 OK(susp+' suspendidos detectados · '+tr+' transferidos marcados');
 
+// ── 12b. EL FIXTURE, ¿SABE QUE SE JUGO? ─────────────────────────────────────
+// Control nuevo (07/09). dataFixture.json es de donde sale TODO lo que el motor
+// sabe sobre que partido ya se jugo: la fecha objetivo, la fecha en curso, el
+// "ya se jugo" de cada tarjeta de la portada y hasta si las cuotas estan
+// vencidas. Nadie miraba si estaba al dia, y cuando queda viejo no rompe nada
+// ruidosamente: simplemente TODOS los partidos figuran por jugarse. Paso con la
+// fecha 8, con el fixture del 02/09: 13 partidos jugados y el motor mostrando
+// los 15 como si vinieran. Se detecta solo, mirando la hora de cada partido.
+{
+  const partidos = (FX && FX.partidos) || [];
+  const ahora = Date.now();
+  // un partido tarda unas 2 horas; se le dan 3 de gracia antes de darlo por terminado
+  const vencidos = partidos.filter(m => m.fecha && !m.terminado &&
+    (ahora - new Date(m.fecha).getTime()) > 3 * 3600000);
+  const dias = (FX && FX.generado) ? (ahora - new Date(FX.generado).getTime()) / 86400000 : null;
+  if (vencidos.length) {
+    const porFecha = {};
+    vencidos.forEach(m => { porFecha[m.numeroFecha] = (porFecha[m.numeroFecha] || 0) + 1; });
+    const det = Object.keys(porFecha).sort((a, b) => a - b).map(f => 'f' + f + ':' + porFecha[f]).join(' ');
+    P_('el fixture esta VIEJO: ' + vencidos.length + ' partido(s) ya se jugaron y siguen sin resultado (' + det + ')' +
+       (dias != null ? ', dataFixture.json tiene ' + dias.toFixed(1) + ' dias' : '') +
+       '.  → corré SYNC_COPAS.bat. Mientras siga asi, el motor cree que NINGUNO de esos partidos se jugo:' +
+       ' la portada los muestra a todos como si vinieran y el cartel de "fecha en juego" no aparece.');
+  } else if (partidos.length) {
+    OK('el fixture sabe que se jugo: ningun partido vencido sin resultado' +
+       (dias != null ? ' (dataFixture.json de hace ' + dias.toFixed(1) + ' dias)' : ''));
+  }
+}
+
 // ── 13. la planilla de Planeta, ¿es la de esta fecha? ───────────────────────
 // Planeta publica una planilla NUEVA cada fecha, con OTRO ID. Estuvimos
 // bajando la de la fecha 6 con la 7 ya jugada y nadie se dio cuenta: el log
@@ -206,11 +235,40 @@ OK(susp+' suspendidos detectados · '+tr+' transferidos marcados');
 if(PL){
   const uf = Number(PL.ultimaFecha)||0;
   const cfg = leer('planilla.json');
-  if(uf && FJ && uf < FJ){
-    P_('la planilla de Planeta esta ATRASADA: trae hasta la fecha '+uf+' y ya se jugo la '+FJ+
-       '.  → Planeta publica una planilla nueva cada fecha, con otro ID. Pedile el link nuevo,'+
-       ' pega el pedazo entre /d/e/ y /pubhtml en planilla.json y corré ACTUALIZAR_TODO de nuevo.'+
-       (cfg&&cfg.id? '  (el ID que estamos usando arranca en '+String(cfg.id).slice(0,18)+'…)':''));
+  // ¿La fecha FJ TERMINO, o todavia se esta jugando? Planeta publica la planilla
+  // nueva recien cuando la fecha termina (fecha 6 -> lunes 25/08, fecha 7 ->
+  // lunes 01/09). Si todavia faltan partidos, mandarlo a buscar un link que no
+  // existe es hacerle perder el tiempo: es un aviso, no un problema.
+  const delaFJ = ((FX&&FX.partidos)||[]).filter(m=>m.numeroFecha===FJ);
+  const faltanFJ = delaFJ.filter(m=>!m.terminado).length;
+  const terminoFJ = delaFJ.length>0 && faltanFJ===0;
+  if(uf && FJ && uf < FJ && !terminoFJ && delaFJ.length){
+    A_('la planilla de Planeta trae hasta la fecha '+uf+' y la '+FJ+' todavia se esta jugando'+
+       (faltanFJ? ' ('+faltanFJ+' de '+delaFJ.length+' partidos por jugarse)':'')+
+       '. Es lo normal: Planeta publica la planilla nueva cuando la fecha termina, no antes.'+
+       ' No hay nada que buscar todavia.');
+  } else if(uf && FJ && uf < FJ){
+    // CUANTO HACE QUE TERMINO (08/09). Planeta publica la planilla nueva uno o
+    // dos dias despues del ultimo partido, no en el momento. Marcarlo como
+    // PROBLEMA el mismo martes manda a buscar un link que todavia no existe y,
+    // peor, le pone "no confies en los numeros" a una corrida que esta bien.
+    // Recien pasadas 72 horas es un problema de verdad.
+    // en dataFixture el campo es `fecha` (hora local, sin zona), no `cuando`
+    const ultimo = delaFJ.map(m=>Date.parse(m.fecha||m.cuando)).filter(x=>!isNaN(x)).sort((a,b)=>b-a)[0];
+    const horas = ultimo ? (Date.now()-ultimo)/3600000 : 999;   // sin hora del ultimo partido, se trata como problema
+    const comoBuscarla = ' → Planeta publica una planilla nueva cada fecha, con otro ID.'+
+       ' SYNC_PLANETA la busca solo; si no aparece, pega el pedazo entre /d/e/ y /pubhtml'+
+       ' de la etiqueta "Estadisticas" en planilla.json.'+
+       (cfg&&cfg.id? '  (el ID que estamos usando arranca en '+String(cfg.id).slice(0,18)+'…)':'');
+    if(horas < 72){
+      A_('la planilla de Planeta trae hasta la fecha '+uf+' y la '+FJ+' termino hace '+
+         Math.round(horas)+' horas. Planeta la publica uno o dos dias despues:'+
+         ' volve a correr SYNC_PLANETA.bat manana. Mientras tanto la ficha de cada jugador'+
+         ' es la de la fecha '+uf+', que es lo unico que hay.');
+    } else {
+      P_('la planilla de Planeta esta ATRASADA: trae hasta la fecha '+uf+' y la '+FJ+
+         ' termino hace '+Math.round(horas/24)+' dias.'+comoBuscarla);
+    }
   } else if(uf && FJ && uf > FJ){
     A_('la planilla de Planeta dice fecha '+uf+' pero el fixture marca '+FJ+' jugadas. Puede ser que'+
        ' Planeta ya cargue la fecha en curso; si no, mira el fixture.');

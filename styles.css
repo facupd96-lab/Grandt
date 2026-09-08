@@ -1,38 +1,54 @@
 :root {
-    /* Gran DT Theme Palette */
-    --gdt-navy: #0a1d37;
-    --gdt-navy-header: #071529;
-    --gdt-red: #d32f2f;
-    --gdt-yellow: #ffcc00;
-    --gdt-green-dark: #1b5e20;
-    --gdt-green-light: #2e7d32;
-    --gdt-grass-1: #297534;
-    --gdt-grass-2: #32863e;
+    /* Los colores viejos de marca. Quedaban del azul-marino original y
+       chocaban con la paleta nueva: la barra de arriba seguia siendo azul
+       sobre un fondo carbon verdoso, y los verdes de las cabeceras eran de
+       otro tono que el de la cancha. Se reapuntan a la familia nueva. */
+    --gdt-navy: #101613;
+    --gdt-navy-header: #0a0f0d;
+    --gdt-red: #e5484d;
+    --gdt-yellow: #f0a828;
+    --gdt-green-dark: #12301f;
+    --gdt-green-light: #1a4a2e;
+    --gdt-grass-1: #12301f;
+    --gdt-grass-2: #1a4a2e;
     
-    /* Colors - Premium Dark Theme */
-    --bg-main: #0b1322;
-    --bg-card: #132238;
-    --bg-input: #09101d;
+    /* ═══════════════════════════════════════════════════════════════════
+       PALETA — CANCHA DE NOCHE (07/09)
+       Antes era el azul-pizarra #0b1322 / #132238 / #2563eb, que es
+       exactamente la paleta que sale por defecto en todo tablero hecho con
+       IA: se reconoce de lejos y no dice nada de lo que hay adentro.
+       Esta sale de otro lado: el carbón tiene un verde apenas insinuado
+       —cancha vista de noche, no pantalla de terminal—, el acento es el
+       verde del césped bajo los focos y el ámbar queda para lo que decide:
+       la cinta de capitán, los avisos, los puntos que importan.
+       Ningún color es puro ni saturado al máximo: la prensa deportiva seria
+       usa grises cálidos y un solo acento fuerte, no un arcoíris.
+       ═══════════════════════════════════════════════════════════════════ */
+    --bg-main: #0c100e;
+    --bg-card: #151a17;
+    --bg-input: #0a0e0c;
+
+    --border-color: #262d28;
+    --border-light: #3a443c;
+
+    --text-main: #f1f4f1;
+    --text-muted: #8f9a92;
+
+    --primary: #16a34a;
+    --primary-hover: #15803d;
+
+    --success: #22c55e;
+    --success-hover: #16a34a;
+
+    --warning: #f0a828;
+    --danger: #e5484d;
     
-    --border-color: #213552;
-    --border-light: #334d73;
-    
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    
-    --success: #10b981;
-    --success-hover: #059669;
-    
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    
-    --pos-arq: #a855f7;
-    --pos-def: #3b82f6;
-    --pos-vol: #10b981;
-    --pos-del: #ef4444;
+    /* los cuatro puestos: separados entre si pero todos algo desaturados,
+       para que las camisetas no compitan con el acento de la interfaz */
+    --pos-arq: #b98cf0;
+    --pos-def: #4b93e8;
+    --pos-vol: #2fbf71;
+    --pos-del: #ef5f5f;
     
     --radius-sm: 6px;
     --radius-md: 12px;
@@ -1496,9 +1512,6 @@ tr.tb-jugado:hover { opacity: 1; }
    minutos y el xG son del club anterior. Violeta, para que no se confunda
    con las alertas de rotación (ámbar) ni con las de disponibilidad (rojo). */
 .pill-transfer { color: #c4b5fd; background: rgba(139,92,246,0.14); border: 1px solid rgba(139,92,246,0.45); }
-/* Pase cargado a mano: naranja, porque es una advertencia y no un dato de color.
-   El pase normal ya no se marca (03/09): no cambiaba ninguna decision. */
-.pill-pase { color: #fdba74; background: rgba(249,115,22,0.14); border: 1px solid rgba(249,115,22,0.5); font-weight: 800; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    PASADA DE DISEÑO — 30/08/2026
@@ -1606,7 +1619,7 @@ tr.tb-jugado:hover { opacity: 1; }
    Franja amarilla en vez de roja (es el acento del Gran DT) y un degrade
    suave para que la cabecera no sea un rectangulo plano.                   */
 .main-header {
-    background: linear-gradient(180deg, var(--gdt-navy-header) 0%, #0a1b33 100%);
+    background: linear-gradient(180deg, #0a0f0d 0%, #101713 100%);
     border-bottom: 3px solid var(--gdt-yellow);
 }
 .gdt-badge {
@@ -1902,7 +1915,7 @@ body { overflow-y: auto; }
 
 .barra {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(9, 20, 37, 0.94);
+    background: rgba(10, 15, 13, 0.92);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);
 }
@@ -2116,24 +2129,22 @@ body { overflow-y: auto; }
    Era un modal apretado con la cancha comprimida. Ahora tiene la pantalla
    entera: cancha grande, banco de cuatro suplentes y panel de alternativas.
    ══════════════════════════════════════════════════════════════════════════ */
-/* ACHICADO 03/09: la cancha y la ficha ocupaban una pantalla y media para
-   mostrar once nombres. Mismo contenido, dos tercios del alto. */
 .once-hero {
-    display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem;
-    flex-wrap: wrap; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0.8rem;
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem;
+    flex-wrap: wrap; padding-bottom: 1.3rem; border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.1rem;
 }
-.once-hero h1 { font-family: 'Outfit', sans-serif; font-size: 1.9rem; font-weight: 800; line-height: 1; margin: 3px 0 6px; }
+.once-hero h1 { font-family: 'Outfit', sans-serif; font-size: 2.6rem; font-weight: 800; line-height: 1; margin: 4px 0 8px; }
 .once-hero p { color: var(--text-muted); font-size: 0.9rem; max-width: 620px; line-height: 1.5; }
 .once-hero p b { color: var(--text-main); }
 .once-marcador { text-align: right; }
-.om-pts { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; color: var(--success); line-height: 1; }
+.om-pts { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 800; color: var(--success); line-height: 1; }
 .om-lbl { font-size: 0.78rem; color: var(--text-muted); }
 .om-sub { font-size: 0.74rem; color: var(--text-muted); margin-top: 3px; }
 
 .once-barra {
     display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
-    padding: 0.55rem 0.9rem; margin-bottom: 0.7rem;
+    padding: 0.85rem 1rem; margin-bottom: 1rem;
     background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
 }
 .once-barra .tab-btn { padding: 0.4rem 0.9rem; font-size: 0.82rem; }
@@ -2145,42 +2156,51 @@ body { overflow-y: auto; }
 }
 
 /* La cancha */
+/* LA CANCHA DE MEJOR 11, REHECHA (07/09).
+   El verde era #1c5527/#226230 a rayas anchas y competia con todo lo que
+   tenia encima; las fichas eran cajas de 124px con borde blanco, sombra
+   fuerte y cinco datos adentro, y arriba de eso un borde amarillo punteado
+   para marcar diferencias con el arriesgado. Todo junto era ilegible.
+   Ahora usa el mismo lenguaje que la cancha de la portada —cesped oscuro,
+   franjas apenas visibles, la camiseta como protagonista— pero mas grande
+   y con las acciones a mano. */
 .cancha {
     position: relative; border-radius: var(--radius-lg); overflow: hidden;
-    background: repeating-linear-gradient(0deg, #1c5527 0 42px, #226230 42px 84px);
-    box-shadow: inset 0 0 60px rgba(0,0,0,0.55);
-    padding: 0.9rem 0.8rem; display: flex; flex-direction: column; justify-content: space-around;
-    gap: 0.55rem; min-height: 340px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.10), transparent 62%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0 54px, transparent 54px 108px),
+        linear-gradient(180deg, #10281c, #0c1c14);
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.5);
+    padding: 1.6rem 1rem; display: flex; flex-direction: column; justify-content: space-around;
+    gap: 1.1rem; min-height: 470px;
 }
 .cancha-lineas {
-    position: absolute; inset: 14px; border: 2px solid rgba(255,255,255,0.16); border-radius: 6px;
+    position: absolute; inset: 16px; border: 1px solid rgba(255,255,255,0.07); border-radius: 8px;
     pointer-events: none;
 }
 .cancha-lineas::before {
     content: ''; position: absolute; left: 0; right: 0; top: 50%;
-    border-top: 2px solid rgba(255,255,255,0.16);
+    border-top: 1px dashed rgba(255,255,255,0.08);
 }
 .cancha-lineas::after {
-    content: ''; position: absolute; left: 50%; top: 50%; width: 70px; height: 70px;
+    content: ''; position: absolute; left: 50%; top: 50%; width: 96px; height: 96px;
     transform: translate(-50%,-50%); border: 2px solid rgba(255,255,255,0.16); border-radius: 50%;
 }
-.linea11 { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; position: relative; z-index: 2; }
+.linea11 { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; position: relative; z-index: 2; }
 
 .ficha11 {
-    position: relative; width: 104px; padding: 6px 5px 5px;
-    background: linear-gradient(180deg, rgba(10,29,55,0.94), rgba(6,20,38,0.96));
-    border: 1px solid rgba(255,255,255,0.22); border-radius: 10px;
+    position: relative; width: 132px; padding: 8px 6px 6px;
+    background: transparent; border: 1px solid transparent; border-radius: 10px;
     text-align: center; cursor: pointer;
-    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+    transition: transform .12s ease, background .12s ease;
 }
-.ficha11:hover { transform: translateY(-3px); border-color: var(--gdt-yellow); box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
-.ficha11.es-capitan { border-color: var(--gdt-yellow); box-shadow: 0 0 0 2px rgba(255,204,0,0.35), 0 4px 12px rgba(0,0,0,0.5); }
-.ficha11.es-distinto { outline: 2px dashed var(--warning); outline-offset: 3px; }
-.ficha11.cambiando { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.5); }
+.ficha11:hover { transform: translateY(-2px); background: rgba(255,255,255,0.05); }
+.ficha11.es-capitan { background: rgba(240,168,40,0.07); }
+.ficha11.es-distinto { background: rgba(240,168,40,0.10); }
+.ficha11.cambiando { background: rgba(34,197,94,0.14); border-color: var(--success); }
 .ficha11.vacia {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: var(--text-muted); font-weight: 700; min-height: 96px; border-style: dashed; cursor: default;
+    color: var(--text-muted); font-weight: 700; min-height: 120px; border-style: dashed; cursor: default;
 }
 .ficha11.vacia span { font-size: 0.68rem; font-weight: 400; }
 .f11-top { position: absolute; top: -8px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 4px; }
@@ -2195,13 +2215,26 @@ body { overflow-y: auto; }
     font-size: 0.66rem; font-weight: 800; display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(0,0,0,0.3);
 }
-.f11-jersey { display: flex; justify-content: center; margin: 1px 0 1px; }
-.f11-jersey svg, .f11-jersey img { width: 26px; height: 26px; }
-.f11-nombre { font-size: 0.7rem; font-weight: 700; line-height: 1.12; color: #fff; }
-.f11-eq { font-size: 0.62rem; color: #a8b6c8; line-height: 1.2; margin-top: 1px; }
+.f11-jersey { display: flex; justify-content: center; margin: 2px 0 4px; position: relative; }
+.f11-num {
+    position: absolute; right: 50%; bottom: -5px; transform: translateX(30px);
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill); padding: 0 5px;
+    font-size: 0.68rem; font-weight: 800; color: var(--text-main);
+    font-variant-numeric: tabular-nums;
+}
+.es-capitan .f11-num { border-color: var(--warning); color: var(--warning); }
+.f11-nombre {
+    font-size: 0.78rem; font-weight: 700; line-height: 1.15; color: #fff;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.f11-eq {
+    font-size: 0.62rem; color: rgba(226,232,240,0.55); line-height: 1.2; margin-top: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .f11-pts {
-    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.92rem; color: var(--gdt-yellow);
-    margin-top: 2px; line-height: 1;
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--gdt-yellow);
+    margin-top: 4px; line-height: 1;
 }
 .f11-pts span { font-size: 0.6rem; font-weight: 600; color: #cbd5e1; }
 .f11-pie { font-size: 0.6rem; color: #94a3b8; margin-top: 2px; }
@@ -2213,9 +2246,9 @@ body { overflow-y: auto; }
 
 /* El banco */
 .banco {
-    margin-top: 0.7rem; padding: 0.7rem 0.9rem;
+    margin-top: 1rem; padding: 1rem 1.1rem;
     background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
-    display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+    display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
 }
 .banco-lbl {
     font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; min-width: 160px;
@@ -2372,185 +2405,2097 @@ body { overflow-y: auto; }
 .tb-op .op-flecha { display: block; font-size: 0.66rem; margin: 2px 0 0; }
 .tb-op th:nth-child(9), .tb-op td:nth-child(9) { width: 76px; }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   DATOS DE LA FECHA — 02/09
-   La pestaña de curiosidades, al estilo de las planillas de Planeta Gran DT.
-   Misma tipografía y mismas tarjetas que Oportunidades: el problema anterior
-   era justamente que cada pantalla parecía de otra app.
-   ══════════════════════════════════════════════════════════════════════════ */
-/* Dos zonas: arriba las tarjetas anchas (ley del ex, once ideal) y abajo el
-   resto en columnas de verdad. Con un grid normal, una tarjeta de 32 filas al
-   lado de una de 10 dejaba media pantalla vacia; con columnas CSS las tarjetas
-   se acomodan solas y no queda hueco. */
-.datos-anchos { display: grid; gap: 16px; margin-bottom: 16px; }
-/* Compactado 03/09: cinco filas por tarjeta y un boton, y el once ideal en
-   lista en vez de once tarjetas gigantes. Antes habia que scrollear seis
-   pantallas para llegar a la ley del ex. */
-.fila-vermas > td { text-align: center; padding: 8px 0 6px !important; border: 0 !important; }
-.oi-lista { display: grid; gap: 2px; }
-.oi-fila { display: flex; align-items: baseline; gap: 8px; font-size: 0.78rem;
-           padding: 2px 0; border-bottom: 1px solid rgba(51,65,85,0.25); }
-.oi-fila .oi-pts { font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--success);
-                   min-width: 26px; font-size: 0.9rem; }
-.oi-fila .oi-nom { font-weight: 700; color: var(--text-main); }
-.oi-fila .oi-eq { margin-left: auto; font-size: 0.68rem; color: var(--text-muted); }
-.once-ideal-cab.compacto { padding: 10px 14px; gap: 18px; }
-.once-ideal-cab.compacto b { font-size: 0.95rem; }
-.once-ideal-lineas { padding: 10px 14px 4px; gap: 10px; }
-.dato-card .tb-datos td, .dato-card .tb-datos th { padding-top: 5px; padding-bottom: 5px; }
-.datos-col { column-count: 2; column-gap: 16px; }
-.datos-col .dato-card {
-    break-inside: avoid; -webkit-column-break-inside: avoid;
-    display: inline-block; width: 100%; margin: 0 0 16px;
+
+/* ── TILDE "NO JUEGA" Y AVISO DE DESCARTES (05/09) ─────────────────────────── */
+.aviso-fuera {
+  margin-top: 10px; padding: 9px 12px; border-radius: 9px;
+  background: rgba(245,158,11,.10); border: 1px solid rgba(245,158,11,.35);
+  font-size: 13px; line-height: 1.5;
 }
-.dato-card { overflow: hidden; }
-.dato-head { padding: 16px 18px 10px; border-bottom: 1px solid rgba(51,65,85,0.35); }
+.aviso-fuera .af-nombres { opacity: .85; }
+.aviso-fuera .af-limpiar {
+  margin-left: 8px; padding: 2px 9px; border-radius: 6px; cursor: pointer;
+  background: transparent; border: 1px solid currentColor; font-size: 12px;
+  color: inherit; opacity: .8;
+}
+.aviso-fuera .af-limpiar:hover { opacity: 1; }
+.aviso-fuera .af-rojo {
+  margin-top: 7px; padding-top: 7px; border-top: 1px solid rgba(245,158,11,.3);
+  color: #fca5a5;
+}
+
+/* las dos columnas nuevas no se comen el ancho de la tabla */
+th[data-k="fuera"], th[data-k="arr"], th[data-k="conc"] { width: 1%; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
+
+
+/* ── LA TIRA DE ÚLTIMAS FECHAS (06/09) ─────────────────────────────────────
+   Existía la clase .tira-min en el JS y nunca tuvo CSS: los minutos salían
+   pegados, "909090". Cada fecha es una pastilla chiquita con su color. */
+.tira-min { display: flex; gap: 3px; margin-top: 3px; justify-content: center; }
+.tira-min .tm {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 16px; padding: 0 3px;
+  border-radius: 4px; font-size: 10px; font-weight: 700;
+  font-variant-numeric: tabular-nums; line-height: 1;
+  border: 1px solid transparent;
+}
+.tm-full  { background: rgba(16,185,129,.18);  color: #34d399; border-color: rgba(16,185,129,.35); }
+.tm-largo { background: rgba(245,158,11,.16);  color: #fbbf24; border-color: rgba(245,158,11,.32); }
+.tm-medio { background: rgba(148,163,184,.16); color: #cbd5e1; border-color: rgba(148,163,184,.3); }
+.tm-corto { background: rgba(148,163,184,.10); color: #94a3b8; border-color: rgba(148,163,184,.22); }
+.tm-supl  { background: transparent; color: #94a3b8; border: 1px dashed rgba(148,163,184,.55); }
+.tm-no    { background: rgba(239,68,68,.12); color: #f87171; border-color: rgba(239,68,68,.35); }
+
+/* ── EL BOTÓN DE "NO JUEGA" ─────────────────────────────────────────────────
+   Va al final de la fila y apagado casi no se ve: es una acción que se usa una
+   vez por fecha, no algo para mirar. Encendido queda rojo lleno. */
+.btn-fuera {
+  width: 20px; height: 20px; line-height: 1; padding: 0;
+  border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 700;
+  background: transparent; border: 1px solid rgba(148,163,184,.25);
+  color: rgba(148,163,184,.5); transition: all .12s;
+}
+.btn-fuera:hover { border-color: rgba(239,68,68,.6); color: #f87171; background: rgba(239,68,68,.10); }
+.btn-fuera.activo { background: #ef4444; border-color: #ef4444; color: #fff; }
+.baja-chip {
+  font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: #f87171; border: 1px solid rgba(239,68,68,.35); border-radius: 4px; padding: 1px 5px;
+}
+th[data-k="p12"], th[data-k="lg"], th[data-k="conc"], th[data-k="arr"] { white-space: nowrap; }
+/* la tabla se pasaba del ancho del contenedor y quedaban PUNTOS y la ✕ afuera:
+   las columnas numericas van con menos aire, el nombre no se toca */
+.data-table th[data-k="pvi"], .data-table th[data-k="tiros"], .data-table th[data-k="xg"],
+.data-table th[data-k="conc"], .data-table th[data-k="lg"], .data-table th[data-k="fi"],
+.data-table th[data-k="arr"], .data-table th[data-k="p12"], .data-table th[data-k="lamc"],
+.data-table th[data-k="delgol"], .data-table th[data-k="lamf"] { padding-left: 5px; padding-right: 5px; }
+.data-table td.text-center { padding-left: 5px; padding-right: 5px; }
+.tira-min .tm { min-width: 19px; }
+/* el nombre se lleva 385px y empujaba la ✕ fuera del contenedor; con 300 los
+   badges envuelven y entra todo sin scroll horizontal */
+/* LA ✕ YA NO SE PEGA AL BORDE (08/09).
+   Estuvo anclada con position:sticky desde el 06/09 para que no se cortara, y
+   el efecto secundario fue el que se veia en pantalla: cuando la tabla es mas
+   ancha que la caja, la ✕ se corre hacia la izquierda y se DIBUJA ENCIMA de la
+   columna PUNTOS, que desaparece. Era eso, y no otra cosa, lo que hacia que en
+   modo analista no se viera el puntaje. Ahora la tabla tiene anchos calculados
+   en pixeles y scrollea entera: la ✕ viaja con su columna, como todas.        */
+
+/* ── EL ROL REAL DE 365SCORES (06/09) ──────────────────────────────────────
+   No cambia ningun puntaje: es para saber si estas poniendo un central o un
+   lateral, que en Gran DT son los dos "DEF" y cobran lo mismo. */
+.chip-rol {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
+  font-size: 11px; font-weight: 700; line-height: 1.15; white-space: nowrap;
+  color: #c7d2fe;
+}
+.chip-rol small { font-size: 9px; font-weight: 600; color: #8b93a7; letter-spacing: .02em; }
+.chip-rol.rol-dudoso { color: #fbbf24; }
+th[data-k="rol"] { white-space: nowrap; }
+#view-rankings .data-table td:nth-child(2) > * { white-space: normal; }
+#view-rankings .data-table th[data-k="fuera"], #view-rankings .data-table td:last-child { padding-left: 4px; padding-right: 4px; }
+
+#view-rankings .data-table th[data-k="epsj"], #view-rankings .data-table td:nth-last-child(2) { padding-right: 10px; }
+
+/* el gol mas seguro de cada puesto, y el aviso de xG concentrado */
+.gol-top{position:relative;font-weight:800}
+.gol-top::after{content:'';position:absolute;top:-2px;right:-7px;width:5px;height:5px;border-radius:50%;background:#34d399}
+.xg-concentrado{color:#fbbf24}
+.conc-mark{font-size:9px;font-weight:800;color:#f87171;margin-left:1px}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PANTALLA DATOS
+   ---------------------------------------------------------------------------
+   ESTAS CLASES NO EXISTIAN (06/09). El 03/09 la pantalla se reescribio de "una
+   tira de tablas de treinta filas" a tarjetas — .datos-col, .dato-card,
+   .dato-head, .tb-datos, .dato-vacio, .reparto, .fila-vermas — y NINGUNA se
+   llego a escribir en el CSS. El HTML salia sin estilo: una columna de tablas
+   gigantes, con celdas de 1rem heredadas de .data-table, una abajo de la otra.
+   Por eso "antes entraban muchos datos y ahora no". Esto es lo que faltaba.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.datos-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1rem;
+    align-items: start;
+}
+.datos-col .card { margin-bottom: 0; }
+
+.dato-card { font-size: 0.85rem; }
+.dato-ancho { grid-column: 1 / -1; }
+
+.dato-head {
+    padding: 0.85rem 1rem 0.6rem;
+    border-bottom: 1px solid var(--border-color);
+}
 .dato-head h2 {
-    margin: 0; font-size: 1rem; font-weight: 800; letter-spacing: -0.01em;
-    color: var(--text-main);
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1.25;
 }
-.dato-head p { margin: 3px 0 0; font-size: 0.76rem; color: var(--text-muted); }
+.dato-head p {
+    margin: 0.2rem 0 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+}
+
 .dato-vacio {
-    padding: 22px 18px; font-size: 0.8rem; color: var(--text-muted); text-align: center;
+    padding: 1.25rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: center;
 }
-.dato-ex { color: var(--accent, #38bdf8); }
-.tb-datos { font-size: 0.82rem; }
+
+/* tablas de la pantalla Datos: la mitad de alto que las de jugadores */
 .tb-datos th {
-    font-size: 0.64rem; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--text-muted); font-weight: 800;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
 }
-.tb-datos td { vertical-align: middle; }
-.tb-datos .player-name { font-size: 0.84rem; }
-.tb-datos .player-sub { font-size: 0.68rem; }
+.tb-datos td {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.8rem;
+}
+.tb-datos .player-name { font-size: 0.82rem; }
+.tb-datos .player-sub  { font-size: 0.68rem; }
+.tb-datos tbody tr:last-child td { border-bottom: none; }
+
+.fila-vermas td {
+    padding: 0.5rem 0.6rem;
+    text-align: center;
+    border-bottom: none;
+}
+
+.dato-card .tabla-referencia {
+    padding: 0.6rem 1rem 0.8rem;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+}
+
+/* ── barra de ventana del bloque local/visitante ───────────────────────────── */
+.cond-barra {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.cond-lab { font-size: 0.72rem; color: var(--text-muted); }
+.chip-vent {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    border-radius: var(--radius-pill);
+    padding: 0.2rem 0.7rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+.chip-vent:hover { border-color: var(--border-light); color: var(--text-main); }
+.chip-vent.on {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    font-weight: 600;
+}
+.cond-leyenda {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.pt-l, .pt-v {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+}
+.pt-l { background: var(--success); }
+.pt-v { background: var(--warning); }
+
+/* ── la tabla de local/visitante ───────────────────────────────────────────── */
+.tb-cond { table-layout: auto; }
+.tb-cond th, .tb-cond td { text-align: center; }
+.tb-cond .th-eq, .tb-cond .td-eq { text-align: left; }
+.tb-cond td { padding: 0.35rem 0.5rem; }
+
+.tb-cond .td-eq {
+    position: sticky;
+    left: 0;
+    background: var(--bg-card);
+    z-index: 5;
+    min-width: 140px;
+    box-shadow: 1px 0 0 var(--border-color);
+}
+.tb-cond .th-eq {
+    position: sticky;
+    left: 0;
+    z-index: 12;
+    box-shadow: 1px 0 0 var(--border-color);
+}
+.tb-cond tbody tr:hover .td-eq { background: #16283f; }
+.tb-cond .td-eq b { font-size: 0.82rem; }
+.tb-cond .op-cuenta { font-size: 0.65rem; color: var(--text-muted); }
+
+.th-cond { white-space: nowrap; vertical-align: bottom; }
+.ord-fila { display: flex; gap: 2px; justify-content: center; margin-top: 3px; }
+.ord-lv {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    border-radius: 4px;
+    font-size: 0.6rem;
+    line-height: 1;
+    padding: 2px 4px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.ord-lv:hover { color: var(--text-main); border-color: var(--border-light); }
+.ord-lv.on {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* celda con el numero de local arriba y el de visitante abajo */
+.lv { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; }
+.lv-l, .lv-v {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.lv-l { color: var(--success); }
+.lv-v { color: var(--warning); }
+.lv-l i, .lv-v i {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.66rem;
+    color: var(--text-muted);
+}
+
+/* Los dos casos que se buscan a ojo en esta tabla.
+   La barrita va en la PRIMERA celda de la fila. Cuando se agrego la columna
+   del puesto (06/09) quedo colgada del nombre del equipo, o sea en el medio de
+   la fila, flotando entre el numero y el nombre. Va con box-shadow inset y no
+   con border para no correr el ancho de la celda 3px. */
+.fila-casero  .td-num { box-shadow: inset 3px 0 0 var(--success); }
+.fila-viajero .td-num { box-shadow: inset 3px 0 0 var(--warning); }
+
+@media (max-width: 700px) {
+    .datos-col { grid-template-columns: 1fr; }
+    .tb-cond { font-size: 0.72rem; }
+    .tb-cond .td-eq { min-width: 110px; }
+}
+
+/* el bloque local/visitante es mas ancho que la pantalla en celular: scrollea
+   el solo, con la columna del equipo pegada a la izquierda */
+.cond-scroll { overflow-x: auto; }
+.cond-scroll table { min-width: 720px; }
+
+/* ── el resto de la pantalla Datos, que tampoco tenia CSS ──────────────────── */
+
+/* pastillas ok / mal (rachas de equipo, motivos de baja) */
 .pill-ok  { color: #10b981; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); }
 .pill-mal { color: #ef4444; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); }
 
-@media (max-width: 1100px) {
-    .datos-col { column-count: 1; }
-}
-.dato-ancho { grid-column: 1 / -1; }
-.dato-ancho .tb-datos th:nth-child(3) { min-width: 150px; }
-.dato-alerta {
-    margin: 12px 14px 0; padding: 9px 12px; border-radius: 8px;
-    font-size: 0.76rem; line-height: 1.45;
-    color: #fbbf24; background: rgba(245,158,11,0.10); border: 1px solid rgba(245,158,11,0.35);
-}
-
-/* El once ideal de la fecha pasada, dentro de Datos. Se lee como una alineacion,
-   no como una tabla: linea por linea, igual que el Ayudante de campo del juego. */
+/* once ideal de la fecha pasada */
 .once-ideal-cab {
-    display: flex; gap: 26px; flex-wrap: wrap;
-    padding: 14px 18px; border-bottom: 1px solid rgba(51,65,85,0.35);
+    display: flex; gap: 1.2rem; flex-wrap: wrap;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
-.once-ideal-cab b { font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: block; }
+.once-ideal-cab > div { display: flex; flex-direction: column; gap: 1px; }
+.once-ideal-cab b { font-size: 0.95rem; font-family: 'Outfit', sans-serif; }
 .oi-lbl {
-    display: block; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--text-muted); font-weight: 800; margin-bottom: 2px;
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 700;
 }
-.once-ideal-lineas { padding: 14px 18px 6px; display: grid; gap: 14px; }
+.once-ideal-lineas { padding: 0.5rem 1rem 0.8rem; display: flex; flex-direction: column; gap: 0.6rem; }
 .oi-linea-tit {
-    font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--text-muted); font-weight: 800; margin-bottom: 7px;
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 700; margin-bottom: 0.25rem;
 }
-.oi-fichas { display: flex; gap: 10px; flex-wrap: wrap; }
-.oi-ficha {
-    flex: 1 1 130px; min-width: 130px; max-width: 200px;
-    background: rgba(148,163,184,0.06); border: 1px solid rgba(51,65,85,0.45);
-    border-radius: 10px; padding: 9px 11px; text-align: center;
+.oi-lista { display: flex; flex-direction: column; gap: 2px; }
+.oi-fila {
+    display: grid; grid-template-columns: 30px 1fr auto;
+    gap: 0.5rem; align-items: baseline;
+    padding: 2px 0; border-bottom: 1px solid rgba(51,65,85,0.25);
 }
-.oi-pts { font-size: 1.25rem; font-weight: 800; color: var(--success); line-height: 1.1; }
-.oi-nom { font-size: 0.8rem; font-weight: 700; color: var(--text-main); margin-top: 2px; }
-.oi-eq, .oi-precio { font-size: 0.66rem; color: var(--text-muted); }
-.oi-precio { margin-top: 2px; }
+.oi-fila:last-child { border-bottom: none; }
+.oi-pts {
+    font-weight: 800; font-variant-numeric: tabular-nums;
+    color: var(--success); font-size: 0.82rem; text-align: right;
+}
+.oi-nom { font-size: 0.8rem; font-weight: 600; }
+.oi-eq  { font-size: 0.68rem; color: var(--text-muted); }
 .oi-cinta {
-    display: inline-block; margin-left: 5px; width: 15px; height: 15px; line-height: 15px;
-    border-radius: 50%; background: var(--accent, #38bdf8); color: #06121f;
-    font-size: 0.6rem; font-weight: 900; vertical-align: middle;
+    display: inline-block; margin-left: 4px; padding: 0 4px;
+    border-radius: 3px; background: var(--warning); color: #0c100e;
+    font-size: 0.6rem; font-weight: 800;
 }
 
-/* Las bajas ya no son cuatro nombres cargados a mano: con el ayudante de campo
-   del Gran DT son setenta. Agrupadas por motivo y en columnas, entran de un
-   vistazo en vez de ser una tabla de scroll infinito. */
-.bajas-grupos { padding: 12px 16px 6px; display: grid; gap: 14px; }
-.baja-tit { font-size: 0.72rem; margin-bottom: 6px; color: var(--text-muted); }
-.baja-tit b { color: var(--text-main); }
-.baja-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 3px 14px; }
-.baja-item { font-size: 0.76rem; display: flex; justify-content: space-between; gap: 8px;
-             padding: 3px 0; border-bottom: 1px solid rgba(51,65,85,0.25); }
-.baja-item b { font-weight: 700; color: var(--text-main); }
-.baja-item span { color: var(--text-muted); font-size: 0.68rem; text-align: right; }
-.pill-duda { color: #f59e0b; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); }
-
-/* La tira de los ultimos 5 partidos de un goleador: un cuadrito por partido,
-   del mas viejo al mas nuevo, con el numero de goles adentro. Se lee de un
-   vistazo si viene metiendo o si fue todo un partido suelto. */
-.tira-goles { display: inline-flex; gap: 3px; margin-top: 5px; justify-content: center; }
-.tg {
-    width: 15px; height: 15px; border-radius: 4px; font-size: 0.6rem; font-weight: 800;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: rgba(148,163,184,0.16); color: var(--text-muted);
+/* bajas, agrupadas por motivo */
+.bajas-grupos { padding: 0.6rem 1rem 0.8rem; display: flex; flex-direction: column; gap: 0.7rem; }
+.baja-tit { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; font-size: 0.75rem; }
+.baja-lista { display: flex; flex-direction: column; gap: 2px; }
+.baja-item {
+    display: flex; justify-content: space-between; gap: 0.5rem;
+    padding: 2px 0; border-bottom: 1px solid rgba(51,65,85,0.25);
+    font-size: 0.76rem;
 }
-.tg-gol { background: rgba(16,185,129,0.85); color: #04231a; }
-.tg-no  { background: rgba(148,163,184,0.07); }
+.baja-item:last-child { border-bottom: none; }
+.baja-item span { color: var(--text-muted); font-size: 0.68rem; }
 
-/* Reparto local/visitante: una barra en vez de un porcentaje suelto. */
-.tb-casa td:last-child { width: 190px; }
-.reparto { display: flex; align-items: center; gap: 8px; }
-.reparto-barra { flex: 1; display: flex; height: 8px; border-radius: 4px; overflow: hidden;
-                 background: rgba(148,163,184,0.12); }
-.rep-l { background: var(--success, #10b981); }
-.rep-v { background: rgba(148,163,184,0.45); }
-.reparto-num { font-size: 0.74rem; font-weight: 800; min-width: 38px; text-align: right; }
+/* avisos y detalles sueltos */
+.dato-alerta {
+    margin: 0.6rem 1rem; padding: 0.5rem 0.7rem;
+    border-radius: var(--radius-sm);
+    background: rgba(245,158,11,0.10); border: 1px solid rgba(245,158,11,0.35);
+    color: #fbbf24; font-size: 0.72rem; line-height: 1.4;
+}
+.dato-ex { color: var(--warning); }
+.tira-goles { display: inline-flex; gap: 2px; }
 
-/* Datos que 365Scores no tiene completos. No es lo mismo "cero tiros" que "no
-   sabemos cuantos tiros": lo primero es un dato, lo segundo es un agujero. */
-.dato-roto { color: var(--danger, #ef4444); font-weight: 700; cursor: help;
-             border-bottom: 1px dashed currentColor; }
-.dato-parcial { border-bottom: 1px dotted rgba(245,158,11,0.7); cursor: help; }
+/* ninguna tabla de la pantalla Datos se sale de su tarjeta.
+   OJO: al pasar la tabla a display:block hay que devolverle el display a
+   thead y tbody, y eso pisa el atributo [hidden] del tbody que esconde las
+   filas de "ver los N restantes". Por eso el !important de abajo. */
+/* NO USAR display:block PARA QUE UNA TABLA SCROLLEE (06/09).
+   Lo intente asi —tabla en display:block y thead/tbody de vuelta en
+   display:table— y desalinea TODAS las tablas de la pantalla: al ser dos
+   display:table separados, cada uno calcula sus propios anchos de columna y
+   los titulos quedan corridos respecto de los numeros. En el bloque de
+   local/visitante los puntos aparecian abajo de "Por partido"; en las otras
+   tablas pasaba lo mismo pero se notaba menos porque tienen menos columnas.
+   La forma correcta es un DIV contenedor con overflow-x (ver .cond-scroll).
+   Aca alcanza con que la tabla ocupe el ancho de la tarjeta y el texto pueda
+   cortarse, que es lo que hace que entre sin desbordar. */
+.dato-card .data-table { width: 100%; table-layout: auto; }
+.dato-card .tb-datos th, .dato-card .tb-datos td { overflow-wrap: anywhere; }
 
-/* Los OCHO primeros de cada zona pasan a octavos, no los cuatro. La linea marca
-   donde termina la clasificacion. */
-.fila-corte > td { border-bottom: 2px solid var(--primary, #3b82f6) !important; }
-.nota-corte { font-size: 0.74rem; color: var(--text-muted); margin: 0 0 10px; }
-.nota-corte b { color: var(--text-main); }
+/* la tira de goles de "En racha": un cuadradito por fecha, verde si convirtio */
+.tira-goles { display: inline-flex; gap: 3px; align-items: center; }
+.tira-goles .tg {
+    width: 14px; height: 14px; border-radius: 3px;
+    background: rgba(148,163,184,0.22);
+    border: 1px solid rgba(148,163,184,0.35);
+    font-size: 0.6rem; font-weight: 800; line-height: 12px;
+    text-align: center; color: var(--text-main);
+}
+.tira-goles .tg-gol { background: rgba(16,185,129,0.28); border-color: var(--success); color: #d1fae5; }
+.tira-goles .tg-no  { background: transparent; border-style: dashed; opacity: 0.5; }
 
-/* Por que esta cada uno en el arriesgado */
-.apuesta-linea { font-size: 0.78rem; line-height: 1.4; color: var(--text-muted); }
-.apuesta-linea + .apuesta-linea { margin-top: 2px; }
+/* las tarjetas angostas se apretaban de mas: un poco mas de ancho minimo */
+.datos-col { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+/* sin nowrap: con las tarjetas angostas es lo que hacia desbordar la tabla */
+.tb-datos .text-center { white-space: normal; }
 
-/* Los ultimos tres partidos que ARRANCO, con el numero real. Un solo numero no
-   contesta "termina los partidos o lo sacan a los 65": estos tres si. */
-.tira-min { display: inline-flex; gap: 2px; justify-content: center; margin-top: 3px; }
-.tm {
-    min-width: 20px; padding: 0 2px; height: 14px; line-height: 14px; border-radius: 3px;
+/* PUESTO SEGUN EL ORDEN ACTUAL, como en las tablas de jugadores (06/09).
+   Al ordenar por xG o por corners no se veia quien iba 1º, 2º, 3º: habia que
+   contar las filas. Es el numero de fila, asi que cambia con cada orden. */
+.tb-cond .th-num, .tb-cond .td-num {
+    position: sticky;
+    left: 0;
+    z-index: 6;
+    width: 34px;
+    min-width: 34px;
+    text-align: center;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+}
+.tb-cond .th-num { z-index: 13; }
+.tb-cond .td-eq  { left: 34px; }
+.tb-cond .th-eq  { left: 34px; }
+.tb-cond tbody tr:hover .td-num { background: #16283f; }
+.cond-scroll table { min-width: 760px; }
+
+@media (max-width: 700px) {
+    .tb-cond .th-num, .tb-cond .td-num { width: 26px; min-width: 26px; }
+    .tb-cond .td-eq, .tb-cond .th-eq { left: 26px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REORGANIZACION DE 4 PANTALLAS (06/09)
+   La fecha · Jugadores · Mejor 11 · Datos
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── DATOS: la tabla y el fixture, arriba y lado a lado ─────────────────── */
+.datos-arriba {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 1rem;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+.datos-arriba > .card { margin-bottom: 0; }
+.datos-arriba .standings-table th,
+.datos-arriba .standings-table td { padding: 0.35rem 0.4rem; font-size: 0.78rem; }
+.datos-arriba .fixture-list { max-height: 760px; overflow-y: auto; }
+
+@media (max-width: 1100px) {
+    .datos-arriba { grid-template-columns: 1fr; }
+}
+
+/* ── bloques que se abren con un clic ───────────────────────────────────── */
+.dato-plegable > summary { cursor: pointer; list-style: none; }
+.dato-plegable > summary::-webkit-details-marker { display: none; }
+.dato-summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    border-bottom: 1px solid transparent;
+    transition: background 0.12s ease;
+}
+.dato-plegable[open] > .dato-summary { border-bottom-color: var(--border-color); }
+.dato-summary:hover { background: rgba(255, 255, 255, 0.03); }
+.dato-flecha {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    transition: transform 0.15s ease;
+    flex: 0 0 auto;
+}
+.dato-plegable[open] .dato-flecha { transform: rotate(90deg); }
+.dato-summary h2, .dato-summary p { margin: 0; }
+.dato-summary h2 { font-size: 0.95rem; font-weight: 700; font-family: 'Outfit', sans-serif; }
+.dato-summary p { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+/* ── LA FECHA: los tres titulares ───────────────────────────────────────── */
+.fecha-titulares {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0 1.5rem;
+}
+.fh-tarjeta {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.8rem 0.9rem;
+}
+.fh-ic { font-size: 1.4rem; line-height: 1; flex: 0 0 auto; }
+.fh-txt { min-width: 0; }
+.fh-lbl {
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 800;
+}
+.fh-val {
+    font-size: 1rem; font-weight: 700; font-family: 'Outfit', sans-serif;
+    margin: 1px 0; line-height: 1.2;
+}
+.fh-sub { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+
+/* ── LA FECHA: los partidos ─────────────────────────────────────────────── */
+.fecha-sec-tit { margin: 1.5rem 0 0.6rem; }
+.fecha-sec-tit h2 { font-size: 1.05rem; margin: 0; font-family: 'Outfit', sans-serif; }
+.fecha-sec-tit p { font-size: 0.78rem; color: var(--text-muted); margin: 0.15rem 0 0; }
+
+.grilla-partidos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 0.75rem;
+}
+.part-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.6rem 0.75rem 0.7rem;
+}
+.part-jugado { opacity: 0.5; }
+.pp-cab {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.66rem; color: var(--text-muted);
+    margin-bottom: 0.45rem;
+}
+.pp-cuando { text-transform: capitalize; }
+.pp-jugado, .pp-sinmercado {
+    font-weight: 700; letter-spacing: 0.03em;
+    padding: 1px 5px; border-radius: 4px;
+}
+.pp-jugado { color: var(--text-muted); background: rgba(148,163,184,0.15); }
+.pp-sinmercado { color: var(--warning); background: rgba(245,158,11,0.12); }
+
+.pp-lados { display: flex; flex-direction: column; gap: 0.5rem; }
+.pp-lado { display: flex; flex-direction: column; gap: 3px; }
+.pp-eq {
+    font-size: 0.82rem; font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+}
+.pp-fuerte .pp-eq { color: var(--text-main); font-weight: 700; }
+.pp-lado:not(.pp-fuerte) .pp-eq { color: var(--text-muted); }
+.pp-cond {
+    font-size: 0.58rem; font-weight: 800;
+    border: 1px solid var(--border-color); border-radius: 3px;
+    padding: 0 3px; color: var(--text-muted);
+}
+.pp-barra {
+    height: 5px; border-radius: 3px;
+    background: rgba(148,163,184,0.14);
+    overflow: hidden;
+}
+.pp-barra span {
+    display: block; height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--primary), #60a5fa);
+}
+.pp-fuerte .pp-barra span { background: linear-gradient(90deg, var(--success), #34d399); }
+.pp-nums {
+    display: flex; gap: 0.7rem;
+    font-size: 0.68rem; color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+.pp-nums b { color: var(--text-main); font-size: 0.74rem; }
+
+.fecha-pie {
+    margin-top: 1rem;
+    font-size: 0.72rem; line-height: 1.45; color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.7rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL MEJOR 11 EN LA PORTADA (07/09)
+   Misma informacion que la pantalla Mejor 11, en una cancha y sin tablas.
+   Comparte el estado: lo que se toca aca queda tocado alla.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.once-inicio {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin: 1rem 0 1.25rem;
+}
+.oi-cab {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1rem; flex-wrap: wrap;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.oi-cab-txt h2 { margin: 0; font-size: 1.05rem; font-family: 'Outfit', sans-serif; }
+.oi-cab-txt p { margin: 0.2rem 0 0; font-size: 0.75rem; color: var(--text-muted); max-width: 52ch; line-height: 1.4; }
+.oi-cab-der { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+.oi-esq {
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    padding: 4px 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; outline: none;
+}
+.oi-esq:disabled { opacity: 0.6; cursor: not-allowed; }
+.oi-total { text-align: right; line-height: 1.1; }
+.oi-total b { font-size: 1.35rem; font-family: 'Outfit', sans-serif; color: var(--success); display: block; }
+.oi-total span { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.oi-costo { font-size: 0.72rem; color: var(--text-muted); }
+.oi-link {
+    background: transparent; border: 1px solid var(--border-color);
+    color: var(--text-main); border-radius: var(--radius-pill);
+    padding: 4px 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+}
+.oi-link:hover { border-color: var(--primary); color: var(--primary); }
+
+/* la cancha */
+.cancha-mini {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.10), transparent 60%),
+        repeating-linear-gradient(180deg, rgba(255,255,255,0.022) 0 46px, transparent 46px 92px),
+        linear-gradient(180deg, #0f2a1f, #0c1f18);
+    padding: 1.1rem 0.6rem 1.3rem;
+    display: flex; flex-direction: column; gap: 0.9rem;
+    position: relative;
+}
+.cancha-mini::before {                     /* linea de mitad de cancha */
+    content: ''; position: absolute; left: 6%; right: 6%; top: 50%;
+    border-top: 1px dashed rgba(255,255,255,0.10);
+}
+.cm-linea {
+    display: flex; justify-content: center; flex-wrap: wrap;
+    gap: 0.5rem 0.9rem; position: relative; z-index: 1;
+}
+.cm-jug {
+    width: 112px; text-align: center; cursor: pointer;
+    position: relative; padding-top: 4px;
+    border-radius: var(--radius-sm);
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+.cm-jug:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+.cm-camiseta { position: relative; display: inline-block; line-height: 0; }
+.cm-pts {
+    position: absolute; right: -6px; bottom: -4px;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: var(--radius-pill);
+    font-size: 0.62rem; font-weight: 800; padding: 0 4px;
+    color: var(--text-main); font-variant-numeric: tabular-nums;
+}
+.cm-nom {
+    font-size: 0.72rem; font-weight: 700; margin-top: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* la cinta va SOBRE la camiseta y no pegada al nombre: ahi la comia el
+   recorte del nombre largo y el capitan no se veia. */
+.cm-cinta {
+    position: absolute; left: -5px; top: -2px;
+    width: 14px; height: 14px; line-height: 14px;
+    border-radius: 50%; background: var(--warning); color: #0c100e;
     font-size: 0.58rem; font-weight: 800; text-align: center;
 }
-.tm-full  { background: rgba(16,185,129,0.85); color: #04231a; }
-.tm-largo { background: rgba(245,158,11,0.75); color: #241a00; }
-.tm-medio { background: rgba(148,163,184,0.30); color: #cbd5e1; }
-.tm-corto { background: rgba(239,68,68,0.55); color: #2a0606; }
+.cm-sub {
+    font-size: 0.6rem; color: rgba(226,232,240,0.55); line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cm-x {
+    position: absolute; top: 0; right: 2px;
+    width: 16px; height: 16px; line-height: 14px;
+    border-radius: 50%; border: 1px solid rgba(239,68,68,0.45);
+    background: rgba(239,68,68,0.14); color: #fca5a5;
+    font-size: 0.6rem; cursor: pointer; padding: 0;
+    opacity: 0; transition: opacity 0.12s ease;
+}
+.cm-jug:hover .cm-x { opacity: 1; }
+.cm-x:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+.cm-vacio { padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
 
-/* El atributo hidden pierde contra un display: grid/flex propio. Sin esto los
-   bloques que se abren con "ver mas" aparecian siempre abiertos. */
-[hidden] { display: none !important; }
-/* "Le falta un partido a 365": el numero sigue siendo real, el aviso va al lado.
-   Mostrar s/d era peor — cero tiros en 483 minutos es un dato, no un agujero. */
-.falta-mark { color: #f59e0b; font-size: 0.62rem; font-weight: 800; margin-left: 1px; }
-/* Sobre cuantos partidos esta hecho el cruce. Con 7 fechas nadie tiene mas de
-   4 en cada condicion: un "0.00 recibidos" de 3 partidos no es un dato duro. */
-.cruce-l i { font-style: normal; font-size: 0.58rem; color: var(--text-muted); opacity: 0.8; }
+.oi-fuera {
+    padding: 0.5rem 1.1rem;
+    font-size: 0.72rem; color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+}
+.oi-limpiar {
+    background: none; border: none; color: var(--primary);
+    font-size: 0.72rem; cursor: pointer; text-decoration: underline; padding: 0;
+}
 
-/* Puesto en el ranking de PUNTOS, al lado del nombre en Oportunidades (03/09).
-   Esa pantalla se ordena por amenaza de gol, que es UNA pieza del puntaje. Sin
-   este numero uno puede ver a alguien primero por amenaza y suponer que es la
-   mejor eleccion, cuando en puntos va 172 de 251. */
-.op-pep { margin-left: 8px; font-size: 10px; font-weight: 700; letter-spacing: .02em;
-  padding: 1px 6px; border-radius: 999px; vertical-align: middle;
-  color: #7dd3fc; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.35); }
-.op-pep-lejos { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.40); }
+/* goles esperados del partido, en la cabecera de cada tarjeta */
+.pp-cab-der { display: flex; align-items: center; gap: 0.4rem; }
+.pp-total {
+    font-weight: 800; color: var(--text-main);
+    font-variant-numeric: tabular-nums; font-size: 0.72rem;
+}
+.pp-total small { font-weight: 400; color: var(--text-muted); font-size: 0.62rem; }
 
-/* "Del gol": que parte del puntaje sale de convertir y no de la nota (03/09).
-   Verde = explosivo, gris = parejo. No es bueno ni malo: depende de si vas a
-   buscar la fecha grande o a no perderla. */
-.dg-alto { color: #34d399; font-weight: 800; }
-.dg-bajo { color: #94a3b8; }
+@media (max-width: 620px) {
+    .cm-jug { width: 84px; }
+    .cm-sub { display: none; }
+}
+
+/* la cinta de capitan es un boton: se elige a mano desde la cancha */
+.cm-cinta {
+    border: 1px solid rgba(148,163,184,0.4);
+    background: rgba(15,23,42,0.75);
+    color: rgba(226,232,240,0.5);
+    cursor: pointer; padding: 0;
+    opacity: 0; transition: opacity 0.12s ease, background 0.12s ease;
+}
+.cm-jug:hover .cm-cinta { opacity: 1; }
+.cm-cinta:hover { background: var(--warning); color: #0c100e; border-color: var(--warning); }
+.cm-cinta.es-cap {
+    opacity: 1; background: var(--warning); color: #0c100e;
+    border-color: var(--warning);
+}
+.oi-cap-aviso { color: var(--text-muted); }
+.oi-cap-aviso b { color: var(--text-main); }
+
+/* la cinta tambien se elige desde la pantalla Mejor 11 */
+.f11-cap { cursor: pointer; border: none; font: inherit; }
+.f11-cap-off {
+    background: rgba(148,163,184,0.18) !important;
+    color: rgba(226,232,240,0.45) !important;
+    opacity: 0; transition: opacity 0.12s ease;
+}
+.ficha11:hover .f11-cap-off { opacity: 1; }
+.f11-cap-off:hover {
+    background: var(--warning) !important; color: #0c100e !important;
+}
+
+/* ── "Cómo llega cada equipo": modos, pestañas y filtro (07/09) ─────────── */
+.cond-barra2 { border-bottom: 1px solid var(--border-color); }
+.cond-sep {
+    width: 1px; height: 18px; background: var(--border-color);
+    margin: 0 0.35rem;
+}
+.chip-tab {
+    background: transparent; border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    padding: 0.25rem 0.5rem 0.3rem;
+    font-size: 0.8rem; font-weight: 700; cursor: pointer;
+}
+.chip-tab:hover { color: var(--text-main); }
+.chip-tab.on { color: var(--text-main); border-bottom-color: var(--primary); }
+.chip-filtro {
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    color: var(--text-muted); border-radius: var(--radius-pill);
+    padding: 0.15rem 0.6rem; font-size: 0.7rem; cursor: pointer;
+}
+.chip-filtro:hover { color: var(--text-main); border-color: var(--border-light); }
+.chip-filtro.on { color: #fff; font-weight: 700; }
+.chip-filtro.chip-l.on { background: var(--success); border-color: var(--success); color: #04231a; }
+.chip-filtro.chip-v.on { background: var(--warning); border-color: var(--warning); color: #241703; }
+.chip-filtro.on:not(.chip-l):not(.chip-v) { background: var(--primary); border-color: var(--primary); }
+
+/* cabecera clickeable (modo "esta fecha": un solo orden por columna) */
+.th-clic { cursor: pointer; user-select: none; }
+.th-clic:hover { color: var(--text-main); }
+.th-clic.on { color: var(--primary); }
+
+/* la celda de un solo numero: grande arriba, contexto abajo */
+.cu { display: flex; flex-direction: column; line-height: 1.15; }
+.cu b { font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+.cu span { font-size: 0.62rem; color: var(--text-muted); white-space: nowrap; }
+
+/* el partido de esta fecha */
+.td-parti { white-space: nowrap; font-size: 0.75rem; }
+.pa-cond {
+    display: inline-block; width: 15px; text-align: center;
+    border-radius: 3px; font-size: 0.6rem; font-weight: 800; margin-right: 3px;
+}
+.pa-L { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+.pa-V { background: rgba(245,158,11,0.2); color: #fcd34d; }
+.pa-jug { font-size: 0.6rem; color: var(--text-muted); }
+.fila-esL .td-num { box-shadow: inset 3px 0 0 var(--success); }
+.fila-esV .td-num { box-shadow: inset 3px 0 0 var(--warning); }
+
+/* con una sola condicion la tabla es angosta: no necesita ancho minimo grande */
+.cond-scroll table.tb-una { min-width: 620px; }
+
+/* el numero chico al lado del grande, con aire: pegados se leian como uno solo
+   ("10" + "2.50 por partido" = "102.50") */
+.lv-l i, .lv-v i { margin-left: 4px; }
+
+/* ── "Por qué este once": lo que el puntaje no puede mostrar (07/09) ────── */
+.analisis-once {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+.an-cab h2 { margin: 0; font-size: 1.05rem; font-family: 'Outfit', sans-serif; }
+.an-cab p { margin: 0.2rem 0 0.9rem; font-size: 0.76rem; color: var(--text-muted); max-width: 90ch; line-height: 1.45; }
+.an-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.75rem;
+}
+.an-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 0.85rem;
+}
+.an-card h3 { margin: 0 0 0.5rem; font-size: 0.82rem; font-family: 'Outfit', sans-serif; }
+.an-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.an-lista li { font-size: 0.78rem; line-height: 1.3; }
+.an-dif {
+    font-variant-numeric: tabular-nums; font-size: 0.7rem; font-weight: 700;
+    color: var(--warning); margin-left: 3px;
+}
+.an-sub { font-size: 0.7rem; color: var(--text-muted); }
+.an-quienes { font-size: 0.68rem; color: var(--text-muted); opacity: 0.85; margin-top: 1px; }
+.an-nota { margin: 0.6rem 0 0; font-size: 0.66rem; color: var(--text-muted); line-height: 1.4; }
+.an-vacio { margin: 0; font-size: 0.75rem; color: var(--text-muted); }
+
+/* ── las formaciones, ahora clickeables (07/09) ─────────────────────────── */
+.an-grid-ancho { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.an-esquemas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 5px;
+}
+.an-esq {
+    display: flex; flex-direction: column; gap: 2px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 5px 7px;
+    text-align: left; cursor: pointer;
+    font-family: inherit; color: var(--text-main);
+    transition: border-color 0.12s ease, background 0.12s ease;
+}
+.an-esq:hover:not(:disabled) { border-color: var(--primary); background: rgba(37,99,235,0.10); }
+.an-esq:disabled { cursor: default; opacity: 1; }
+.an-esq-on { background: rgba(37,99,235,0.16); border-color: var(--primary); }
+.an-esq-empata { border-color: rgba(245,158,11,0.55); }
+.ane-top { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
+.ane-top b { font-size: 0.8rem; font-family: 'Outfit', sans-serif; }
+.ane-dif {
+    font-size: 0.64rem; font-variant-numeric: tabular-nums;
+    color: var(--text-muted); font-weight: 700;
+}
+.an-esq-on .ane-dif { color: var(--primary); }
+.ane-cambio {
+    font-size: 0.63rem; color: var(--text-muted); line-height: 1.25;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.ane-entra { color: var(--success); font-weight: 700; }
+
+/* ── portada: sólido / arriesgado y las formaciones ─────────────────────── */
+.oi-modo { display: flex; gap: 3px; }
+.oi-modo-btn {
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    color: var(--text-muted); border-radius: var(--radius-pill);
+    padding: 3px 10px; font-size: 0.74rem; font-weight: 600; cursor: pointer;
+}
+.oi-modo-btn:hover:not(:disabled) { color: var(--text-main); border-color: var(--border-light); }
+.oi-modo-btn.on { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+.oi-modo-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.oi-esquemas {
+    padding: 0.6rem 1.1rem 0.7rem;
+    border-top: 1px solid var(--border-color);
+}
+.oi-esq-lbl {
+    display: block; font-size: 0.62rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); font-weight: 800; margin-bottom: 5px;
+}
+.an-esquemas-chico { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+.an-esquemas-chico .ane-top b { font-size: 0.74rem; }
+.oi-esq-nota { display: block; margin-top: 5px; font-size: 0.65rem; color: var(--text-muted); }
+
+/* el que se cruza con otro del once */
+.cm-cruza .cm-camiseta::before {
+    content: '⇄';
+    position: absolute; left: -7px; bottom: -3px;
+    font-size: 0.6rem; line-height: 1;
+    background: var(--bg-main); border: 1px solid var(--border-color);
+    border-radius: 50%; width: 14px; height: 14px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--warning);
+}
+
+/* ── los cambios, uno por uno (07/09) ──────────────────────────────────── */
+.cambios-lista { display: flex; flex-direction: column; gap: 3px; }
+.cam-fila {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto auto;
+    align-items: center; gap: 6px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 5px 8px;
+    cursor: pointer; text-align: left;
+    font-family: inherit; color: var(--text-main);
+    transition: border-color 0.12s ease, background 0.12s ease;
+}
+.cam-fila:hover { border-color: var(--primary); background: rgba(37,99,235,0.10); }
+.cam-barato { border-color: rgba(16,185,129,0.45); }
+.cam-entra {
+    font-size: 0.76rem; font-weight: 700; color: var(--success);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cam-flecha { font-size: 0.62rem; color: var(--text-muted); }
+.cam-sale {
+    font-size: 0.76rem; color: var(--text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cam-meta {
+    font-size: 0.6rem; color: var(--text-muted);
+    background: rgba(148,163,184,0.12);
+    border-radius: 3px; padding: 1px 5px; white-space: nowrap;
+}
+.cam-costo {
+    font-size: 0.74rem; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--danger); min-width: 44px; text-align: right;
+}
+.cam-costo-ok { color: var(--warning); }
+.cambios-chico .cam-fila { grid-template-columns: 1fr auto 1fr auto; padding: 3px 7px; }
+.cambios-chico .cam-entra, .cambios-chico .cam-sale { font-size: 0.7rem; }
+
+/* el sello: este es el once que el motor firma */
+.om-sello, .oi-sello {
+    display: inline-block; font-size: 0.6rem; font-weight: 800;
+    letter-spacing: 0.04em; padding: 1px 7px; border-radius: var(--radius-pill);
+    margin-bottom: 3px;
+}
+.om-sello-of, .oi-sello-of { background: rgba(16,185,129,0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.4); }
+.om-sello-mod, .oi-sello-mod { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); }
+.om-sello-r, .oi-sello-r { background: rgba(37,99,235,0.18); color: #93c5fd; border: 1px solid rgba(37,99,235,0.45); }
+.oi-sello { display: block; margin-bottom: 2px; }
+
+/* ── portada: la cancha y los cambios, lado a lado (07/09) ──────────────── */
+.oi-cuerpo { display: grid; grid-template-columns: 1fr 210px; align-items: stretch; }
+.oi-cuerpo .cancha-mini { border-right: 1px solid var(--border-color); }
+.oi-cambios {
+    padding: 0.7rem 0.75rem;
+    background: var(--bg-card);
+    display: flex; flex-direction: column; gap: 4px;
+}
+.oi-cambios .cam-fila {
+    grid-template-columns: 1fr auto;
+    padding: 4px 6px; gap: 4px;
+}
+.cam-par { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.cam-par b {
+    font-size: 0.72rem; color: var(--success); font-weight: 700;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cam-par i {
+    font-style: normal; font-size: 0.62rem; color: var(--text-muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.oi-cambios .cam-costo { font-size: 0.68rem; min-width: 38px; }
+
+/* la ✕ para descartar, también en la pantalla Mejor 11 */
+.f11-x {
+    position: absolute; top: 4px; right: 4px;
+    width: 17px; height: 17px; line-height: 15px;
+    border-radius: 50%; padding: 0;
+    border: 1px solid rgba(239,68,68,0.45);
+    background: rgba(239,68,68,0.14); color: #fca5a5;
+    font-size: 0.62rem; cursor: pointer;
+    opacity: 0; transition: opacity 0.12s ease;
+    z-index: 3;
+}
+.ficha11:hover .f11-x { opacity: 1; }
+.f11-x:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+@media (max-width: 900px) {
+    .oi-cuerpo { grid-template-columns: 1fr; }
+    .oi-cuerpo .cancha-mini { border-right: none; border-bottom: 1px solid var(--border-color); }
+}
+
+/* publicar los descartes para que viajen con la app */
+.exp-txt { font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); margin: 0 0 0.7rem; }
+.exp-txt b { color: var(--text-main); }
+.exp-json {
+    width: 100%; min-height: 150px;
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    padding: 0.6rem; font-family: ui-monospace, monospace; font-size: 0.68rem;
+    line-height: 1.45; resize: vertical;
+}
+.exp-nota { margin-top: 0.6rem; font-size: 0.72rem; }
+.oi-solo-vos {
+    font-size: 0.62rem; padding: 1px 6px; border-radius: var(--radius-pill);
+    background: rgba(148,163,184,0.14); border: 1px solid var(--border-color);
+    color: var(--text-muted);
+}
+
+/* los descartes, en el menú de los tres puntos */
+.menu-fuera { cursor: default; display: block; }
+.menu-fuera small { display: block; margin-top: 3px; line-height: 1.35; }
+.menu-fuera-acc { display: flex; gap: 6px; margin-top: 6px; }
+.menu-mini {
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    color: var(--text-main); border-radius: var(--radius-pill);
+    padding: 2px 9px; font-size: 0.68rem; cursor: pointer; font-family: inherit;
+}
+.menu-mini:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── CABECERA UNICA PARA LAS CUATRO PANTALLAS (07/09) ──────────────────── */
+.cab {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    padding: 0 0 0.85rem;
+    margin-bottom: 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.cab-txt h1 {
+    margin: 0; font-size: 1.75rem; line-height: 1;
+    font-family: 'Outfit', sans-serif; font-weight: 800;
+    letter-spacing: -0.02em;
+}
+.cab-txt span { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--text-muted); }
+
+/* el estado, a la derecha del titulo */
+.est {
+    display: flex; flex-direction: column; align-items: flex-end;
+    line-height: 1.1; padding: 4px 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color); background: var(--bg-card);
+}
+.est-lbl {
+    font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--text-muted); font-weight: 800;
+}
+.est b { font-size: 1.1rem; font-family: 'Outfit', sans-serif; letter-spacing: -0.01em; }
+.est-abierta { border-color: rgba(34,197,94,0.4); }
+.est-abierta b { color: var(--success); }
+.est-cerrada { border-color: rgba(229,72,77,0.35); }
+.est-cerrada b { color: var(--danger); }
+.est-pts { align-items: flex-end; }
+.est-pts b { font-size: 1.7rem; color: var(--success); }
+.est-sello {
+    font-size: 0.56rem; font-weight: 800; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 0 6px; border-radius: var(--radius-pill);
+    margin-bottom: 2px;
+}
+.est-of  { background: rgba(34,197,94,0.16); color: #86efac; }
+.est-mod { background: rgba(240,168,40,0.16); color: #fcd34d; }
+.est-r   { background: rgba(22,163,74,0.18); color: #86efac; }
+
+/* que las cuatro pantallas arranquen a la misma altura */
+.seccion > .cab:first-child { margin-top: 0; }
+
+/* la marca de "distinto al arriesgado" era un fondo ambar en media cancha:
+   demasiado peso para un dato secundario. Ahora es un punto en la esquina. */
+.ficha11.es-distinto { background: transparent; }
+.ficha11.es-distinto::after {
+    content: ''; position: absolute; top: 6px; right: 6px;
+    width: 5px; height: 5px; border-radius: 50%; background: var(--warning);
+}
+.ficha11.es-capitan { background: transparent; }
+.ficha11.es-capitan .f11-nombre { color: var(--warning); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VERSUS — el once del motor contra el tuyo (07/09)
+   Dos canchas al lado, un marcador arriba. La regla de diseno es la misma que
+   en el resto: un solo acento fuerte (el verde del cesped), el ambar reservado
+   para lo que decide (la cinta), y nada de color por decoracion. El lado del
+   motor va en verde y el tuyo en ambar para que se distingan de un vistazo sin
+   tener que leer el titulo.
+   ═════════════════════════════════════════════════════════════════════════ */
+.vs {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 1.1rem;
+}
+.vs-cab {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.vs-cab-txt h2 { margin: 0; font-size: 1.05rem; font-family: 'Outfit', sans-serif; }
+.vs-cab-txt p {
+    margin: 0.2rem 0 0; font-size: 0.75rem; color: var(--text-muted);
+    max-width: 62ch; line-height: 1.4;
+}
+
+/* ── el marcador ── */
+.vs-marcador {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: stretch; gap: 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.vs-lado { padding: 0.9rem 1.1rem; display: flex; flex-direction: column; gap: 0.15rem; }
+/* Los dos marcadores miran al centro, como un tablero de cancha: si cada uno
+   se pega a su borde queda medio metro de vacio en el medio y hay que barrer
+   la pantalla con la vista para comparar dos numeros. */
+.vs-motor { border-right: 1px solid var(--border-color); text-align: right; align-items: flex-end; }
+.vs-mio   { border-left: 1px solid var(--border-color); text-align: left;  align-items: flex-start; }
+.vs-quien {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); font-weight: 700;
+}
+.vs-pts {
+    font-family: 'Outfit', sans-serif; font-weight: 800;
+    font-size: 2.5rem; line-height: 1; font-variant-numeric: tabular-nums;
+}
+.vs-motor .vs-pts { color: var(--success); }
+.vs-mio   .vs-pts { color: var(--warning); }
+.vs-meta { font-size: 0.72rem; color: var(--text-muted); }
+.vs-meta b { color: var(--text-main); }
+.vs-medio {
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 0.9rem;
+}
+.vs-vs {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.8rem;
+    letter-spacing: 0.12em; color: var(--text-muted);
+    border: 1px solid var(--border-color); border-radius: var(--radius-pill);
+    padding: 0.2rem 0.55rem;
+}
+.vs-lado-vacio { justify-content: center; }
+.vs-cta { display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; }
+.vs-cta p { margin: 0; font-size: 0.78rem; color: var(--text-muted); max-width: 34ch; }
+.vs-cta-o { font-size: 0.68rem; color: var(--text-muted); }
+
+/* ── la barra de chances ── */
+.vs-barra { display: flex; height: 7px; background: var(--bg-input); }
+/* los tres tramos suman 100% exacto: nada de min-width, que desbordaba la barra
+   cuando un lado quedaba en 0 */
+.vs-barra span { flex: 0 0 auto; min-width: 0; }
+.vs-b-a { background: var(--success); }
+.vs-b-e { background: var(--border-light); }
+.vs-b-b { background: var(--warning); }
+.vs-frase {
+    padding: 0.5rem 1.1rem; font-size: 0.8rem; color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+.vs-frase b { color: var(--text-main); font-variant-numeric: tabular-nums; }
+.vs-frase small { display: block; font-size: 0.66rem; opacity: 0.75; margin-top: 1px; }
+.vs-notas {
+    padding: 0.45rem 1.1rem; font-size: 0.73rem; color: var(--text-muted);
+    background: rgba(240,168,40,0.05);
+    border-bottom: 1px solid var(--border-color);
+}
+.vs-notas b { color: var(--text-main); }
+
+/* ── las dos canchas ── */
+.vs-canchas { display: grid; grid-template-columns: 1fr 1fr; }
+.vs-col:first-child { border-right: 1px solid var(--border-color); }
+.vs-col-tit {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    padding: 0.55rem 0.9rem; font-size: 0.78rem; font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+}
+.vs-col-tit small { color: var(--text-muted); font-weight: 500; }
+.vs-herr { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
+.vs-herr-der { margin-left: auto; }
+.vs-col > .vs-herr {
+    padding: 0.45rem 0.9rem; border-bottom: 1px solid var(--border-color);
+}
+.vs-sel {
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    font-size: 0.72rem; padding: 0.2rem 0.35rem;
+}
+.vs-plata { font-size: 0.72rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.vs-plata-mal { color: var(--danger); font-weight: 700; }
+.vs-btn {
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    font-size: 0.74rem; padding: 0.3rem 0.6rem; cursor: pointer;
+    font-family: inherit;
+}
+.vs-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.vs-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.vs-btn.on { border-color: var(--primary); background: rgba(22,163,74,0.14); color: var(--success); }
+.vs-btn-chico { font-size: 0.68rem; padding: 0.2rem 0.45rem; }
+.vs-btn-fuerte { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+.vs-btn-fuerte:hover { background: var(--primary-hover); color: #fff; }
+
+.vs-cancha {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.09), transparent 62%),
+        repeating-linear-gradient(180deg, rgba(255,255,255,0.02) 0 40px, transparent 40px 80px),
+        linear-gradient(180deg, #0f2a1f, #0c1f18);
+    padding: 0.8rem 0.5rem 1rem;
+    display: flex; flex-direction: column; gap: 0.55rem;
+    min-height: 260px;
+}
+.vs-linea { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.35rem; }
+
+/* la ficha: chica a proposito, porque hay veintidos en pantalla */
+.vsj {
+    position: relative; width: 82px; padding: 0.3rem 0.2rem 0.28rem;
+    border-radius: var(--radius-sm); text-align: center; cursor: pointer;
+    background: rgba(10,14,12,0.55); border: 1px solid rgba(255,255,255,0.07);
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.vsj:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.22); }
+.vsj-pts {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem;
+    line-height: 1.05; font-variant-numeric: tabular-nums;
+}
+.vsj-nom {
+    font-size: 0.66rem; font-weight: 600; max-width: 100%;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vsj-eq { font-size: 0.56rem; color: rgba(226,232,240,0.5); letter-spacing: 0.03em; }
+.vsj-eq i { font-style: normal; opacity: 0.7; margin-left: 2px; }
+/* ya jugo: el numero es real y se nota */
+.vsj-jugo   { border-color: rgba(34,197,94,0.35); background: rgba(22,163,74,0.10); }
+.vsj-jugo .vsj-pts { color: var(--success); }
+/* jugo su partido y no sumo */
+.vsj-nojugo { opacity: 0.5; }
+.vsj-nojugo .vsj-pts { color: var(--text-muted); }
+/* todavia no jugo: el numero es una estimacion, va en cursiva */
+.vsj-falta .vsj-pts { color: var(--text-main); font-style: italic; opacity: 0.85; }
+.vsj-cap { border-color: rgba(240,168,40,0.55); }
+.vsj-c {
+    position: absolute; left: -4px; top: -4px;
+    width: 15px; height: 15px; line-height: 15px;
+    border-radius: 50%; background: var(--warning); color: #0c100e;
+    font-size: 0.58rem; font-weight: 800;
+}
+.vsj-x, .vsj-cc {
+    position: absolute; top: -6px;
+    width: 16px; height: 16px; line-height: 14px; padding: 0;
+    border-radius: 50%; border: 1px solid var(--border-color);
+    background: var(--bg-main); color: var(--text-muted);
+    font-size: 0.6rem; cursor: pointer; opacity: 0; transition: opacity 0.12s ease;
+}
+.vsj-x  { right: -6px; }
+.vsj-cc { right: 12px; }
+.vsj:hover .vsj-x, .vsj:hover .vsj-cc { opacity: 1; }
+.vsj-x:hover  { border-color: var(--danger); color: var(--danger); }
+.vsj-cc:hover { border-color: var(--warning); color: var(--warning); }
+.vsj-vacia {
+    justify-content: center; color: var(--text-muted);
+    border-style: dashed; background: rgba(10,14,12,0.3);
+    font-size: 1.1rem; font-weight: 700; min-height: 52px;
+}
+.vsj-vacia small { display: block; font-size: 0.55rem; letter-spacing: 0.06em; }
+.vsj-vacia:hover { border-color: var(--primary); color: var(--primary); }
+
+.vs-pie {
+    padding: 0.6rem 1.1rem 0.8rem; font-size: 0.72rem;
+    color: var(--text-muted); line-height: 1.5;
+    border-top: 1px solid var(--border-color);
+}
+.vs-pie b { color: var(--text-main); }
+
+/* En pantalla angosta las dos canchas una abajo de la otra: apretarlas a la
+   mitad del ancho deja fichas de 40px donde no entra ni el apellido. */
+@media (max-width: 900px) {
+    .vs-canchas { grid-template-columns: 1fr; }
+    .vs-col:first-child { border-right: none; border-bottom: 1px solid var(--border-color); }
+    .vs-marcador { grid-template-columns: 1fr auto 1fr; }
+    .vs-pts { font-size: 2rem; }
+}
+@media (max-width: 560px) {
+    .vs-marcador { grid-template-columns: 1fr; }
+    .vs-motor { border-right: none; border-bottom: 1px solid var(--border-color); }
+    .vs-motor { text-align: left; align-items: flex-start; }
+    .vs-mio { border-left: none; }
+    .vs-medio { display: none; }
+}
+
+/* El chip de estado del Versus cuando todavia no hay puntajes bajados: es
+   informacion, no una alarma. En rojo parecia que algo estaba roto. */
+.vs-cab .est-neutra { border-color: var(--border-color); color: var(--text-muted); }
+.vs-cab .est-neutra b { color: var(--text-muted); font-weight: 600; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LIGA — el torneo de amigos (07/09)
+   Es una tabla de posiciones, no un tablero: la forma que ya sabe leer
+   cualquiera que mire fútbol. El detalle de cada equipo se despliega abajo de
+   su fila, para no perder de vista contra quien esta compitiendo.
+   ═════════════════════════════════════════════════════════════════════════ */
+.lg-card { padding: 0; overflow: hidden; }
+.lg-tabla { width: 100%; }
+.lg-tabla thead th {
+    font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 700;
+    padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+.lg-fila { cursor: pointer; transition: background 0.12s ease; }
+.lg-fila > td { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+.lg-fila:hover { background: rgba(255,255,255,0.035); }
+.lg-abierta { background: rgba(22,163,74,0.08); }
+.lg-abierta > td { border-bottom-color: transparent; }
+.lg-pos {
+    width: 2.2rem; text-align: center; font-family: 'Outfit', sans-serif;
+    font-weight: 800; color: var(--text-muted); font-size: 0.9rem;
+}
+.lg-fila:first-child .lg-pos, .lg-tabla tbody tr:first-child .lg-pos { color: var(--warning); }
+.lg-nom b { font-size: 0.9rem; }
+.lg-nom small { display: block; font-size: 0.66rem; color: var(--text-muted); }
+.lg-tag {
+    display: inline-block; margin-left: 0.35rem; padding: 0 0.3rem;
+    border-radius: var(--radius-sm); background: var(--bg-input);
+    border: 1px solid var(--border-color); color: var(--text-muted);
+    font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;
+}
+.lg-tag-mio { border-color: rgba(240,168,40,0.5); color: var(--warning); }
+.lg-ojo { color: var(--warning); }
+.lg-jug { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lg-jug small { color: var(--text-muted); }
+.lg-pts b {
+    font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 800;
+    font-variant-numeric: tabular-nums; color: var(--success);
+}
+.lg-pts small { display: block; font-size: 0.62rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.lg-proy { font-variant-numeric: tabular-nums; color: var(--text-muted); }
+.lg-chance { width: 30%; min-width: 130px; }
+.lg-chance b { font-size: 0.74rem; font-variant-numeric: tabular-nums; }
+.lg-barra {
+    height: 6px; background: var(--bg-input); border-radius: var(--radius-pill);
+    overflow: hidden; margin-bottom: 2px;
+}
+.lg-barra span { display: block; height: 100%; background: var(--primary); }
+.lg-cinta-ok    { color: var(--success); font-weight: 700; font-variant-numeric: tabular-nums; }
+.lg-cinta-esp   { color: var(--text-muted); font-style: italic; font-variant-numeric: tabular-nums; }
+.lg-cinta-falta { color: var(--warning); font-size: 0.72rem; border-bottom: 1px dotted var(--warning); }
+.lg-cinta-mal   { color: var(--danger); font-size: 0.72rem; }
+.lg-cinta-na    { color: var(--text-muted); font-size: 0.72rem; }
+.lg-acciones {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+    padding: 0.7rem 0.8rem 0.2rem;
+}
+.lg-pie {
+    padding: 0.5rem 0.8rem 0.8rem; margin: 0;
+    font-size: 0.72rem; color: var(--text-muted); line-height: 1.5;
+}
+.lg-pie b { color: var(--text-main); }
+
+/* ── el detalle desplegado ── */
+.lg-detalle-fila > td { padding: 0 !important; border-bottom: 1px solid var(--border-color); }
+.lg-detalle { background: var(--bg-input); }
+.lg-det-cab {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.8rem; flex-wrap: wrap; padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.lg-det-cab .text-muted { font-size: 0.72rem; margin-left: 0.5rem; }
+.lg-det-nota { font-size: 0.72rem; }
+.lg-det-cuerpo { display: grid; grid-template-columns: 1fr 280px; }
+.lg-cancha {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.09), transparent 62%),
+        linear-gradient(180deg, #0f2a1f, #0c1f18);
+    padding: 0.8rem 0.5rem 1rem;
+    display: flex; flex-direction: column; gap: 0.5rem; min-height: 240px;
+}
+.lg-linea { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.3rem; }
+.lg-lateral {
+    padding: 0.7rem 0.8rem; display: flex; flex-direction: column; gap: 0.7rem;
+    border-left: 1px solid var(--border-color);
+}
+.lg-banco-tit { font-size: 0.74rem; font-weight: 700; margin-bottom: 0.4rem; }
+.lg-banco-tit small { display: block; font-weight: 400; font-size: 0.64rem; color: var(--text-muted); line-height: 1.35; }
+.lg-banco-fichas { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.lg-ficha-in { display: block; font-size: 0.72rem; color: var(--text-muted); }
+.lg-ficha-in input {
+    display: block; width: 100%; margin-top: 0.25rem;
+    background: var(--bg-main); color: var(--text-main);
+    border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    padding: 0.3rem 0.4rem; font-size: 0.9rem; font-family: inherit;
+    font-variant-numeric: tabular-nums;
+}
+.lg-ficha-in input:focus { outline: none; border-color: var(--warning); }
+.lg-ficha-in small { display: block; font-size: 0.62rem; margin-top: 2px; opacity: 0.8; }
+.lg-ficha-mal { color: var(--danger); font-size: 0.72rem; line-height: 1.4; }
+.lg-ficha-mal small { color: var(--text-muted); }
+.lg-entraron { font-size: 0.72rem; color: var(--text-muted); line-height: 1.6; }
+.lg-entraron b { color: var(--text-main); }
+.lg-entraron span { color: var(--success); font-weight: 700; }
+
+/* ── la ficha chica de la liga ── */
+.lgj {
+    position: relative; width: 76px; padding: 0.28rem 0.18rem;
+    border-radius: var(--radius-sm); text-align: center;
+    background: rgba(10,14,12,0.55); border: 1px solid rgba(255,255,255,0.07);
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.lgj[data-jug] { cursor: pointer; }
+.lgj[data-jug]:hover { border-color: rgba(255,255,255,0.22); }
+.lgj-pts {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem;
+    line-height: 1.05; font-variant-numeric: tabular-nums;
+}
+.lgj-nom { font-size: 0.63rem; font-weight: 600; max-width: 100%;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lgj-eq { font-size: 0.54rem; color: rgba(226,232,240,0.5); }
+.lgj-eq i { font-style: normal; opacity: 0.7; margin-left: 2px; }
+.lgj-jugo  { border-color: rgba(34,197,94,0.35); background: rgba(22,163,74,0.10); }
+.lgj-jugo .lgj-pts { color: var(--success); }
+.lgj-entro { border-color: rgba(59,130,246,0.45); background: rgba(59,130,246,0.10); }
+.lgj-entro .lgj-pts { color: #7fb2f5; }
+.lgj-nojugo { opacity: 0.45; }
+.lgj-nojugo .lgj-pts { color: var(--text-muted); }
+.lgj-falta .lgj-pts, .lgj-espera .lgj-pts, .lgj-entra-falta .lgj-pts {
+    color: var(--text-main); font-style: italic; opacity: 0.85;
+}
+.lgj-espera { opacity: 0.6; }
+.lgj-entra-falta { border-color: rgba(59,130,246,0.35); border-style: dashed; }
+.lgj-cap { border-color: rgba(240,168,40,0.55); }
+.lgj-c {
+    position: absolute; left: -4px; top: -4px; width: 14px; height: 14px; line-height: 14px;
+    border-radius: 50%; background: var(--warning); color: #0c100e;
+    font-size: 0.55rem; font-weight: 800;
+}
+.lgj-x, .lgj-cc {
+    position: absolute; top: -6px; width: 16px; height: 16px; line-height: 14px; padding: 0;
+    border-radius: 50%; border: 1px solid var(--border-color);
+    background: var(--bg-main); color: var(--text-muted);
+    font-size: 0.6rem; cursor: pointer; opacity: 0; transition: opacity 0.12s ease;
+}
+.lgj-x { right: -6px; }
+.lgj-cc { right: 12px; }
+.lgj:hover .lgj-x, .lgj:hover .lgj-cc { opacity: 1; }
+.lgj-x:hover { border-color: var(--danger); color: var(--danger); }
+.lgj-cc:hover { border-color: var(--warning); color: var(--warning); }
+.lgj-vacia {
+    justify-content: center; color: var(--text-muted); cursor: pointer;
+    border-style: dashed; background: rgba(10,14,12,0.3);
+    font-size: 1rem; font-weight: 700; min-height: 48px;
+}
+.lgj-vacia small { display: block; font-size: 0.53rem; letter-spacing: 0.06em; }
+.lgj-vacia:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── pegar una lista ── */
+.lg-pegar { display: flex; flex-direction: column; gap: 0.5rem; }
+.lg-pegar label { font-size: 0.74rem; color: var(--text-muted); }
+.lg-pegar input, .lg-pegar textarea {
+    width: 100%; margin-top: 0.25rem;
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    padding: 0.45rem 0.55rem; font-family: inherit; font-size: 0.85rem;
+}
+.lg-pegar textarea { font-family: ui-monospace, monospace; font-size: 0.8rem; resize: vertical; }
+.lg-pegar input:focus, .lg-pegar textarea:focus { outline: none; border-color: var(--primary); }
+.lg-sep {
+    font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 700; background: var(--bg-input);
+}
+#lg-p-res select {
+    background: var(--bg-input); color: var(--text-main); max-width: 100%;
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    padding: 0.25rem 0.35rem; font-size: 0.76rem; font-family: inherit;
+}
+
+@media (max-width: 900px) {
+    .lg-det-cuerpo { grid-template-columns: 1fr; }
+    .lg-lateral { border-left: none; border-top: 1px solid var(--border-color); }
+    .lg-proy, .lg-tabla thead th:nth-child(6) { display: none; }
+}
+@media (max-width: 620px) {
+    .lg-jug, .lg-tabla thead th:nth-child(3) { display: none; }
+}
+.lg-perdidos {
+    margin: 0.6rem 0.8rem 0; padding: 0.5rem 0.7rem;
+    background: rgba(240,168,40,0.08); border: 1px solid rgba(240,168,40,0.3);
+    border-radius: var(--radius-sm); font-size: 0.74rem;
+    color: var(--text-muted); line-height: 1.5;
+}
+.lg-perdidos b { color: var(--text-main); }
+
+/* ── EL SELECTOR DE JUGADORES CON BUSCADOR ────────────────────────────────── */
+.sel-barra {
+    display: flex; align-items: center; gap: 0.6rem;
+    position: sticky; top: 0; z-index: 2;
+    background: var(--bg-card); padding-bottom: 0.5rem;
+}
+.sel-q {
+    flex: 1; background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    padding: 0.5rem 0.7rem; font-size: 0.92rem; font-family: inherit;
+}
+.sel-q:focus { outline: none; border-color: var(--primary); }
+.sel-q::placeholder { color: var(--text-muted); }
+.sel-cnt { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; }
+.sel-nota { margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; }
+.sel-nota b { color: var(--text-main); }
+.sel-lista { display: flex; flex-direction: column; }
+.sel-fila {
+    display: grid; grid-template-columns: auto 1fr auto auto;
+    align-items: center; gap: 0.6rem; width: 100%; text-align: left;
+    background: none; border: none; border-bottom: 1px solid var(--border-color);
+    padding: 0.45rem 0.3rem; cursor: pointer; color: var(--text-main);
+    font-family: inherit;
+}
+.sel-fila:hover:not(:disabled) { background: rgba(255,255,255,0.05); }
+.sel-fila:disabled { opacity: 0.5; cursor: default; }
+.sel-actual { background: rgba(22,163,74,0.10); }
+.sel-nom { font-size: 0.86rem; font-weight: 600; min-width: 0; }
+.sel-nom small { display: block; font-size: 0.68rem; color: var(--text-muted); font-weight: 400;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sel-baja {
+    font-style: normal; font-size: 0.58rem; margin-left: 0.35rem; padding: 0 0.25rem;
+    border-radius: var(--radius-sm); border: 1px solid rgba(229,72,77,0.5); color: var(--danger);
+    text-transform: uppercase; letter-spacing: 0.04em;
+}
+.sel-pr { font-size: 0.74rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.sel-ep {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.95rem;
+    font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right;
+}
+.sel-vivo {
+    width: 26px; text-align: center; font-weight: 800; font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+}
+.sel-vivo-si { color: var(--success); }
+.sel-vivo-no { color: var(--text-muted); opacity: 0.6; }
+.sel-vivo-falta { color: var(--border-light); }
+.sel-mas, .sel-vacio {
+    padding: 0.7rem 0.3rem; font-size: 0.78rem; color: var(--text-muted); text-align: center;
+}
+
+/* ── TORNEO DE AMIGOS: alta de equipo ─────────────────────────────────────── */
+.ne-caja { display: flex; flex-direction: column; gap: 0.8rem; }
+.ne-lbl { font-size: 0.78rem; color: var(--text-muted); }
+.ne-lbl input {
+    display: block; width: 100%; margin-top: 0.3rem;
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    padding: 0.55rem 0.7rem; font-size: 1rem; font-family: inherit;
+}
+.ne-lbl input:focus { outline: none; border-color: var(--primary); }
+.ne-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.ne-nota { margin: 0; font-size: 0.74rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ── jugador por jugador ──────────────────────────────────────────────────── */
+.tr-aportes { border-top: 1px solid var(--border-color); background: var(--bg-card); }
+.ap-tabla { width: 100%; border-collapse: collapse; }
+.ap-tabla thead th {
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 700; text-align: left;
+    padding: 0.45rem 0.8rem; border-bottom: 1px solid var(--border-color);
+}
+.ap-tabla td { padding: 0.35rem 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.035); vertical-align: middle; }
+.ap-pendiente { opacity: 0.72; }
+.ap-nom b { font-size: 0.82rem; }
+.ap-nom small { display: block; font-size: 0.66rem; color: var(--text-muted); }
+.ap-c {
+    display: inline-block; width: 14px; height: 14px; line-height: 14px; text-align: center;
+    border-radius: 50%; background: var(--warning); color: #0c100e;
+    font-size: 0.55rem; font-weight: 800; margin-left: 0.3rem; vertical-align: middle;
+}
+.ap-tag {
+    display: inline-block; margin-left: 0.35rem; padding: 0 0.3rem;
+    border-radius: var(--radius-sm); font-size: 0.56rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em; border: 1px solid;
+}
+.ap-tag-banco { border-color: rgba(59,130,246,0.5); color: #7fb2f5; }
+.ap-tag-mal { border-color: rgba(229,72,77,0.45); color: var(--danger); }
+.ap-tag-esp { border-color: var(--border-light); color: var(--text-muted); }
+.ap-pts {
+    width: 5.5rem; text-align: right; font-family: 'Outfit', sans-serif;
+    font-weight: 800; font-size: 1rem; font-variant-numeric: tabular-nums;
+}
+.ap-pts i { font-style: italic; font-weight: 700; opacity: 0.8; }
+.ap-pts small { display: block; font-family: inherit; font-size: 0.6rem;
+    font-weight: 400; color: var(--text-muted); }
+.ap-bar { width: 34%; }
+.ap-barra { display: block; height: 6px; background: var(--bg-input); border-radius: var(--radius-pill); overflow: hidden; }
+.ap-barra i { display: block; height: 100%; background: var(--primary); }
+.ap-neg i { background: var(--danger); }
+.ap-tienen { width: 5rem; text-align: center; font-size: 0.74rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.ap-tienen i { font-style: normal; opacity: 0.55; }
+.ap-dif { color: var(--warning); font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.ap-todos { opacity: 0.55; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.ap-sep td {
+    font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); background: var(--bg-input); padding: 0.3rem 0.8rem;
+}
+.tr-vacio { padding: 0.8rem; margin: 0; font-size: 0.78rem; color: var(--text-muted); }
+
+/* ── cara a cara y propiedad ──────────────────────────────────────────────── */
+.tr-card { margin-top: 1.1rem; padding: 0; overflow: hidden; }
+.tr-cab { padding: 0.8rem 1rem 0.6rem; border-bottom: 1px solid var(--border-color); }
+.tr-cab h2 { margin: 0; font-size: 1rem; font-family: 'Outfit', sans-serif; }
+.tr-cab p { margin: 0.25rem 0 0; font-size: 0.76rem; color: var(--text-muted); line-height: 1.5; max-width: 78ch; }
+.tr-cab b { color: var(--text-main); }
+.cc-sels { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 1rem; flex-wrap: wrap; }
+.tr-sel { font-size: 0.85rem; padding: 0.35rem 0.5rem; min-width: 9rem; }
+.cc-vs { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; font-weight: 700; }
+.cc-compartidos {
+    padding: 0.5rem 1rem; font-size: 0.78rem; color: var(--text-muted);
+    background: var(--bg-input); border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+.cc-compartidos b { color: var(--text-main); }
+.cc-comp-nombres { font-size: 0.7rem; margin-top: 0.2rem; opacity: 0.8; line-height: 1.5; }
+.cc-grid { display: grid; grid-template-columns: 1fr auto 1fr; }
+.cc-col { padding: 0.7rem 1rem; }
+.cc-b { border-left: 1px solid var(--border-color); }
+.cc-col-cab { margin-bottom: 0.4rem; }
+.cc-col-cab b { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cc-a .cc-col-cab b { color: var(--success); }
+.cc-b .cc-col-cab b { color: var(--warning); }
+.cc-col-cab span { display: block; font-size: 0.68rem; color: var(--text-muted); }
+.cc-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.cc-lista li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; padding: 0.15rem 0; }
+.cc-falta { opacity: 0.65; }
+.cc-p {
+    min-width: 2.4rem; text-align: right; font-family: 'Outfit', sans-serif;
+    font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.cc-p i { font-style: italic; opacity: 0.8; }
+.cc-n small { color: var(--text-muted); font-size: 0.62rem; margin-left: 0.35rem; }
+.cc-nada { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
+.cc-medio {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 0.9rem; text-align: center; border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+}
+.cc-dif { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cc-dif-a { color: var(--success); }
+.cc-dif-b { color: var(--warning); }
+.cc-medio small { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 2px; }
+.cc-pie {
+    margin: 0; padding: 0.6rem 1rem 0.8rem; font-size: 0.78rem; color: var(--text-muted);
+    border-top: 1px solid var(--border-color); line-height: 1.5;
+}
+.cc-pie b { color: var(--text-main); }
+
+.pr-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.pr-grid > div { padding: 0.8rem 1rem; }
+.pr-grid > div + div { border-left: 1px solid var(--border-color); }
+.pr-grid h3 { margin: 0; font-size: 0.85rem; }
+.pr-sub { margin: 0.15rem 0 0.5rem; font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; }
+.pr-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.pr-lista li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; }
+.pr-pts {
+    min-width: 2.2rem; text-align: center; font-family: 'Outfit', sans-serif;
+    font-weight: 800; font-variant-numeric: tabular-nums;
+    background: var(--bg-input); border-radius: var(--radius-sm); padding: 1px 0;
+}
+.pr-alto { color: var(--success); }
+.pr-esp { color: var(--text-muted); font-style: italic; }
+.pr-n { flex: 1; min-width: 0; }
+.pr-n small { display: block; font-size: 0.63rem; color: var(--text-muted); }
+.pr-c { font-size: 0.74rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.pr-c i { font-style: normal; opacity: 0.55; }
+
+@media (max-width: 820px) {
+    .cc-grid, .pr-grid { grid-template-columns: 1fr; }
+    .cc-medio { flex-direction: row; gap: 0.5rem; border: none;
+        border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 0.4rem; }
+    .cc-b, .pr-grid > div + div { border-left: none; border-top: 1px solid var(--border-color); }
+    .ap-bar { display: none; }
+}
+.ap-resumen {
+    display: flex; gap: 1.2rem; flex-wrap: wrap;
+    padding: 0.5rem 0.8rem; font-size: 0.74rem; color: var(--text-muted);
+    background: var(--bg-input); border-bottom: 1px solid var(--border-color);
+}
+.ap-resumen b { color: var(--text-main); font-variant-numeric: tabular-nums; }
+.ap-th-pts { text-align: right !important; padding-right: 0.8rem !important; }
+/* el lider del torneo se ve de lejos */
+.lg-tabla tbody tr.lg-fila:first-child { background: rgba(240,168,40,0.05); }
+.lg-tabla tbody tr.lg-fila:first-child .lg-nom b { color: var(--warning); }
+/* compartir el torneo */
+.cp-caja {
+    border: 1px solid var(--border-color); border-radius: var(--radius-md);
+    padding: 0.7rem 0.8rem; margin-bottom: 0.8rem;
+}
+.cp-caja h4 { margin: 0 0 0.3rem; font-size: 0.88rem; }
+.cp-caja p { margin: 0 0 0.55rem; font-size: 0.76rem; color: var(--text-muted); line-height: 1.5; }
+.cp-caja p b { color: var(--text-main); }
+.cp-caja code {
+    background: var(--bg-input); padding: 0 0.25rem; border-radius: var(--radius-sm);
+    font-size: 0.9em; color: var(--text-main);
+}
+.cp-tag {
+    font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.05em;
+    border: 1px solid var(--primary); color: var(--success);
+    border-radius: var(--radius-sm); padding: 0 0.3rem; margin-left: 0.35rem; vertical-align: middle;
+}
+.cp-lbl { display: block; font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.55rem; }
+.cp-lbl input {
+    display: block; width: 100%; margin-top: 0.25rem;
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    padding: 0.45rem 0.6rem; font-size: 0.95rem; font-family: inherit;
+}
+.cp-lbl input:focus { outline: none; border-color: var(--primary); }
+.cp-ojo { border-color: var(--warning) !important; }
+.cp-aviso { color: var(--warning) !important; font-size: 0.72rem !important; margin: -0.3rem 0 0.55rem !important; }
+.lg-nueva { background: rgba(22,163,74,0.08); border-color: rgba(22,163,74,0.35); }
+.lg-nueva .vs-btn { margin-left: 0.4rem; }
+/* la columna Hizo: lo que sumo de verdad esta fecha */
+.hizo-si {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem;
+    font-variant-numeric: tabular-nums; color: var(--success);
+}
+.hizo-alto { color: var(--success); text-shadow: 0 0 12px rgba(34,197,94,0.35); }
+.hizo-no { font-size: 0.66rem; color: var(--text-muted); opacity: 0.7; }
+.hizo-falta { color: var(--border-light); font-size: 1.1rem; }
+.hizo-na { color: var(--border-light); }
+/* cuando la busqueda pega en otro puesto */
+.aviso-otros {
+    padding: 0.4rem 0.8rem; font-size: 0.76rem; color: var(--text-muted);
+    background: transparent; border-bottom: 1px solid var(--border-color);
+}
+.aviso-otros b { color: var(--text-main); }
+.op-link {
+    background: none; border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    color: var(--warning); font-family: inherit; font-size: 0.74rem;
+    padding: 0.1rem 0.4rem; cursor: pointer; margin: 0 0.1rem;
+}
+.op-link:hover { border-color: var(--warning); background: rgba(240,168,40,0.12); }
+.tb-corte {
+    text-align: center; color: var(--text-muted); font-size: 0.76rem;
+    padding: 0.7rem !important; background: var(--bg-input);
+}
+.tb-corte b { color: var(--text-main); }
+.op-tilde { color: var(--warning); }
+
+/* ── EL PARTIDO EN NUMEROS: posesion y corners por condicion ─────────────── */
+.pn-caja { margin: 18px 0; }
+.pn-vent { float: right; display: inline-flex; gap: 0.3rem; }
+.pn-vbtn {
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); color: var(--text-muted);
+    font-size: 0.66rem; padding: 0.15rem 0.4rem; cursor: pointer; font-family: inherit;
+    text-transform: none; letter-spacing: 0;
+}
+.pn-vbtn.on { border-color: var(--primary); color: var(--success); background: rgba(22,163,74,0.12); }
+.pn-tabla { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.pn-tabla thead th {
+    text-align: center; font-size: 0.78rem; font-weight: 700;
+    padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border-color);
+    vertical-align: bottom;
+}
+.pn-tabla thead th:first-child { width: 34%; }
+.pn-tabla thead th small {
+    display: block; font-size: 0.62rem; font-weight: 400; color: var(--text-muted);
+    text-transform: none; letter-spacing: 0; margin-top: 1px;
+}
+.pn-tabla td { padding: 0.32rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.pn-k { color: #cbd5e1; font-size: 0.84rem; border-bottom: 1px dotted transparent; cursor: help; }
+.pn-k:hover { border-bottom-color: var(--border-light); }
+.pn-v { text-align: center; font-variant-numeric: tabular-nums; }
+.pn-v b { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; }
+.pn-v i {
+    font-style: normal; display: inline-block; margin-left: 0.35rem;
+    font-size: 0.66rem; color: var(--text-muted); cursor: help;
+}
+.pn-bien b { color: var(--success); }
+.pn-mal b { color: var(--danger); }
+.pn-med { text-align: center; color: var(--text-muted); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.pn-xg td { opacity: 0.85; }
+.pn-pie { font-size: 0.74rem; color: var(--text-muted); line-height: 1.55; margin: 0.5rem 0 0; }
+.pn-pie b { color: var(--text-main); }
+/* posesion y corners como columna de la tabla */
+.cnd { font-variant-numeric: tabular-nums; font-weight: 700; }
+.cnd i { font-style: normal; font-size: 0.6rem; color: var(--text-muted); margin-left: 2px; font-weight: 400; }
+.cnd-bien { color: var(--success); }
+.cnd-mal { color: var(--danger); }
+.orden-vent { display: inline-flex; gap: 0.3rem; margin-left: 0.6rem; }
+
+/* ── EL CAMPEONATO ────────────────────────────────────────────────────────── */
+.cmp-tabla { width: 100%; }
+.cmp-tabla thead th {
+    font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 700; padding: 0.5rem 0.7rem;
+    border-bottom: 1px solid var(--border-color); white-space: nowrap;
+}
+.cmp-tabla td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+.cmp-tabla tbody tr:first-child .cmp-dt b { color: var(--warning); }
+.cmp-sin { opacity: 0.72; }
+.cmp-pos {
+    width: 4.2rem; font-family: 'Outfit', sans-serif; font-weight: 800;
+    font-size: 1rem; color: var(--text-muted); white-space: nowrap;
+}
+.cmp-mov { font-size: 0.62rem; font-weight: 700; margin-left: 0.35rem; }
+.cmp-sube { color: var(--success); }
+.cmp-baja { color: var(--danger); }
+.cmp-igual { color: var(--text-muted); opacity: 0.6; }
+.cmp-dt b { font-size: 0.9rem; }
+.cmp-dt small { display: block; font-size: 0.68rem; color: var(--text-muted); }
+.cmp-pts { text-align: center; }
+.cmp-pts b {
+    font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 800;
+    font-variant-numeric: tabular-nums; color: var(--success);
+}
+.cmp-dif { text-align: center; color: var(--text-muted); font-variant-numeric: tabular-nums; font-size: 0.85rem; }
+.cmp-lider {
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--warning); border: 1px solid rgba(240,168,40,0.45);
+    border-radius: var(--radius-sm); padding: 0 0.3rem;
+}
+.cmp-f {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums;
+    background: var(--bg-input); border-radius: var(--radius-sm); padding: 0.1rem 0.4rem;
+}
+.cmp-gan { font-size: 0.8rem; letter-spacing: -2px; }
+.cmp-once { text-align: right; white-space: nowrap; }
+.cmp-ok { font-size: 0.9rem; color: var(--success); opacity: 0.65; }
+.cmp-falta { font-size: 0.74rem; color: var(--warning); align-self: center; }
+.cmp-falta b { color: var(--text-main); }
+.cmp-error { color: var(--danger); font-size: 0.8rem; line-height: 1.5; }
+.cmp-vacio .lg-acciones { padding-bottom: 0.9rem; }
+.gdt-btns { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-top: 0.7rem; }
+.gdt-fecha { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-muted); }
+.gdt-fecha input {
+    width: 3.6rem; background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    padding: 0.25rem 0.4rem; font-family: inherit; font-size: 0.85rem;
+}
+.dt-lista { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.7rem; }
+.dt-fila {
+    display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); padding: 0.5rem 0.7rem; cursor: pointer;
+    color: var(--text-main); font-family: inherit; text-align: left; width: 100%;
+}
+.dt-fila:hover { border-color: var(--primary); }
+.dt-eq { font-weight: 700; font-size: 0.88rem; }
+.dt-eq small { display: block; font-weight: 400; font-size: 0.7rem; color: var(--text-muted); }
+.dt-pts { font-size: 0.8rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 720px) {
+    .cmp-tabla thead th:nth-child(4), .cmp-dif, .cmp-gan, .cmp-tabla thead th:nth-child(6) { display: none; }
+}
+.su-eq {
+    display: inline-flex; align-items: center; gap: 0.3rem; margin: 0.25rem 0.5rem 0 0;
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); padding: 0.15rem 0.4rem; font-size: 0.78rem;
+    color: var(--text-main);
+}
+.su-borrar { color: var(--danger) !important; border-color: rgba(229,72,77,0.4) !important; }
+.lab-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.lab-t { padding: 0.8rem 1rem; }
+.lab-t + .lab-t { border-left: 1px solid var(--border-color); }
+.lab-cab { font-size: 0.8rem; }
+.lab-cab span { display: block; font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
+.lab-pts {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.2rem;
+    line-height: 1.1; font-variant-numeric: tabular-nums; margin-top: 0.2rem;
+}
+.lab-motor .lab-pts { color: var(--success); }
+.lab-mio .lab-pts { color: var(--warning); }
+.lab-proy, .lab-puesto { font-size: 0.72rem; color: var(--text-muted); }
+.lab-proy b, .lab-puesto b { color: var(--text-main); }
+.lab-puesto { margin-top: 0.25rem; }
+@media (max-width: 720px) { .lab-grid { grid-template-columns: 1fr; }
+  .lab-t + .lab-t { border-left: none; border-top: 1px solid var(--border-color); } }
+.cie {
+    margin: 0.6rem 0.8rem 0; padding: 0.55rem 0.7rem;
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-muted);
+    display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+}
+.cie b { color: var(--text-main); }
+.cie small { flex: 1; min-width: 12rem; font-size: 0.72rem; opacity: 0.85; }
+.cie-listo { background: rgba(22,163,74,0.09); border-color: rgba(22,163,74,0.4); }
+.cie-ok { background: rgba(22,163,74,0.05); }
+
+/* ── PODIO Y TITULARES ────────────────────────────────────────────────────── */
+.pod { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 0.6rem; margin-bottom: 0.8rem; }
+.pod-t {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg); padding: 0.9rem 1rem; text-align: center;
+    position: relative; overflow: hidden;
+}
+.pod-1 { border-color: rgba(240,168,40,0.45); background:
+    linear-gradient(180deg, rgba(240,168,40,0.10), transparent 70%), var(--bg-card); }
+.pod-m { font-size: 1.4rem; line-height: 1; }
+.pod-1 .pod-m { font-size: 1.8rem; }
+.pod-n { font-weight: 700; font-size: 0.9rem; margin-top: 0.25rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pod-1 .pod-n { font-size: 1.05rem; color: var(--warning); }
+.pod-p {
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.1rem;
+    line-height: 1.05; font-variant-numeric: tabular-nums; color: var(--success);
+}
+.pod-1 .pod-p { font-size: 2.8rem; }
+.pod-s { font-size: 0.72rem; color: var(--text-muted); }
+.pod-ch {
+    display: inline-block; margin-top: 0.4rem; padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-pill); background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    font-size: 0.74rem; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.pod-j { font-size: 0.66rem; color: var(--text-muted); margin-top: 0.3rem; }
+.tit {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: var(--radius-md); padding: 0.55rem 0.8rem; margin-bottom: 0.9rem;
+    display: flex; flex-direction: column; gap: 0.3rem;
+}
+.tit-l { display: flex; gap: 0.5rem; align-items: baseline; font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; }
+.tit-l b { color: var(--text-main); }
+.tit-ic { font-size: 0.95rem; flex-shrink: 0; }
+@media (max-width: 720px) { .pod { grid-template-columns: 1fr; } .pod-1 .pod-p { font-size: 2.2rem; } }
+.vac { text-align: center; padding: 1.6rem 1.2rem; }
+.vac-ic { font-size: 2.4rem; }
+.vac h2 { margin: 0.4rem 0 0.3rem; font-size: 1.1rem; font-family: 'Outfit', sans-serif; }
+.vac p { margin: 0 auto; max-width: 56ch; font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+.vac-btns { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin: 0.9rem 0 0.6rem; }
+.vac-nota { font-size: 0.74rem !important; opacity: 0.8; }
+.vac-nota b { color: var(--text-main); }
+.lab-gral { margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color); }
+.lab-gral label { font-size: 0.68rem; color: var(--text-muted); display: block; }
+.lab-gral input {
+    display: block; width: 5.5rem; margin-top: 0.2rem;
+    background: var(--bg-input); color: var(--text-main);
+    border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    padding: 0.25rem 0.4rem; font-size: 1rem; font-family: inherit;
+    font-variant-numeric: tabular-nums;
+}
+.lab-gral input:focus { outline: none; border-color: var(--warning); }
+.lab-gral-r { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.3rem; }
+.lab-gral-r b { color: var(--text-main); }
+.lab-gral-vac { font-size: 0.7rem; opacity: 0.75; }
+.rev {
+    display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+    background: rgba(240,168,40,0.08); border: 1px solid rgba(240,168,40,0.32);
+    border-radius: var(--radius-md); padding: 0.6rem 0.8rem; margin-bottom: 0.8rem;
+}
+.rev-txt { flex: 1; min-width: 16rem; font-size: 0.82rem; color: var(--text-muted); }
+.rev-txt b { color: var(--text-main); }
+.rev-txt small { display: block; font-size: 0.72rem; margin-top: 0.15rem; line-height: 1.45; opacity: 0.9; }
+.rev-eqs { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+.rev-eq {
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); color: var(--text-main);
+    font-size: 0.74rem; padding: 0.2rem 0.45rem; cursor: pointer; font-family: inherit;
+}
+.rev-eq:hover { border-color: var(--warning); color: var(--warning); }
+.rev-ok {
+    font-size: 0.68rem; color: var(--success); border: 1px solid rgba(34,197,94,0.4);
+    border-radius: var(--radius-sm); padding: 0.15rem 0.4rem; align-self: center;
+}
+.lg-mas { font-weight: 800; letter-spacing: 1px; padding: 0.3rem 0.7rem; }
+.mt-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.mt-sec { border-top: 1px solid var(--border-color); padding-top: 0.8rem; margin-bottom: 0.8rem; }
+.mt-sec h4 { margin: 0 0 0.35rem; font-size: 0.85rem; }
+.mt-sec p { margin: 0 0 0.5rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.55; }
+.mt-sec p b { color: var(--text-main); }
+.mt-ojo { border-left: 2px solid var(--border-light); padding-left: 0.6rem; }
+/* bloques que se pliegan */
+.pleg .pleg-cuerpo { display: none; }
+.pleg.pleg-abierto .pleg-cuerpo { display: block; }
+.pleg-cab { cursor: pointer; user-select: none; border-bottom: none; }
+.pleg.pleg-abierto .pleg-cab { border-bottom: 1px solid var(--border-color); }
+.pleg-cab:hover h2 { color: var(--success); }
+.pleg-fl {
+    display: inline-block; margin-left: 0.45rem; font-size: 0.7rem;
+    color: var(--text-muted); transition: transform 0.15s ease;
+}
+.pleg.pleg-abierto .pleg-fl { transform: rotate(180deg); }
+.pleg .tr-cab p { transition: opacity 0.15s ease; }
+
+
+/* ── LA TABLA DE JUGADORES: ANCHOS FIJOS, NUNCA DESFASADA (08/09) ───────────
+   Probé anclar el nombre y el puntaje con position:sticky y salió peor: con
+   border-collapse los anchos que calcula el navegador para el <thead> y para
+   el <tbody> no tienen por qué coincidir, y el encabezado terminaba corrido
+   una columna respecto de los números. La forma que NO se puede romper es
+   table-layout:fixed: el ancho lo define la primera fila y vale para las dos
+   partes de la tabla, así que si algo scrollea, scrollea junto.             */
+#view-rankings .data-table { table-layout: fixed; }
+#view-rankings .data-table th { white-space: normal; line-height: 1.15; }
+#view-rankings .data-table th,
+#view-rankings .data-table td { overflow: hidden; text-overflow: ellipsis; }
+#view-rankings .data-table td { padding: 0.8rem 0.4rem; }
+#view-rankings .data-table th { padding: 0.7rem 0.4rem; }
+/* el nombre es lo único que puede pasarse de largo: se corta con puntitos */
+#view-rankings .data-table td.cl-n { overflow: visible; }
+#view-rankings .data-table td.cl-n .player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tb-pie { position: static; width: auto; min-width: 0; box-shadow: none; }
+
+.tb-pie {
+    text-align: center; color: var(--text-muted); font-size: 0.74rem;
+    padding: 0.55rem 0.8rem; border-top: 1px solid var(--border-color);
+}
+.pie-link {
+    background: none; border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+    color: var(--text-muted); font-family: inherit; font-size: 0.72rem;
+    padding: 0.05rem 0.35rem; cursor: pointer; margin: 0 0.1rem;
+}
+.pie-link:hover { color: var(--text-main); border-color: var(--text-muted); }
+.fila-pie:hover { background: none !important; }
+
+
+/* ── EL ENCABEZADO ALINEADO CON SU COLUMNA (08/09) ──────────────────────────
+   `.data-table th` fijaba text-align:left con mas peso que `.text-center`, asi
+   que en TODA la app el titulo quedaba pegado a la izquierda de la columna y el
+   numero centrado abajo. En una tabla ancha eso se lee como columnas corridas.
+   Es una linea de CSS y arregla Jugadores, Mejor 11, Datos y el campeonato.   */
+.data-table th.text-center { text-align: center; }
+.data-table th.text-right,
+.data-table td.text-right { text-align: right; }
+
+
+/* ── LA TABLA "COMO LLEGA CADA EQUIPO" SE LEE COMO UN DIBUJO (08/09) ────────
+   Treinta filas de numeros sueltos no dicen nada hasta que uno los compara de
+   a uno. El puesto entre los 30 ahora esta a la vista, y el fondo de la celda
+   va del verde al rojo segun ese puesto: se ve de un vistazo que equipo llega
+   bien en que cosa, sin leer un solo numero.                                 */
+.tb-cond .cu-p {
+    font-size: 0.58rem; font-weight: 600; color: var(--text-muted);
+    margin-left: 0.18rem; vertical-align: super; font-style: normal;
+}
+.tb-cond td.hq1 { background: rgba(34,197,94,0.16); }
+.tb-cond td.hq2 { background: rgba(34,197,94,0.07); }
+.tb-cond td.hq3 { background: transparent; }
+.tb-cond td.hq4 { background: rgba(239,68,68,0.06); }
+.tb-cond td.hq5 { background: rgba(239,68,68,0.14); }
+.tb-cond tbody tr:hover td.hq1 { background: rgba(34,197,94,0.24); }
+.tb-cond tbody tr:hover td.hq5 { background: rgba(239,68,68,0.2); }
+.tb-cond .cd-num .cu b { display: inline-flex; align-items: baseline; }
+.cond-escala {
+    display: flex; align-items: center; gap: 0.35rem; margin-left: auto;
+    font-size: 0.66rem; color: var(--text-muted);
+}
+.cond-escala i { width: 1.1rem; height: 0.6rem; border-radius: 2px; display: inline-block; }
+
+/* la explicacion larga, plegada: se lee una vez y despues estorba todas las semanas */
+.ref-det > summary {
+    cursor: pointer; list-style: none; color: var(--text-muted); font-size: 0.74rem;
+    padding: 0.15rem 0; user-select: none;
+}
+.ref-det > summary::-webkit-details-marker { display: none; }
+.ref-det > summary::before { content: '▸ '; }
+.ref-det[open] > summary::before { content: '▾ '; }
+.ref-det[open] > summary { margin-bottom: 0.5rem; }
+/* la tabla de condicion, mas apretada: son doce columnas y tienen que entrar */
+.tb-cond.tb-una td { padding: 0.3rem 0.35rem; }
+.tb-cond.tb-una .td-eq { max-width: 12rem; }
+.tb-cond.tb-una .td-parti { max-width: 13rem; font-size: 0.76rem; white-space: normal; overflow: hidden; }
+.tb-cond.tb-una .cu b { font-size: 0.82rem; }
+.tb-cond.tb-una .cu span { font-size: 0.6rem; }
+
+/* el intercambio titular ⇄ suplente, marcado en el panel de alternativas */
+.pc-item.pc-permuta { border-color: rgba(56,189,248,0.45); }
+.pc-tag {
+    display: inline-block; margin-left: 0.4rem; font-size: 0.6rem; font-weight: 700;
+    letter-spacing: .04em; color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4);
+    border-radius: 3px; padding: 0 0.25rem; vertical-align: middle;
+}
+
+
+/* ── REVISIÓN: la foto de una fecha que ya se jugó ──────────────────────────
+   Es la única pantalla que no depende de datos.js: lee lo que se guardó cuando
+   la fecha terminó, así que sigue mostrando la fecha 8 cuando el motor ya está
+   en la 9. Por eso también es la única que puede comparar lo esperado con lo
+   que efectivamente pasó.                                                    */
+.rev-vacio { padding: 1.6rem; }
+.rev-vacio h2 { font-size: 1.05rem; margin: 0 0 0.6rem; }
+.rev-vacio p { color: var(--text-muted); font-size: 0.86rem; line-height: 1.6; margin: 0 0 0.7rem; max-width: 62ch; }
+.rev-sel { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0 0 0.9rem; }
+.rev-aviso {
+    background: rgba(240,168,40,0.09); border: 1px solid rgba(240,168,40,0.3);
+    border-radius: var(--radius-md); padding: 0.6rem 0.9rem; margin-bottom: 0.9rem;
+    font-size: 0.82rem; color: var(--text-muted);
+}
+.rev-card { padding: 1.1rem 1.2rem 1.3rem; margin-bottom: 1rem; }
+.rev-tres { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.8rem; margin-top: 0.9rem; }
+.rev-t {
+    background: var(--bg-input); border: 1px solid var(--border-color);
+    border-radius: var(--radius-md); padding: 0.9rem 1rem; text-align: center;
+}
+.rev-t-rot { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); font-weight: 700; }
+.rev-t-nom { font-weight: 800; font-size: 0.95rem; margin: 0.25rem 0 0.35rem; }
+.rev-t-pts { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.1rem; line-height: 1; color: var(--success); }
+.rev-t-esp { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem; }
+.rev-t-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; }
+.rev-frase { font-size: 0.86rem; color: var(--text-muted); margin: 0.9rem 0 0; line-height: 1.6; }
+.rev-frase b { color: var(--text-main); }
+.ok  { color: var(--success); font-weight: 700; }
+.mal { color: var(--danger);  font-weight: 700; }
+.rev-tabla td, .rev-tabla th { padding: 0.5rem 0.6rem; }
+.rev-tabla tfoot td { border-top: 2px solid var(--border-color); background: rgba(255,255,255,0.02); }
+.rev-p { font-family: 'Outfit', sans-serif; font-size: 1rem; color: var(--success); }
+.rev-c {
+    font-size: 0.6rem; font-weight: 800; color: #fbbf24; border: 1px solid rgba(251,191,36,.5);
+    border-radius: 3px; padding: 0 0.2rem; vertical-align: middle;
+}
+.rev-barra { width: 26%; }
+.rev-barra i { display: block; height: 7px; border-radius: 4px; background: linear-gradient(90deg, var(--primary), #8b5cf6); }
+.rev-cruce { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.rev-col h4 {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted);
+    margin: 0 0 0.5rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem;
+}
+.rev-col h4 span { color: var(--text-main); font-weight: 800; font-size: 0.8rem; text-transform: none; letter-spacing: 0; }
+.rev-l {
+    display: flex; align-items: baseline; gap: 0.5rem; padding: 0.32rem 0;
+    border-bottom: 1px solid var(--border-color); font-size: 0.82rem;
+}
+.rev-l span { flex: 1; min-width: 0; }
+.rev-l small { display: block; font-size: 0.68rem; color: var(--text-muted); }
+.rev-l i { font-style: normal; font-size: 0.68rem; color: var(--text-muted); }
+.rev-l b { font-variant-numeric: tabular-nums; }
+.rev-nada { font-size: 0.8rem; color: var(--text-muted); margin: 0.3rem 0; }
+.rev-nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 0.4rem; }
+.rev-n { background: var(--bg-input); border-radius: var(--radius-md); padding: 0.75rem 0.9rem; }
+.rev-n b { display: block; font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; line-height: 1; }
+.rev-n span { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-top: 0.25rem; font-weight: 700; }
+.rev-n i { display: block; font-style: normal; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem; line-height: 1.45; }
+.rev-nota-cal { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; margin: 0.9rem 0 0; max-width: 78ch; }
+
+.rev-resc { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.3); }
+.rev-falta {
+    font-size: 0.62rem; color: var(--warning); border: 1px solid rgba(240,168,40,0.35);
+    border-radius: 3px; padding: 0 0.22rem; margin-left: 0.3rem;
+}
+.rev-pie-nota { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }

@@ -31,14 +31,19 @@
             </div>
 
             <nav class="nav-secciones">
+                <!-- CUATRO PANTALLAS, NO OCHO (06/09).
+                     Partidos y Posiciones se mudaron ARRIBA de Datos, que es
+                     donde se las mira: primero la tabla y el fixture, y abajo
+                     el detalle de cada equipo. Oportunidades era el mismo
+                     ranking que Jugadores ordenado por amenaza/90 (que ya es
+                     una columna de esa tabla) y Lideres era otra vez lo mismo
+                     con un selector de categoria: las dos se eliminaron. -->
                 <button class="nav-btn active" data-sec="fecha">La fecha</button>
                 <button class="nav-btn" data-sec="jugadores">Jugadores</button>
-                <button class="nav-btn" data-sec="fixture">Partidos</button>
-                <button class="nav-btn" data-sec="posiciones">Posiciones</button>
                 <button class="nav-btn" data-sec="once">Mejor 11</button>
-            <button class="nav-btn" data-sec="oportunidades">Oportunidades</button>
-            <button class="nav-btn" data-sec="lideres">Líderes</button>
-            <button class="nav-btn" data-sec="datos">Datos</button>
+                <button class="nav-btn" data-sec="liga">Torneo de amigos</button>
+                <button class="nav-btn" data-sec="datos">Datos</button>
+                <button class="nav-btn" data-sec="revision" title="Lo que pasó en las fechas que ya se jugaron">Revisión</button>
             </nav>
 
             <div class="barra-acciones">
@@ -61,6 +66,16 @@
                 <small>Cuánto pesa cada término del reglamento en cada puesto</small>
             </button>
             <div class="menu-sep"></div>
+            <!-- Los descartes de la ✕ viven aca (07/09): ocupaban una barra
+                 abajo del once para algo que se toca una vez por fecha. -->
+            <div class="menu-item menu-fuera" id="menu-fuera" hidden>
+                <span id="lbl-fuera-txt"></span>
+                <div class="menu-fuera-acc">
+                    <button class="menu-mini" id="btn-fuera-publicar">publicar en la app</button>
+                    <button class="menu-mini" id="btn-fuera-limpiar">deshacer todos</button>
+                </div>
+            </div>
+            <div class="menu-sep" id="menu-sep-fuera" hidden></div>
             <button class="menu-item" id="lbl-health-badge">
                 Estado de los datos · <span id="lbl-health-pct">–</span>
                 <small>Última fecha jugada: <span id="lbl-datos-fecha">–</span> · <span id="lbl-version"></span></small>
@@ -86,6 +101,9 @@
         </section>
 
         <section class="seccion" id="sec-jugadores" hidden>
+            <div class="cab">
+                <div class="cab-txt"><h1>Jugadores</h1><span>Los 748, ordenables por cualquier columna</span></div>
+            </div>
             <div class="card">
                 <div class="main-toolbar">
                     <div class="main-tabs">
@@ -110,6 +128,7 @@
                 </div>
 
                 <!-- Rankings Content -->
+                <div id="aviso-otros-puestos" class="aviso-otros" hidden></div>
                 <div id="orden-ranking" class="orden-barra"></div>
                 <div id="view-rankings" class="table-responsive flex-1">
                     <table class="data-table">
@@ -134,28 +153,37 @@
             </div>
         </section>
 
-        <section class="seccion" id="sec-fixture" hidden>
-            <!-- Fixture Deportivo -->
-            <div class="card">
-                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1.25rem;">
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        <h2 style="font-size:0.95rem;margin:0;">📅 Fixture</h2>
-                        <button id="btn-open-odds-modal" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;" title="Ajustar Cuotas Manualmente de las casas de apuestas">⚙️</button>
-                    </div>
-                    <select id="fixture-round-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:3px 6px;font-size:0.75rem;cursor:pointer;outline:none;">
-                    </select>
-                </div>
-                <div class="card-body p-0">
-                    <div class="fixture-list" id="fixture-list">
-                        <!-- Generado dinámicamente por app.js -->
-                        <div style="padding:20px;text-align:center;color:var(--text-muted);">Cargando fixture...</div>
-                    </div>
-                </div>
-            </div>
+                        <section class="seccion" id="sec-once" hidden>
+            <div id="pantalla-once"></div>
         </section>
 
-        <section class="seccion" id="sec-posiciones" hidden>
-            <!-- Posiciones -->
+        <!-- LA LIGA: el torneo de amigos, con los puntajes de la fecha en vivo.
+             Todo lo que se ve aca sale de dataVivo.js, que es una fuente aparte
+             y no alimenta al motor. Los equipos de los amigos viven en el
+             localStorage de este navegador. -->
+        <section class="seccion" id="sec-liga" hidden>
+            <div id="pantalla-liga"></div>
+        </section>
+
+        <!-- LA FECHA ANTERIOR. Vive aparte de todo lo demas: no lee datos.js
+             ni dataVivo.js, lee la foto que se guardo cuando la fecha termino.
+             Por eso sigue funcionando cuando el motor ya paso a la que viene. -->
+        <section class="seccion" id="sec-revision" hidden>
+            <div id="pantalla-revision"></div>
+        </section>
+
+                <section class="seccion" id="sec-datos" hidden>
+            <div class="cab">
+                <div class="cab-txt"><h1>Datos</h1><span>Tabla, fixture y el detalle de cada equipo</span></div>
+            </div>
+            <!-- LA TABLA Y EL FIXTURE, ARRIBA DE TODO.
+                 Van ACA y no adentro de #pantalla-datos porque pintarDatos()
+                 reescribe ese div entero con innerHTML: si estuvieran adentro,
+                 los nodos que buscan pintarTabla() y pintarFixture()
+                 (#standings-body y #fixture-list) se destruirian en cada
+                 repintado. Asi las dos funciones siguen andando sin tocarlas. -->
+            <div class="datos-arriba">
+<!-- Posiciones -->
             <div class="card">
                 <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.65rem 1rem;">
                     <h2 style="font-size:0.95rem;margin:0;">🏆 Posiciones</h2>
@@ -200,77 +228,28 @@
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section class="seccion" id="sec-once" hidden>
-            <div id="pantalla-once"></div>
-        </section>
-
-        <section class="seccion" id="sec-oportunidades" hidden>
-            <div id="pantalla-oportunidades"></div>
-        </section>
-
-        <section class="seccion" id="sec-datos" hidden>
+<!-- Fixture Deportivo -->
+            <div class="card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1.25rem;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <h2 style="font-size:0.95rem;margin:0;">📅 Fixture</h2>
+                        <button id="btn-open-odds-modal" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.75rem;" title="Ajustar Cuotas Manualmente de las casas de apuestas">⚙️</button>
+                    </div>
+                    <select id="fixture-round-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:3px 6px;font-size:0.75rem;cursor:pointer;outline:none;">
+                    </select>
+                </div>
+                <div class="card-body p-0">
+                    <div class="fixture-list" id="fixture-list">
+                        <!-- Generado dinámicamente por app.js -->
+                        <div style="padding:20px;text-align:center;color:var(--text-muted);">Cargando fixture...</div>
+                    </div>
+                </div>
+            </div>
+            </div>
             <div id="pantalla-datos"></div>
         </section>
 
-        <section class="seccion" id="sec-lideres" hidden>
-            <!-- Centro de Líderes Estadísticos (Ranking Ordinal por Categoría) -->
-                <div id="view-leaders" class="p-4" >
-                    <div id="leaders-nota" style="font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;"></div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;background:var(--bg-card);padding:14px 18px;border-radius:12px;border:1px solid var(--border-color);">
-                        <div>
-                            <h2 style="font-size:1.15rem;font-weight:700;color:var(--text-main);margin:0;">📊 Líderes y Rankings Estadísticos</h2>
-                            <p style="font-size:0.8rem;color:var(--text-muted);margin:2px 0 0 0;">Ranking ordinal por categoría de juego y posición</p>
-                        </div>
-                        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-                            <div>
-                                <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px;font-weight:600;">Categoría:</label>
-                                <select id="leaders-cat-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:0.85rem;font-weight:700;outline:none;cursor:pointer;">
-                                    <option value="xgPerMatch_noPen">📈 xG generado cada 90′</option>
-                                    <option value="shotsPerMatch">🎯 Tiros cada 90′</option>
-                                    <option value="goalsPerMatch">⚽ Goles / Partido</option>
-                                    <option value="avgRating">📰 Promedio Ficha Clarín</option>
-                                    <option value="cleanSheets">🧤 Vallas Invictas Totales</option>
-                                    <option value="yellowCards">🟨 Tarjetas Amarillas</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:2px;font-weight:600;">Posición:</label>
-                                <select id="leaders-pos-select" style="background:var(--bg-main);color:var(--text-main);border:1px solid var(--border-color);border-radius:8px;padding:6px 12px;font-size:0.85rem;font-weight:700;outline:none;cursor:pointer;">
-                                    <option value="ALL">Todas las Posiciones</option>
-                                    <option value="ARQ">🧤 Arqueros</option>
-                                    <option value="DEF">🛡️ Defensores</option>
-                                    <option value="VOL">🪄 Volantes</option>
-                                    <option value="DEL">🎯 Delanteros</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th style="width:60px;" class="text-center"># Rank</th>
-                                    <th>Jugador</th>
-                                    <th>Equipo</th>
-                                    <th class="text-center">Posición</th>
-                                    <th class="text-center">PJ</th>
-                                    <th class="text-center" id="lbl-leader-metric-header">Métrica (Promedio / Acumulado)</th>
-                                    <th class="text-center">Top Percentil</th>
-                                    <th class="text-center">Ver</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaders-body">
-                                <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Cargando líderes estadísticos...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-        </section>
-
-    </div>
+            </div>
 
     <!-- Modals -->
     <!-- Modal Auditoría -->
@@ -427,7 +406,16 @@
     <script>
     (function () {
       var v = Date.now();
-      ['teamsRegistry.js', 'datos.js', 'appV3.js'].forEach(function (f) {
+      // dataVivo.js son los puntajes de la fecha en vivo (SYNC_VIVO.bat). Si no
+      // existe, el <script> tira 404 en la consola y la pagina anda igual: el
+      // Versus muestra los puntos esperados en vez de los reales.
+      // dataHist.js son los puntos que el motor esperaba de cada jugador en las
+      // fechas anteriores. Lo escribe el motor en cada corrida. Sirve para
+      // rearmar la foto de una fecha que quedo sin guardar.
+      // dataLiga.js son los equipos del torneo de amigos publicados con la app,
+      // para que el que entra los vea sin importar nada. Si no existe, 404 en la
+      // consola y la pagina anda igual: cada uno carga los suyos.
+      ['teamsRegistry.js', 'datos.js', 'dataVivo.js', 'dataHist.js', 'dataLiga.js', 'appV3.js'].forEach(function (f) {
         document.write('<script src="' + f + '?v=' + v + '"><\/script>');
       });
     })();
