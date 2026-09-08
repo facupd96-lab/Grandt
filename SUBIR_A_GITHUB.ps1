@@ -1,4 +1,4 @@
-# =============================================================================
+﻿# =============================================================================
 #  SUBIR_A_GITHUB.ps1 - Sube el proyecto a GitHub y COMPRUEBA que subio.
 #
 #  Por que se rehizo (08/09). El script viejo hacia bien el commit y el push,
@@ -40,6 +40,37 @@ function Salir($msg) {
 function Huella($ruta) {
   if (-not (Test-Path $ruta)) { return $null }
   return (Get-FileHash -Path $ruta -Algorithm SHA256).Hash.ToLower()
+}
+# COMPARAR SIN LOS FINES DE LINEA (08/09).
+# La comparacion byte a byte daba SIEMPRE "no coincide" y era una falsa alarma
+# mia. Git para Windows viene con core.autocrlf=true: cuando guarda un archivo
+# en el repositorio le cambia los fines de linea de CRLF a LF. teamsRegistry.js
+# tiene 518 lineas con CRLF y esas 518 lineas se meten adentro de index.html al
+# construirlo, asi que el archivo de tu carpeta y el del repositorio tienen el
+# mismo contenido y 518 bytes de diferencia. Se compara el texto normalizado,
+# que es lo que de verdad importa.
+function HuellaTexto($ruta) {
+  if (-not (Test-Path $ruta)) { return $null }
+  $t = [System.IO.File]::ReadAllText($ruta)
+  $t = $t -replace "`r`n", "`n"
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  $h = $sha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($t))
+  return ([BitConverter]::ToString($h)).Replace('-','').ToLower()
+}
+function SelloDe($ruta) {
+  if (-not (Test-Path $ruta)) { return '' }
+  $m = [regex]::Match([System.IO.File]::ReadAllText($ruta), 'name="gdt-build"\s+content="([^"]+)"')
+  if ($m.Success) { return $m.Groups[1].Value }
+  return ''
+}
+function Bajar($url, $destino) {
+  for ($i = 1; $i -le 3; $i++) {
+    try {
+      Invoke-WebRequest -Uri ($url + "?nocache=" + [guid]::NewGuid().ToString('N')) -OutFile $destino -UseBasicParsing -TimeoutSec 40
+      return $true
+    } catch { Start-Sleep -Seconds 4 }
+  }
+  return $false
 }
 
 Titulo "1. Reviso que este todo listo"
@@ -86,7 +117,6 @@ if ($LASTEXITCODE -ne 0) { Salir "construir.cjs fallo. Sin eso no se puede subir
 
 $sello = ''
 if (Test-Path (Join-Path $carpeta 'BUILD.txt')) { $sello = (Get-Content 'BUILD.txt' -Raw).Trim() }
-$hLocal = Huella (Join-Path $carpeta 'index.html')
 Write-Host ("   sello del build: {0}" -f $sello) -ForegroundColor Green
 
 # los archivos que la pagina necesita del otro lado
@@ -265,51 +295,61 @@ if ($cambian.Count -eq 0 -and $pendientes -eq 0) {
 }
 
 # ---------------------------------------------------------------------------
-Titulo "7. Compruebo que lo que hay en GitHub sea esto"
+Titulo "7. Compruebo que lo que hay publicado sea esto"
 # ---------------------------------------------------------------------------
-# El paso que no existia. Se baja el index.html publicado y se compara la
-# huella con el de tu carpeta. Si no dan iguales, algo no llego, y es mejor
-# enterarse aca que dentro de una semana.
+# Se miran los dos lugares, que no son el mismo:
+#   - el REPOSITORIO (raw.githubusercontent): lo que acabas de subir.
+#   - la PAGINA (github.io): lo que abren tus amigos. Puede servirse de OTRA
+#     rama y quedarse vieja aunque el repositorio este perfecto.
+$hLocalTxt = HuellaTexto (Join-Path $carpeta 'index.html')
 $url = (git config --get remote.origin.url)
 $slug = ''
 if ($url -match 'github\.com[:/]+([^/]+)/([^/.]+)') { $slug = $Matches[1] + '/' + $Matches[2] }
+$usuario = ''; $repo = ''
+if ($slug) { $usuario = $slug.Split('/')[0]; $repo = $slug.Split('/')[1] }
+
 if (-not $slug) {
   Write-Host "   No pude leer el nombre del repo. Verificalo a mano." -ForegroundColor Yellow
 } else {
-  $crudo = "https://raw.githubusercontent.com/$slug/$rama/index.html"
-  Write-Host ("   bajando {0}" -f $crudo) -ForegroundColor DarkGray
-  $tmp = Join-Path $env:TEMP ("gdt_pub_" + [guid]::NewGuid().ToString('N') + ".html")
-  $bien = $false
-  for ($i = 1; $i -le 3; $i++) {
-    try {
-      Invoke-WebRequest -Uri ($crudo + "?nocache=" + [guid]::NewGuid().ToString('N')) -OutFile $tmp -UseBasicParsing -TimeoutSec 30
-      $bien = $true; break
-    } catch {
-      Write-Host ("   intento {0}: no pude bajarlo ({1})" -f $i, $_.Exception.Message) -ForegroundColor DarkYellow
-      Start-Sleep -Seconds 4
-    }
-  }
-  if (-not $bien) {
-    Write-Host "   No pude comprobarlo (sin internet o GitHub tardando)." -ForegroundColor Yellow
-    Write-Host ("   Comprobalo vos: abri {0} y busca el sello {1}" -f $crudo, $sello) -ForegroundColor Yellow
-  } else {
-    $hPub = Huella $tmp
-    $selloPub = ''
-    $m = [regex]::Match((Get-Content $tmp -Raw), 'name="gdt-build"\s+content="([^"]+)"')
-    if ($m.Success) { $selloPub = $m.Groups[1].Value }
-    Remove-Item $tmp -ErrorAction SilentlyContinue
-    Write-Host ""
-    Write-Host ("   en tu carpeta : {0}" -f $sello) -ForegroundColor White
-    Write-Host ("   en GitHub     : {0}" -f $(if ($selloPub) { $selloPub } else { '(sin sello: es un index viejo)' })) -ForegroundColor White
-    Write-Host ""
-    if ($hPub -eq $hLocal) {
-      Write-Host "   COMPROBADO: GitHub tiene exactamente tu index.html." -ForegroundColor Green
+  $tmp1 = Join-Path $env:TEMP ("gdt_repo_" + [guid]::NewGuid().ToString('N') + ".html")
+  $tmp2 = Join-Path $env:TEMP ("gdt_pag_"  + [guid]::NewGuid().ToString('N') + ".html")
+  $urlRepo = "https://raw.githubusercontent.com/$slug/$rama/index.html"
+  $urlPag  = "https://$usuario.github.io/$repo/index.html"
+
+  Write-Host ("   sello de tu carpeta : {0}" -f $sello) -ForegroundColor White
+  Write-Host ""
+
+  # --- el repositorio ---
+  Write-Host "   EL REPOSITORIO" -ForegroundColor White
+  if (Bajar $urlRepo $tmp1) {
+    $s1 = SelloDe $tmp1
+    $h1 = HuellaTexto $tmp1
+    Write-Host ("      sello: {0}" -f $(if ($s1) { $s1 } else { '(sin sello: es un index viejo)' })) -ForegroundColor Gray
+    if ($h1 -eq $hLocalTxt) { Write-Host "      COMPROBADO: tiene exactamente tu index.html" -ForegroundColor Green }
+    elseif ($s1 -eq $sello)  { Write-Host "      OK: mismo build (difieren solo los fines de linea, es normal)" -ForegroundColor Green }
+    else { Write-Host "      NO COINCIDE: lo que hay ahi no es lo que acabas de subir" -ForegroundColor Red }
+    Remove-Item $tmp1 -ErrorAction SilentlyContinue
+  } else { Write-Host "      no pude bajarlo (sin internet o GitHub tardando)" -ForegroundColor Yellow }
+
+  # --- la pagina, que es lo que ven tus amigos ---
+  Write-Host ""
+  Write-Host "   LA PAGINA (lo que abren tus amigos)" -ForegroundColor White
+  if (Bajar $urlPag $tmp2) {
+    $s2 = SelloDe $tmp2
+    $h2 = HuellaTexto $tmp2
+    Write-Host ("      sello: {0}" -f $(if ($s2) { $s2 } else { '(sin sello: es un index viejo)' })) -ForegroundColor Gray
+    if ($h2 -eq $hLocalTxt -or $s2 -eq $sello) {
+      Write-Host "      COMPROBADO: la pagina esta al dia" -ForegroundColor Green
+    } elseif (-not $s2) {
+      Write-Host "      LA PAGINA ESTA VIEJA y ni siquiera tiene sello." -ForegroundColor Red
+      Write-Host ("      Si en un rato sigue asi, entra a https://github.com/{0}/settings/pages" -f $slug) -ForegroundColor Yellow
+      Write-Host ("      y fijate que 'Branch' diga '{0}'. Ahi esta el problema." -f $rama) -ForegroundColor Yellow
     } else {
-      Write-Host "   NO COINCIDE. Lo que esta publicado no es tu index.html." -ForegroundColor Red
-      Write-Host "   Puede ser que GitHub todavia no lo haya procesado (esperá un minuto y" -ForegroundColor Yellow
-      Write-Host "   volve a correr esto), o que la pagina se sirva de otra rama." -ForegroundColor Yellow
+      Write-Host ("      todavia sirve el build {0}." -f $s2) -ForegroundColor Yellow
+      Write-Host "      GitHub tarda entre uno y dos minutos en rehacer la pagina. Espera y recarga." -ForegroundColor Yellow
     }
-  }
+    Remove-Item $tmp2 -ErrorAction SilentlyContinue
+  } else { Write-Host "      no pude bajarla (todavia armandose, o sin internet)" -ForegroundColor Yellow }
 }
 
 Write-Host ""
