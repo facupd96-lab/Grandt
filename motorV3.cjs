@@ -66,8 +66,49 @@ let CAL = {
   },
 
   notaMedia: 5.60,   // media de la nota Clarín reconstruida (se recalcula sola)
-  partidos: 60
+  partidos: 60,
+
+  // Prior de la ficha, en partidos-equivalentes, por posición. NO elegido a
+  // dedo: medido. De la varianza de UNA nota por partido, la parte que es
+  // habilidad del jugador (y no ruido de ese partido) resulta:
+  //   ARQ 0,3% [0,0-6,1]   DEF 8,2% [4,3-13,1]
+  //   VOL 8,6% [4,4-13,8]  DEL 6,9% [1,6-14,4]      (IC 95% bootstrap)
+  // sobre 6.107 notas por partido de 365 en 651 jugador-torneo, partiendo los
+  // dos torneos por separado (16 fechas el anterior, 8 el actual) y pidiendo
+  // 20+ minutos, que es lo que exige la ficha. K = (1 - r) / r.
+  // K chico = le creo a la ficha histórica. K grande = la llevo a la media.
+  // Antes era K=3 para todos: con 8 fechas jugadas equivalía a creerle el 73%.
+  // El 3 queda FUERA del IC 95% en las cuatro posiciones, por eso el cambio.
+  // El arquero se topea en 60 porque la medición da 0% de señal: la ficha de
+  // un arquero no predice su ficha siguiente, lo que manda es la valla.
+  // CALIBRAR.bat vuelve a medir con los datos del día y escribe
+  // calibracion.json, que pisa estos valores.
+  kFicha: { ARQ: 60, DEF: 11.2, VOL: 10.7, DEL: 13.6 },
+  kFichaDefecto: 12,
+  kFichaFuente: 'medido 2026-09-10, torneo anterior + fechas 1-8'
 };
+
+// calibracion.json (si existe) pisa el prior por posición. Si el archivo no
+// está, falta una posición o el número es absurdo, queda el valor de arriba.
+try {
+  const _fs = require('fs'), _ruta = require('path').join(__dirname, 'calibracion.json');
+  if (_fs.existsSync(_ruta)) {
+    const c = JSON.parse(_fs.readFileSync(_ruta, 'utf8'));
+    let tocados = 0;
+    if (c && c.kFicha) ['ARQ', 'DEF', 'VOL', 'DEL'].forEach(pos => {
+      const k = c.kFicha[pos];
+      if (typeof k === 'number' && isFinite(k) && k >= 3 && k <= 60) { CAL.kFicha[pos] = k; tocados++; }
+    });
+    if (tocados) CAL.kFichaFuente = 'calibracion.json · ' + (c.generado || 'sin fecha') +
+                                    ' · ' + tocados + '/4 posiciones';
+  }
+} catch (e) { /* sin calibracion.json se usan los valores medidos arriba */ }
+
+/** Prior de la ficha para esa posición, con red por si llega una posición rara. */
+function kFichaDe(pos) {
+  const k = CAL.kFicha && CAL.kFicha[pos];
+  return (typeof k === 'number' && isFinite(k) && k >= 1 && k <= 200) ? k : CAL.kFichaDefecto;
+}
 
 /** Valor EFECTIVO de un gol: el del reglamento + lo que arrastra de figura. */
 function valorEfectivoGol(pos, esVisitante) {
@@ -122,7 +163,7 @@ function fichaLimpia(p) {
   const AcT = num(p.totalPoints ?? p.AcT);
   if (CT < 1 || !AcT) return { ficha: CAL.notaMedia, cruda: null, ct: CT, ok: false };
   const cruda = (AcT - bonosAcumulados(p)) / CT;
-  const K = 3; // prior de 3 partidos: con 1-2 fechas la ficha individual es ruido
+  const K = kFichaDe(p.position); // prior medido por posición (ver CAL.kFicha)
   const shrunk = (cruda * CT + CAL.notaMedia * K) / (CT + K);
   return { ficha: clamp(shrunk, 1, 10), cruda, ct: CT, ok: cruda >= 1 && cruda <= 10 };
 }
@@ -1214,7 +1255,8 @@ function evaluar(p, ctx, eq) {
     concXG: concentracionXG(p),
     lam,
     desglose: [
-      ['Ficha Clarín limpia',  round2(f.ficha), `${f.ct} PJ · cruda ${f.cruda === null ? 's/d' : round2(f.cruda)}`],
+      ['Ficha Clarín limpia',  round2(f.ficha), `${f.ct} PJ · cruda ${f.cruda === null ? 's/d' : round2(f.cruda)}` +
+        (f.cruda === null ? '' : ` · le creo ${Math.round(100 * f.ct / (f.ct + kFichaDe(pos)))}%`)],
       ['Valla invicta',        round2(EP_vi),   `${(lam.pVI * 100).toFixed(1)}% × ${RG.vallaInvicta[pos] || 0} pts`],
       ['Goles recibidos',      round2(EP_gc),   pos === 'ARQ' ? `${lam.lamAgainst} esperados × -1` : '—'],
       // EL VALOR DEL GOL VA AL FINAL, DESPUES DEL ULTIMO "×" (05/09).

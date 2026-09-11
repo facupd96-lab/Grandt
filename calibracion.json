@@ -1,0 +1,92 @@
+{
+  "generado": "2026-09-11T00:43:44.257Z",
+  "fuente": "data365.json log[].nota · dos torneos separados por gid >= 4633318",
+  "minutosMinimos": 20,
+  "partidosMinimos": 6,
+  "remuestreos": 4000,
+  "limites": {
+    "min": 3,
+    "max": 60
+  },
+  "kFicha": {
+    "ARQ": 60,
+    "DEF": 11.2,
+    "VOL": 10.7,
+    "DEL": 13.6
+  },
+  "detalle": {
+    "ARQ": {
+      "jugadorTorneo": 52,
+      "notas": 534,
+      "sdNota": 0.746,
+      "partidosPorMitad": 4.9,
+      "pendiente": 0.016,
+      "rPorPartido": 0.3,
+      "rIC95": [
+        0,
+        6.4
+      ],
+      "K": 60,
+      "kIC95": [
+        14.7,
+        null
+      ],
+      "topeado": true
+    },
+    "DEF": {
+      "jugadorTorneo": 227,
+      "notas": 2127,
+      "sdNota": 0.557,
+      "partidosPorMitad": 4.5,
+      "pendiente": 0.285,
+      "rPorPartido": 8.2,
+      "rIC95": [
+        4.4,
+        13.4
+      ],
+      "K": 11.2,
+      "kIC95": [
+        6.4,
+        21.6
+      ],
+      "topeado": false
+    },
+    "VOL": {
+      "jugadorTorneo": 209,
+      "notas": 1976,
+      "sdNota": 0.511,
+      "partidosPorMitad": 4.5,
+      "pendiente": 0.298,
+      "rPorPartido": 8.6,
+      "rIC95": [
+        4.5,
+        13.9
+      ],
+      "K": 10.7,
+      "kIC95": [
+        6.2,
+        21.2
+      ],
+      "topeado": false
+    },
+    "DEL": {
+      "jugadorTorneo": 163,
+      "notas": 1470,
+      "sdNota": 0.592,
+      "partidosPorMitad": 4.3,
+      "pendiente": 0.24,
+      "rPorPartido": 6.9,
+      "rIC95": [
+        1.4,
+        14.6
+      ],
+      "K": 13.6,
+      "kIC95": [
+        5.8,
+        69
+      ],
+      "topeado": false
+    }
+  },
+  "avisos": []
+}
