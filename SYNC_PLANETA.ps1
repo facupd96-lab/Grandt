@@ -76,12 +76,43 @@ function Buscar-PlanillaNueva {
   }
 }
 
+# QUE FECHA SE JUGO YA. Este script corre antes que el motor, asi que no lo
+# sabe: se saca del fixture, que es el que tiene los partidos terminados.
+$ultimaJugada = $null
+try {
+  $rutaFx = Join-Path $PSScriptRoot 'dataFixture.json'
+  if (Test-Path $rutaFx) {
+    $fx = Get-Content $rutaFx -Raw -Encoding UTF8 | ConvertFrom-Json
+    $porFecha = @{}
+    foreach ($m in $fx.partidos) {
+      $nf = [int]$m.numeroFecha
+      if (-not $porFecha.ContainsKey($nf)) { $porFecha[$nf] = @{ total = 0; listos = 0 } }
+      $porFecha[$nf].total++
+      if ($m.terminado) { $porFecha[$nf].listos++ }
+    }
+    foreach ($nf in ($porFecha.Keys | Sort-Object)) {
+      if ($porFecha[$nf].total -gt 0 -and $porFecha[$nf].listos -eq $porFecha[$nf].total) { $ultimaJugada = $nf }
+    }
+  }
+} catch { }
+
 $nueva = Buscar-PlanillaNueva
 if ($nueva) {
   $fechaActual = 0
   if ($cfg -and $cfg.fecha) { $fechaActual = [int]$cfg.fecha }
   if ($nueva.id -eq $idPlanilla) {
     Write-Host ("   la planilla que tenemos ES la ultima publicada ({0})" -f $nueva.titulo) -ForegroundColor DarkGray
+    # NO ES LO MISMO "ESTOY AL DIA" QUE "TODAVIA NO LA SUBIERON" (10/09).
+    # Si el blog va una fecha atras de la que ya se jugo, este mensaje sonaba a
+    # que estaba todo bien y en realidad faltaba la planilla nueva. Planeta la
+    # publica cerca de las 22 hs del lunes o el martes: la fecha 7 salio el
+    # lunes 1/9 a las 22:32 y la 8 el martes 8/9 a las 21:27. Correr esto a la
+    # tarde es correrlo antes de que exista.
+    if ($cfg -and $cfg.fecha -and $ultimaJugada -and ([int]$cfg.fecha) -lt ([int]$ultimaJugada)) {
+      Write-Host ("   OJO: ya se jugo la fecha {0} y el blog todavia publica hasta la {1}." -f $ultimaJugada, $cfg.fecha) -ForegroundColor Yellow
+      Write-Host "   Planeta sube la planilla nueva cerca de las 22 hs del lunes o el martes." -ForegroundColor Yellow
+      Write-Host "   Volve a correr SYNC_PLANETA.bat mas tarde y se actualiza sola." -ForegroundColor Yellow
+    }
   } elseif ($nueva.fecha -ge $fechaActual) {
     Write-Host ("   HAY PLANILLA NUEVA: {0}" -f $nueva.titulo) -ForegroundColor Green
     Write-Host ("   la cambio sola. Antes: fecha {0}. Ahora: fecha {1}." -f $fechaActual, $nueva.fecha) -ForegroundColor Green

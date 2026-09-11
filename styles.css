@@ -4499,3 +4499,46 @@ th[data-k="rol"] { white-space: nowrap; }
     border-radius: 3px; padding: 0 0.22rem; margin-left: 0.3rem;
 }
 .rev-pie-nota { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
+
+
+/* ── LA FECHA PASADA, EQUIPO POR EQUIPO (09/09) ─────────────────────────────
+   Vive en el Torneo de amigos porque es la historia del torneo, no el
+   laboratorio. Cada fila se abre y muestra el once entero de ese DT.        */
+.fp-sel { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 0 0 0.8rem; }
+.fp-tabla td, .fp-tabla th { padding: 0.5rem 0.6rem; vertical-align: middle; }
+.fp-tabla td small { display: block; font-size: 0.68rem; color: var(--text-muted); }
+.fp-pos { font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--text-muted); }
+.fp-pts { font-family: 'Outfit', sans-serif; font-size: 1.05rem; color: var(--success); }
+.fp-nota { font-size: 0.6rem; color: var(--warning); }
+.fp-cinta { white-space: nowrap; font-size: 0.82rem; }
+.fp-mp { font-size: 0.78rem; line-height: 1.4; }
+.fp-mp span { display: block; white-space: nowrap; }
+.fp-b b { color: var(--success); }
+.fp-m b { color: var(--danger); }
+.fp-fila.fp-on { background: rgba(255,255,255,0.04); }
+.fp-fila.fp-on td { border-bottom: none; }
+.fp-det td { background: rgba(255,255,255,0.02); padding: 0 0.6rem 0.9rem; }
+.fp-caja { padding-top: 0.2rem; }
+.fp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem 1.6rem; }
+.fp-cols h4 {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted);
+    margin: 0 0 0.4rem; display: flex; justify-content: space-between; align-items: baseline;
+}
+.fp-cols h4 span { text-transform: none; letter-spacing: 0; font-weight: 700; color: var(--text-main); }
+.fp-j {
+    display: grid; grid-template-columns: 1fr auto 3.2rem; align-items: baseline; gap: 0.5rem;
+    padding: 0.28rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.82rem;
+}
+.fp-j-n small { display: block; font-size: 0.66rem; color: var(--text-muted); }
+.fp-j-p { font-variant-numeric: tabular-nums; font-weight: 800; }
+.fp-j-d { font-size: 0.72rem; text-align: right; font-variant-numeric: tabular-nums; }
+.fp-j-no .fp-j-n { opacity: 0.55; }
+.fp-j-entro .fp-j-n { color: var(--success); }
+.fp-cierre {
+    margin-top: 0.8rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);
+    font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 0.9rem; flex-wrap: wrap;
+}
+.fp-cierre b { color: var(--text-main); }
+.fp-tercera { margin-left: auto; }
+.fp-pie { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; margin: 0.8rem 0 0; max-width: 82ch; }
+.fp-pie b { color: var(--text-main); }

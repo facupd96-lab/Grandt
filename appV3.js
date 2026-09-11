@@ -4993,6 +4993,7 @@ function pintarPantallaLiga() {
       </div>
     </div>
 
+    ${bloqueFechaPasada()}
     ${bloqueLaboratorio(msLab, ms)}
     ${bloqueCaraACara(ms.concat(msLab))}
     ${bloquePropiedad(ms, _PROP)}
@@ -6127,12 +6128,16 @@ Modificó equipo
       <div class="gdt-btns">
         <button class="vs-btn${pareceFecha ? '' : ' vs-btn-fuerte'}" id="gdt-gral">Es la tabla general</button>
         <label class="gdt-fecha">Es la fecha
-          <input type="number" id="gdt-nf" min="1" max="30" value="${D.fechaObjetivo ?? 1}">
+          <input type="number" id="gdt-nf" min="1" max="30" value="${D.ultimaFechaJugada ?? D.fechaObjetivo ?? 1}"
+            title="La fecha a la que corresponde esta tabla. Por defecto, la última que se jugó — que es la que uno pega.">
           <button class="vs-btn${pareceFecha ? ' vs-btn-fuerte' : ''}" id="gdt-fec">guardar</button></label>
       </div>`;
     const cerrar = () => { cerrarModal($('team-detail-modal')); pintarPantallaLiga(); };
     $('gdt-gral').onclick = () => { guardarTablaGranDT(filas, 'general'); cerrar(); };
-    $('gdt-fec').onclick = () => { guardarTablaGranDT(filas, 'fecha', Number($('gdt-nf').value) || D.fechaObjetivo); cerrar(); };
+    // POR DEFECTO, LA ULTIMA JUGADA (09/09). Estaba puesto en la fecha OBJETIVO,
+    // que es la que VIENE: pegabas la tabla de la 8 el martes y se guardaba como
+    // fecha 9. Uno pega la tabla de la fecha que ya se jugó, no la de la próxima.
+    $('gdt-fec').onclick = () => { guardarTablaGranDT(filas, 'fecha', Number($('gdt-nf').value) || D.ultimaFechaJugada || D.fechaObjetivo); cerrar(); };
   };
 };
 
@@ -6201,6 +6206,180 @@ function tarjetaPleg(id, titulo, sub, cuerpo, porDefecto) {
       ${sub ? `<p>${sub}</p>` : ''}</div>
     </div>
     <div class="pleg-cuerpo">${cuerpo}</div>
+  </div>`;
+}
+
+// ── LA FECHA PASADA, EQUIPO POR EQUIPO ─────────────────────────────────────
+// Vive en el Torneo de amigos y no en Revisión a propósito: Revisión es el
+// laboratorio —cuánto le erró el motor—, y esto es la historia del torneo, que
+// es lo que uno mira cuando entra acá.
+//
+// Se arma con DOS fuentes, y conviene tener clara la diferencia:
+//   · los PUNTOS salen de la tabla del Gran DT que pegaste. Son los del juego,
+//     están para los siete DTs y son la verdad.
+//   · el DETALLE (quién jugó, la cinta, el mejor y el peor) sale de la foto que
+//     la app saca cuando termina la fecha, y sólo existe para los equipos que
+//     tenías cargados esa semana. Del que no tenías, se dice que no está en vez
+//     de inventarlo.
+let FP_ABIERTO = null;   // qué equipo está desplegado
+let FP_FECHA = null;     // qué fecha se está mirando
+window.fpVer = function (id) { FP_ABIERTO = (FP_ABIERTO === id) ? null : id; pintarPantallaLiga(); };
+window.fpFecha = function (n) { FP_FECHA = +n; FP_ABIERTO = null; pintarPantallaLiga(); };
+
+// las fechas de las que se sabe algo, de la más nueva a la más vieja
+function fechasConDatos() {
+  const s = new Set();
+  const C = (S.liga && S.liga.camp) || null;
+  if (C && C.fechas) Object.keys(C.fechas).forEach(f => s.add(+f));
+  Object.keys(leerHist()).forEach(f => s.add(+f));
+  return [...s].filter(n => !isNaN(n)).sort((a, b) => b - a);
+}
+function bloqueFechaPasada() {
+  const todas = fechasConDatos();
+  if (!todas.length) return '';
+  // la pasada es la última terminada: si el motor está en la 9, es la 8
+  const cerradas = todas.filter(n => D.fechaObjetivo == null || n < D.fechaObjetivo);
+  const porDefecto = cerradas.length ? cerradas[0] : todas[0];
+  const f = (FP_FECHA != null && todas.includes(FP_FECHA)) ? FP_FECHA : porDefecto;
+
+  const C = (S.liga && S.liga.camp) || null;
+  const oficiales = (C && C.fechas && C.fechas[String(f)]) || {};
+  const foto = leerHist()[f] || null;
+  const dts = (S.liga && S.liga.dts) || [];
+
+  // una fila por DT del torneo; si no hay DTs, por equipo de la foto
+  let filas = [];
+  if (dts.length) {
+    filas = dts.map(dt => ({
+      id: dt.id, nombre: dt.equipo, persona: dt.persona,
+      pts: oficiales[dt.id] != null ? oficiales[dt.id] : null,
+      det: foto ? (foto.equipos || []).find(e => e.dt === dt.id) || null : null
+    }));
+  } else if (foto) {
+    filas = (foto.equipos || []).map((e, i) => ({
+      id: 'f' + i, nombre: e.nombre, persona: '', pts: e.total, det: e
+    }));
+  }
+  filas = filas.filter(x => x.pts != null || x.det);
+  if (!filas.length) return '';
+  // el que no tiene puntos del juego usa los que calculó la app, y se avisa
+  filas.forEach(x => { if (x.pts == null && x.det) { x.pts = x.det.total; x.calculado = true; } });
+  filas.sort((a, b) => (b.pts ?? -1) - (a.pts ?? -1));
+  const top = filas[0].pts;
+  const conDetalle = filas.filter(x => x.det).length;
+
+  const selector = todas.length > 1
+    ? `<div class="fp-sel">${todas.slice(0, 6).map(n => `<button class="chip-filtro${n === f ? ' on' : ''}"
+        onclick="fpFecha(${n})">Fecha ${n}</button>`).join('')}</div>` : '';
+
+  const cuerpo = `
+    ${selector}
+    <table class="data-table fp-tabla">
+      <thead><tr>
+        <th class="text-center">#</th><th>DT</th>
+        <th class="text-center" title="Los puntos que le dio el juego en esa fecha.">Puntos</th>
+        <th class="text-center" title="Cuánto le sacó el ganador de la fecha.">Dif.</th>
+        <th class="text-center" title="Cuántos de su once llegaron a los 20 minutos.">Jugaron</th>
+        <th title="El capitán y lo que pagó la cinta.">La cinta</th>
+        <th title="El que más y el que menos sumó de su once.">Su mejor y su peor</th>
+        <th class="text-right"></th>
+      </tr></thead>
+      <tbody>${filas.map((x, i) => filaFP(x, i, top, f)).join('')}</tbody>
+    </table>
+    <p class="fp-pie">Los <b>puntos</b> son los del <b>Gran DT</b>, de la tabla que pegaste.
+    ${conDetalle
+      ? `El detalle de la derecha sale de la foto que guardó la app, y existe para
+         <b>${conDetalle}</b> de los ${filas.length} equipos: son los que tenías cargados esa fecha.`
+      : `Todavía no hay foto de esta fecha, así que no puedo mostrar el detalle de ningún equipo.`}
+    ${conDetalle < filas.length
+      ? `De los otros <b>${filas.length - conDetalle}</b> sólo tengo el puntaje. Esto no se puede arreglar
+         para atrás —cargarles el once ahora sería el de la fecha que viene, no el que jugaron—: para
+         tenerlo la próxima, cargá sus onces <b>antes de que termine la fecha</b>.` : ''}</p>`;
+  return tarjetaPleg('fpasada', 'La fecha pasada · fecha ' + f,
+    'Cómo terminó, equipo por equipo.', cuerpo, true);
+}
+
+function filaFP(x, i, top, fecha) {
+  const d = x.det;
+  const brecha = top - x.pts;
+  const abierto = FP_ABIERTO === x.id;
+  // el mejor y el peor del once, de los que efectivamente jugaron
+  let mejor = null, peor = null, jug = null;
+  if (d) {
+    const jugaron = (d.once || []).filter(j => j.real != null);
+    if (jugaron.length) {
+      const orden = jugaron.slice().sort((a, b) => b.real - a.real);
+      mejor = orden[0]; peor = orden[orden.length - 1];
+    }
+    jug = d.jugaron + '/' + d.n;
+  }
+  let cinta = '<span class="text-muted">–</span>';
+  if (d && d.cinta && d.cinta.quien) {
+    const c = d.cinta, q = esc(c.quien);
+    if (c.estado === 'perdida') cinta = `<span class="mal">se perdió</span> <small>${q} no jugó</small>`;
+    else if (c.estado === 'sindato' || c.valor == null || (!c.valor && c.estado !== 'mano'))
+      cinta = `<span class="text-muted">sin ficha</span> <small>${q} · Planeta no la publicó</small>`;
+    else cinta = `<b>+${n1(c.valor)}</b> <small>${q}${c.estado === 'mano' ? ' · a mano' : ''}</small>`;
+  }
+  // control: lo que calculó la app contra lo que dio el juego
+  const desvio = (d && !x.calculado && d.total != null) ? +(d.total - x.pts).toFixed(1) : null;
+  return `<tr class="fp-fila${abierto ? ' fp-on' : ''}">
+      <td class="text-center fp-pos">${i + 1}</td>
+      <td><b>${esc(x.nombre)}</b>${x.persona ? `<small>${esc(x.persona)}</small>` : ''}</td>
+      <td class="text-center"><b class="fp-pts">${x.pts}</b>${x.calculado
+        ? '<div class="fp-nota" title="No estaba en la tabla del juego: es lo que calculó la app.">calculado</div>' : ''}</td>
+      <td class="text-center">${x.pts === top
+        ? '<span class="cmp-lider">ganó</span>'
+        : (brecha === 0 ? '<span class="text-muted">igualó</span>' : '−' + brecha)}</td>
+      <td class="text-center">${jug || '<span class="text-muted">–</span>'}</td>
+      <td class="fp-cinta">${cinta}</td>
+      <td class="fp-mp">${mejor
+        ? `<span class="fp-b">${esc(mejor.n)} <b>${mejor.real}</b></span>
+           <span class="fp-m">${esc(peor.n)} <b>${peor.real}</b></span>`
+        : '<span class="text-muted">no tenías su once cargado</span>'}</td>
+      <td class="text-right">${d
+        ? `<button class="vs-btn vs-btn-chico" onclick="fpVer('${x.id}')">${abierto ? 'cerrar' : 'ver el once'}</button>`
+        : ''}</td>
+    </tr>
+    ${abierto && d ? `<tr class="fp-det"><td colspan="8">${detalleFP(d, desvio, fecha)}</td></tr>` : ''}`;
+}
+
+function detalleFP(d, desvio, fecha) {
+  const orden = (d.once || []).slice().sort((a, b) => (b.real ?? -99) - (a.real ?? -99));
+  const linea = j => `<div class="fp-j${j.real == null ? ' fp-j-no' : ''}">
+      <span class="fp-j-n">${esc(j.n)}${j.cap ? ' <i class="rev-c">C</i>' : ''}<small>${esc(j.eq)} · ${j.pos}</small></span>
+      <span class="fp-j-p">${j.real == null ? '<span class="text-muted">no jugó</span>' : j.real}</span>
+      ${j.esp != null && j.real != null
+        ? `<span class="fp-j-d ${j.real - j.esp >= 0 ? 'ok' : 'mal'}">${j.real - j.esp >= 0 ? '+' : ''}${n1(j.real - j.esp)}</span>`
+        : '<span class="fp-j-d text-muted">·</span>'}
+    </div>`;
+  const banco = (d.banco || []).filter(b => b);
+  return `<div class="fp-caja">
+    <div class="fp-cols">
+      <div>
+        <h4>El once <span>${d.esq ? esc(esquemaLindo(d.esq)) : ''}</span></h4>
+        ${orden.map(linea).join('')}
+      </div>
+      ${banco.length ? `<div>
+        <h4>El banco</h4>
+        ${banco.map(b => `<div class="fp-j${b.entro ? ' fp-j-entro' : ''}">
+          <span class="fp-j-n">${esc(b.n)}<small>${esc(b.eq)} · ${b.pos}${b.entro ? ' · entró' : ''}</small></span>
+          <span class="fp-j-p">${b.real == null ? '<span class="text-muted">–</span>' : b.real}</span>
+          <span class="fp-j-d text-muted">·</span></div>`).join('')}
+      </div>` : ''}
+    </div>
+    <div class="fp-cierre">
+      <span>La app le calculó <b>${n1(d.total)}</b> con las fichas de Planeta.</span>
+      ${desvio == null ? ''
+        : (Math.abs(desvio) < 0.05
+            ? '<span class="ok">Coincide exacto con el juego.</span>'
+            : `<span class="${Math.abs(desvio) <= 1.5 ? '' : 'mal'}">Contra el juego hay <b>${desvio > 0 ? '+' : ''}${n1(desvio)}</b> de diferencia${
+                Math.abs(desvio) <= 1.5
+                  ? ' — suele ser una ficha que Planeta no publicó.'
+                  : ': con esa distancia, el once que tenés cargado no es el que jugó esa fecha.'}</span>`)}
+      <span class="fp-tercera">La columna de la derecha es contra lo que esperaba el motor;
+        el punto gris es que de ese jugador no quedó guardado el esperado.</span>
+    </div>
   </div>`;
 }
 
