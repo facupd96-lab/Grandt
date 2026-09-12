@@ -14,11 +14,17 @@
 #  Solo rehace salida.json, datos.js e index.html.
 # =============================================================================
 
+param([switch]$Auto)   # -Auto: no pregunta nada. Lo usa la corrida diaria.
+
 Set-StrictMode -Off
 $ErrorActionPreference = 'Continue'
 
 $carpeta = $PSScriptRoot
 if (-not $carpeta) { $carpeta = (Get-Location).Path }
+
+# En modo -Auto no hay nadie mirando: un "Enter para cerrar" dejaria la tarea
+# programada colgada para siempre. Pausa() los saltea cuando corre solo.
+function Pausa($t) { if (-not $Auto) { Read-Host $t } }
 
 function Titulo([string]$texto) {
   Write-Host ""
@@ -37,7 +43,7 @@ Titulo "rehaciendo las cuentas (armar.cjs)"
 if ($LASTEXITCODE -ne 0) {
   Write-Host "   armar.cjs fallo. No sigo." -ForegroundColor Red
   Pop-Location
-  Read-Host "Enter para cerrar"
+  Pausa "Enter para cerrar"
   exit 1
 }
 
@@ -58,4 +64,4 @@ Titulo "3. el algoritmo: el puntaje esta bien armado?"
 Pop-Location
 Write-Host ""
 Write-Host "   Listo. Abri index.html y recarga con Ctrl+F5." -ForegroundColor Green
-Read-Host "Enter para cerrar"
+Pausa "Enter para cerrar"

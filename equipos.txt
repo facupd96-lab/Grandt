@@ -1,0 +1,137 @@
+# Este archivo define el torneo de amigos. Lo lee armar_liga.cjs y escribe dataLiga.js.
+#
+# COMO SE ESCRIBE
+#   = Nombre del equipo          <- empieza un equipo
+#   Apellido                     <- un jugador del once, uno por linea
+#   Apellido (C)                 <- el capitan
+#   -- suplentes                 <- de aca para abajo, el banco (uno por puesto)
+#   Apellido (club)              <- si hay dos con el mismo apellido, aclara el club
+#
+# El orden no importa: el script pone a cada uno en su puesto y deduce el esquema.
+# Las lineas que empiezan con # se ignoran.
+
+= Falcon de ramon
+Ledesma (instituto)
+Alarcon (instituto)
+Cerato
+Montiel (river)
+Florentin (ind rivadavia)
+Luna (instituto)
+Mavilla
+Arce (ind rivadavia)
+Caicedo
+Correa (river) (C)
+Lima
+-- suplentes
+Bolcato
+Zabala (independiente)
+Barbona
+Valencia
+
+= Runero Atomico
+Ledesma (instituto)
+Pellegrino
+Elordi
+Cerato
+Luna (instituto) (C)
+Mavilla
+Di Maria
+Coccaro
+Valencia
+Modica
+Arce (ind rivadavia)
+-- suplentes
+Ayala (sarmiento)
+Arrayago
+Fernandez (gimnasia mza)
+Diaz (atl tucuman)
+
+= La aplanadora danesa
+Ledesma (instituto)
+Cerato
+Otamendi
+Blondel
+Andrada (river)
+Luna (instituto)
+Malcorra
+Almada
+Correa (river) (C)
+Arce (ind rivadavia)
+Modica
+-- suplentes
+Bolcato
+Mosevich
+Cuello (union)
+Estigarribia
+
+= Atilio chara fc
+Ledesma (instituto)
+Cerato
+Arrayago
+Montiel (river)
+Luna (instituto)
+Malcorra
+Velasco
+Arce (ind rivadavia)
+Modica
+Correa (river) (C)
+Caicedo
+-- suplentes
+Ayala (sarmiento)
+Sosa (instituto)
+Lencioni
+Coccaro
+
+= La bestia fc
+Ledesma (instituto)
+Cerato
+Elordi
+Montiel (river)
+Di Maria
+Lanzini
+Mavilla
+Almada (C)
+Arce (ind rivadavia)
+Correa (river)
+Molina
+-- suplentes
+Ayala (sarmiento)
+Munoz (gimnasia mza)
+Martinez (sarmiento)
+Marabel
+
+= Giri fc
+Mino (barracas)
+Rak
+Martinez (barracas)
+Cerato
+Lanzini
+Di Maria
+Mavilla
+Arce (ind rivadavia) (C)
+Driussi
+Martinez (velez)
+Caicedo
+-- suplentes
+Marchiori
+Blondel
+Barbona
+Correa (river)
+
+= El favorito de la tati
+Ledesma (instituto)
+Montiel (river)
+Ovando
+Silvero
+Lopez Munoz
+Lanzini
+Di Maria (C)
+Almada
+Driussi
+Arce (ind rivadavia)
+Correa (river)
+-- suplentes
+Werner
+Palazzo
+Lencioni
+Molina

@@ -18,10 +18,16 @@
 #  disco.
 # =============================================================================
 
+param([switch]$Auto)   # -Auto: no pregunta nada. Lo usa la corrida diaria.
+
 Set-StrictMode -Off
 $ErrorActionPreference = 'Continue'
 $carpeta = $PSScriptRoot
 if (-not $carpeta) { $carpeta = (Get-Location).Path }
+
+# En modo -Auto no hay nadie mirando: un "Enter para cerrar" dejaria la tarea
+# programada colgada para siempre. Pausa() los saltea cuando corre solo.
+function Pausa($t) { if (-not $Auto) { Read-Host $t } }
 Set-Location $carpeta
 
 function Titulo($t) {
@@ -34,7 +40,7 @@ function Salir($msg) {
   Write-Host ""
   Write-Host "   $msg" -ForegroundColor Red
   Write-Host ""
-  Read-Host "Enter para cerrar"
+  Pausa "Enter para cerrar"
   exit 1
 }
 function Huella($ruta) {
@@ -80,7 +86,7 @@ if (-not $git) {
   Write-Host "   No tenes git instalado." -ForegroundColor Red
   Write-Host "   Bajalo de:  https://git-scm.com/download/win" -ForegroundColor Yellow
   Write-Host "   Instalalo con todas las opciones por defecto y volve a hacer doble clic aca."
-  Read-Host "Enter para cerrar"; exit 1
+  Pausa "Enter para cerrar"; exit 1
 }
 Write-Host "   git instalado: OK" -ForegroundColor Green
 
@@ -176,7 +182,7 @@ if ($sobran.Count -gt 0) {
     Write-Host "   NO PUDE SACARLOS. Siguen anotados:" -ForegroundColor Red
     $siguen | ForEach-Object { Write-Host ("      {0}" -f $_) -ForegroundColor Red }
     Write-Host "   Copiame esto y lo resolvemos." -ForegroundColor Yellow
-    Read-Host "Enter para cerrar"; exit 1
+    Pausa "Enter para cerrar"; exit 1
   }
 }
 
@@ -204,7 +210,7 @@ if ($colados.Count -gt 0) {
   Write-Host ""
   Write-Host "   Si son datos crudos o capturas, se arregla agregandolos al .gitignore." -ForegroundColor Yellow
   Write-Host "   Mandale esta lista a Claude." -ForegroundColor Yellow
-  Read-Host "Enter para cerrar"; exit 1
+  Pausa "Enter para cerrar"; exit 1
 }
 Write-Host "   control: no se colo ningun archivo pesado ni la clave" -ForegroundColor Green
 
@@ -251,14 +257,20 @@ if ($cambian.Count -eq 0 -and $pendientes -eq 0) {
     }
     Write-Host ("   Total: {0} archivos en el repo." -f $cuantos) -ForegroundColor Cyan
     Write-Host ""
-    $ok = Read-Host "   Escribi SI y Enter para subirlos (cualquier otra cosa cancela)"
+    if ($Auto) {
+      $ok = 'SI'
+      Write-Host "   (modo automatico: subo sin preguntar)" -ForegroundColor DarkGray
+    } else {
+      $ok = Read-Host "   Escribi SI y Enter para subirlos (cualquier otra cosa cancela)"
+    }
     if ($ok -notmatch '^(?i)si$') {
       Write-Host "   Cancelado. No se subio nada." -ForegroundColor Yellow
-      Read-Host "Enter para cerrar"; exit 0
+      Pausa "Enter para cerrar"; exit 0
     }
 
     Titulo "5. Guardando los cambios"
-    $mensaje = Read-Host "   Descripcion (Enter para usar la de por defecto)"
+    if ($Auto) { $mensaje = "" }
+    else { $mensaje = Read-Host "   Descripcion (Enter para usar la de por defecto)" }
     if (-not $mensaje) { $mensaje = "Actualizacion " + (Get-Date -Format 'yyyy-MM-dd HH:mm') + " - build " + $sello }
     git commit -m $mensaje
     if ($LASTEXITCODE -ne 0) { Salir "El commit fallo. Copiame lo que dice arriba." }
@@ -278,10 +290,16 @@ if ($cambian.Count -eq 0 -and $pendientes -eq 0) {
     Write-Host "   Voy a apoyar tu carpeta ENCIMA de lo que ya hay en GitHub, en un solo paso." -ForegroundColor White
     Write-Host "   Tus archivos del disco no se tocan en ningun momento." -ForegroundColor DarkGray
     Write-Host ""
+    if ($Auto) {
+      Write-Host ""
+      Write-Host "   MODO AUTOMATICO: esto reescribe la rama y no lo hago solo." -ForegroundColor Yellow
+      Write-Host "   No subi nada. Corre SUBIR_A_GITHUB.bat a mano para resolverlo." -ForegroundColor Yellow
+      exit 1
+    }
     $r = Read-Host "   Escribi SI y Enter para hacerlo (cualquier otra cosa cancela)"
     if ($r -notmatch '^(?i)si$') {
       Write-Host "   Cancelado. Tu trabajo sigue guardado aca." -ForegroundColor Yellow
-      Read-Host "Enter para cerrar"; exit 0
+      Pausa "Enter para cerrar"; exit 0
     }
     git reset --soft ("origin/" + $rama)
     if ($LASTEXITCODE -ne 0) { Salir "No pude apoyarme sobre lo de GitHub. Copiame la pantalla." }
@@ -360,4 +378,4 @@ Write-Host "   OJO con la cache: GitHub sirve el index guardado hasta 10 minutos
 Write-Host "   Si abris la pagina y ves el sello viejo, espera un rato y recarga con Ctrl+F5." -ForegroundColor DarkGray
 Write-Host "   El sello se ve en el menu (...) de arriba a la derecha, abajo de todo." -ForegroundColor DarkGray
 Write-Host ""
-Read-Host "Enter para cerrar"
+Pausa "Enter para cerrar"
