@@ -3577,6 +3577,51 @@ th[data-k="rol"] { white-space: nowrap; }
 }
 .vs-linea { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.35rem; }
 
+/* ── EL BANCO, DEBAJO DE CADA CANCHA (13/09) ─────────────────────────────────
+   El juego son quince. Estos cuatro entran solos si el titular de su puesto no
+   llega a los 20 minutos, asi que ver de que banco depende cada once no es un
+   adorno. Va como una tira baja, deliberadamente mas apagada que la cancha:
+   son suplentes, no tienen que competir visualmente con los titulares. */
+.vs-banco {
+    display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;
+    padding: 0.45rem 0.6rem;
+    background: rgba(10,14,12,0.35);
+    border-top: 1px solid var(--border-color);
+}
+.vs-banco-lbl {
+    font-size: 0.56rem; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--text-muted); margin-right: 0.15rem;
+}
+.vsb {
+    position: relative; display: flex; align-items: center; gap: 0.3rem;
+    padding: 0.18rem 0.4rem; border-radius: var(--radius-sm);
+    background: rgba(10,14,12,0.55); border: 1px solid rgba(255,255,255,0.07);
+    font-size: 0.66rem; cursor: pointer; flex: 1 1 0; min-width: 0;
+    transition: border-color 0.12s ease;
+}
+.vsb:hover { border-color: rgba(255,255,255,0.22); }
+.vsb-pos { font-size: 0.52rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.04em; }
+.vsb-nom { font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vsb-pts { font-family: 'Outfit', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; }
+.vsb-vacia {
+    justify-content: center; color: var(--text-muted); border-style: dashed;
+    background: transparent; font-size: 0.7rem;
+}
+.vsb-vacia small { font-size: 0.52rem; letter-spacing: 0.04em; margin-left: 3px; }
+.vsb-off { cursor: default; opacity: 0.45; }
+.vsb-off:hover { border-color: rgba(255,255,255,0.07); }
+.vsb-x {
+    background: none; border: none; color: var(--text-muted); cursor: pointer;
+    font-size: 0.62rem; padding: 0 1px; line-height: 1; opacity: 0;
+}
+.vsb:hover .vsb-x { opacity: 0.75; }
+.vsb-x:hover { color: var(--danger, #ef4444); opacity: 1; }
+
+@media (max-width: 720px) {
+    .vs-banco { padding: 0.4rem 0.45rem; }
+    .vsb { flex: 1 1 44%; }
+}
+
 /* la ficha: chica a proposito, porque hay veintidos en pantalla */
 .vsj {
     position: relative; width: 82px; padding: 0.3rem 0.2rem 0.28rem;

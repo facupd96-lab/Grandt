@@ -1779,6 +1779,8 @@ function pintarPantallaFecha() {
   { const e = $('vs-esq'); if (e) e.onchange = () => miEsquema(e.value); }
   ['vs-copiar', 'vs-copiar2'].forEach(id => { const b = $(id); if (b) b.onclick = () => miCopiarDelMotor(); });
   ['vs-pegar', 'vs-pegar2'].forEach(id => { const b = $(id); if (b) b.onclick = () => pegarMiOnce(); });
+  cont.querySelectorAll('[data-mi-banco]').forEach(b => b.onclick = () => miElegirBanco(b.dataset.miBanco));
+  cont.querySelectorAll('[data-mi-banco-x]').forEach(b => b.onclick = ev => miSacarBanco(b.dataset.miBancoX, ev));
   { const b = $('vs-borrar'); if (b) b.onclick = () => miVaciar(); }
   { const se = $('oi-esquema'); if (se) se.onchange = () => cambiarEsquema(se.value); }
   { const vd = $('oi-ver-detalle'); if (vd) vd.onclick = () => mostrarSeccion('once'); }
@@ -3394,6 +3396,27 @@ function costoOnce() {
 // sigue siendo el del ultimo RECALCULAR y se avisa si tiene un tildado adentro.
 const ESQUEMAS_11 = ['1-3-4-3', '1-4-4-2', '1-4-3-3', '1-3-5-2', '1-4-5-1',
                      '1-5-3-2', '1-3-3-4', '1-4-2-4', '1-5-2-3', '1-5-4-1'];
+
+// UN ESQUEMA QUE SE PUEDA DIBUJAR, SIEMPRE (13/09).
+// Nace de un pegado de quince lineas donde la palabra "Suplentes:" no estaba:
+// los cuatro del banco entraron como titulares, la formacion salio "1-4-5-5" y
+// la cancha dibujo quince huecos. Peor: "vaciar" no lo arreglaba, porque
+// limpiaba los jugadores y dejaba guardada la formacion rota. Cualquier cosa
+// que no sea uno de los diez esquemas del juego se cambia por el mas parecido,
+// midiendo la diferencia puesto por puesto.
+function esquemaValido(e) {
+  if (ESQUEMAS_11.includes(e)) return e;
+  const porDefecto = (S.oncesLocales && S.oncesLocales[0] && S.oncesLocales[0].e) || '1-4-4-2';
+  const n = String(e || '').split('-').map(x => parseInt(x, 10));
+  if (n.length !== 4 || n.some(x => isNaN(x))) return porDefecto;
+  let mejor = porDefecto, mejorD = Infinity;
+  ESQUEMAS_11.forEach(x => {
+    const q = cuentaPos(x);
+    const d = Math.abs(q.DEF - n[1]) + Math.abs(q.VOL - n[2]) + Math.abs(q.DEL - n[3]);
+    if (d < mejorD) { mejorD = d; mejor = x; }
+  });
+  return mejor;
+}
 function mejor11Local(esq) {
   const c = cuentaPos(esq), once = [];
   for (const pos of ['ARQ', 'DEF', 'VOL', 'DEL']) {
@@ -4123,6 +4146,10 @@ function slotsMi() {
   return out;
 }
 function normalizarMi11() {
+  // Si quedo guardada una formacion imposible, se arregla sola aca: esta
+  // funcion corre en cada pintada del Versus, asi que un once roto se
+  // endereza con abrir la pagina, sin tener que borrar nada a mano.
+  S.miEsq = esquemaValido(S.miEsq);
   // deja adentro solo los que entran en la formacion elegida y ordena por puesto
   const s = slotsMi();
   S.mi11 = ['ARQ', 'DEF', 'VOL', 'DEL'].flatMap(pos => s[pos].filter(Boolean).map(p => p.id));
@@ -4304,6 +4331,38 @@ function canchaVersus(m, opts) {
     .map(pos => porPos[pos].length ? `<div class="vs-linea">${porPos[pos].join('')}</div>` : '').join('')}</div>`;
 }
 
+// LOS CUATRO DEL BANCO, EN EL INICIO (13/09).
+// El juego son quince, no once: si el titular no llega a los 20 minutos entra
+// el suplente de su puesto y esos puntos cuentan. Tenerlos solo en el Torneo de
+// amigos hacia que pegar una lista de quince en el Versus no tuviera donde
+// caer, y que uno no viera de que banco depende.
+function tiraBanco(banco, opts) {
+  const o = opts || {};
+  const chip = pos => {
+    const id = (banco || {})[pos], p = id ? TODOS[id] : null;
+    if (!p) return o.mio
+      ? `<button class="vsb vsb-vacia" data-mi-banco="${pos}"
+           title="${esc('Elegir el suplente ' + pos + '. Entra solo si tu titular de ese puesto no juega.')}">+<small>${pos}</small></button>`
+      : `<span class="vsb vsb-vacia vsb-off"><small>${pos}</small></span>`;
+    const v = vivoDe(p.id);
+    const jugo = !!(v && v.p != null);
+    const num = jugo ? String(v.p) : n1(p.epsj != null ? p.epsj : p.ep);
+    const ayuda = nombreCorto(p.n) + ' — ' + NOM(p.eq) + ' ' + (p.cond === 'L' ? 'de local' : 'de visitante') +
+      ' vs ' + NOM(p.riv) + '. Suplente de ' + pos + ': entra solo si el titular de ese puesto no juega.' +
+      (jugo ? ' Ya jugó: ' + v.p + ' puntos.' : '');
+    return `<div class="vsb" title="${esc(ayuda)}"${o.mio ? ` data-mi-banco="${pos}"` : ''}>
+      <span class="vsb-pos">${pos}</span>
+      <span class="vsb-nom">${esc(APELLIDO(p.n))}</span>
+      <span class="vsb-pts">${num}</span>
+      ${o.mio ? `<button class="vsb-x" data-mi-banco-x="${pos}" title="Sacarlo del banco">✕</button>` : ''}
+    </div>`;
+  };
+  return `<div class="vs-banco" title="${esc('El banco. Uno por puesto: entra automáticamente si el titular de ese puesto juega menos de 20 minutos.')}">
+    <span class="vs-banco-lbl">BANCO</span>
+    ${['ARQ', 'DEF', 'VOL', 'DEL'].map(chip).join('')}
+  </div>`;
+}
+
 function bloqueVersus() {
   if (!S.once.length) rearmarOnce();
   recalcCapitan();
@@ -4423,6 +4482,7 @@ function bloqueVersus() {
             <button class="vs-btn vs-btn-chico" id="oi-ver-detalle" title="Abrir la pantalla Mejor 11">detalle →</button>
           </span></div>
         ${canchaVersus(A)}
+        ${tiraBanco(armarBanco(), {})}
       </div>
       <div class="vs-col">
         <div class="vs-col-tit">👤 El tuyo <small>${hayMio ? esquemaLindo(S.miEsq) : 'sin armar'}</small>${cabMi}</div>
@@ -4431,6 +4491,7 @@ function bloqueVersus() {
           return ['DEL', 'VOL', 'DEF', 'ARQ'].map(pos => `<div class="vs-linea">${s[pos]
             .map((_, i) => fichaVersus({ p: null }, { pos, idx: i })).join('')}</div>`).join('');
         })()}</div>`}
+        ${tiraBanco((equipoMio() || {}).banco, { mio: true })}
       </div>
     </div>
 
@@ -4449,10 +4510,22 @@ window.miCopiarDelMotor = function () {
   S.mi11 = S.once.slice(); S.miCap = S.capitan;
   normalizarMi11(); repintarVersus();
 };
-window.miVaciar = function () { S.mi11 = []; S.miCap = null; repintarVersus(); };
+window.miVaciar = function () {
+  S.mi11 = []; S.miCap = null;
+  // vaciar tiene que dejarlo COMO NUEVO: si no se toca la formacion, un once
+  // que quedo con quince huecos sigue con quince huecos despues de vaciarlo.
+  S.miEsq = esquemaValido(S.miEsq);
+  repintarVersus();
+};
 // Abre el mismo pegador que usan los equipos del torneo, apuntado al tuyo. El
 // equipo propio se busca por la marca .mio y no por el id: una liga guardada de
 // antes puede traerlo con otro id y quedaria sin pegador y sin decir por que.
+// El equipo propio dentro de la liga. Ahi vive el banco: S.mi11 guarda los
+// once y el banco es lo unico "de liga" que tiene el equipo tuyo.
+function equipoMio() {
+  if (!S.liga) cargarLiga();
+  return ((S.liga && S.liga.equipos) || []).find(x => x.mio) || null;
+}
 window.pegarMiOnce = function () {
   if (!S.liga) cargarLiga();
   const t = ((S.liga && S.liga.equipos) || []).find(x => x.mio);
@@ -4470,7 +4543,27 @@ window.miCapitan = function (id, ev) {
   if (S.mi11.includes(id)) S.miCap = id;
   repintarVersus();
 };
-window.miEsquema = function (e) { S.miEsq = e; normalizarMi11(); repintarVersus(); };
+window.miEsquema = function (e) { S.miEsq = esquemaValido(e); normalizarMi11(); repintarVersus(); };
+window.miElegirBanco = function (pos) {
+  const t = equipoMio(); if (!t) return;
+  const actual = (t.banco || {})[pos] || null;
+  abrirSelector({
+    pos, actual,
+    // en el banco no puede estar alguien que ya es titular tuyo
+    excluidos: new Set(S.mi11),
+    titulo: `Elegir el suplente ${pos} de tu equipo`,
+    nota: 'Entra solo si tu titular de ese puesto <b>no juega</b>. Es parte de los quince del juego.',
+    onElegir: id => {
+      t.banco = t.banco || {}; t.banco[pos] = id;
+      guardarLiga(); cerrarModal($('team-detail-modal')); repintarVersus();
+    }
+  });
+};
+window.miSacarBanco = function (pos, ev) {
+  if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+  const t = equipoMio(); if (!t || !t.banco) return;
+  delete t.banco[pos]; guardarLiga(); repintarVersus();
+};
 window.miElegir = function (pos, saliendo) {
   abrirSelector({
     pos, actual: saliendo || null,
@@ -5326,7 +5419,21 @@ Adrián Martínez"></textarea>
       <button class="op-link" onclick="armarAMano('${tid || ''}')">armalo tocando la cancha</button></p>`;
   abrirModal('team-detail-modal');
   $('lg-p-leer').onclick = () => {
+    // NO PERDER LO QUE YA ELEGISTE (13/09). Uno lee la lista, resuelve a mano
+    // los tres apellidos repetidos, se da cuenta de que escribio mal un cuarto,
+    // lo corrige arriba y vuelve a apretar "Leer la lista"... y perdia los tres
+    // que ya habia resuelto. Se guardan por el texto de la linea y se vuelven a
+    // aplicar si ese jugador sigue siendo un candidato posible para esa linea.
+    const previas = {};
+    if (_pegado.filas) {
+      [].concat(_pegado.filas.titulares, _pegado.filas.suplentes)
+        .forEach(f => { if (f.elegido) previas[f.texto.toLowerCase()] = f.elegido; });
+    }
     const r = leerPegado($('lg-p-txt').value);
+    [].concat(r.titulares, r.suplentes).forEach(f => {
+      const y = previas[f.texto.toLowerCase()];
+      if (!f.elegido && y && f.cands.some(c => c.id === y)) f.elegido = y;
+    });
     _pegado.filas = r;
     pintarPegado();
   };
@@ -5360,15 +5467,26 @@ function pintarPegado() {
 function guardarPegado() {
   const r = _pegado.filas;
   const nombre = ($('lg-p-nombre').value || '').trim() || 'Equipo';
-  const tit = r.titulares.map(f => f.elegido).filter(Boolean);
+  // SI PEGASTE QUINCE Y NO ESCRIBISTE "Suplentes:", LOS CUATRO ULTIMOS SON EL
+  // BANCO (13/09). Es lo que significa una lista de quince y es como la copia
+  // el juego. Antes entraban los quince como titulares y la cancha se rompia.
+  let filasTit = r.titulares.slice(), filasSup = r.suplentes.slice();
+  if (!filasSup.length && filasTit.length > 11) {
+    filasSup = filasTit.slice(11);
+    filasTit = filasTit.slice(0, 11);
+  }
+  const tit = filasTit.map(f => f.elegido).filter(Boolean);
   const banco = {};
-  r.suplentes.forEach(f => { const p = TODOS[f.elegido]; if (p && !banco[p.pos]) banco[p.pos] = p.id; });
-  const capFila = r.titulares.find(f => f.cap) || r.suplentes.find(f => f.cap);
+  filasSup.forEach(f => { const p = TODOS[f.elegido]; if (p && !banco[p.pos]) banco[p.pos] = p.id; });
+  const capFila = filasTit.find(f => f.cap) || filasSup.find(f => f.cap);
   const cap = capFila && capFila.elegido ? capFila.elegido : null;
   // la formacion sale de los puestos que pegaste, no de una lista fija
   const c = { ARQ: 0, DEF: 0, VOL: 0, DEL: 0 };
   tit.forEach(id => { const p = TODOS[id]; if (p) c[p.pos]++; });
-  const esq = [c.ARQ, c.DEF, c.VOL, c.DEL].join('-');
+  const esqCrudo = [c.ARQ, c.DEF, c.VOL, c.DEL].join('-');
+  // ...pero tiene que ser una de las diez del juego. Si no cruzaron todos, o
+  // pegaste dos arqueros, el esquema crudo no se puede dibujar.
+  const esq = esquemaValido(esqCrudo);
   let t = _pegado.tid ? equiposLiga().find(x => x.id === _pegado.tid) : null;
   if (!t) {
     t = { id: 'e' + Date.now().toString(36), nombre, once: [], banco: {}, fichas: {} };
@@ -5386,8 +5504,12 @@ function guardarPegado() {
   if (t.mio) { normalizarMi11(); pintarPantallaFecha(); }
   else S.ligaAbierto = t.id;
   pintarPantallaLiga();
-  if (tit.length !== 11) setTimeout(() => alert('Ojo: quedaron ' + tit.length + ' titulares, no 11.\n' +
-    'Los que no cruzaron quedaron afuera. Completalos tocando los huecos de la cancha.'), 60);
+  if (tit.length !== 11 || esq !== esqCrudo) setTimeout(() => {
+    const l = [];
+    if (tit.length !== 11) l.push('Quedaron ' + tit.length + ' titulares, no 11. Los que no cruzaron quedaron afuera: completalos tocando los huecos de la cancha.');
+    if (esq !== esqCrudo) l.push('La formacion que salia de la lista (' + esqCrudo + ') no es una de las del juego, asi que la puse en ' + esq + '.');
+    alert(l.join('\n\n'));
+  }, 60);
 }
 
 // ── pasarle la liga a alguien ──────────────────────────────────────────────
