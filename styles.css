@@ -4033,6 +4033,54 @@ th[data-k="rol"] { white-space: nowrap; }
 .pr-c { font-size: 0.74rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .pr-c i { font-style: normal; opacity: 0.55; }
 
+/* ── QUIEN TIENE A QUIEN: la tabla completa (12/09) ──────────────────────────
+   Las dos listas de arriba muestran los extremos. Esto es el plantel entero
+   con el nombre de cada dueno A LA VISTA: antes solo estaba en un title, que
+   en el celular no se puede abrir, y era justo el dato que se venia a buscar. */
+.pr-nota { margin: 0; padding: 0.55rem 1rem; font-size: 0.7rem; line-height: 1.45;
+    color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+.pr-det { border-top: 1px solid var(--border-color); }
+.pr-det > summary { cursor: pointer; padding: 0.6rem 1rem; font-size: 0.74rem;
+    color: var(--text-muted); user-select: none; }
+.pr-det > summary:hover { color: var(--text-primary); }
+.pr-det[open] > summary { border-bottom: 1px solid var(--border-color); }
+.pr-tabla { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.pr-tabla th { text-align: left; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.02em;
+    text-transform: uppercase; color: var(--text-muted); padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+.pr-tabla td { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border-color); vertical-align: top; }
+.pr-tabla tr:last-child td { border-bottom: none; }
+.pr-tabla .pt-nom { min-width: 8.5rem; }
+.pr-tabla .pt-nom small { display: block; font-size: 0.63rem; color: var(--text-muted); }
+.pr-tabla .pt-pts, .pr-tabla .pt-th-pts { text-align: right; width: 3rem;
+    font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pr-tabla .pt-pts i { color: var(--text-muted); }
+.pr-tabla .pt-n, .pr-tabla .pt-th-n { text-align: center; width: 5rem; white-space: nowrap;
+    font-variant-numeric: tabular-nums; color: var(--text-muted); }
+.pr-tabla .pt-n i { font-style: normal; opacity: 0.55; }
+.pr-tabla .pt-de { width: 55%; }
+.pr-eq { display: inline-block; margin: 1px 3px 1px 0; padding: 1px 6px;
+    border-radius: var(--radius-sm); background: var(--bg-input);
+    font-size: 0.68rem; white-space: nowrap; }
+.pr-eq-banco { opacity: 0.6; }
+.pr-eq-banco i { font-style: normal; font-size: 0.6rem; opacity: 0.8; }
+
+/* En el celular la 4a columna no entra: los nombres de los equipos quedaban
+   cortados justo a la mitad, que es el dato que uno viene a buscar. Abajo de
+   620px cada fila pasa a ser un bloque y los equipos van debajo, a lo ancho. */
+@media (max-width: 620px) {
+    .pr-tabla { font-size: 0.75rem; }
+    .pr-tabla thead { display: none; }
+    .pr-tabla tbody tr { display: grid; grid-template-columns: 1fr auto auto;
+        gap: 0 0.5rem; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--border-color); }
+    .pr-tabla tbody tr:last-child { border-bottom: none; }
+    .pr-tabla td { display: block; padding: 0; border: none; }
+    .pr-tabla .pt-nom { grid-column: 1; min-width: 0; }
+    .pr-tabla .pt-pts { grid-column: 2; text-align: right; align-self: start; }
+    .pr-tabla .pt-n { grid-column: 3; width: auto; text-align: right; align-self: start; }
+    .pr-tabla .pt-de { grid-column: 1 / -1; width: auto; margin-top: 0.3rem; }
+}
+
 @media (max-width: 820px) {
     .cc-grid, .pr-grid { grid-template-columns: 1fr; }
     .cc-medio { flex-direction: row; gap: 0.5rem; border: none;

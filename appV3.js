@@ -796,20 +796,20 @@ function fichaCancha(p, opts) {
 // alguien; el arriesgado no, asi que si quedo un tildado adentro hay que
 // decirlo en vez de mostrar un once que sabemos que esta roto.
 function avisoDescartes(esR) {
-  const n = S.fuera.size;
   const rotos = esR ? tildadosEnRiesgo() : [];
-  if (!n && !rotos.length) return '';
-  const nombres = [...S.fuera].map(id => TODOS[id]).filter(Boolean).map(p => nombreCorto(p.n));
-  // las bajas del juego no se listan aca: ya salen solas y no las tildo yo
+  // LA LISTA DE TILDADOS SE FUE DE ACA (13/09). Estaba repetida: los descartes
+  // de la ✕ ya viven en el menu de los tres puntitos, con su "deshacer todos".
+  // Tenerla arriba de Mejor 11 ademas ocupaba una barra entera para algo que se
+  // toca una vez por fecha, que es justo el motivo por el que se habia movido
+  // al menu. Lo que SI se queda es el aviso rojo de abajo, porque ese no esta
+  // en ningun otro lado: avisa que el once arriesgado quedo roto.
+  if (!rotos.length) return '';
   return `<div class="aviso-fuera">
-    ${n ? `<b>${n}</b> tildado${n > 1 ? 's' : ''} como que no juega${n > 1 ? 'n' : ''} esta fecha:
-      <span class="af-nombres">${nombres.map(esc).join(' · ')}</span>
-      <button class="af-limpiar" onclick="limpiarFuera()">Destildar todos</button>` : ''}
-    ${rotos.length ? `<div class="af-rojo">⚠️ El once <b>arriesgado</b> tiene
+    <div class="af-rojo">⚠️ El once <b>arriesgado</b> tiene
       ${rotos.length} tildado${rotos.length > 1 ? 's' : ''} adentro
       (${rotos.map(id => esc(nombreCorto((TODOS[id] || {}).n || '?'))).join(', ')}).
       Ese once sale de la simulación y no se rehace en la página: hay que correr
-      <code>RECALCULAR</code> para que lo tenga en cuenta.</div>` : ''}
+      <code>RECALCULAR</code> para que lo tenga en cuenta.</div>
   </div>`;
 }
 
@@ -1778,6 +1778,7 @@ function pintarPantallaFecha() {
   cont.querySelectorAll('[data-mi-cap]').forEach(b => b.onclick = ev => miCapitan(b.dataset.miCap, ev));
   { const e = $('vs-esq'); if (e) e.onchange = () => miEsquema(e.value); }
   ['vs-copiar', 'vs-copiar2'].forEach(id => { const b = $(id); if (b) b.onclick = () => miCopiarDelMotor(); });
+  ['vs-pegar', 'vs-pegar2'].forEach(id => { const b = $(id); if (b) b.onclick = () => pegarMiOnce(); });
   { const b = $('vs-borrar'); if (b) b.onclick = () => miVaciar(); }
   { const se = $('oi-esquema'); if (se) se.onchange = () => cambiarEsquema(se.value); }
   { const vd = $('oi-ver-detalle'); if (vd) vd.onclick = () => mostrarSeccion('once'); }
@@ -4328,11 +4329,19 @@ function bloqueVersus() {
       ${extra || ''}
     </div>`;
 
+  // PEGAR LA LISTA (13/09). Antes las unicas dos formas de cargar tu once eran
+  // tocar hueco por hueco o copiar el del motor y editarlo. Pero el once uno ya
+  // lo tiene escrito en el juego: pegarlo es un paso, los otros dos son quince.
+  // El pegador ya existia para los equipos de tus amigos —abrirPegar()— y el
+  // equipo propio pasa por el mismo camino que cualquier otro (ponerOnce y
+  // compania ya saben escribir en S.mi11 cuando el equipo es el tuyo). Lo unico
+  // que faltaba era el boton.
   const vacio = `<div class="vs-lado vs-mio vs-lado-vacio">
       <div class="vs-quien">👤 El tuyo</div>
       <div class="vs-cta">
         <p>Cargá el once que usaste vos y mirá la fecha como un partido.</p>
-        <button class="vs-btn vs-btn-fuerte" id="vs-copiar">Copiar el del motor y editarlo</button>
+        <button class="vs-btn vs-btn-fuerte" id="vs-pegar">Pegar mi lista</button>
+        <button class="vs-btn" id="vs-copiar">Copiar el del motor y editarlo</button>
         <span class="vs-cta-o">o tocá los huecos de la cancha de acá abajo</span>
       </div>
     </div>`;
@@ -4377,6 +4386,7 @@ function bloqueVersus() {
       </select>
       <span class="vs-plata${costoMi > 65e6 ? ' vs-plata-mal' : ''}"
         title="${esc('Lo que sale tu once. El tope del juego es $65.000.000.')}">$${(costoMi / 1e6).toFixed(1)}M</span>
+      <button class="vs-btn vs-btn-chico" id="vs-pegar2" title="Pegar tu once como lista de texto, igual que lo ves en el juego">pegar lista</button>
       <button class="vs-btn vs-btn-chico" id="vs-copiar2" title="Reemplaza tu once por el del motor">copiar el del motor</button>
       <button class="vs-btn vs-btn-chico" id="vs-borrar" title="Vaciar tu once">vaciar</button>
     </span>` : '';
@@ -4440,6 +4450,15 @@ window.miCopiarDelMotor = function () {
   normalizarMi11(); repintarVersus();
 };
 window.miVaciar = function () { S.mi11 = []; S.miCap = null; repintarVersus(); };
+// Abre el mismo pegador que usan los equipos del torneo, apuntado al tuyo. El
+// equipo propio se busca por la marca .mio y no por el id: una liga guardada de
+// antes puede traerlo con otro id y quedaria sin pegador y sin decir por que.
+window.pegarMiOnce = function () {
+  if (!S.liga) cargarLiga();
+  const t = ((S.liga && S.liga.equipos) || []).find(x => x.mio);
+  if (!t) { alert('No encuentro tu equipo. Recargá la página con Ctrl+F5.'); return; }
+  abrirPegar(t.id);
+};
 window.miSacar = function (id, ev) {
   if (ev) { ev.stopPropagation(); ev.preventDefault(); }
   S.mi11 = S.mi11.filter(x => x !== id);
@@ -4900,7 +4919,14 @@ function pintarPantallaLiga() {
   const eqs = equiposTorneo();
   const ms = eqs.map(marcadorEquipo);
   const msLab = equiposLab().map(marcadorEquipo);
-  _PROP = propiedadTorneo(ms.concat(msLab));
+  // "LO TIENEN X DE Y" CUENTA SOLO EL TORNEO (12/09).
+  // Antes esto era propiedadTorneo(ms.concat(msLab)) y el denominador incluia
+  // los dos equipos del laboratorio —el del motor y el propio—, que NO compiten.
+  // Resultado: Correa aparecia "7 de 9" cuando en el torneo son 7 equipos, y la
+  // lista de duenos de abajo nombraba 5. El numero y los nombres no cerraban, y
+  // para el grupo era directamente enganoso. El laboratorio se mide contra el
+  // torneo, no forma parte de el.
+  _PROP = propiedadTorneo(ms);
   const ch = chancesLiga(ms);
   const sueltos = ms.filter(m => m.t.suelto);
   const enJuego = !!VIVO && ms.some(m => m.cerrados > 0);
@@ -5354,8 +5380,11 @@ function guardarPegado() {
   ponerCap(t, cap);
   t.banco = banco;
   guardarLiga();
-  S.ligaAbierto = t.id;
   cerrarModal($('team-detail-modal'));
+  // Si lo que se pego es el once propio, el que hay que repintar es el Versus
+  // de "La fecha": es donde vive. Sin esto se guardaba bien y no se veia nada.
+  if (t.mio) { normalizarMi11(); pintarPantallaFecha(); }
+  else S.ligaAbierto = t.id;
   pintarPantallaLiga();
   if (tit.length !== 11) setTimeout(() => alert('Ojo: quedaron ' + tit.length + ' titulares, no 11.\n' +
     'Los que no cruzaron quedaron afuera. Completalos tocando los huecos de la cancha.'), 60);
@@ -5593,7 +5622,9 @@ function aportesDe(m, prop) {
   filas.forEach(f => {
     f.suma = (f.estado === 'falta' ? f.esperado : (f.pts || 0)) + f.cinta;
     f.real = f.estado !== 'falta';
-    f.tienen = prop ? (prop.cuenta[f.p.id] || 1) : 1;
+    // 0 es un valor real: un jugador del motor o del equipo propio puede no
+    // estar en ningun equipo del torneo. Antes el || 1 lo disfrazaba de 1.
+    f.tienen = prop ? (prop.cuenta[f.p.id] || 0) : 0;
   });
   return filas.sort((a, b) => b.suma - a.suma);
 }
@@ -5651,6 +5682,7 @@ function bloqueAportes(m, prop) {
     <td class="ap-bar">${barraAporte(f.suma, max)}</td>
     <td class="ap-tienen">${(() => {
       const n = f.tienen, tot = prop ? prop.equipos : 1;
+      if (n === 0) return `<span class="ap-dif" title="${esc('No lo tiene ninguno de los ' + tot + ' equipos del torneo.')}">nadie</span>`;
       if (n <= 1) return `<span class="ap-dif" title="${esc('Sólo este equipo lo tiene. Cada punto suyo es diferencia pura contra todos los demás.')}">único</span>`;
       if (n >= tot) return `<span class="ap-todos" title="${esc('Lo tienen los ' + tot + ' equipos. Sume lo que sume, no acerca ni aleja a nadie.')}">todos</span>`;
       return `<span title="${esc(n + ' de los ' + tot + ' equipos del torneo lo tienen.')}">${n}<i>/${tot}</i></span>`;
@@ -5720,18 +5752,26 @@ function bloqueCaraACara(ms) {
 
 function bloquePropiedad(ms, prop) {
   if (ms.length < 2) return '';
-  // de quien es cada jugador: sin esto, "Marabel 11 puntos, único" no dice a
-  // quien le sirvio, que es justo lo que uno quiere saber
+  // DE QUIEN ES CADA JUGADOR.
+  // Sin esto, "Marabel 11 puntos, unico" no dice a quien le sirvio, que es
+  // justo lo que uno quiere saber. Se guarda tambien si lo tiene de titular o
+  // de suplente: no es lo mismo, y el que mira la tabla necesita distinguirlo.
+  // OJO: aca entran SOLO los equipos del torneo. El del motor y el propio se
+  // miden aparte, en el laboratorio, y no cuentan para nada de esto.
   const duenos = {};
   ms.forEach(m => {
-    const ids = new Set((onceDe(m.t) || []).concat(Object.values(m.t.banco || {})));
-    ids.forEach(id => { (duenos[id] = duenos[id] || []).push(m.t.nombre); });
+    const titulares = new Set(onceDe(m.t) || []);
+    const todos = new Set([...titulares].concat(Object.values(m.t.banco || {})));
+    todos.forEach(id => {
+      (duenos[id] = duenos[id] || []).push({ nombre: m.t.nombre, banco: !titulares.has(id) });
+    });
   });
   const filas = [];
   Object.keys(prop.cuenta).forEach(id => {
     const p = TODOS[id]; if (!p) return;
     const v = vivoDe(id), res = resuelto(p);
-    filas.push({ p, n: prop.cuenta[id], pts: res ? (v && v.p != null ? v.p : 0) : null,
+    filas.push({ p, n: prop.cuenta[id], tit: prop.comoTitular[id] || 0,
+                 pts: res ? (v && v.p != null ? v.p : 0) : null,
                  esp: p.epsj != null ? p.epsj : (p.ep || 0), de: duenos[id] || [] });
   });
   if (!filas.length) return '';
@@ -5740,11 +5780,33 @@ function bloquePropiedad(ms, prop) {
   const fila = (f, conDueno) => `<li>
     <span class="pr-pts${f.pts == null ? ' pr-esp' : (f.pts >= 8 ? ' pr-alto' : '')}"
       title="${esc(f.pts == null ? 'Todavía no jugó: ' + n1(f.esp) + ' es lo que el motor espera de él.' : 'Puntos que ya sumó, sin contar la cinta de nadie.')}">${f.pts == null ? n1(f.esp) : f.pts}</span>
-    <span class="pr-n">${esc(nombreCorto(f.p.n))}<small>${esc(NOM(f.p.eq))}${conDueno && f.de.length === 1 ? ' · lo tiene <b>' + esc(f.de[0]) + '</b>' : ''}</small></span>
-    <span class="pr-c" title="${esc(f.de.length ? 'Lo tienen: ' + f.de.join(', ') : '')}">${f.n}<i>/${prop.equipos}</i></span></li>`;
+    <span class="pr-n">${esc(nombreCorto(f.p.n))}<small>${esc(NOM(f.p.eq))}${conDueno && f.de.length === 1 ? ' · lo tiene <b>' + esc(f.de[0].nombre) + '</b>' : ''}</small></span>
+    <span class="pr-c" title="${esc(f.de.length ? 'Lo tienen: ' + f.de.map(d => d.nombre + (d.banco ? ' (banco)' : '')).join(', ') : '')}">${f.n}<i>/${prop.equipos}</i></span></li>`;
+
+  // ── LA TABLA COMPLETA ──────────────────────────────────────────────────
+  // Las dos listas de arriba son los extremos. Esto es el plantel entero del
+  // torneo con los nombres de los duenos A LA VISTA, no escondidos en un
+  // title que en el celular no se puede ni abrir.
+  const todas = filas.slice().sort((a, b) =>
+    b.n - a.n || (b.pts ?? b.esp) - (a.pts ?? a.esp) || a.p.n.localeCompare(b.p.n));
+  const chip = d => `<span class="pr-eq${d.banco ? ' pr-eq-banco' : ''}"${d.banco
+    ? ' title="' + esc('Lo tiene en el banco: sólo suma si se le cae un titular de ese puesto.') + '"' : ''}>${esc(d.nombre)}${d.banco ? ' <i>banco</i>' : ''}</span>`;
+  const filaTabla = f => `<tr>
+    <td class="pt-nom"><b>${esc(nombreCorto(f.p.n))}</b><small>${esc(NOM(f.p.eq))} · ${f.p.pos}</small></td>
+    <td class="pt-pts">${f.pts == null
+      ? `<i title="${esc('Todavía no jugó. Es lo que el motor le espera.')}">${n1(f.esp)}</i>`
+      : `<b class="${f.pts >= 8 ? 'pr-alto' : ''}">${f.pts}</b>`}</td>
+    <td class="pt-n">${f.n === prop.equipos
+      ? `<span class="ap-todos" title="${esc('Lo tienen los ' + prop.equipos + ' equipos: sume lo que sume, la tabla no se mueve.')}">todos</span>`
+      : `${f.n}<i>/${prop.equipos}</i>`}</td>
+    <td class="pt-de">${f.de.map(chip).join('')}</td>
+  </tr>`;
+
   return tarjetaPleg('prop', 'Quién tiene a quién',
     'Contra qué te estás midiendo de verdad, y qué apuesta salió bien.',
-    `<div class="pr-grid">
+    `<p class="pr-nota">Cuenta los <b>${prop.equipos}</b> equipos del torneo. El del motor y el tuyo
+      no entran acá: no compiten, se miden aparte en el laboratorio.</p>
+    <div class="pr-grid">
       <div><h3>Los más elegidos</h3>
         <p class="pr-sub">Están en casi todos los equipos: lo que hagan casi no cambia la tabla.</p>
         <ul class="pr-lista">${masElegidos.map(f => fila(f, false)).join('')}</ul></div>
@@ -5752,7 +5814,14 @@ function bloquePropiedad(ms, prop) {
         <p class="pr-sub">Los tiene <b>un solo</b> equipo y ya sumaron. Cada punto acá es ventaja pura.</p>
         ${unicos.length ? `<ul class="pr-lista">${unicos.map(f => fila(f, true)).join('')}</ul>`
           : '<p class="tr-vacio">Todavía ninguno: o no hay diferenciales, o no jugaron.</p>'}</div>
-    </div>`, false);
+    </div>
+    <details class="pr-det"><summary>El plantel completo del torneo — ${todas.length} jugadores repartidos entre ${prop.equipos} equipos</summary>
+      <div class="table-responsive"><table class="pr-tabla">
+        <thead><tr><th>Jugador</th><th class="pt-th-pts" title="Puntos que ya sumó. En cursiva, lo que el motor le espera si todavía no jugó.">Pts</th>
+          <th class="pt-th-n">Lo tienen</th><th>Quiénes</th></tr></thead>
+        <tbody>${todas.map(filaTabla).join('')}</tbody>
+      </table></div>
+    </details>`, false);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
