@@ -147,6 +147,106 @@ function limpiarFuera() { S.fuera = new Set(); guardarFuera(); repintarTodo(); }
 // Para que tu criterio VIAJE con la app hay que pasarlo a pases.json, que si
 // entra en datos.js y lo ve todo el que abra ese archivo. Esto arma el bloque
 // listo para pegar, en vez de tener que escribirlo a mano jugador por jugador.
+// ── CARGAR PUNTAJES A MANO ─────────────────────────────────────────────────
+// Se pegan igual que un equipo: "Almada 12", uno por linea. Es mucho mas rapido
+// que cincuenta casilleros, y es como uno los tiene cuando los saca de Twitter.
+function leerPuntajes(txt) {
+  return String(txt || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => {
+    // el numero puede ir al final o separado por dos puntos o guion
+    const m = /^(.*?)[\s:\-–]+(-?\d{1,2})$/.exec(l);
+    if (!m) return { texto: l, pts: null, cands: [], elegido: null };
+    const nombre = m[1].replace(/^\d+[.)\-\s]+/, '').trim();
+    const cands = candidatosNombre(nombre);
+    return { texto: nombre, pts: parseInt(m[2], 10), cands,
+             elegido: cands.length === 1 ? cands[0].id : null };
+  });
+}
+let _mano = null;
+window.abrirCargarMano = function () {
+  // el nombre lindo sale del partido, no del slug: NOM() no traduce 'atl-tucuman'
+  const faltan = [];
+  if (VIVO) (VIVO.partidos || []).forEach(m => {
+    if (m.cl && !EQ_RESUELTOS.has(m.cl)) faltan.push(m.local || m.cl);
+    if (m.cv && !EQ_RESUELTOS.has(m.cv)) faltan.push(m.visitante || m.cv);
+  });
+  const yaCargados = Object.keys(MANO).map(k => ({ k, p: porClave(k), pts: MANO[k] })).filter(x => x.p);
+  _mano = null;
+  $('team-detail-title').innerHTML = 'Cargar puntajes a mano';
+  $('team-detail-body').innerHTML = `
+    <p class="exp-txt">Planeta publica por tandas. Si ya sabés un puntaje y él todavía no lo subió,
+    escribilo acá y la app lo usa <b>hasta que llegue el oficial</b>, que después lo pisa solo.
+    Un jugador por línea, con el número al final: <code>Almada 12</code>.</p>
+    ${faltan.length ? `<p class="exp-txt exp-nota">Ahora mismo falta el puntaje de: <b>${esc([...new Set(faltan)].join(', '))}</b>.</p>`
+      : '<p class="exp-txt exp-nota">Ahora mismo Planeta publicó todos los partidos que se jugaron.</p>'}
+    <div class="lg-pegar">
+      <textarea id="mn-txt" rows="8" placeholder="Almada 12
+Correa 8
+Otamendi 5"></textarea>
+      <button class="vs-btn vs-btn-fuerte" id="mn-leer">Leer los puntajes</button>
+    </div>
+    <div id="mn-res"></div>
+    ${yaCargados.length ? `<div class="mn-ya"><h4>Ya cargados a mano (${yaCargados.length})</h4>
+      <div class="mn-chips">${yaCargados.map(x => `<span class="mn-chip">${esc(nombreCorto(x.p.n))}
+        <b>${x.pts}</b><button data-mn-borrar="${esc(x.k)}" title="Borrarlo">✕</button></span>`).join('')}</div>
+      <button class="vs-btn" id="mn-bajar">Bajar dataManual.js para tus amigos</button>
+      <p class="exp-txt exp-nota">Los puntajes a mano viven <b>en este navegador</b>. Para que tus amigos
+      también los vean, bajá el archivo, dejalo en la carpeta Grandt y corré <b>SUBIR_A_GITHUB.bat</b>.
+      El día que Planeta publique, el oficial gana igual y no hace falta borrar nada.</p></div>` : ''}`;
+  abrirModal('team-detail-modal');
+  $('mn-leer').onclick = () => { _mano = leerPuntajes($('mn-txt').value); pintarMano(); };
+  const bb = $('mn-bajar'); if (bb) bb.onclick = bajarManual;
+  $('team-detail-body').querySelectorAll('[data-mn-borrar]').forEach(b => b.onclick = () => {
+    delete MANO[b.dataset.mnBorrar]; guardarMano(); rearmarResueltos();
+    abrirCargarMano(); repintarPorMano();
+  });
+};
+function pintarMano() {
+  const r = _mano || [];
+  const ok = r.filter(f => f.elegido && f.pts != null).length;
+  $('mn-res').innerHTML = `
+    <p class="exp-txt"><b>${ok}</b> de ${r.length} cruzaron.</p>
+    <table class="data-table"><thead><tr><th>Lo que pegaste</th><th>Quién es</th><th>Puntos</th></tr></thead>
+      <tbody>${r.map((f, i) => `<tr>
+        <td>${esc(f.texto)}</td>
+        <td>${f.pts == null ? '<span class="lg-cinta-mal">falta el número</span>'
+          : f.cands.length === 0 ? '<span class="lg-cinta-mal">no lo encontré</span>'
+          : `<select data-mn="${i}">${f.cands.length > 1 ? '<option value="">— elegí —</option>' : ''}
+              ${f.cands.slice(0, 12).map(p => `<option value="${p.id}"${p.id === f.elegido ? ' selected' : ''}>${esc(p.n)} · ${esc(NOM(p.eq))} · ${p.pos}</option>`).join('')}
+            </select>`}</td>
+        <td class="text-center"><b>${f.pts == null ? '—' : f.pts}</b></td></tr>`).join('')}</tbody></table>
+    <button class="vs-btn vs-btn-fuerte" id="mn-guardar">Guardar ${ok} puntaje${ok === 1 ? '' : 's'}</button>`;
+  $('mn-res').querySelectorAll('[data-mn]').forEach(sel => sel.onchange = () => {
+    _mano[+sel.dataset.mn].elegido = sel.value || null;
+  });
+  $('mn-guardar').onclick = () => {
+    let n = 0;
+    (_mano || []).forEach(f => {
+      if (!f.elegido || f.pts == null) return;
+      const k = claveDe(f.elegido); if (!k) return;
+      MANO[k] = f.pts; n++;
+    });
+    guardarMano(); rearmarResueltos();
+    cerrarModal($('team-detail-modal'));
+    repintarPorMano();
+    if (!n) alert('No guardé ninguno: revisá que cada línea termine con el número.');
+  };
+}
+function bajarManual() {
+  const obj = { fecha: D.fechaObjetivo, generado: new Date().toISOString(), puntos: MANO };
+  const b = new Blob(['window.MANUAL=' + JSON.stringify(obj) + ';\n'], { type: 'text/javascript' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = 'dataManual.js';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+// Un puntaje a mano toca todo: el Versus, el torneo, la tabla y la revision.
+// repintarTodo() ya cubre casi todo; Revision no estaba porque los tildados no
+// la afectan, pero un puntaje si.
+function repintarPorMano() {
+  try { repintarTodo(); } catch (e) { }
+  try { if (document.getElementById('pantalla-revision')) pintarRevision(); } catch (e) { }
+}
+
 window.exportarDescartes = function () {
   const hoy = new Date().toISOString().slice(0, 10);
   const items = [...S.fuera].map(id => TODOS[id]).filter(Boolean).map(p => ({
@@ -386,6 +486,8 @@ function iniciar() {
   S.esquema = D.esquema.optimo.esquema;
   S.once = D.esquema.optimo.once.map(x => x.id);
   try { S.analista = localStorage.getItem('gdt_analista') !== '0'; } catch (e) { }
+  cargarMano();                        // los puntajes que cargaste a mano
+  rearmarResueltos();                  // ahora si, con TODOS lleno, se puede contar
   cargarFuera(); cargarCapitan();      // los tildados de esta fecha, guardados en el navegador
   rearmarOnce();      // el once se rehace aca, no viene cocinado de datos.js
   cargarMi11();       // el once que armaste vos, para el Versus
@@ -1810,6 +1912,7 @@ function eventos() {
     }));
   }
   { const bp = $('btn-fuera-publicar'); if (bp) bp.onclick = e => { e.stopPropagation(); exportarDescartes(); }; }
+  { const bm = $('btn-cargar-mano'); if (bm) bm.onclick = () => abrirCargarMano(); }   // el menu se cierra solo: es un .menu-item
   { const bl = $('btn-fuera-limpiar'); if (bl) bl.onclick = e => { e.stopPropagation(); limpiarFuera(); }; }
   pintarMenuFuera();
   document.querySelectorAll('.nav-btn[data-sec]').forEach(b => b.onclick = () => mostrarSeccion(b.dataset.sec));
@@ -4071,11 +4174,52 @@ const FECHA_EMPEZO = (() => {
 })();
 // los equipos cuyo partido ya salio publicado: para ellos la fecha esta cerrada
 const EQ_RESUELTOS = new Set();
+// CUANTOS PUNTAJES PUBLICADOS ALCANZAN PARA DAR UN EQUIPO POR CERRADO (13/09).
+// SYNC_VIVO agrega un partido a la lista en cuanto Planeta publica EL RESULTADO,
+// que sale antes que las fichas. Con eso, un equipo cuyo 1-2 ya se sabe pero
+// cuyos jugadores todavia no tienen puntaje quedaba "cerrado", y los 25 sin
+// puntaje se mostraban como "no jugo: 0". Paso justo con Atl. Tucuman - River.
+// Medido en la fecha 9: los equipos publicados tienen entre 13 y 16 jugadores
+// con puntaje, y los que no, 0 o 3 (Planeta adelanta los destacados). El corte
+// en 8 separa los dos grupos con margen de los dos lados.
+const MIN_PUBLICADOS = 8;
 function rearmarResueltos() {
   EQ_RESUELTOS.clear();
-  if (VIVO) (VIVO.partidos || []).forEach(m => { if (m.cl) EQ_RESUELTOS.add(m.cl); if (m.cv) EQ_RESUELTOS.add(m.cv); });
+  if (!VIVO) return;
+  const cuenta = {};
+  Object.keys(VIVO.puntos || {}).forEach(id => {
+    const p = TODOS[id]; if (!p) return;
+    const c = claveEquipo(p.eq); if (c) cuenta[c] = (cuenta[c] || 0) + 1;
+  });
+  (VIVO.partidos || []).forEach(m => [m.cl, m.cv].forEach(c => {
+    if (c && (cuenta[c] || 0) >= MIN_PUBLICADOS) EQ_RESUELTOS.add(c);
+  }));
 }
 rearmarResueltos();
+
+// ── PUNTAJES CARGADOS A MANO ───────────────────────────────────────────────
+// Planeta publica por tandas y a veces un partido tarda medio dia. Mientras
+// tanto uno YA sabe el puntaje —sale por Twitter— y no poder ponerlo obliga a
+// mirar una tabla que uno sabe incompleta. Esto deja escribirlo y que valga
+// hasta que llegue el oficial, que siempre manda.
+// Se guarda por clave estable, no por id: los id cambian en cada RECALCULAR.
+const CLAVE_MANO = () => 'gdt_mano_f' + ((D && D.fechaObjetivo != null) ? D.fechaObjetivo : 'x');
+let MANO = {};
+function cargarMano() {
+  MANO = {};
+  try {
+    const r = JSON.parse(localStorage.getItem(CLAVE_MANO()) || '{}');
+    if (r && typeof r === 'object') MANO = r;
+  } catch (e) { }
+  // Los que viajan con la app (dataManual.js) van ABAJO de los tuyos: si vos
+  // cargaste otro numero para el mismo jugador, manda el tuyo.
+  const pub = (typeof window !== 'undefined' && window.MANUAL) ? window.MANUAL : null;
+  if (pub && pub.puntos && (pub.fecha == null || !D || pub.fecha === D.fechaObjetivo)) {
+    Object.keys(pub.puntos).forEach(k => { if (MANO[k] == null) MANO[k] = pub.puntos[k]; });
+  }
+}
+function guardarMano() { try { localStorage.setItem(CLAVE_MANO(), JSON.stringify(MANO)); } catch (e) { } }
+const manoDe = id => { const k = claveDe(id); return (k && MANO[k] != null) ? MANO[k] : null; };
 // EL ESPERADO DE OTRA FECHA. datos.js solo tiene el de la fecha que viene: para
 // rearmar la foto de una que ya paso hay que leerlo de dataHist.js. Mientras
 // este mapa esta puesto, todo lo que pregunte "cuanto esperaba el motor de
@@ -4099,8 +4243,14 @@ function conVivo(v, esperados, fn) {
   try { return fn(); }
   finally { VIVO = vAntes; ESP_DE = eAntes; rearmarResueltos(); }
 }
-const vivoDe = id => (VIVO && VIVO.puntos && VIVO.puntos[id]) ? VIVO.puntos[id] : null;
-const resuelto = p => !!p && EQ_RESUELTOS.has(claveEquipo(p.eq));
+const vivoDe = id => {
+  const of = (VIVO && VIVO.puntos && VIVO.puntos[id]) ? VIVO.puntos[id] : null;
+  if (of) return of;                       // el oficial de Planeta manda siempre
+  const m = manoDe(id);
+  return m == null ? null : { p: m, mano: true };
+};
+// Un jugador con puntaje a mano esta resuelto aunque su equipo no lo este.
+const resuelto = p => !!p && (EQ_RESUELTOS.has(claveEquipo(p.eq)) || manoDe(p.id) != null);
 
 // ── MI ONCE ────────────────────────────────────────────────────────────────
 // El que usaste vos en el juego. Vive en el localStorage de ESTE navegador,
@@ -4174,7 +4324,7 @@ function marcadorDe(ids, capId) {
       const pts = jugo ? v.p : 0;
       if (jugo) jugaron++;
       real += pts;
-      det.push({ p, estado: jugo ? 'jugo' : 'nojugo', pts, sup: !!(v && v.s) });
+      det.push({ p, estado: jugo ? 'jugo' : 'nojugo', pts, sup: !!(v && v.s), mano: !!(v && v.mano) });
     } else {
       pendientes.push(id);
       esperado += (p.epsj != null ? p.epsj : (p.ep || 0));
@@ -4293,13 +4443,15 @@ function fichaVersus(d, opts) {
   const quien = nombreCorto(p.n) + ' — ' + NOM(p.eq) + ' ' + (p.cond === 'L' ? 'de local' : 'de visitante') +
     ' vs ' + NOM(p.riv) + '. ';
   const ayuda = quien + (d.estado === 'jugo'
-    ? `Ya jugó: ${d.pts} puntos${d.sup ? ' (entró desde el banco)' : ''}. Publicado por Planeta.`
+    ? (d.mano
+      ? `${d.pts} puntos cargados A MANO por vos. Planeta todavía no publicó este partido; cuando lo publique, el oficial pisa este número solo.`
+      : `Ya jugó: ${d.pts} puntos${d.sup ? ' (entró desde el banco)' : ''}. Publicado por Planeta.`)
     : d.estado === 'nojugo'
       ? 'Su partido ya se jugó y no sumó: no entró, o entró sin calificación.'
       : `Todavía no jugó. ${n1(p.epsj != null ? p.epsj : p.ep)} es lo que el motor espera de él.`);
   return `<div class="vsj vsj-${d.estado}${cap ? ' vsj-cap' : ''}" title="${esc(ayuda)}"
       ${o.mio ? `data-mi-jug="${p.id}"` : `data-cambiar="${p.id}"`}>
-    <span class="vsj-pts">${num}</span>
+    <span class="vsj-pts">${num}${d.mano ? '<i class="mano-m" title="Cargado a mano">✎</i>' : ''}</span>
     <span class="vsj-nom">${esc(APELLIDO(p.n))}</span>
     <span class="vsj-eq">${esc(SIGLA(p.eq))}<i>${p.cond === 'L' ? 'L' : 'V'}</i></span>
     ${cap ? '<span class="vsj-c">C</span>' : ''}
@@ -4787,7 +4939,7 @@ function marcadorEquipo(t) {
       const pts = jugo ? v.p : 0;
       if (jugo) { jugaron++; real += pts; }
       else caidos[p.pos].push(p);
-      det.push({ p, estado: jugo ? 'jugo' : 'nojugo', pts, sup: !!(v && v.s) });
+      det.push({ p, estado: jugo ? 'jugo' : 'nojugo', pts, sup: !!(v && v.s), mano: !!(v && v.mano) });
     } else {
       pendientes.push(p.id);
       esperado += (p.epsj != null ? p.epsj : (p.ep || 0));

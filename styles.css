@@ -3617,6 +3617,26 @@ th[data-k="rol"] { white-space: nowrap; }
 .vsb:hover .vsb-x { opacity: 0.75; }
 .vsb-x:hover { color: var(--danger, #ef4444); opacity: 1; }
 
+/* ── PUNTAJES CARGADOS A MANO (13/09) ────────────────────────────────────────
+   Tienen que verse distinto de los de Planeta sin gritar: son provisorios y el
+   oficial los pisa solo. Un lapicito chico al lado del numero alcanza. */
+.mano-m { font-style: normal; font-size: 0.55em; opacity: 0.65; margin-left: 1px; vertical-align: super; }
+.mn-ya { border-top: 1px solid var(--border-color); margin-top: 0.8rem; padding-top: 0.7rem; }
+.mn-ya h4 { margin: 0 0 0.4rem; font-size: 0.78rem; }
+.mn-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.6rem; }
+.mn-chip {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.15rem 0.4rem; border-radius: var(--radius-sm);
+    background: var(--bg-input); font-size: 0.72rem;
+}
+.mn-chip b { font-variant-numeric: tabular-nums; }
+.mn-chip button {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 0.68rem; padding: 0; line-height: 1;
+}
+.mn-chip button:hover { color: var(--danger, #ef4444); }
+#mn-txt { width: 100%; }
+
 @media (max-width: 720px) {
     .vs-banco { padding: 0.4rem 0.45rem; }
     .vsb { flex: 1 1 44%; }
