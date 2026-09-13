@@ -3637,6 +3637,27 @@ th[data-k="rol"] { white-space: nowrap; }
 .mn-chip button:hover { color: var(--danger, #ef4444); }
 #mn-txt { width: 100%; }
 
+/* ── LA CINTA EN EL MARCADOR DEL VERSUS (13/09) ──────────────────────────────
+   Chica y debajo del subtitulo: no compite con el numero grande, pero esta
+   siempre. Cuando falta la ficha trae el casillero al lado, porque el problema
+   no era no verla, era no poder arreglarla desde ahi. */
+.vs-cinta {
+    display: inline-flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;
+    margin-top: 0.3rem; padding: 0.1rem 0.4rem; border-radius: var(--radius-sm);
+    font-size: 0.68rem; color: var(--text-muted); background: var(--bg-input);
+}
+.vs-cinta b { color: var(--text-main); font-variant-numeric: tabular-nums; }
+.vs-cinta input {
+    width: 3.1rem; background: var(--bg-card); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    font-size: 0.68rem; padding: 0 0.2rem; font-variant-numeric: tabular-nums;
+}
+.vs-cinta-ok { color: var(--success); }
+.vs-cinta-ok b { color: var(--success); }
+.vs-cinta-mal { color: var(--danger, #ef4444); }
+.vs-cinta-falta { color: var(--warning, #f59e0b); }
+.vs-cinta-falta input { border-color: var(--warning, #f59e0b); }
+
 @media (max-width: 720px) {
     .vs-banco { padding: 0.4rem 0.45rem; }
     .vsb { flex: 1 1 44%; }

@@ -3647,6 +3647,27 @@ th[data-k="rol"] { white-space: nowrap; }
 .mn-chip button:hover { color: var(--danger, #ef4444); }
 #mn-txt { width: 100%; }
 
+/* ── LA CINTA EN EL MARCADOR DEL VERSUS (13/09) ──────────────────────────────
+   Chica y debajo del subtitulo: no compite con el numero grande, pero esta
+   siempre. Cuando falta la ficha trae el casillero al lado, porque el problema
+   no era no verla, era no poder arreglarla desde ahi. */
+.vs-cinta {
+    display: inline-flex; align-items: center; gap: 0.3rem; flex-wrap: wrap;
+    margin-top: 0.3rem; padding: 0.1rem 0.4rem; border-radius: var(--radius-sm);
+    font-size: 0.68rem; color: var(--text-muted); background: var(--bg-input);
+}
+.vs-cinta b { color: var(--text-main); font-variant-numeric: tabular-nums; }
+.vs-cinta input {
+    width: 3.1rem; background: var(--bg-card); color: var(--text-main);
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    font-size: 0.68rem; padding: 0 0.2rem; font-variant-numeric: tabular-nums;
+}
+.vs-cinta-ok { color: var(--success); }
+.vs-cinta-ok b { color: var(--success); }
+.vs-cinta-mal { color: var(--danger, #ef4444); }
+.vs-cinta-falta { color: var(--warning, #f59e0b); }
+.vs-cinta-falta input { border-color: var(--warning, #f59e0b); }
+
 @media (max-width: 720px) {
     .vs-banco { padding: 0.4rem 0.45rem; }
     .vsb { flex: 1 1 44%; }
@@ -4667,7 +4688,7 @@ th[data-k="rol"] { white-space: nowrap; }
 .fp-pie b { color: var(--text-main); }
 
 </style>
-    <meta name="gdt-build" content="8cf505ce4b84 | 2026-09-13 02:19">
+    <meta name="gdt-build" content="9e0bf15b3a39 | 2026-09-13 02:29">
 </head>
 <body>
     <!-- UNA SOLA BARRA.
@@ -7470,6 +7491,14 @@ function pintarPantallaFecha() {
   { const e = $('vs-esq'); if (e) e.onchange = () => miEsquema(e.value); }
   ['vs-copiar', 'vs-copiar2'].forEach(id => { const b = $(id); if (b) b.onclick = () => miCopiarDelMotor(); });
   ['vs-pegar', 'vs-pegar2'].forEach(id => { const b = $(id); if (b) b.onclick = () => pegarMiOnce(); });
+  cont.querySelectorAll('[data-cinta]').forEach(inp => {
+    inp.onclick = e => e.stopPropagation();
+    inp.onchange = () => {
+      const v = inp.value === '' ? null : parseFloat(inp.value);
+      ponerFichaManual(inp.dataset.cinta, v);
+      repintarPorMano();
+    };
+  });
   cont.querySelectorAll('[data-mi-banco]').forEach(b => b.onclick = () => miElegirBanco(b.dataset.miBanco));
   cont.querySelectorAll('[data-mi-banco-x]').forEach(b => b.onclick = ev => miSacarBanco(b.dataset.miBancoX, ev));
   { const b = $('vs-borrar'); if (b) b.onclick = () => miVaciar(); }
@@ -9927,15 +9956,20 @@ function marcadorDe(ids, capId) {
     const q = nombreCorto(cap.n);
     const aMano = (typeof fichaManual === 'function') ? fichaManual(cap.id) : null;
     const v = vivoDe(cap.id);
-    if (aMano != null) cinta = { estado: 'ok', valor: aMano, quien: q };
-    else if (!resuelto(cap)) cinta = { estado: 'falta', valor: fichaCap(cap), quien: q };
+    if (aMano != null) cinta = { estado: 'ok', valor: aMano, quien: q, id: cap.id, mano: true };
+    else if (!resuelto(cap)) cinta = { estado: 'falta', valor: fichaCap(cap), quien: q, id: cap.id };
     // regla del juego: si el capitan no suma puntos, la cinta se pierde
-    else if (!(v && v.p != null)) cinta = { estado: 'perdida', valor: 0, quien: q };
-    else if (VIVO && VIVO.fichas && VIVO.fichas[cap.id] != null) cinta = { estado: 'ok', valor: VIVO.fichas[cap.id], quien: q };
-    else cinta = { estado: 'sindato', valor: 0, quien: q };
+    else if (!(v && v.p != null)) cinta = { estado: 'perdida', valor: 0, quien: q, id: cap.id };
+    else if (VIVO && VIVO.fichas && VIVO.fichas[cap.id] != null) cinta = { estado: 'ok', valor: VIVO.fichas[cap.id], quien: q, id: cap.id };
+    else cinta = { estado: 'sindato', valor: 0, quien: q, id: cap.id };
   }
+  // COBRADA = el capitan ya jugo Y sabemos su ficha. Solo esa se suma a lo
+  // hecho; la 'falta' es la ficha ESPERADA y vive en la proyeccion, no en el
+  // marcador real.
+  cinta.cobrada = (cinta.estado === 'ok');
   return {
     ids, real, esperado, jugaron, cerrados, pendientes, det, cinta,
+    hecho: real + (cinta.cobrada ? cinta.valor : 0),
     proyeccion: real + esperado + cinta.valor,
     n: ids.length
   };
@@ -10119,13 +10153,42 @@ function bloqueVersus() {
   const pa = ch ? Math.round(ch.a * 100) : null;
   const pb = ch ? Math.round(ch.b * 100) : null;
 
+  // LA CINTA TIENE QUE VERSE SIEMPRE (13/09).
+  // Con la fecha empezada el marcador mostraba "80.0 · 7 de 11 ya jugaron" y de
+  // la cinta no decia una palabra. Si el capitan ya jugo pero Planeta no
+  // publico su ficha, la cinta vale 0 y no habia forma de darse cuenta ni de
+  // arreglarlo desde esta pantalla: el casillero para escribir la ficha existia
+  // solo en el Torneo de amigos. Pasa siempre que el puntaje se carga a mano,
+  // porque a mano viene el total y la ficha no.
+  const lineaCinta = c => {
+    if (!c || c.estado === 'nadie') return '';
+    const q = esc(c.quien || '');
+    if (c.estado === 'perdida') return `<div class="vs-cinta vs-cinta-mal"
+      title="${esc('Regla del juego: si el capitán no suma puntos, la cinta se pierde. El suplente que lo reemplaza no la hereda.')}">
+      cinta perdida · ${q} no sumó</div>`;
+    if (c.estado === 'falta') return `<div class="vs-cinta"
+      title="${esc(c.quien + ' todavía no jugó. ' + n2(c.valor) + ' es la ficha que el motor le espera; ya está contada en la proyección.')}">
+      cinta <b>+${n1(c.valor)}</b> esperada · ${q}</div>`;
+    if (c.estado === 'ok') return `<div class="vs-cinta vs-cinta-ok"
+      title="${esc(c.mano ? 'Ficha cargada por vos. Manda sobre lo que diga Planeta.' : 'Ficha de Clarín publicada por Planeta.')}">
+      cinta <b>+${n1(c.valor)}</b> · ${q}${c.mano ? ' ✎' : ''}
+      <input type="number" step="0.5" min="-5" max="10" value="${c.valor}" data-cinta="${c.id}"
+        title="La ficha del capitán. La cinta la duplica, así que este número se suma una vez más."></div>`;
+    // sindato: jugó, pero no sabemos su ficha. Es el caso que lo hacía valer 0.
+    return `<div class="vs-cinta vs-cinta-falta"
+      title="${esc('La cinta duplica la FICHA, y Planeta publica el total sin separarla. Escribí la ficha de ' + c.quien + ' (1 a 10) y el total va a coincidir exacto con el del juego.')}">
+      cinta: falta la ficha de ${q}
+      <input type="number" step="0.5" min="-5" max="10" value="" placeholder="—" data-cinta="${c.id}"></div>`;
+  };
+
   const lado = (m, quien, ic, clase, extra) => `
     <div class="vs-lado ${clase}">
       <div class="vs-quien">${ic} ${quien}</div>
-      <div class="vs-pts">${enJuego ? n1(m.real) : n1(m.proyeccion)}</div>
+      <div class="vs-pts">${enJuego ? n1(m.hecho) : n1(m.proyeccion)}</div>
       <div class="vs-meta">${enJuego
         ? `${m.jugaron} de ${m.n} ya jugaron · proyección <b>${n1(m.proyeccion)}</b>`
         : `${n1(m.real + m.esperado)} esperados + ${n2(m.cinta.valor)} de la cinta`}</div>
+      ${lineaCinta(m.cinta)}
       ${extra || ''}
     </div>`;
 
