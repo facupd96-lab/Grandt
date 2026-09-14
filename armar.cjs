@@ -1936,17 +1936,26 @@ try{
   // La pantalla de Revision necesita el esperado de una fecha que ya paso, y
   // datos.js solo tiene el de la fecha que viene. Sin este archivo, una fecha
   // que no se llego a fotografiar en el navegador quedaba perdida.
-  const H={};
+  const H={}, saltadas=[];
   fs.readdirSync('historial').filter(f=>/^fecha_\d+\.json$/.test(f)).forEach(f=>{
     try{
       const x=JSON.parse(fs.readFileSync('historial/'+f,'utf8'));
       if(!x || x.fecha==null) return;
       const esp={};
       if(Array.isArray(x.todos)) x.todos.forEach(j=>{ esp[j.k]=j.EP; });
+      // NADA DE ENTRADAS VACIAS (13/09). Las fotos anteriores al 08/09 no tienen
+      // el campo "todos" ni "onceK": entraban igual con esperados:{} y once:[].
+      // En la app eso no se distinguia de una fecha buena —un objeto vacio es
+      // "verdadero"— y el rescate se daba por listo y guardaba una foto sin un
+      // solo esperado y con el once de la fecha equivocada. Si no hay datos, la
+      // fecha no va: asi la app dice "no la tengo" en vez de inventarla.
+      if(Object.keys(esp).length < 50 || !Array.isArray(x.onceK) || x.onceK.length < 7){
+        saltadas.push(x.fecha); return;
+      }
       H[x.fecha]={fecha:x.fecha, generado:x.generado, esquema:x.esquema||null, esperados:esp,
                   n:Object.keys(esp).length,
                   // el once que recomendaba el motor ESA fecha, en claves
-                  once:(x.onceK||null), capitan:(x.capitanK||null)};
+                  once:x.onceK, capitan:(x.capitanK||null)};
     }catch(e){}
   });
   // solo las ultimas 8: mas que eso es peso muerto en cada carga de la pagina
@@ -1955,6 +1964,8 @@ try{
   fs.writeFileSync('dataHist.js','window.HIST='+JSON.stringify(HH)+';');
   console.log('  dataHist.js: '+cuales.length+' fecha(s) con el esperado de cada jugador ('+
     (fs.statSync('dataHist.js').size/1024).toFixed(0)+' KB)');
+  if(saltadas.length) console.log('  (fechas '+saltadas.sort((a,b)=>a-b).join(', ')+
+    ' quedaron afuera: su foto es anterior al campo que guarda el esperado de cada jugador)');
 }catch(e){ console.log('  no pude guardar la foto de la fecha:',e.message); }
 
 out.version = VERSION_MOTOR;

@@ -3549,6 +3549,9 @@ th[data-k="rol"] { white-space: nowrap; }
     display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
     padding: 0.55rem 0.9rem; font-size: 0.78rem; font-weight: 700;
     border-bottom: 1px solid var(--border-color);
+    /* Con el once armado esta barra trae botones y mide 40px; sin armar, 37.
+       Tres pixeles que corren la cancha entera de un lado respecto del otro. */
+    min-height: 40px; box-sizing: border-box;
 }
 .vs-col-tit small { color: var(--text-muted); font-weight: 500; }
 .vs-herr { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
@@ -3608,6 +3611,9 @@ th[data-k="rol"] { white-space: nowrap; }
     background: rgba(10,14,12,0.55); border: 1px solid rgba(255,255,255,0.07);
     font-size: 0.66rem; cursor: pointer; flex: 1 1 0; min-width: 0;
     transition: border-color 0.12s ease;
+    /* igual que las fichas: el chip con jugador y el vacio miden lo mismo, si no
+       las dos tiras de BANCO no arrancan a la misma altura */
+    min-height: 24px; box-sizing: border-box;
 }
 .vsb:hover { border-color: rgba(255,255,255,0.22); }
 .vsb-pos { font-size: 0.52rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.04em; }
@@ -3668,19 +3674,38 @@ th[data-k="rol"] { white-space: nowrap; }
 .vs-cinta-falta { color: var(--warning, #f59e0b); }
 .vs-cinta-falta input { border-color: var(--warning, #f59e0b); }
 
+/* Revisión: tirar una foto mal sacada, y decir cuándo una foto no sirve. */
+.rev-borrar { margin-left: auto; opacity: 0.7; }
+.rev-borrar:hover { opacity: 1; color: var(--danger, #ef4444); border-color: var(--danger, #ef4444); }
+.rev-sel { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
+.rev-aviso-mal {
+    border-left: 3px solid var(--danger, #ef4444);
+    background: rgba(239,68,68,0.08);
+}
+
 @media (max-width: 720px) {
     .vs-banco { padding: 0.4rem 0.45rem; }
     .vsb { flex: 1 1 44%; }
 }
 
 /* la ficha: chica a proposito, porque hay veintidos en pantalla */
+/* LAS DOS CANCHAS TIENEN QUE ALINEARSE (13/09). La ficha con jugador mide tres
+   renglones (puntos, apellido, club) y el hueco vacio uno solo: 60px contra 52.
+   Ocho pixeles por fila que se van sumando, asi que con un lado armado y el
+   otro vacio las lineas quedaban corridas y los dos BANCO a 36px de distancia.
+   Altura fija para las dos y listo. */
 .vsj {
-    position: relative; width: 82px; padding: 0.3rem 0.2rem 0.28rem;
+    position: relative; width: 82px; min-height: 60px; padding: 0.3rem 0.2rem 0.28rem;
     border-radius: var(--radius-sm); text-align: center; cursor: pointer;
     background: rgba(10,14,12,0.55); border: 1px solid rgba(255,255,255,0.07);
-    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
     transition: transform 0.12s ease, border-color 0.12s ease;
 }
+/* Y el banco va SIEMPRE abajo del todo: si una linea se parte en dos por falta
+   de ancho, la columna crece y sin esto el banco de un lado sube y el del otro
+   no. Con la cancha estirandose, los dos quedan pegados al piso. */
+.vs-col { display: flex; flex-direction: column; }
+.vs-col > .vs-cancha { flex: 1 1 auto; }
 .vsj:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.22); }
 .vsj-pts {
     font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem;
@@ -3722,7 +3747,7 @@ th[data-k="rol"] { white-space: nowrap; }
 .vsj-vacia {
     justify-content: center; color: var(--text-muted);
     border-style: dashed; background: rgba(10,14,12,0.3);
-    font-size: 1.1rem; font-weight: 700; min-height: 52px;
+    font-size: 1.1rem; font-weight: 700;   /* la altura la pone .vsj: tienen que medir igual */
 }
 .vsj-vacia small { display: block; font-size: 0.55rem; letter-spacing: 0.06em; }
 .vsj-vacia:hover { border-color: var(--primary); color: var(--primary); }
@@ -4688,7 +4713,7 @@ th[data-k="rol"] { white-space: nowrap; }
 .fp-pie b { color: var(--text-main); }
 
 </style>
-    <meta name="gdt-build" content="9e0bf15b3a39 | 2026-09-13 02:29">
+    <meta name="gdt-build" content="c1ae5a27e0e1 | 2026-09-13 20:44">
 </head>
 <body>
     <!-- UNA SOLA BARRA.
@@ -10001,11 +10026,29 @@ function _acumDe(pos) {
   ks.forEach(k => { c += v.h[k]; cum.push(c); });
   return (_ACUM[pos] = { ks, cum, tot: c, media: v.media });
 }
+// EL SORTEO TIENE QUE DAR SIEMPRE LO MISMO (13/09).
+// Las chances salen de simular miles de fechas. Con Math.random() cada pintada
+// de la pantalla tiraba dados nuevos, asi que abrir un equipo para mirarle el
+// once movia el numero de otro: "85,0%" pasaba a "85,9%" sin que cambiara nada.
+// No estaba mal calculado —con 8.000 simulaciones el error es de ~0,4 puntos y
+// eso es exactamente lo que se movia— pero un numero que baila cuando uno solo
+// mira no se puede leer, y peor, no se puede creer.
+// Con semilla fija el mismo estado da SIEMPRE el mismo resultado, y si el
+// numero cambia es porque cambio algo de verdad.
+let _sem = 1;
+function _resembrar(n) { _sem = (n >>> 0) || 1; }
+function _rnd() {                                   // mulberry32
+  _sem = (_sem + 0x6D2B79F5) | 0;
+  let t = Math.imul(_sem ^ (_sem >>> 15), 1 | _sem);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+const SEMILLA = 20260913;
 function _sortear(p) {
   const base = (p.epsj != null ? p.epsj : (p.ep || 0));
   const a = _acumDe(p.pos);
   if (!a || !a.tot) return base;
-  const r = Math.random() * a.tot;
+  const r = _rnd() * a.tot;
   let lo = 0, hi = a.cum.length - 1;
   while (lo < hi) { const m = (lo + hi) >> 1; if (a.cum[m] <= r) lo = m + 1; else hi = m; }
   return base + (a.ks[lo] - a.media);
@@ -10032,7 +10075,11 @@ function chanceGanar(A, B, sims) {
     return { a: base > 0 ? 1 : 0, b: base < 0 ? 1 : 0, empate: base === 0 ? 1 : 0,
              sims: 0, cerrado: terminado, decidido: true, sinCinta };
   }
-  const N = sims || 6000;
+  // 30.000 en vez de 6.000: son 12 ms y bajan el error de la simulacion de
+  // ~0,6 puntos a ~0,26. Con la semilla fija el numero ya no baila, pero que
+  // ademas sea preciso hace que un 85,3 signifique 85,3 y no "85 y monedas".
+  const N = sims || 30000;
+  _resembrar(SEMILLA);
   let ga = 0, gb = 0, emp = 0;
   for (let i = 0; i < N; i++) {
     let d = base;
@@ -10689,7 +10736,8 @@ function chancesLiga(ms, sims) {
     const g = base.map(b => b === max ? 1 : 0), n = g.reduce((a, b) => a + b, 0);
     return { p: g.map(x => x / n), sims: 0, cerrado: true, pendientes: 0 };
   }
-  const N = sims || 8000;
+  const N = sims || 40000;      // 50 ms; error de simulacion ~0,26 puntos
+  _resembrar(SEMILLA);
   const gan = ms.map(() => 0);
   const tiro = new Float64Array(union.length);
   const tot = new Float64Array(ms.length);
@@ -12493,9 +12541,20 @@ function estadoRescate() {
   if (V.fecha === D.fechaObjetivo) return null;       // de eso se encarga autoCapturar
   if (leerHist()[V.fecha]) return null;               // ya está guardada
   const H = (typeof window !== 'undefined') && window.HIST ? window.HIST[V.fecha] : null;
-  if (!H || !H.esperados) return { fecha: V.fecha, falta: 'hist' };
+  // {} ES VERDADERO (13/09). Este chequeo era "!H.esperados", y un objeto vacio
+  // pasa. Las fechas viejas de dataHist.js vienen con esperados:{} y once:[]
+  // porque su historial/fecha_N.json es anterior al campo "todos". Con eso, el
+  // rescate se daba por listo, corria SOLO al abrir la pagina, y guardaba una
+  // foto con CERO esperados y —peor— con el once que el motor recomienda HOY,
+  // que es un equipo que en esa fecha no existio. Esa foto despues no habia
+  // forma de distinguirla de una buena.
+  const cuantos = (H && H.esperados) ? Object.keys(H.esperados).length : 0;
+  if (!H || cuantos < 50) return { fecha: V.fecha, falta: 'hist' };
+  // sin el once de esa fecha, la foto mostraria el once de hoy con los puntos
+  // de entonces: mejor no tenerla que tenerla mal
+  if (!Array.isArray(H.once) || H.once.length < 7) return { fecha: V.fecha, falta: 'once' };
   if (!V.generadoCon || V.generadoCon !== D.generado) return { fecha: V.fecha, falta: 'sello' };
-  return { fecha: V.fecha, listo: true, V, esperados: H.esperados, n: H.n || 0 };
+  return { fecha: V.fecha, listo: true, V, esperados: H.esperados, n: cuantos };
 }
 window.rescatarFecha = function (silencio) {
   const e = estadoRescate();
@@ -12523,10 +12582,18 @@ function autoCapturar() {
   } catch (e) { }
   try {
     if (!D || !VIVO || D.fechaObjetivo == null) return;
-    if (!fechaTerminada()) return;
     const h = leerHist(), y = h[D.fechaObjetivo];
+    const hay = (VIVO.partidos || []).length;
+    // LA FOTO DE LA FECHA EN CURSO SE REFRESCA SOLA (13/09).
+    // Antes solo se sacaba con la fecha terminada. Pero si uno apretaba
+    // "actualizar la foto" un sábado a la tarde, esa foto —con dos partidos
+    // publicados— quedaba clavada en Revisión todo el fin de semana, diciendo
+    // "2 de 11 jugaron" mientras el Versus ya mostraba siete. Dos pantallas de
+    // la misma app contando cosas distintas.
+    if (y && !y.completa && hay > (y.partidos || 0)) { capturarFecha(true); return; }
+    if (!fechaTerminada()) return;
     // si ya está guardada con los mismos partidos, no se toca
-    if (y && y.completa && y.partidos >= (VIVO.partidos || []).length) return;
+    if (y && y.completa && y.partidos >= hay) return;
     capturarFecha(true);
   } catch (e) { }
 }
@@ -12534,6 +12601,19 @@ function autoCapturar() {
 // ── LA PANTALLA ────────────────────────────────────────────────────────────
 let REV_FECHA = null;
 window.verRevision = function (n) { REV_FECHA = +n; pintarRevision(); };
+// Una foto mal sacada no se arregla sola: queda guardada en el navegador y
+// pisa cualquier intento posterior. Sin un boton para tirarla, el unico camino
+// era vaciar el localStorage entero y perder tambien las buenas.
+window.borrarFoto = function (n) {
+  const h = leerHist();
+  if (!h[n]) return;
+  if (!confirm('¿Borrar la foto de la fecha ' + n + '?\n\n' +
+    'Se puede volver a sacar mientras dataVivo.js siga siendo de esa fecha. ' +
+    'Si ya pasó, esa foto se pierde.')) return;
+  delete h[n]; guardarHist(h);
+  REV_FECHA = null;
+  pintarRevision();
+};
 
 function bloqueRescate(r) {
   if (!r || r.fecha == null) return '';
@@ -12544,8 +12624,12 @@ function bloqueRescate(r) {
     <b>dataVivo.js</b> se cruzó contra un <code>datos.js</code> anterior: sus números de jugador ya no
     corresponden y colgarle los puntos a otro sería peor que no tenerlos.
     Corré <b>SYNC_VIVO.bat</b> —tarda dos segundos— y volvé a entrar acá.</div>`;
-  return `<div class="rev-aviso">La <b>fecha ${r.fecha}</b> quedó sin foto y falta <b>dataHist.js</b>,
-    que es donde el motor guarda lo que esperaba de cada uno. Corré <b>RECALCULAR.bat</b> y volvé a entrar.</div>`;
+  if (r.falta === 'once') return `<div class="rev-aviso">La <b>fecha ${r.fecha}</b> quedó sin foto y en
+    <b>dataHist.js</b> no está el once que el motor recomendaba esa semana. Rearmarla mostraría el once
+    de <b>hoy</b> con los puntos de entonces: un equipo que nunca existió. Prefiero no hacerla.</div>`;
+  return `<div class="rev-aviso">La <b>fecha ${r.fecha}</b> quedó sin foto y en <b>dataHist.js</b> no está
+    lo que el motor esperaba de cada jugador esa semana —su <code>historial/fecha_${r.fecha}.json</code> es
+    anterior al campo que lo guarda—. Sin eso, la foto no tendría con qué comparar.</div>`;
 }
 function pintarRevision() {
   const cont = $('pantalla-revision'); if (!cont) return;
@@ -12578,17 +12662,33 @@ function pintarRevision() {
   const f = hs[REV_FECHA];
   const enCurso = !!(D && D.fechaObjetivo === f.fecha);
 
-  const selector = ns.length > 1
-    ? `<div class="rev-sel">${ns.map(n => `<button class="chip-filtro${n === REV_FECHA ? ' on' : ''}"
-        onclick="verRevision(${n})">Fecha ${n}</button>`).join('')}</div>` : '';
+  const selector = `<div class="rev-sel">${ns.map(n => `<button class="chip-filtro${n === REV_FECHA ? ' on' : ''}"
+      onclick="verRevision(${n})">Fecha ${n}</button>`).join('')}
+      <button class="chip-filtro rev-borrar" onclick="borrarFoto(${f.fecha})"
+        title="${esc('Tirar la foto de la fecha ' + f.fecha + '. Sirve cuando quedó mal sacada.')}">✕ borrar esta foto</button>
+    </div>`;
+
+  // UNA FOTO POBRE HAY QUE DECIRLA (13/09). Si la mayoría del once no tiene
+  // esperado, todas las comparaciones de abajo son aire, y hasta ahora eso se
+  // veía como un montón de "s/d" sueltos sin explicar de dónde salían.
+  const sinEsp = ((f.motor && f.motor.sinEsp) || 0) + ((f.mio && f.mio.sinEsp) || 0);
+  const totEsp = ((f.motor && f.motor.once) || []).length + ((f.mio && f.mio.once) || []).length;
+  const avisoPobre = (totEsp > 0 && sinEsp >= totEsp / 2) ? `<div class="rev-aviso rev-aviso-mal">
+    Esta foto se sacó <b>sin los esperados</b> de la fecha ${f.fecha}: ${sinEsp} de ${totEsp} jugadores
+    no tienen con qué compararse. Salió de un rescate que no debería haber corrido.
+    Lo más sano es <b>borrarla</b> con el botón de arriba.</div>` : '';
 
   cont.innerHTML = `
     ${cabecera('Revisión', 'Fecha ' + f.fecha + ' · ' + (f.completa ? 'terminada' : f.partidos + ' de ' + f.deTotal + ' partidos') +
       ' · foto del ' + fechaCorta(f.cuando), `<button class="vs-btn vs-btn-chico" onclick="capturarFecha()"
         title="Vuelve a sacar la foto de la fecha que el motor tiene ahora. Si ya existe, la pisa.">actualizar la foto</button>`)}
     ${selector}
+    ${avisoPobre}
     ${enCurso && !f.completa ? `<div class="rev-aviso">La fecha ${f.fecha} <b>todavía se está jugando</b>:
-      lo de abajo es parcial. Cuando estén los ${f.deTotal} partidos, la foto se rehace sola.</div>` : ''}
+      lo de abajo es la foto de <b>${f.partidos}</b> de ${f.deTotal} partidos${
+        VIVO && (VIVO.partidos || []).length > (f.partidos || 0)
+          ? `, y ya hay <b>${(VIVO.partidos || []).length}</b> publicados. Se rehace sola al entrar; si no, tocá "actualizar la foto"`
+          : '. Cuando estén los ' + f.deTotal + ', se rehace sola'}.</div>` : ''}
     ${bloqueRescate(resc)}
     ${bloqueRevTres(f)}
     ${bloqueRevMotor(f)}

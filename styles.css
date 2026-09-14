@@ -3539,6 +3539,9 @@ th[data-k="rol"] { white-space: nowrap; }
     display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
     padding: 0.55rem 0.9rem; font-size: 0.78rem; font-weight: 700;
     border-bottom: 1px solid var(--border-color);
+    /* Con el once armado esta barra trae botones y mide 40px; sin armar, 37.
+       Tres pixeles que corren la cancha entera de un lado respecto del otro. */
+    min-height: 40px; box-sizing: border-box;
 }
 .vs-col-tit small { color: var(--text-muted); font-weight: 500; }
 .vs-herr { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
@@ -3598,6 +3601,9 @@ th[data-k="rol"] { white-space: nowrap; }
     background: rgba(10,14,12,0.55); border: 1px solid rgba(255,255,255,0.07);
     font-size: 0.66rem; cursor: pointer; flex: 1 1 0; min-width: 0;
     transition: border-color 0.12s ease;
+    /* igual que las fichas: el chip con jugador y el vacio miden lo mismo, si no
+       las dos tiras de BANCO no arrancan a la misma altura */
+    min-height: 24px; box-sizing: border-box;
 }
 .vsb:hover { border-color: rgba(255,255,255,0.22); }
 .vsb-pos { font-size: 0.52rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.04em; }
@@ -3658,19 +3664,38 @@ th[data-k="rol"] { white-space: nowrap; }
 .vs-cinta-falta { color: var(--warning, #f59e0b); }
 .vs-cinta-falta input { border-color: var(--warning, #f59e0b); }
 
+/* Revisión: tirar una foto mal sacada, y decir cuándo una foto no sirve. */
+.rev-borrar { margin-left: auto; opacity: 0.7; }
+.rev-borrar:hover { opacity: 1; color: var(--danger, #ef4444); border-color: var(--danger, #ef4444); }
+.rev-sel { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
+.rev-aviso-mal {
+    border-left: 3px solid var(--danger, #ef4444);
+    background: rgba(239,68,68,0.08);
+}
+
 @media (max-width: 720px) {
     .vs-banco { padding: 0.4rem 0.45rem; }
     .vsb { flex: 1 1 44%; }
 }
 
 /* la ficha: chica a proposito, porque hay veintidos en pantalla */
+/* LAS DOS CANCHAS TIENEN QUE ALINEARSE (13/09). La ficha con jugador mide tres
+   renglones (puntos, apellido, club) y el hueco vacio uno solo: 60px contra 52.
+   Ocho pixeles por fila que se van sumando, asi que con un lado armado y el
+   otro vacio las lineas quedaban corridas y los dos BANCO a 36px de distancia.
+   Altura fija para las dos y listo. */
 .vsj {
-    position: relative; width: 82px; padding: 0.3rem 0.2rem 0.28rem;
+    position: relative; width: 82px; min-height: 60px; padding: 0.3rem 0.2rem 0.28rem;
     border-radius: var(--radius-sm); text-align: center; cursor: pointer;
     background: rgba(10,14,12,0.55); border: 1px solid rgba(255,255,255,0.07);
-    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
     transition: transform 0.12s ease, border-color 0.12s ease;
 }
+/* Y el banco va SIEMPRE abajo del todo: si una linea se parte en dos por falta
+   de ancho, la columna crece y sin esto el banco de un lado sube y el del otro
+   no. Con la cancha estirandose, los dos quedan pegados al piso. */
+.vs-col { display: flex; flex-direction: column; }
+.vs-col > .vs-cancha { flex: 1 1 auto; }
 .vsj:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.22); }
 .vsj-pts {
     font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.05rem;
@@ -3712,7 +3737,7 @@ th[data-k="rol"] { white-space: nowrap; }
 .vsj-vacia {
     justify-content: center; color: var(--text-muted);
     border-style: dashed; background: rgba(10,14,12,0.3);
-    font-size: 1.1rem; font-weight: 700; min-height: 52px;
+    font-size: 1.1rem; font-weight: 700;   /* la altura la pone .vsj: tienen que medir igual */
 }
 .vsj-vacia small { display: block; font-size: 0.55rem; letter-spacing: 0.06em; }
 .vsj-vacia:hover { border-color: var(--primary); color: var(--primary); }

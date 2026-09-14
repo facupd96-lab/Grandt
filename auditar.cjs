@@ -5,8 +5,12 @@
    ══════════════════════════════════════════════════════════════════════════ */
 const fs=require('fs'), vm=require('vm');
 const L=(s)=>console.log(s);
-const problemas=[], avisos=[], ok=[];
+const problemas=[], avisos=[], ok=[], fatales=[];
 const P_=(t)=>problemas.push(t), A_=(t)=>avisos.push(t), OK=(t)=>ok.push(t);
+// FATAL = publicar esto es peor que no publicar. Lo demas se avisa y se
+// publica igual: dejar a los amigos con datos de hace tres dias por un
+// control quisquilloso es peor que publicar algo con una imprecision.
+const F_=(t)=>{ fatales.push(t); problemas.push(t); };
 const leer=(f)=>{ try{ return JSON.parse(fs.readFileSync(f,'utf8')); }catch(e){ return null; } };
 
 const OUT=leer('salida.json');
@@ -29,6 +33,35 @@ L('');
 L('  ══════════════════════════════════════════════════════════════');
 L('   AUDITORIA DE DATOS   ·   motor '+(OUT.version||'sin sello'));
 L('   fecha objetivo '+OUT.fechaObjetivo+'  ·  ultima fecha jugada '+FJ+'  ·  '+TODOS.length+' jugadores');
+
+// ¿ESTAMOS PRONOSTICANDO UNA FECHA QUE YA SE JUGO? (14/09)
+// Si la ultima fecha jugada alcanzo a la fecha objetivo, el motor esta
+// proyectando partidos que YA terminaron, y encima con las estadisticas de
+// esos mismos partidos ya sumadas a cada jugador: se predice a si mismo. Los
+// numeros que salen parecen normales —no hay nada roto a la vista— pero estan
+// todos mal, y el ranking se da vuelta sin explicacion.
+// Pasa al recalcular con el fixture viejo: Planeta ya cargo los puntajes de la
+// fecha pero SYNC_365/SYNC_COPAS no corrieron, asi que para el motor esos
+// partidos siguen "por jugarse".
+{
+  // "ultimaFechaJugada" es la ultima fecha con ALGUN partido jugado, asi que
+  // durante la fecha vale lo mismo que fechaObjetivo y eso es normal. Lo que
+  // hay que mirar es cuantos partidos DE ESTA fecha ya se jugaron.
+  const PS = OUT.partidos || [];
+  const jug = PS.filter(m => m && m.yaJugado === true).length;
+  if (PS.length && jug === PS.length) {
+    F_('EL MOTOR SIGUE APUNTANDO A LA FECHA '+OUT.fechaObjetivo+' Y ESOS '+PS.length+' PARTIDOS YA SE JUGARON TODOS. '+
+       'Deberia haber pasado a la siguiente. Como las estadisticas de esta fecha ya estan adentro de cada jugador, '+
+       'se esta prediciendo a si mismo y todos los rankings estan mal. Casi seguro el fixture quedo viejo: '+
+       'corré SYNC_365.bat y SYNC_COPAS.bat, y despues RECALCULAR.bat.');
+  } else if (jug > 0) {
+    A_(jug+' de los '+PS.length+' partidos de la fecha '+OUT.fechaObjetivo+' YA SE JUGARON, y el motor los sigue '+
+       'proyectando con las estadisticas de esos mismos partidos ya sumadas. Los numeros de esos jugadores no son '+
+       'un pronostico: miralos solo en el Versus y en el Torneo, donde se usan los puntos reales. El ranking de '+
+       'Jugadores recien vuelve a servir cuando el motor pase a la fecha siguiente.');
+    OK('la fecha '+OUT.fechaObjetivo+' esta en juego: '+(PS.length-jug)+' partido(s) por jugarse');
+  } else OK('la fecha que se proyecta ('+OUT.fechaObjetivo+') todavia no empezo');
+}
 L('  ══════════════════════════════════════════════════════════════');
 
 // ── 1. minutos y partidos imposibles ────────────────────────────────────────
@@ -320,6 +353,29 @@ if(!GD){
   }
 }
 
+// ── 14.b RESULTADOS FANTASMA (14/09) ────────────────────────────────────────
+// Aparecio con la fecha 9: tres partidos que todavia no se habian jugado
+// figuraban 0-0 y "terminado" en fixtureCompleto. Sale de armar.cjs, que cuando
+// un gid de 365 no tiene eventos de gol lo toma como 0-0 valido. Un 0-0
+// inventado no es cosmetico: le regala una valla invicta y un partido sin goles
+// a los seis equipos, y eso entra en las cuentas de todos sus jugadores.
+if(Array.isArray(OUT.partidos) && Array.isArray(OUT.fixtureCompleto)){
+  const porPar={};
+  OUT.fixtureCompleto.forEach(m=>{ porPar[CT(m.local)+'|'+CT(m.visitante)]=m; });
+  const fantasma=OUT.partidos.filter(p=>{
+    if(p.yaJugado===true) return false;
+    const m=porPar[CT(p.local)+'|'+CT(p.visitante)];
+    return m && m.terminado===true && m.golesLocal!=null;
+  });
+  if(fantasma.length){
+    P_(fantasma.length+' partido(s) que TODAVIA NO SE JUGARON figuran con resultado en el fixture: '+
+      fantasma.map(p=>p.local+'-'+p.visitante+' ('+(porPar[CT(p.local)+'|'+CT(p.visitante)].golesLocal)+'-'+
+      (porPar[CT(p.local)+'|'+CT(p.visitante)].golesVisitante)+')').join(' · ')+
+      '. Es un 0-0 inventado: armar.cjs toma "sin eventos de gol" como 0-0. A esos equipos les suma una valla '+
+      'invicta y un partido sin goles que no existieron, y eso entra en las cuentas de todos sus jugadores.');
+  } else OK('ningun partido sin jugar tiene resultado cargado');
+}
+
 // ── 15. cobertura de 365Scores: partidos que le faltan ──────────────────────
 // 365Scores arma la lista de partidos con una ventana movil, asi que si un
 // partido no aparecio el dia que corrimos el sync, no entra nunca mas. Cuatro
@@ -371,3 +427,13 @@ L(problemas.length ? '   HAY '+problemas.length+' PROBLEMA(S). No confies en los
                    : '   Todo en orden.');
 L('  ══════════════════════════════════════════════════════════════');
 L('');
+// CODIGO DE SALIDA (14/09). Hasta hoy esto imprimia y devolvia cero, asi que
+// una corrida automatica leia "todo bien" y publicaba igual: el auditor habia
+// cazado el fixture viejo y el aviso quedo enterrado en el log.
+//   3 = fatal, no publiques
+//   0 = publica igual (los problemas comunes se imprimen y se ven en el log)
+if(fatales.length){
+  L('   ESTO ES FATAL: no publiques hasta arreglarlo.');
+  L('');
+}
+process.exit(fatales.length ? 3 : 0);
