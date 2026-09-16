@@ -371,9 +371,35 @@ if(Array.isArray(OUT.partidos) && Array.isArray(OUT.fixtureCompleto)){
     P_(fantasma.length+' partido(s) que TODAVIA NO SE JUGARON figuran con resultado en el fixture: '+
       fantasma.map(p=>p.local+'-'+p.visitante+' ('+(porPar[CT(p.local)+'|'+CT(p.visitante)].golesLocal)+'-'+
       (porPar[CT(p.local)+'|'+CT(p.visitante)].golesVisitante)+')').join(' · ')+
-      '. Es un 0-0 inventado: armar.cjs toma "sin eventos de gol" como 0-0. A esos equipos les suma una valla '+
+      '. El resultado que figura NO es de fiar: o 365Scores no tenia eventos cargados, o se bajo con el '+
+      'partido en curso. A esos equipos les puede estar sumando una valla '+
       'invicta y un partido sin goles que no existieron, y eso entra en las cuentas de todos sus jugadores.');
   } else OK('ningun partido sin jugar tiene resultado cargado');
+}
+
+// ── 14.c CUOTAS BAJADAS CON EL PARTIDO EMPEZADO (14/09) ─────────────────────
+// Si SYNC_CUOTAS corre despues del pitazo inicial, lo que baja son cuotas EN
+// VIVO. Paso con Huracan-Racing: Racing pagaba 11,37 porque ya iba perdiendo,
+// y el margen de la casa dio -0,46 (en un mercado previo siempre es +0,03 a
+// +0,05; una casa no paga mas de lo que recauda). De esas cuotas salen los
+// goles esperados del partido, asi que se contamina la proyeccion de los 30
+// jugadores de los dos equipos.
+if(CU && Array.isArray(CU.cuotas) && CU.generado){
+  const gen=Date.parse(CU.generado);
+  const tarde=CU.cuotas.filter(c=>{ const t=Date.parse(c.cuando); return isFinite(t)&&isFinite(gen)&&t<gen; });
+  const margenRaro=CU.cuotas.filter(c=>typeof c.margenCasa==='number' && c.margenCasa<0);
+  if(tarde.length){
+    P_(tarde.length+' partido(s) tienen la cuota bajada DESPUES de que empezaron, asi que son cuotas EN VIVO, '+
+      'no un pronostico: '+tarde.slice(0,4).map(c=>c.local+'-'+c.visitante+' ('+
+      Math.round((gen-Date.parse(c.cuando))/60000)+' min tarde, paga '+c.cuotaVisitante+' el visitante)').join(' · ')+
+      '. De ahi salen los goles esperados del partido: la proyeccion de los jugadores de esos equipos esta mal. '+
+      'Corré SYNC_CUOTAS.bat ANTES de que arranque la fecha.');
+  } else OK('ninguna cuota se bajo con el partido ya empezado');
+  if(margenRaro.length){
+    A_(margenRaro.length+' partido(s) con margen de casa negativo ('+
+      margenRaro.slice(0,3).map(c=>c.local+'-'+c.visitante+' '+c.margenCasa).join(' · ')+
+      '). Eso no existe en un mercado previo: casi seguro se mezclaron cuotas en vivo con cuotas viejas.');
+  }
 }
 
 // ── 15. cobertura de 365Scores: partidos que le faltan ──────────────────────

@@ -1420,6 +1420,7 @@ tr.tb-jugado:hover { opacity: 1; }
 .fx2-card:hover { background: rgba(255, 255, 255, 0.02); }
 .fx2-head {
     display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 4px;
     font-size: 0.68rem; color: var(--text-muted); font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
 }
@@ -4701,3 +4702,61 @@ th[data-k="rol"] { white-space: nowrap; }
 .fp-tercera { margin-left: auto; }
 .fp-pie { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; margin: 0.8rem 0 0; max-width: 82ch; }
 .fp-pie b { color: var(--text-main); }
+
+/* ═══ CÓRNERS: el que más genera contra el que más concede ══════════════════
+   Verde azulado a propósito: no es una alerta (rojo/ámbar ya están tomados por
+   rotación y disponibilidad) ni un dato de puntaje. Es una oportunidad para
+   mirar el partido, y tiene que leerse como algo aparte. */
+.pill-corner {
+    color: #5eead4;
+    background: rgba(45, 212, 191, 0.14);
+    border: 1px solid rgba(45, 212, 191, 0.42);
+}
+.fx-corner {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #5eead4;
+    background: rgba(45, 212, 191, 0.12);
+    border: 1px solid rgba(45, 212, 191, 0.32);
+    border-radius: var(--radius-pill);
+    padding: 1px 7px;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+    /* Siempre en su propio renglón: en 320px de barra lateral no entran la
+       hora, la línea de goles y esto en la misma fila sin espachurrarse. */
+    order: 3;
+    flex: 1 0 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pn-corner {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 0 0.6rem;
+    padding: 7px 10px;
+    border-radius: var(--radius-md, 8px);
+    background: rgba(45, 212, 191, 0.10);
+    border: 1px solid rgba(45, 212, 191, 0.30);
+    font-size: 0.74rem;
+    line-height: 1.5;
+}
+.pn-corner > b { color: #5eead4; font-size: 0.78rem; }
+.pn-corner span { color: var(--text-muted); }
+.pn-corner span b { color: var(--text-main); }
+
+/* La aclaración de qué fecha es el once ideal: cuando la fecha está en curso
+   el once que se muestra es el de la anterior, porque la planilla publica los
+   puntajes recién al cerrar. Sin este renglón parecía un error. */
+.oi-nota {
+    margin: 0.55rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+.oi-nota b { color: var(--text-main); }
+/* El "JUGADO" dentro del nombre en las tablas de datos: más chico que el del
+   fixture, que ahí es el título de la tarjeta y acá va pegado a un nombre. */
+.player-name .fx-jugado { font-size: 0.58rem; vertical-align: middle; }

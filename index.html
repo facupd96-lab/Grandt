@@ -1430,6 +1430,7 @@ tr.tb-jugado:hover { opacity: 1; }
 .fx2-card:hover { background: rgba(255, 255, 255, 0.02); }
 .fx2-head {
     display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 4px;
     font-size: 0.68rem; color: var(--text-muted); font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;
 }
@@ -4712,8 +4713,66 @@ th[data-k="rol"] { white-space: nowrap; }
 .fp-pie { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; margin: 0.8rem 0 0; max-width: 82ch; }
 .fp-pie b { color: var(--text-main); }
 
+/* ═══ CÓRNERS: el que más genera contra el que más concede ══════════════════
+   Verde azulado a propósito: no es una alerta (rojo/ámbar ya están tomados por
+   rotación y disponibilidad) ni un dato de puntaje. Es una oportunidad para
+   mirar el partido, y tiene que leerse como algo aparte. */
+.pill-corner {
+    color: #5eead4;
+    background: rgba(45, 212, 191, 0.14);
+    border: 1px solid rgba(45, 212, 191, 0.42);
+}
+.fx-corner {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #5eead4;
+    background: rgba(45, 212, 191, 0.12);
+    border: 1px solid rgba(45, 212, 191, 0.32);
+    border-radius: var(--radius-pill);
+    padding: 1px 7px;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+    /* Siempre en su propio renglón: en 320px de barra lateral no entran la
+       hora, la línea de goles y esto en la misma fila sin espachurrarse. */
+    order: 3;
+    flex: 1 0 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.pn-corner {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0 0 0.6rem;
+    padding: 7px 10px;
+    border-radius: var(--radius-md, 8px);
+    background: rgba(45, 212, 191, 0.10);
+    border: 1px solid rgba(45, 212, 191, 0.30);
+    font-size: 0.74rem;
+    line-height: 1.5;
+}
+.pn-corner > b { color: #5eead4; font-size: 0.78rem; }
+.pn-corner span { color: var(--text-muted); }
+.pn-corner span b { color: var(--text-main); }
+
+/* La aclaración de qué fecha es el once ideal: cuando la fecha está en curso
+   el once que se muestra es el de la anterior, porque la planilla publica los
+   puntajes recién al cerrar. Sin este renglón parecía un error. */
+.oi-nota {
+    margin: 0.55rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+.oi-nota b { color: var(--text-main); }
+/* El "JUGADO" dentro del nombre en las tablas de datos: más chico que el del
+   fixture, que ahí es el título de la tarjeta y acá va pegado a un nombre. */
+.player-name .fx-jugado { font-size: 0.58rem; vertical-align: middle; }
+
 </style>
-    <meta name="gdt-build" content="c1ae5a27e0e1 | 2026-09-13 20:44">
+    <meta name="gdt-build" content="58db039a546c | 2026-09-14 22:21">
 </head>
 <body>
     <!-- UNA SOLA BARRA.
@@ -4906,7 +4965,7 @@ th[data-k="rol"] { white-space: nowrap; }
                     </div>
                     <div class="nota-corte">Los <b>ocho primeros</b> de cada zona pasan a los octavos de final. La línea marca dónde termina la clasificación.</div>
 
-                    <div class="table-responsive standings-wrap" style="overflow-x:hidden;">
+                    <div class="table-responsive standings-wrap" style="overflow-x:auto;">
                         <table class="standings-table">
                             <thead>
                                 <tr>
@@ -6851,7 +6910,11 @@ function pintarDatos() {
       ${cuerpo}
       ${nota ? `<details class="tabla-referencia ref-det"><summary>Cómo se lee esta tabla y de dónde salen los números</summary><div>${nota}</div></details>` : ''}
     </div>`;
-  const chip = x => `<div class="player-info"><div class="player-name">${esc(nombreCorto(x.nombre))}</div>
+  // El que ya jugó su partido de esta fecha queda marcado, no escondido: el
+  // dato sigue siendo cierto y a mitad de fecha esconderlos dejaba estas tablas
+  // con dos filas. Los que faltan jugar van primero (los ordena el motor).
+  const chip = x => `<div class="player-info"><div class="player-name">${esc(nombreCorto(x.nombre))}${
+      x.yaJugado ? ' <span class="fx-jugado" title="Su partido de esta fecha ya se jugó: el dato sigue valiendo, pero ya no lo podés usar para esta fecha.">JUGADO</span>' : ''}</div>
       <div class="player-sub">${esc(x.equipo)} · ${x.condicion === 'L' ? 'L' : 'V'} vs ${esc(x.rival)}</div></div>`;
 
   // ── LEY DEL EX ───────────────────────────────────────────────────────────
@@ -6895,7 +6958,7 @@ function pintarDatos() {
             : (x.partidos === 1 ? '<span class="op-cuenta">viene de marcar</span>' : '<span class="text-muted">—</span>')}</td>`,
         `<td class="text-center">${n2(x.EP)}</td>`
       ])))}
-    </table>` : vacio('Nadie con dos goles o más en sus últimos cinco partidos.');
+    </table>` : vacio('Nadie de la liga llega con dos goles o más en sus últimos cinco partidos.');
 
   // ── LE DEBEN GOLES ───────────────────────────────────────────────────────
   const deb = C.leDeben || [];
@@ -7213,7 +7276,11 @@ function pintarDatos() {
           </div>`).join('')}</div>
         </div>`;
       }).join('')}
-    </div>` : vacio('Todavía no hay una fecha jugada con puntajes cargados.');
+    </div>
+    ${oi.fecha < (D.fechaObjetivo || 0) ? `<p class="oi-nota">Es el once de la fecha <b>${oi.fecha}</b>:
+      la planilla de Gran DT publica los puntajes cuando la fecha termina, así que el de la
+      fecha ${D.fechaObjetivo} aparece acá recién cuando los cargue.</p>` : ''}`
+    : vacio('La planilla de Gran DT todavía no publicó los puntajes de ninguna fecha. En cuanto los cargue, el once ideal aparece solo.');
 
   // ── FIGURAS ──────────────────────────────────────────────────────────────
   const fig = C.figuras || [];
@@ -7875,6 +7942,7 @@ function pintarFixture() {
       <div class="fx2-head">
         <span>${m.yaJugado ? '<span class="fx-jugado" title="Este partido ya se jugó">JUGADO</span> ' : ''}${esc(hora)}</span>
         ${m.lineaTotales != null ? `<span class="fx-ou" title="Línea de goles del mercado: las casas ponen el corte en ${m.lineaTotales} goles TOTALES entre los dos equipos y pagan casi lo mismo por encima o por debajo. Cuanto más alta, más goles se esperan en el partido.">${m.lineaTotales} goles</span>` : ''}
+        ${badgeCorners(m)}
       </div>
       ${filaEquipo(m.local, m.pGolLocal, m.pVallaLocal, m.motivoRotLocal, m.cuotaLocal, 'que gane el local', m.cuotaGolLocalEstimada)}
       ${filaEquipo(m.visitante, m.pGolVisitante, m.pVallaVisitante, m.motivoRotVisitante, m.cuotaVisitante, 'que gane el visitante', m.cuotaGolVisitanteEstimada)}
@@ -7889,7 +7957,8 @@ function pintarFixture() {
     `<div class="fx-nota">El número en negrita al lado del <b>⚽</b> es la <b>cuota de gol</b> que sale de nuestro cálculo. Comparala con la que paga tu casa: si difieren mucho en un partido, avisame y lo miramos.
       El número de arriba a la derecha (<b>2.5 goles</b>) es la línea de las casas: cuántos goles TOTALES esperan en ese partido. Cuanto más alta, partido más abierto.
       Las cuotas <b>1 / X / 2</b> son de mercado, promediadas entre casas y con el margen descontado.
-      Lo de <b>⚽</b> y <b>🛡️</b> es cálculo nuestro: la cuota de "gol de tal equipo" no existe en el plan gratis de la API.</div>`);
+      Lo de <b>⚽</b> y <b>🛡️</b> es cálculo nuestro: la cuota de "gol de tal equipo" no existe en el plan gratis de la API.
+      El <b>🚩</b> marca los tres partidos de la fecha donde el que más córners genera se cruza con el que más concede, con los córners ya contados por ESPN en este torneo. No suma puntos en Gran DT: es para mirar el partido.</div>`);
 }
 
 // ── tabla de posiciones ─────────────────────────────────────────────────────
@@ -8285,6 +8354,7 @@ function celda(x, k, i) {
       // el club anterior. Sirven para saber si es titular, pero no dicen nada
       // de cómo lo va a usar el DT nuevo.
       const pc = pillCond(x); if (pc) etq.push(pc);
+      const pcr = pillCorners(x); if (pcr) etq.push(pcr);
       if (x.mrot) etq.push(pillRotacion(x.mrot));
       else if (x.rot > 0) etq.push(`<span class="pill-alerta pill-copa">ROTA</span>`);
       if (x.mrotr) etq.push(`<span class="pill-alerta pill-copa-rival" title="Al rival le pasa esto: ${x.mrotr.tipo === 'guarda' ? 'juega copa en ' + x.mrotr.dias + ' días' : 'viene de jugar hace ' + x.mrotr.dias + ' días'}">RIVAL ${x.mrotr.tipo === 'guarda' ? 'CON COPA' : 'CANSADO'}</span>`);
@@ -11870,6 +11940,114 @@ function perfilCond(equipo, cond, ventana) {
   };
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+//  CORNERS: el que mas genera contra el que mas concede
+//  ------------------------------------------------------------------------
+//  El dato ya estaba —las columnas Crn+ y Crn− lo muestran por jugador— pero
+//  para encontrar el partido donde un equipo que tira muchos corners visita a
+//  uno que los regala habia que ordenar dos tablas y cruzarlas a mano. Esto lo
+//  hace solo y marca los partidos con 🚩.
+//
+//  NADA de esto se estima. corners y cornersRec son córners CONTADOS por ESPN
+//  en los partidos ya jugados de ESTE torneo, separados por condicion. Lo unico
+//  que se hace es promediar los dos lados de la misma pregunta:
+//
+//     corners esperados de A  =  (los que A genera de local
+//                               + los que B concede de visitante) / 2
+//
+//  y restarle la misma cuenta hecha con las MEDIANAS de la liga, para que el
+//  numero diga "cuantos corners de mas que un partido normal", no "8.4".
+//
+//  Con 3 o 4 partidos por condicion el promedio se mueve mucho: por eso se
+//  exige un minimo de partidos, se muestra sobre cuantos sale y solo se marcan
+//  los 3 partidos con mas ventaja. Es una señal para mirar, no un pronostico.
+// ════════════════════════════════════════════════════════════════════════════
+const CRN_MIN_PJ = 3;   // menos partidos que esto en la condicion: no se marca
+const CRN_TOP    = 3;   // cuantos partidos de la fecha se marcan
+const CRN_MIN_V  = 1.0; // ventaja minima sobre la liga para que valga marcarlo
+
+let _CRN = null;
+function cornersFecha() {
+  const v = S.condVent || 'actual';
+  _CRN = _CRN || {};
+  if (_CRN[v]) return _CRN[v];
+  const R = rankCond(v);
+  const mediana = (cond, campo) => (R[cond] && R[cond][campo]) ? R[cond][campo]._mediana : null;
+  const salida = { lista: [], porPartido: {}, porEquipo: {} };
+
+  (D.partidos || []).forEach(m => {
+    const L = perfilCond(m.local, 'local', v);
+    const V = perfilCond(m.visitante, 'visitante', v);
+    if (!L || !V || L.pj < CRN_MIN_PJ || V.pj < CRN_MIN_PJ) return;
+    const cL = L.val('corners'), rL = L.val('cornersRec');
+    const cV = V.val('corners'), rV = V.val('cornersRec');
+    if ([cL, rL, cV, rV].some(z => z == null)) return;
+    const mLc = mediana('local', 'corners'), mLr = mediana('local', 'cornersRec');
+    const mVc = mediana('visitante', 'corners'), mVr = mediana('visitante', 'cornersRec');
+    if ([mLc, mLr, mVc, mVr].some(z => z == null)) return;
+
+    const espL = (cL + rV) / 2, baseL = (mLc + mVr) / 2;
+    const espV = (cV + rL) / 2, baseV = (mVc + mLr) / 2;
+    const esL = (espL - baseL) >= (espV - baseV);
+
+    salida.lista.push({
+      local: m.local, visitante: m.visitante, yaJugado: !!m.yaJugado,
+      lado: esL ? 'L' : 'V',
+      equipo: esL ? m.local : m.visitante,
+      rival:  esL ? m.visitante : m.local,
+      condEq: esL ? 'local' : 'visitante',
+      condRi: esL ? 'visitante' : 'local',
+      esp:    esL ? espL : espV,
+      base:   esL ? baseL : baseV,
+      vent:   esL ? espL - baseL : espV - baseV,
+      genera: esL ? cL : cV,
+      pGen:   esL ? L.puesto('corners') : V.puesto('corners'),
+      concede: esL ? rV : rL,
+      pCon:   esL ? V.puesto('cornersRec') : L.puesto('cornersRec'),
+      total:  esL ? L.total('corners') : V.total('corners'),
+      pj: Math.min(L.pj, V.pj)
+    });
+  });
+
+  salida.lista.sort((a, b) => b.vent - a.vent);
+  salida.lista.filter(x => x.vent >= CRN_MIN_V).slice(0, CRN_TOP).forEach((x, i) => {
+    x.orden = i + 1;
+    salida.porPartido[claveEquipo(x.local) + '|' + claveEquipo(x.visitante)] = x;
+    salida.porPartido[claveEquipo(x.visitante) + '|' + claveEquipo(x.local)] = x;
+    salida.porEquipo[claveEquipo(x.equipo)] = x;   // solo el que GENERA: ahi esta la chance
+  });
+  return (_CRN[v] = salida);
+}
+
+// Texto largo, uno solo, para que el globito diga lo mismo en los tres lugares.
+function cornersAyuda(c) {
+  return `${NOM(c.equipo)} de ${c.condEq} genera ${n1(c.genera)} córners por partido`
+    + (c.pGen ? ` (${c.pGen}º de ${c.total} en esa condición)` : '')
+    + ` y ${NOM(c.rival)} de ${c.condRi} concede ${n1(c.concede)}`
+    + (c.pCon ? ` (${c.pCon}º de ${c.total}, contando 1 al que menos concede)` : '')
+    + `. Da ${n1(c.esp)} córners esperados para ${NOM(c.equipo)}, contra ${n1(c.base)} de un partido promedio:`
+    + ` ${n1(c.vent)} de más. Córners contados por ESPN en este torneo, sobre ${c.pj} partidos por lado`
+    + `; con esa muestra el número se mueve, es para mirar el partido, no un pronóstico.`
+    + ` No entra en el puntaje de Gran DT: los córners no suman por sí solos.`;
+}
+
+// La pilita que va al lado del nombre del jugador, solo para los del equipo que
+// genera los corners: es ahi donde esta la chance.
+function pillCorners(x) {
+  if (x.pos === 'ARQ') return '';   // la chance del corner es cabecear: el arquero no
+  const c = cornersFecha().porEquipo[claveEquipo(x.eq)];
+  if (!c) return '';
+  return `<span class="pill-alerta pill-corner" title="${esc(cornersAyuda(c))}">🚩 CÓRNERS +${n1(c.vent)}</span>`;
+}
+
+// El cartelito de la tarjeta del fixture.
+function badgeCorners(m) {
+  const c = cornersFecha().porPartido[claveEquipo(m.local) + '|' + claveEquipo(m.visitante)];
+  if (!c) return '';
+  return `<span class="fx-corner" title="${esc(cornersAyuda(c))}">🚩 ${n1(c.esp)} córners ${
+    esc(NOM(c.equipo))}</span>`;
+}
+
 // El bloque que va en la ficha del jugador: su equipo y el rival, cada uno en
 // la condicion que le toca HOY, uno al lado del otro.
 function bloquePartidoNumeros(x, ventana) {
@@ -11901,12 +12079,21 @@ function bloquePartidoNumeros(x, ventana) {
     <tr class="pn-xg"><td class="pn-k">xG en contra</td>
       <td class="pn-v">${mio && mio.xgC != null ? '<b>' + n2(mio.xgC) + '</b>' : 's/d'}</td>
       <td class="pn-v">${riv && riv.xgC != null ? '<b>' + n2(riv.xgC) + '</b>' : 's/d'}</td><td class="pn-med">–</td></tr>` : '';
+  // La bandera de corners, arriba de todo: es lo unico de este bloque que
+  // compara los DOS equipos entre si en vez de mostrarlos uno al lado del otro.
+  const crn = cornersFecha().porPartido[claveEquipo(x.eq) + '|' + claveEquipo(x.riv)];
+  const avisoCrn = !crn ? '' : `<div class="pn-corner" title="${esc(cornersAyuda(crn))}">
+    <b>🚩 Partido de córners</b>
+    <span>${esc(NOM(crn.equipo))} de ${crn.condEq} genera <b>${n1(crn.genera)}</b> por partido y ${
+      esc(NOM(crn.rival))} de ${crn.condRi} concede <b>${n1(crn.concede)}</b>:
+      <b>${n1(crn.esp)}</b> esperados contra ${n1(crn.base)} de un partido promedio.</span></div>`;
   return `<div class="pn-caja">
     <div class="md-titulo">El partido, en números
       <span class="pn-vent">
         <button class="pn-vbtn${v === 'actual' ? ' on' : ''}" onclick="verPartidoNumeros('${x.id}','actual')">este torneo</button>
         <button class="pn-vbtn${v === 'anio' ? ' on' : ''}" onclick="verPartidoNumeros('${x.id}','anio')">los dos torneos</button>
       </span></div>
+    ${avisoCrn}
     <table class="pn-tabla">
       <thead><tr><th></th>
         <th>${esc(NOM(x.eq))}<small>de ${cMio}${mio ? ' · ' + mio.pj + ' PJ' : ''}</small></th>

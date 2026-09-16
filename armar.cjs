@@ -1262,11 +1262,20 @@ const listaChoques=[];
 // Los eventos si estan completos: reproducen el marcador correcto en los 74
 // partidos donde se pudo comparar, incluidos esos 5.
 const golesPorGid={};
+const arranquePorGid={};
 (S.tarjetasDetalle||[]).forEach(t=>{
+  if(t.cuando && arranquePorGid[t.gid]==null){
+    const z=new Date(t.cuando).getTime(); if(isFinite(z)) arranquePorGid[t.gid]=z;
+  }
   if(t.tipo!=='gol') return;
   const g=golesPorGid[t.gid]=golesPorGid[t.gid]||{L:0,V:0};
   if(t.esLocal===true||t.esLocal==='True') g.L++; else g.V++;
 });
+// CUANDO SE BAJO data365 (15/09). Sin esto no hay forma de saber si el marcador
+// que trae es el final o una foto del partido en curso.
+const BAJADO_365 = (()=>{ const z=new Date(S.generado).getTime(); return isFinite(z)?z:null; })();
+// 90' + entretiempo + descuento + el rato que tarda 365 en cerrar la ficha.
+const DURA_PARTIDO = 2.5*3600*1000;
 // para saber que equipos jugaron cada gid hace falta el log de jugadores
 const equiposPorGid={};
 Object.values(S.jugadores).forEach(j=>{(j.log||[]).forEach(l=>{
@@ -1276,24 +1285,50 @@ Object.values(S.jugadores).forEach(j=>{(j.log||[]).forEach(l=>{
   if(l.fecha) g.fecha=l.fecha;
 });});
 let de365=0, choques365=0;
+const sinEventos=[], enVivo365=[];
 Object.keys(equiposPorGid).forEach(gid=>{
   const e=equiposPorGid[gid]; if(!e.local||!e.visitante) return;
-  const m=golesPorGid[gid]||{L:0,V:0};          // sin eventos = 0-0, que es un resultado valido
   const b=base.get(claveP(e.local,e.visitante));
   if(!b) return;
+  const m=golesPorGid[gid];
+
   if(b.terminado){
-    if(b.golesLocal!==m.L||b.golesVisitante!==m.V){
+    if(m && (b.golesLocal!==m.L||b.golesVisitante!==m.V)){
       choques365++;
       if(choques365<=5) console.log('  conflicto:',e.local,b.golesLocal+'-'+b.golesVisitante,e.visitante,'-> eventos dicen',m.L+'-'+m.V);
     }
     return;
   }
+
+  // (1) NI UN EVENTO DE GOL (15/09). Antes esto se tomaba como 0-0 "valido".
+  // No lo es: un partido sin eventos cargados y un 0-0 de verdad se ven igual
+  // desde aca, y al elegir 0-0 se les regalaba una valla invicta a los dos
+  // equipos, que entra en el puntaje de todos sus defensores y arqueros.
+  // Sin dato es sin dato: queda sin resultado y el auditor lo canta.
+  if(!m){ sinEventos.push(e.local+'-'+e.visitante); return; }
+
+  // (2) PARTIDO EN CURSO CUANDO SE BAJO (15/09). El marcador que trae 365 es
+  // la foto del minuto en que se bajo, no el final. Paso con Huracan-Racing de
+  // la fecha 9: data365 se bajo 22:45, el partido arranco 21:30, el ultimo
+  // evento era el gol de Waller a los 53' — entro como 1-0 final y termino
+  // 2-1. El 1-0 ya estaba en la tabla, con la valla invicta de Huracan puesta.
+  const arranque = arranquePorGid[gid] != null ? arranquePorGid[gid]
+                 : (b.fecha ? new Date(b.fecha).getTime() : null);
+  if(BAJADO_365!=null && arranque!=null && isFinite(arranque) && BAJADO_365 < arranque + DURA_PARTIDO){
+    enVivo365.push(e.local+'-'+e.visitante+' ('+m.L+'-'+m.V+' al momento de bajarlo)');
+    return;
+  }
+
   b.golesLocal=m.L; b.golesVisitante=m.V; b.terminado=true; b.fuente='365Scores eventos';
   if(b.numeroFecha==null&&e.fecha) b.numeroFecha=e.fecha;
   de365++;
 });
 if(de365) console.log('  '+de365+' resultados tomados de los eventos de gol de 365Scores');
 if(choques365) console.log('  OJO: '+choques365+' resultados en conflicto (se respeto el que ya estaba)');
+if(sinEventos.length) console.log('  '+sinEventos.length+' partido(s) jugados sin un solo evento de gol en 365Scores: '+
+  sinEventos.slice(0,6).join(' · ')+'. Quedan SIN resultado a proposito (antes entraban como 0-0 inventado). Corre SYNC_COPAS.bat.');
+if(enVivo365.length) console.log('  '+enVivo365.length+' partido(s) estaban EN CURSO cuando se bajo data365: '+
+  enVivo365.slice(0,6).join(' · ')+'. No se toma ese marcador. Corre SYNC_365.bat con el partido terminado.');
 
 const FX=[...base.values()];
 FX.forEach(m=>{ m.zona=ZONA[CT(m.local)]===ZONA[CT(m.visitante)]?ZONA[CT(m.local)]:'INT'; });
@@ -1557,7 +1592,19 @@ out.liga = Object.assign(out.liga||{}, {
 // pendientes del xG sin penales. Si un dato no se puede sostener, no entra.
 (function(){
   const TODOS=[].concat(...['ARQ','DEF','VOL','DEL'].map(p=>out.rankings[p]||[]));
+  // deLaFecha = los que TODAVIA no jugaron. Sirve para las alertas cuya
+  // pregunta se responde sola cuando el partido termina (en duda, al filo).
   const deLaFecha = TODOS.filter(x=>!x.partidoYaJugado);
+  // OJO (15/09): las listas de FORMA (en racha, le deben goles, figuras) no
+  // tienen que usar deLaFecha. Son hechos del torneo que siguen siendo ciertos
+  // despues de que el tipo juega, y filtrarlos dejaba la pantalla casi vacia a
+  // mitad de fecha: con 11 de 15 partidos jugados quedaban 4 partidos, 8
+  // equipos, y "En racha" mostraba 2 jugadores de los 35 que la cumplian.
+  // Parecia roto y no lo estaba: estaba escondiendo el 73% de la liga.
+  // Entran todos, cada fila dice si su partido ya paso (como ya hacia ley del
+  // ex) y los que quedan por jugar van primero, que son los accionables.
+  const deTodaLaFecha = TODOS.slice()
+    .sort((a,b)=>(a.partidoYaJugado?1:0)-(b.partidoYaJugado?1:0));
   const cur={ fecha: out.fechaObjetivo };
 
   // ── LEY DEL EX ───────────────────────────────────────────────────────────
@@ -1593,13 +1640,15 @@ out.liga = Object.assign(out.liga||{}, {
   cur.veda = GDT_VEDA;
 
   // ── goles que le deben (xG sin penales contra goles de jugada) ───────────
-  cur.leDeben = deLaFecha
+  cur.leDeben = deTodaLaFecha
     .filter(x=>x.individual && x.individual.minutos>=250 && x.xgTorneo!=null)
     .map(x=>{ const gJugada=(x.individual.goles||0)-(x.individual.golesPenal||0);
       return { id:x.id, nombre:x.nombre, pos:x.pos, equipo:x.equipo, rival:x.rival,
+        condicion:x.condicion, yaJugado:!!x.partidoYaJugado,
         xg:+x.xgTorneo.toFixed(2), goles:gJugada, deuda:+(x.xgTorneo-gJugada).toFixed(2),
         minutos:x.individual.minutos, EP:+x.EP.toFixed(2) }; })
-    .filter(r=>r.deuda>=0.8).sort((a,b)=>b.deuda-a.deuda).slice(0,8);
+    .filter(r=>r.deuda>=0.8)
+    .sort((a,b)=>(a.yaJugado?1:0)-(b.yaJugado?1:0)||b.deuda-a.deuda).slice(0,8);
 
   // ── en racha: quien viene metiendo ───────────────────────────────────────
   // OJO CON EL ORDEN DEL LOG (02/09). Dentro de este torneo 365Scores numera
@@ -1612,7 +1661,7 @@ out.liga = Object.assign(out.liga||{}, {
     if(a.fecha!=null && b.fecha!=null) return a.fecha-b.fecha;
     return b.gid-a.gid;   // sin numero de fecha, el gid mas alto es el mas viejo
   });
-  cur.enRacha = deLaFecha.map(x=>{
+  cur.enRacha = deTodaLaFecha.map(x=>{
       const jugados=ordenarLog(logDe[x.id]||[]).filter(l=>(l.min||0)>0);
       if(!jugados.length) return null;
       // racha = fechas seguidas convirtiendo, contadas desde la ultima que jugo
@@ -1622,12 +1671,13 @@ out.liga = Object.assign(out.liga||{}, {
       const conGol5=ult5.filter(l=>(l.goles||0)>0).length;
       if(n<2 && goles5<2) return null;
       return { id:x.id, nombre:x.nombre, pos:x.pos, equipo:x.equipo, rival:x.rival,
-               condicion:x.condicion, partidos:n,
+               condicion:x.condicion, yaJugado:!!x.partidoYaJugado, partidos:n,
                goles: jugados.slice(jugados.length-Math.max(n,1)).reduce((a,l)=>a+(l.goles||0),0),
                goles5, conGol5, pj5:ult5.length,
                ultimas: ult5.map(l=>({fecha:l.fecha??null, goles:l.goles||0, min:l.min||0})),
                EP:+x.EP.toFixed(2) }; })
-    .filter(Boolean).sort((a,b)=>b.goles5-a.goles5||b.partidos-a.partidos||b.EP-a.EP);
+    .filter(Boolean)
+    .sort((a,b)=>(a.yaJugado?1:0)-(b.yaJugado?1:0)||b.goles5-a.goles5||b.partidos-a.partidos||b.EP-a.EP);
 
   // ── equipos: donde sacan los puntos ──────────────────────────────────────
   // LOS 30, NO UNA SELECCION. Antes solo se mostraban los extremos (80% o mas
@@ -1704,7 +1754,25 @@ out.liga = Object.assign(out.liga||{}, {
   // out.ultimaFechaJugada se asigna mas abajo, asi que aca se usa la misma
   // cuenta: la ultima fecha del fixture con al menos 8 partidos jugados, y si
   // no hay fixture, la que dice la planilla.
-  const fUlt = out.ultimaFechaJugada || ultimaJugada || P.ultimaFecha || 0;
+  // OJO (15/09): "ultima fecha jugada" NO es "ultima fecha publicada".
+  // ultimaFechaJugada es la ultima fecha con ALGUN partido jugado, asi que a
+  // mitad de fecha ya vale 9 — pero la planilla publica los puntajes de la 9
+  // recien cuando termina. puntajes[8] daba null para los 1008 jugadores, no
+  // entraba nadie en ningun esquema, mejor quedaba en null y el once ideal
+  // desaparecia de la pantalla sin un solo cartel que dijera por que.
+  // Ahora se busca hacia atras la ultima fecha que la planilla tenga
+  // REALMENTE publicada. Se corrige solo: cuando publiquen la 9, pasa a la 9.
+  const fTope = out.ultimaFechaJugada || ultimaJugada || P.ultimaFecha || 0;
+  let fUlt = 0, conPuntaje = 0;
+  for(let f=fTope; f>=1; f--){
+    const c = P.jugadores.filter(j=>(j.puntajes||[])[f-1]!=null).length;
+    // una fecha publicada tiene ~400 jugadores con puntaje; con menos de 200
+    // esta a medio publicar y el once que saldria de ahi seria falso
+    if(c>=200){ fUlt=f; conPuntaje=c; break; }
+  }
+  if(fUlt>0 && fUlt<fTope) console.log('  once ideal: la planilla todavia no publico la fecha '+fTope+
+    ', asi que el once es el de la ultima publicada (fecha '+fUlt+', '+conPuntaje+' puntajes).');
+  if(fUlt===0) console.log('  OJO — la planilla no tiene ninguna fecha publicada: no hay once ideal.');
   if(fUlt>0){
     const porPos={ARQ:[],DEF:[],VOL:[],DEL:[]};
     P.jugadores.forEach(j=>{
@@ -1738,12 +1806,13 @@ out.liga = Object.assign(out.liga||{}, {
 
   // ── JUGADORES FIGURA ─────────────────────────────────────────────────────
   // VF de la planilla: cuantas veces fue la figura de su equipo en el torneo.
-  cur.figuras = deLaFecha
+  cur.figuras = deTodaLaFecha
     .filter(x=>x.individual && (x.individual.figuras||0)>0)
     .map(x=>({ id:x.id, nombre:x.nombre, pos:x.pos, equipo:x.equipo, rival:x.rival,
-      condicion:x.condicion, veces:x.individual.figuras, pj:x.individual.pj,
+      condicion:x.condicion, yaJugado:!!x.partidoYaJugado,
+      veces:x.individual.figuras, pj:x.individual.pj,
       pFigura:+(x.pFigura||0).toFixed(3), EP:+x.EP.toFixed(2) }))
-    .sort((a,b)=>b.veces-a.veces||b.EP-a.EP).slice(0,10);
+    .sort((a,b)=>(a.yaJugado?1:0)-(b.yaJugado?1:0)||b.veces-a.veces||b.EP-a.EP).slice(0,10);
 
   out.curiosidades=cur;
   if(cur.onceIdeal) console.log('  once ideal de la fecha '+cur.onceIdeal.fecha+': '+cur.onceIdeal.esquema+
