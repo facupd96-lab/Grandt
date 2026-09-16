@@ -5954,3 +5954,297 @@ escrito dataLiga.js (5.6 KB) — ahora corre SUBIR_A_GITHUB.bat
 ======================================================================
   2. Rehago index.html con lo ultimo de la carpeta
 ======================================================================
+sello del build: 58db039a546c | 2026-09-14 22:21
+index.html armado — 682 KB  (css 191 KB + registry 16 KB + app 452 KB)
+Lo unico que queda afuera es datos.js, que lo regenera ACTUALIZAR_TODO.
+   sello del build: 58db039a546c | 2026-09-14 22:21
+
+======================================================================
+  3. Preparo la lista (no toco ningun archivo de tu disco)
+======================================================================
+   91 archivos quedan en el repo, 15 cambiaron desde la ultima vez.
+   control: no se colo ningun archivo pesado ni la clave
+   estas parado en la rama: main
+
+======================================================================
+  4. Esto es lo que va a subir
+======================================================================
+   SE SUBEN (nuevos o modificados):
+   + appV3.js
+   + armar.cjs
+   + auditar.cjs
+   + BUILD.txt
+   + CERRAR_FECHA.bat
+   + dataHist.js
+   + dataLiga.js
+   + dataVivo.js
+   + datos.js
+   + historial/fecha_10.json
+   + historial/fecha_9.json
+   + index.fuente.html
+   + index.html
+   + registro_diario.txt
+   + styles.css
+
+   Total: 91 archivos en el repo.
+
+   (modo automatico: subo sin preguntar)
+
+======================================================================
+  5. Guardando los cambios
+======================================================================
+[main 108a85e] Actualizacion 2026-09-15 21:35 - build 58db039a546c | 2026-09-14 22:21
+ 15 files changed, 6354 insertions(+), 39 deletions(-)
+ create mode 100644 historial/fecha_10.json
+
+======================================================================
+  6. Subiendo a GitHub
+======================================================================
+   Si te pide usuario y contrasena, se abre una ventana de GitHub.
+
+To https://github.com/facupd96-lab/Grandt.git
+   93dd530..108a85e  main -> main
+
+======================================================================
+  7. Compruebo que lo que hay publicado sea esto
+======================================================================
+   sello de tu carpeta : 58db039a546c | 2026-09-14 22:21
+
+   EL REPOSITORIO
+      sello: 58db039a546c | 2026-09-14 22:21
+      COMPROBADO: tiene exactamente tu index.html
+
+   LA PAGINA (lo que abren tus amigos)
+      sello: c1ae5a27e0e1 | 2026-09-13 20:44
+      todavia sirve el build c1ae5a27e0e1 | 2026-09-13 20:44.
+      GitHub tarda entre uno y dos minutos en rehacer la pagina. Espera y recarga.
+
+   Repo:    https://github.com/facupd96-lab/Grandt
+   Pagina:  https://facupd96-lab.github.io/Grandt/
+
+   OJO con la cache: GitHub sirve el index guardado hasta 10 minutos.
+   Si abris la pagina y ves el sello viejo, espera un rato y recarga con Ctrl+F5.
+   El sello se ve en el menu (...) de arriba a la derecha, abajo de todo.
+
+LISTO mar 15/09/2026 21:35:16,89 
+ 
+======================================================== 
+CORRIDA (durante la fecha) mar 15/09/2026 21:41:00,40 
+   planilla: la de la fecha 8 (planilla.json, actualizada el 2026-09-10)
+   la planilla que tenemos ES la ultima publicada (Estadísticas - A la Fecha 8 - Gran DT Torneo Clausura 2026)
+   OJO: ya se jugo la fecha 9 y el blog todavia publica hasta la 8.
+   Planeta sube la planilla nueva cerca de las 22 hs del lunes o el martes.
+   Volve a correr SYNC_PLANETA.bat mas tarde y se actualiza sola.
+
+-- sync planeta gran dt: bajando la planilla oficial --
+
+   buscando la planilla...
+      una sola hoja con todos los puestos: ARQ 101 · DEF 330 · DEL 269 · VOL 308
+   1 hoja(s) para procesar
+
+   procesando TODOS (gid unica) ... 1008 jugadores
+
+LISTO. Escrito: dataPlaneta.json
+
+   jugadores:        1008
+   ultima fecha:     F8
+
+   -- control de la ficha Clarin reconstruida --
+   evaluados:        686
+   dentro de 1 a 10: 683
+   fuera de rango:   3 (0,4%)
+   ficha promedio:   5,13
+   OK: la reconstruccion cierra
+
+   Top 10 en ficha Clarin limpia (el piso real del jugador):
+    1. Correa, Ángel                DEL  River                ficha 7  (7 PJ)
+    2. Módica, Agustín              DEL  Gimnasia Mza         ficha 6,86  (7 PJ)
+    3. Fernández, Ignacio           VOL  Gimnasia LP          ficha 6,75  (8 PJ)
+    4. Fernández, Matías            DEL  Ind. Rivadavia       ficha 6,71  (7 PJ)
+    5. Martínez, Gonzalo            VOL  Tigre                ficha 6,67  (3 PJ)
+    6. Mavilla, Julián              VOL  Sarmiento            ficha 6,5  (6 PJ)
+    7. Almada, Thiago               DEL  River                ficha 6,5  (4 PJ)
+    8. Lencioni, Facundo            VOL  Gimnasia Mza         ficha 6,5  (8 PJ)
+    9. Zelarayán, Lucas             VOL  Belgrano             ficha 6,4  (5 PJ)
+   10. Arce, Alex                   DEL  Ind. Rivadavia       ficha 6,38  (8 PJ)
+
+
+-- puntajes en vivo: bajando los posts de Planeta --
+   feed bajado: 225 KB
+
+-- puntajes en vivo: leyendo los posts de Planeta --
+  fecha 10 · 775 jugadores en la app
+  todavia no hay ningun post de la fecha 10. Escribo dataVivo.js vacio.
+
+  partidos leidos: 0
+  filas de jugador: 0
+  cruzaron con la app: 0  (0%)
+  fichas de Clarin publicadas: 0   (solo las destacadas: sirven para saber cuanto pago la cinta)
+
+OK -> dataVivo.js
+
+
+TORNEO DE AMIGOS — fecha 10 — 7 equipos
+
+== Falcon de ramon   (1-3-3-4)
+   ARQ  Ledesma, Marcos           Instituto        PTS  5.89
+   DEF  Montiel, Gonzalo          River            PTS  6.41
+   DEF  Cerato, Giuliano          Instituto        PTS  6.29
+   DEF  Alarcón, Fernando         Instituto        PTS  6.06
+   VOL  Luna, Alex                Instituto        PTS   7.7
+   VOL  Mavilla, Julián           Sarmiento        PTS  5.83
+   VOL  Florentín, José           Ind. Rivadavia   PTS  5.63
+   DEL  Arce, Alex                Ind. Rivadavia   PTS  7.46
+   DEL  Correa, Ángel             River            PTS  7.24   <<< CAPITAN
+   DEL  Lima Morais, Rick         Talleres         PTS  5.76
+   DEL  Caicedo, Jordy            Huracán          PTS   5.6
+   banco: ARQ Bolcato · DEF Zabala · VOL Barbona · DEL Valencia
+
+== Runero Atomico   (1-3-3-4)
+   ARQ  Ledesma, Marcos           Instituto        PTS  5.89
+   DEF  Cerato, Giuliano          Instituto        PTS  6.29
+   DEF  Elordi, Juan Manuel       Ind. Rivadavia   PTS   5.8
+   DEF  Pellegrino, Marco         Boca             PTS  5.79
+   VOL  Luna, Alex                Instituto        PTS   7.7   <<< CAPITAN
+   VOL  Di María, Ángel           Rosario Ctral.   PTS   7.1
+   VOL  Mavilla, Julián           Sarmiento        PTS  5.83
+   DEL  Arce, Alex                Ind. Rivadavia   PTS  7.46
+   DEL  Cóccaro, Matías           Newell's         PTS  7.37
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.92
+   DEL  Valencia, Enner           Boca             PTS  6.33
+   banco: ARQ Ayala · DEF Arrayago · VOL Fernández · DEL Díaz
+
+== La aplanadora danesa   (1-3-3-4)
+   ARQ  Ledesma, Marcos           Instituto        PTS  5.89
+   DEF  Cerato, Giuliano          Instituto        PTS  6.29
+   DEF  Otamendi, Nicolás         River            PTS  6.19
+   DEF  Blondel, Lucas            Huracán          PTS  5.64
+   VOL  Luna, Alex                Instituto        PTS   7.7
+   VOL  Malcorra, Ignacio         Unión            PTS  6.58
+   VOL  Andrada, Tobías           River            PTS  5.87
+   DEL  Arce, Alex                Ind. Rivadavia   PTS  7.46
+   DEL  Correa, Ángel             River            PTS  7.24   <<< CAPITAN
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.92
+   DEL  Almada, Thiago            River            PTS  6.45
+   banco: ARQ Bolcato · DEF Mosevich · VOL Cuello · DEL Estigarribia
+
+== Atilio chara fc   (1-3-3-4)
+   ARQ  Ledesma, Marcos           Instituto        PTS  5.89
+   DEF  Montiel, Gonzalo          River            PTS  6.41
+   DEF  Cerato, Giuliano          Instituto        PTS  6.29
+   DEF  Arrayago, Juan Miguel     Independiente    PTS  5.78
+   VOL  Luna, Alex                Instituto        PTS   7.7
+   VOL  Malcorra, Ignacio         Unión            PTS  6.58
+   VOL  Velasco, Alan             Boca             PTS  5.43
+   DEL  Arce, Alex                Ind. Rivadavia   PTS  7.46
+   DEL  Correa, Ángel             River            PTS  7.24   <<< CAPITAN
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.92
+   DEL  Caicedo, Jordy            Huracán          PTS   5.6
+   banco: ARQ Ayala · DEF Sosa · VOL Lencioni · DEL Cóccaro
+
+== La bestia fc   (1-3-3-4)
+   ARQ  Ledesma, Marcos           Instituto        PTS  5.89
+   DEF  Montiel, Gonzalo          River            PTS  6.41
+   DEF  Cerato, Giuliano          Instituto        PTS  6.29
+   DEF  Elordi, Juan Manuel       Ind. Rivadavia   PTS   5.8
+   VOL  Di María, Ángel           Rosario Ctral.   PTS   7.1
+   VOL  Lanzini, Manuel           Vélez            PTS  6.94
+   VOL  Mavilla, Julián           Sarmiento        PTS  5.83
+   DEL  Arce, Alex                Ind. Rivadavia   PTS  7.46
+   DEL  Correa, Ángel             River            PTS  7.24
+   DEL  Almada, Thiago            River            PTS  6.45   <<< CAPITAN
+   DEL  Molina, Tomás             Argentinos       PTS   5.6
+   banco: ARQ Ayala · DEF Muñoz · VOL Martínez · DEL Marabel
+
+== Giri fc   (1-3-3-4)
+   ARQ  Miño, Marcelo             Barracas Ctral.  PTS  5.14
+   DEF  Cerato, Giuliano          Instituto        PTS  6.29
+   DEF  Rak, Yonatthan            Barracas Ctral.  PTS   5.8
+   DEF  Martínez, Damián          Barracas Ctral.  PTS   5.3
+   VOL  Di María, Ángel           Rosario Ctral.   PTS   7.1
+   VOL  Lanzini, Manuel           Vélez            PTS  6.94
+   VOL  Mavilla, Julián           Sarmiento        PTS  5.83
+   DEL  Arce, Alex                Ind. Rivadavia   PTS  7.46   <<< CAPITAN
+   DEL  Driussi, Sebastián        River            PTS  6.57
+   DEL  Martínez, Ronaldo         Vélez            PTS  6.27
+   DEL  Caicedo, Jordy            Huracán          PTS   5.6
+   banco: ARQ Marchiori · DEF Blondel · VOL Barbona · DEL Correa
+
+== El favorito de la tati   (1-3-3-4)
+   ARQ  Ledesma, Marcos           Instituto        PTS  5.89
+   DEF  Montiel, Gonzalo          River            PTS  6.41
+   DEF  Silvero, Thiago           Vélez            PTS  6.24
+   DEF  Ovando, Ignacio           Rosario Ctral.   PTS  6.02
+   VOL  Di María, Ángel           Rosario Ctral.   PTS   7.1   <<< CAPITAN
+   VOL  Lanzini, Manuel           Vélez            PTS  6.94
+   VOL  López Muñoz, Hernán       Argentinos       PTS  5.76
+   DEL  Arce, Alex                Ind. Rivadavia   PTS  7.46
+   DEL  Correa, Ángel             River            PTS  7.24
+   DEL  Driussi, Sebastián        River            PTS  6.57
+   DEL  Almada, Thiago            River            PTS  6.45
+   banco: ARQ Werner · DEF Palazzo · VOL Lencioni · DEL Molina
+
+REVISAR:
+  - La aplanadora danesa: "Almada" -> Almada, Thiago (River, DEL) [OJO: habia 2 con ese apellido y elegi al de mas puntos. Aclara el club si es otro]
+  - La bestia fc: "Almada" -> Almada, Thiago (River, DEL) [OJO: habia 2 con ese apellido y elegi al de mas puntos. Aclara el club si es otro]
+  - El favorito de la tati: "Almada" -> Almada, Thiago (River, DEL) [OJO: habia 2 con ese apellido y elegi al de mas puntos. Aclara el club si es otro]
+
+jugadores distintos en el torneo: 34
+escrito dataLiga.js (5.6 KB) — ahora corre SUBIR_A_GITHUB.bat
+
+  ══════════════════════════════════════════════════════════════
+   AUDITORIA DE DATOS   ·   motor v38 · 07/09/2026
+   fecha objetivo 10  ·  ultima fecha jugada 9  ·  775 jugadores
+  ══════════════════════════════════════════════════════════════
+
+  ! PARA MIRAR (7)
+     • 1 jugador(es) con mas minutos que el maximo de liga (810'): Sosa Yung, Santiago 938'  → casi seguro partidos de copa
+     • 1 jugador(es) con mas partidos que fechas jugadas: Sosa Yung, Santiago 11 PJ  → casi seguro copa
+     • data365.json sigue guardando los dos torneos juntos (SYNC_365 detecta el receso pero no corta, a proposito, para no repetir el dia que borro el archivo). El motor los separa en cada corrida: no hace falta tocar nada.
+     • 1 jugadores que metieron mucho mas de lo que su xG esperaba (racha, no error): Módica, Agustín
+     • 89 jugadores sin ficha propia (usan el promedio de la liga, quedan marcados en la app)
+     • la planilla de Planeta trae hasta la fecha 8 y la 9 termino hace 24 horas. Planeta la publica uno o dos dias despues: volve a correr SYNC_PLANETA.bat manana. Mientras tanto la ficha de cada jugador es la de la fecha 8, que es lo unico que hay.
+     • 5 jugadores con menos partidos en 365 que en la planilla: su ritmo por 90 sale de menos futbol del que jugaron. Van marcados.
+
+  ✓ CONTROLES QUE PASARON (25)
+     · la fecha que se proyecta (10) todavia no empezo
+     · el corte de torneos funciona: el archivo trae 480 jugadores con fechas de los dos torneos y el motor los deja en 2 (copas)
+     · 4 nombres repetidos, cada uno con sus propios datos: Vázquez, Franco, Martínez, David, Fernández, Julián, González, Tomás
+     · todas las fichas caen dentro del 1 al 10
+     · ningun xG por partido absurdo
+     · ningun promedio de goles imposible
+     · el xG y los goles hablan del mismo torneo
+     · el desglose suma exactamente los puntos si entra, en los 775 jugadores
+     · los 15 partidos de la fecha caen en 3 dias
+     · ningun partido futuro marcado como jugado
+     · las probabilidades de las 29 cuotas suman 1
+     · margen de las casas entre 1.6% y 5.4%
+     · la tabla cierra: puntos = 3×ganados + empatados en los 30 equipos
+     · los goles a favor y en contra de la liga cierran (294)
+     · el 100% de los jugadores tiene datos de 365Scores
+     · todos los jugadores tienen cotizacion
+     · 30 equipos, todos reconocidos
+     · 88 suspendidos detectados · 16 transferidos marcados
+     · el fixture sabe que se jugo: ningun partido vencido sin resultado (dataFixture.json de hace 0.0 dias)
+     · el ayudante de campo cruza con el 100% del ranking · 88 bajas detectadas
+     · ninguna baja se colo en el once recomendado
+     · cierre de cambios: 2026-09-18 20:59 UTC (lo publica el juego)
+     · ningun partido sin jugar tiene resultado cargado
+     · ninguna cuota se bajo con el partido ya empezado
+     · 365Scores tiene los 135 partidos jugados del torneo
+
+  ══════════════════════════════════════════════════════════════
+   Todo en orden.
+  ══════════════════════════════════════════════════════════════
+
+
+======================================================================
+  1. Reviso que este todo listo
+======================================================================
+   git instalado: OK
+   la carpeta es un repositorio: OK
+   sos: facupd96-lab <facupd96@gmail.com>
+
+======================================================================
+  2. Rehago index.html con lo ultimo de la carpeta
+======================================================================

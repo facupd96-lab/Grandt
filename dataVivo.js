@@ -1,1 +1,1 @@
-window.VIVO={"fecha":10,"generado":"2026-09-16T00:35:03.004Z","generadoCon":"2026-09-16T00:34:57.296Z","fechaMotor":10,"posts":[],"partidos":[],"puntos":{},"fichas":{},"cruce":{"filas":0,"cruzadas":0,"pct":0,"sinCruzar":[],"fichas":0}};
+window.VIVO={"fecha":10,"generado":"2026-09-16T00:41:10.970Z","generadoCon":"2026-09-16T00:34:57.296Z","fechaMotor":10,"posts":[],"partidos":[],"puntos":{},"fichas":{},"cruce":{"filas":0,"cruzadas":0,"pct":0,"sinCruzar":[],"fichas":0}};
