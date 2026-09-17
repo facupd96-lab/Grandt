@@ -7460,3 +7460,72 @@ escrito dataLiga.js (5.7 KB) — ahora corre SUBIR_A_GITHUB.bat
 ======================================================================
   2. Rehago index.html con lo ultimo de la carpeta
 ======================================================================
+sello del build: 97726954536a | 2026-09-16 23:08
+index.html armado — 710 KB  (css 195 KB + registry 16 KB + app 476 KB)
+Lo unico que queda afuera es datos.js, que lo regenera ACTUALIZAR_TODO.
+   sello del build: 97726954536a | 2026-09-16 23:08
+
+======================================================================
+  3. Preparo la lista (no toco ningun archivo de tu disco)
+======================================================================
+   98 archivos quedan en el repo, 12 cambiaron desde la ultima vez.
+   control: no se colo ningun archivo pesado ni la clave
+   estas parado en la rama: main
+
+======================================================================
+  4. Esto es lo que va a subir
+======================================================================
+   SE SUBEN (nuevos o modificados):
+   + appV3.js
+   + BUILD.txt
+   + dataFotos.js
+   + dataHist.js
+   + dataLiga.js
+   + dataVivo.js
+   + datos.js
+   + foto.cjs
+   + historial/fecha_10.json
+   + index.html
+   + registro_diario.txt
+   + styles.css
+
+   Total: 98 archivos en el repo.
+
+   (modo automatico: subo sin preguntar)
+
+======================================================================
+  5. Guardando los cambios
+======================================================================
+[main 9c51a0e] Actualizacion 2026-09-16 23:12 - build 97726954536a | 2026-09-16 23:08
+ 12 files changed, 1283 insertions(+), 422 deletions(-)
+
+======================================================================
+  6. Subiendo a GitHub
+======================================================================
+   Si te pide usuario y contrasena, se abre una ventana de GitHub.
+
+To https://github.com/facupd96-lab/Grandt.git
+   0602ec5..9c51a0e  main -> main
+
+======================================================================
+  7. Compruebo que lo que hay publicado sea esto
+======================================================================
+   sello de tu carpeta : 97726954536a | 2026-09-16 23:08
+
+   EL REPOSITORIO
+      sello: 97726954536a | 2026-09-16 23:08
+      COMPROBADO: tiene exactamente tu index.html
+
+   LA PAGINA (lo que abren tus amigos)
+      sello: d26b79e4b2b4 | 2026-09-16 22:21
+      todavia sirve el build d26b79e4b2b4 | 2026-09-16 22:21.
+      GitHub tarda entre uno y dos minutos en rehacer la pagina. Espera y recarga.
+
+   Repo:    https://github.com/facupd96-lab/Grandt
+   Pagina:  https://facupd96-lab.github.io/Grandt/
+
+   OJO con la cache: GitHub sirve el index guardado hasta 10 minutos.
+   Si abris la pagina y ves el sello viejo, espera un rato y recarga con Ctrl+F5.
+   El sello se ve en el menu (...) de arriba a la derecha, abajo de todo.
+
+LISTO mié 16/09/2026 23:12:35,79 
