@@ -4760,3 +4760,64 @@ th[data-k="rol"] { white-space: nowrap; }
 /* El "JUGADO" dentro del nombre en las tablas de datos: más chico que el del
    fixture, que ahí es el título de la tarjeta y acá va pegado a un nombre. */
 .player-name .fx-jugado { font-size: 0.58rem; vertical-align: middle; }
+
+/* El once traído de la fecha anterior. Va arriba de todo el Versus y no como
+   un pie de página: hay que verlo ANTES de mirar los números, porque son los
+   de un once que todavía no confirmaste para esta fecha. */
+.vs-heredado {
+    margin: 0 0 0.7rem;
+    padding: 8px 12px;
+    border-radius: var(--radius-md, 8px);
+    background: rgba(56, 189, 248, 0.10);
+    border: 1px solid rgba(56, 189, 248, 0.30);
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    line-height: 1.5;
+}
+.vs-heredado b { color: var(--text-main); }
+
+/* "Este es tu once". Sin este cartel, un once guardado y un once que el motor
+   cambió de opinión se ven exactamente igual, y no hay forma de volver. */
+.once-guardado {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin: 0 0 0.7rem;
+    padding: 8px 12px;
+    border-radius: var(--radius-md, 8px);
+    background: rgba(56, 189, 248, 0.10);
+    border: 1px solid rgba(56, 189, 248, 0.30);
+    color: var(--text-muted);
+    font-size: 0.76rem; line-height: 1.5;
+}
+.once-guardado > span { flex: 1 1 260px; min-width: 0; }
+.once-guardado b { color: var(--text-main); }
+
+/* "Esta fecha viene del archivo". Verde: es la buena, la que ven todos y la que
+   revisa el auditor. El aviso ámbar de al lado es el caso contrario — una foto
+   que solo existe en este navegador. */
+.rev-archivo {
+    margin: 0 0 0.7rem;
+    padding: 8px 12px;
+    border-radius: var(--radius-md, 8px);
+    background: rgba(16, 185, 129, 0.10);
+    border: 1px solid rgba(16, 185, 129, 0.30);
+    color: var(--text-muted);
+    font-size: 0.76rem; line-height: 1.5;
+}
+.rev-archivo b { color: var(--text-main); }
+
+/* "Estos equipos son de la fecha anterior". Ámbar y arriba de todo: lo que hay
+   debajo son proyecciones de onces que nadie confirmó para esta fecha. */
+.lg-viejos {
+    margin: 0 0 0.8rem;
+    padding: 9px 12px;
+    border-radius: var(--radius-md, 8px);
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.38);
+    color: var(--text-muted);
+    font-size: 0.76rem; line-height: 1.55;
+}
+.lg-viejos b { color: var(--text-main); }
+.lg-viejos code {
+    background: rgba(148,163,184,0.16); border-radius: 4px;
+    padding: 0 4px; font-size: 0.72rem;
+}

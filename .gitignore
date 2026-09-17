@@ -19,6 +19,10 @@ salida_RECHAZADA.json
 # dataHist.js y dataLiga.js TAMBIEN se suben: uno trae lo que el motor esperaba
 # en las fechas anteriores (pantalla Revision) y el otro los equipos del torneo
 # de amigos. Sin dataLiga.js, el que entra a la pagina no ve ningun equipo.
+# dataFotos.js TAMBIEN se sube, y es el mas importante de todos: es como
+# termino cada fecha. Hasta el 17/09 eso vivia en el localStorage de cada
+# navegador, o sea que el que entraba a la pagina publicada no veia NINGUN
+# historial. Lo escribe foto.cjs y se acumula fecha a fecha.
 # BUILD.txt se sube: es la huella de con que archivos se armo el index.
 feedVivo.json
 equipoPartido.json

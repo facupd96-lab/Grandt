@@ -71,7 +71,18 @@ const CLAVE_FUERA = () => 'gdt_fuera_f' + ((typeof D !== 'undefined' && D && D.f
 function cargarFuera() {
   S.fuera = new Set();
   try {
-    const r = JSON.parse(localStorage.getItem(CLAVE_FUERA()) || 'null');
+    // LOS DESCARTES SE ARRASTRAN (17/09). Se guardaban por fecha, y el armado
+    // se hace justo cuando el motor cambia de fecha: todo lo que tildabas el
+    // martes desaparecia el viernes. Si no hay nada para la fecha de hoy, se
+    // toma la ultima que si tenga. Se reescribe bajo la fecha nueva, asi que la
+    // vieja queda como estaba.
+    let r = JSON.parse(localStorage.getItem(CLAVE_FUERA()) || 'null');
+    if (!Array.isArray(r) && D && D.fechaObjetivo != null) {
+      for (let f = D.fechaObjetivo - 1; f >= D.fechaObjetivo - 6 && f >= 1; f--) {
+        const v = JSON.parse(localStorage.getItem('gdt_fuera_f' + f) || 'null');
+        if (Array.isArray(v) && v.length) { r = v; break; }
+      }
+    }
     if (Array.isArray(r)) {
       r.forEach(v => {
         // formato viejo: el id pelado. Se acepta una vez y se reescribe por clave.
@@ -490,6 +501,7 @@ function iniciar() {
   rearmarResueltos();                  // ahora si, con TODOS lleno, se puede contar
   cargarFuera(); cargarCapitan();      // los tildados de esta fecha, guardados en el navegador
   rearmarOnce();      // el once se rehace aca, no viene cocinado de datos.js
+  cargarOnceEditado();  // ...y si vos lo editaste, gana el tuyo
   cargarMi11();       // el once que armaste vos, para el Versus
   cargarLiga();       // los equipos del torneo de amigos
 
@@ -848,11 +860,119 @@ const S_ONCE = { banco: null, cambiando: null };
 // Suplentes: el mejor de cada puesto que NO esta en el once. En Gran DT el
 // suplente entra cuando el titular de su puesto no juega, asi que lo que
 // importa es que juegue: se ordena por puntos descontando la chance de no jugar.
-function armarBanco() {
-  const b = {};
+// ════════════════════════════════════════════════════════════════════════════
+//  EL ONCE QUE VOS EDITASTE SE GUARDA (17/09)
+//  ------------------------------------------------------------------------
+//  Hasta hoy NO SE GUARDABA. Literal: S.once salia de datos.js en cada carga y
+//  cada cambio —un ⇅, un ✕, cambiar de esquema— vivia solo en memoria. Armabas
+//  el equipo, sacabas a los que sabias que no jugaban, recargabas la pagina y
+//  estaba todo como al principio. No habia ningun localStorage.setItem para el
+//  once: por eso "no se guarda" era exactamente cierto.
+//
+//  Ahora se guarda solo, en cuanto tocas algo, POR CLAVE ESTABLE
+//  (nombre@club@puesto) y no por id: los ids son el numero de fila de la
+//  planilla de Planeta y se corren en cuanto Planeta publica una nueva.
+//
+//  Y SE ARRASTRA A LA FECHA SIGUIENTE. Esto es lo que mas rompia: el armado se
+//  hace justo cuando el motor pasa de una fecha a la otra, asi que lo que
+//  armabas el martes quedaba guardado bajo la fecha vieja y el viernes, con el
+//  motor ya en la fecha nueva, aparecia vacio.
+const CLAVE_ONCE = f => 'gdt_once_f' + (f != null ? f : ((D && D.fechaObjetivo != null) ? D.fechaObjetivo : 'x'));
+const ONCE_MIRAR_ATRAS = 6;
+
+function guardarOnceEditado() {
+  try {
+    if (!S_ONCE.editado) return;
+    const banco = {};
+    ['ARQ', 'DEF', 'VOL', 'DEL'].forEach(p => {
+      const id = S_ONCE.banco && S_ONCE.banco[p];
+      banco[p] = id ? (claveDe(id) || null) : null;
+    });
+    localStorage.setItem(CLAVE_ONCE(), JSON.stringify({
+      kOnce: clavesDesdeIds(S.once), kBanco: banco, esq: S.esquema,
+      cuando: new Date().toISOString()
+    }));
+  } catch (e) { }
+}
+
+function cargarOnceEditado() {
+  S_ONCE.editado = false; S_ONCE.heredadoDe = null; S_ONCE.perdidos = 0;
+  let r = null, deFecha = null;
+  try {
+    r = JSON.parse(localStorage.getItem(CLAVE_ONCE()) || 'null');
+    if (!r && D && D.fechaObjetivo != null) {
+      for (let f = D.fechaObjetivo - 1; f >= D.fechaObjetivo - ONCE_MIRAR_ATRAS && f >= 1; f--) {
+        const v = JSON.parse(localStorage.getItem(CLAVE_ONCE(f)) || 'null');
+        if (v && Array.isArray(v.kOnce) && v.kOnce.length >= 7) { r = v; deFecha = f; break; }
+      }
+    }
+  } catch (e) { return false; }
+  if (!r || !Array.isArray(r.kOnce) || r.kOnce.length < 7) return false;
+
+  const q = idsDesdeClaves(r.kOnce);
+  // un jugador que se fue del torneo ya no resuelve; si faltan muchos, el once
+  // guardado es de otra epoca y es mas honesto volver al del motor
+  if (q.ids.length < 7) return false;
+  S.once = q.ids.slice();
+  S_ONCE.perdidos = (q.perdidas || []).length;
+  if (r.esq) S.esquema = r.esq;
+  S_ONCE.banco = {};
   ['ARQ', 'DEF', 'VOL', 'DEL'].forEach(p => {
-    // El suplente se elige por PUNTOS igual que el resto (05/09) y nunca es
-    // alguien que yo ya tilde como que no juega: seria un banco de mentira.
+    const k = r.kBanco && r.kBanco[p];
+    const j = k ? porClave(k) : null;
+    S_ONCE.banco[p] = (j && !S.once.includes(j.id)) ? j.id : null;
+  });
+  // los huecos del banco (alguien que se fue, o que ahora es titular) se
+  // rellenan con el criterio de siempre
+  const auto = armarBanco();
+  ['ARQ', 'DEF', 'VOL', 'DEL'].forEach(p => { if (!S_ONCE.banco[p]) S_ONCE.banco[p] = auto[p]; });
+  S_ONCE.editado = true;
+  S_ONCE.heredadoDe = deFecha;
+  return true;
+}
+
+window.volverAlOnceDelMotor = function () {
+  if (!confirm('¿Volver al once que recomienda el motor?\n\nSe pierden los cambios que hiciste en este once. Los jugadores que tildaste con la ✕ se mantienen.')) return;
+  try { localStorage.removeItem(CLAVE_ONCE()); } catch (e) { }
+  S_ONCE.editado = false; S_ONCE.heredadoDe = null; S_ONCE.perdidos = 0;
+  S.esquema = D.esquema.optimo.esquema;
+  S.once = D.esquema.optimo.once.map(x => x.id);
+  S_ONCE.banco = null; S_ONCE.cambiando = null;
+  rearmarOnce();
+  pintarPantallaOnce();
+};
+
+function armarBanco() {
+  // EL BANCO LO ELIGE EL MOTOR (17/09). Antes se armaba solo aca, en el
+  // navegador, y por eso no existia en ningun archivo: no entraba en salida.json,
+  // ni en la foto de Revision, ni lo veia ningun auditor. Consecuencia concreta:
+  // en la fecha 9 el once del motor figuraba "8 de 11 jugaron, 72 puntos",
+  // comiendose tres ceros que un banco habria cubierto.
+  //
+  // El criterio es el MISMO que el de los titulares (epsj, lo que suma si entra
+  // a la cancha): el suplente es una alternativa de titular, no un seguro. El
+  // motor no descarta a nadie por creer que no va a jugar — eso lo tildas vos.
+  //
+  // Si vos editaste el once, el banco del motor puede tener a alguien que ahora
+  // es titular tuyo: en ese caso se rearma aca, con el mismo criterio.
+  const delMotor = (D.esquema && D.esquema.optimo && D.esquema.optimo.banco &&
+                    Array.isArray(D.esquema.optimo.banco.jugadores))
+    ? D.esquema.optimo.banco.jugadores : null;
+  const b = {};
+  let sirveElDelMotor = !!delMotor;
+  if (delMotor) {
+    delMotor.forEach(j => { if (j && j.pos) b[j.pos] = j.id || null; });
+    ['ARQ', 'DEF', 'VOL', 'DEL'].forEach(p => {
+      const id = b[p];
+      if (!id || !TODOS[id] || S.once.includes(id) || estaFuera(TODOS[id])) sirveElDelMotor = false;
+    });
+  }
+  if (sirveElDelMotor) return b;
+
+  ['ARQ', 'DEF', 'VOL', 'DEL'].forEach(p => {
+    // el suplente nunca es alguien que yo ya tilde como que no juega: seria un
+    // banco de mentira. Se ordena por epsj —lo que suma SI entra— igual que los
+    // titulares: el suplente es una alternativa de titular, no un seguro.
     const cand = (D.rankings[p] || [])
       .filter(x => !S.once.includes(x.id) && !estaFuera(x))
       .sort((a, c) => (c.epsj ?? c.ep ?? -1) - (a.epsj ?? a.ep ?? -1));
@@ -1044,7 +1164,16 @@ function pintarPantallaOnce() {
     }
   }
 
+  // Si el once es tuyo hay que decirlo, y hay que poder volver al del motor.
+  // Sin esto, "guardado" seria indistinguible de "el motor cambio de opinion".
+  const avisoEditado = (S_ONCE.editado && !esR) ? `<div class="once-guardado">
+    <span><b>Este es tu once</b>, no el que recomienda el motor: quedó guardado solo con los cambios que hiciste${
+      S_ONCE.heredadoDe != null ? `, y viene de la <b>fecha ${S_ONCE.heredadoDe}</b>` : ''}.${
+      S_ONCE.perdidos ? ` <b>${S_ONCE.perdidos}</b> ${S_ONCE.perdidos === 1 ? 'jugador ya no está' : 'jugadores ya no están'} en la lista y ${S_ONCE.perdidos === 1 ? 'fue reemplazado' : 'fueron reemplazados'}.` : ''}</span>
+    <button class="vs-btn vs-btn-chico" onclick="volverAlOnceDelMotor()">volver al del motor</button></div>` : '';
+
   cont.innerHTML = `
+    ${avisoEditado}
     ${cabecera('Mejor 11', esquemaTxt + ' · ' + (c ? '$' + (c / 1e6).toFixed(1) + 'M' : 's/d'), (() => {
       const of = (S.oncesLocales && S.oncesLocales[0]) || null;
       let sello = '';
@@ -1135,10 +1264,12 @@ function pintarPantallaOnce() {
   cont.querySelectorAll('[data-modo]').forEach(b => b.onclick = () => {
     if (b.dataset.modo === 'riesgo' && D.arriesgado) cambiarEsquema('__riesgo');
     else if (b.dataset.modo === 'solido' && esR) cambiarEsquema(D.esquema.optimo.esquema);
-    S_ONCE.cambiando = null; S_ONCE.banco = armarBanco(); pintarPantallaOnce();
+    S_ONCE.cambiando = null; S_ONCE.banco = armarBanco();
+    S_ONCE.editado = true; guardarOnceEditado(); pintarPantallaOnce();
   });
   const se = $('once-esquema');
-  if (se) se.onchange = () => { cambiarEsquema(se.value); S_ONCE.cambiando = null; S_ONCE.banco = armarBanco(); pintarPantallaOnce(); };
+  if (se) se.onchange = () => { cambiarEsquema(se.value); S_ONCE.cambiando = null; S_ONCE.banco = armarBanco();
+    S_ONCE.editado = true; guardarOnceEditado(); pintarPantallaOnce(); };
   cont.querySelectorAll('.f11-swap').forEach(b => b.onclick = e => {
     e.stopPropagation();
     const id = b.closest('.ficha11').dataset.id;
@@ -1162,6 +1293,7 @@ function pintarPantallaOnce() {
     else if (i >= 0) S.once[i] = nuevo;
     else if (viejoEnBanco) S_ONCE.banco[pos] = nuevo;
     S_ONCE.cambiando = null;
+    S_ONCE.editado = true; guardarOnceEditado();
     pintarPantallaOnce();
   });
 }
@@ -3566,6 +3698,44 @@ function rearmarOnce() {
   // "modificado por vos" sin que hubieras tocado nada; le dabas a "volver al
   // oficial", funcionaba, y al recargar volvia a pasar lo mismo.
   // Ahora el esquema del motor solo se respeta si vos lo elegiste a mano.
+  // SI VOS EDITASTE EL ONCE, MANDA EL TUYO (17/09).
+  // Esta funcion pisaba S.once entero, y la llama repintarTodo() — o sea que
+  // alcanzaba con tildar a UNO con la ✕ para perder todos los cambios que
+  // habias hecho a mano. Ahora, con un once editado, lo unico que se toca es
+  // sacar al que acabas de tildar y poner en su lugar al mejor de su puesto
+  // que quede libre, que es justo lo que uno espera al apretar la ✕.
+  if (S_ONCE.editado && Array.isArray(S.once) && S.once.length) {
+    let cambio = false;
+    const ocupados = () => new Set(S.once.concat(
+      S_ONCE.banco ? Object.values(S_ONCE.banco).filter(Boolean) : []));
+    S.once = S.once.map(id => {
+      const p = TODOS[id];
+      if (!p || !estaFuera(p)) return id;
+      const ya = ocupados();
+      const rep = (D.rankings[p.pos] || [])
+        .filter(x => !ya.has(x.id) && !estaFuera(x))
+        .sort((a, c) => (c.epsj ?? c.ep ?? -1) - (a.epsj ?? a.ep ?? -1))[0];
+      if (!rep) return id;              // no hay con quien reemplazarlo: se deja
+      cambio = true;
+      return rep.id;
+    });
+    // el banco tambien: un suplente tildado deja de ser suplente
+    if (S_ONCE.banco) {
+      ['ARQ', 'DEF', 'VOL', 'DEL'].forEach(pos => {
+        const id = S_ONCE.banco[pos], p = id ? TODOS[id] : null;
+        if (!p || !estaFuera(p)) return;
+        const ya = ocupados();
+        const rep = (D.rankings[pos] || [])
+          .filter(x => !ya.has(x.id) && !estaFuera(x))
+          .sort((a, c) => (c.epsj ?? c.ep ?? -1) - (a.epsj ?? a.ep ?? -1))[0];
+        S_ONCE.banco[pos] = rep ? rep.id : null;
+        if (rep) cambio = true;
+      });
+    }
+    if (cambio) guardarOnceEditado();
+    recalcCapitan();
+    return;
+  }
   const q = (S.esquemaElegido && onces.find(o => o.e === S.esquema)) || onces[0];
   S.esquema = q.e; S.once = q.ids.slice(); S_ONCE.banco = null;
   recalcCapitan();
@@ -4275,10 +4445,34 @@ const resuelto = p => !!p && (EQ_RESUELTOS.has(claveEquipo(p.eq)) || manoDe(p.id
 // El que usaste vos en el juego. Vive en el localStorage de ESTE navegador,
 // igual que los descartes: es tuyo y no viaja con la app.
 const CLAVE_MI11 = () => 'gdt_mi11_f' + ((D && D.fechaObjetivo != null) ? D.fechaObjetivo : 'x');
+// EL ONCE SE ARRASTRA DE UNA FECHA A LA OTRA (17/09).
+// Se guardaba en 'gdt_mi11_f' + la fecha del motor, asi que en cuanto el motor
+// pasaba a la fecha siguiente la clave cambiaba y tu once aparecia VACIO. No se
+// borraba —seguia guardado bajo la fecha vieja— pero desde la pantalla era
+// exactamente lo mismo: "nunca se guarda el equipo". Y en Gran DT uno no rearma
+// once jugadores cada semana, cambia dos o tres.
+// Ahora, si no hay nada guardado para la fecha de hoy, se busca hacia atras la
+// ultima que si tenga y se arranca de ahi. El once viejo NO se pisa: cuando
+// toques algo se guarda bajo la fecha nueva y la vieja queda como estaba.
+// Se puede hacer porque el once se guarda por CLAVE ESTABLE (nombre@equipo@pos)
+// y no por id: los ids son el numero de fila de datos.js y se corren en cada
+// corrida del motor, las claves no.
+const MI11_MIRAR_ATRAS = 6;
+function leerMi11Crudo(f) {
+  try { return JSON.parse(localStorage.getItem('gdt_mi11_f' + f) || 'null'); } catch (e) { return null; }
+}
 function cargarMi11() {
-  S.mi11 = []; S.miCap = null; S.miEsq = null; S.miPerdidos = 0;
+  S.mi11 = []; S.miCap = null; S.miEsq = null; S.miPerdidos = 0; S.miHeredadoDe = null;
   try {
-    const r = JSON.parse(localStorage.getItem(CLAVE_MI11()) || 'null');
+    let r = JSON.parse(localStorage.getItem(CLAVE_MI11()) || 'null');
+    if (!r && D && D.fechaObjetivo != null) {
+      for (let f = D.fechaObjetivo - 1; f >= D.fechaObjetivo - MI11_MIRAR_ATRAS && f >= 1; f--) {
+        const v = leerMi11Crudo(f);
+        if (v && ((Array.isArray(v.kOnce) && v.kOnce.length) || (Array.isArray(v.once) && v.once.length))) {
+          r = v; S.miHeredadoDe = f; break;
+        }
+      }
+    }
     if (r) {
       // formato nuevo: por clave estable. El viejo (por id) se lee igual, pero
       // solo sirve dentro de la misma corrida del motor.
@@ -4295,6 +4489,7 @@ function cargarMi11() {
   } catch (e) { }
   if (S.miCap && !S.mi11.includes(S.miCap)) S.miCap = null;
   if (!S.miEsq) S.miEsq = (S.oncesLocales && S.oncesLocales[0] && S.oncesLocales[0].e) || '1-4-4-2';
+  if (S.miHeredadoDe != null && !S.mi11.length) S.miHeredadoDe = null;
 }
 function guardarMi11() {
   try {
@@ -4677,8 +4872,18 @@ function bloqueVersus() {
       <button class="vs-btn vs-btn-chico" id="vs-borrar" title="Vaciar tu once">vaciar</button>
     </span>` : '';
 
+  // Arrastrar el once sin decirlo seria peor que no arrastrarlo: hay que saber
+  // que lo que se ve es el de la fecha pasada y todavia no lo tocaste.
+  const avisoHeredado = (hayMio && S.miHeredadoDe != null) ? `<div class="vs-heredado">
+    Este es el once que tenías en la <b>fecha ${S.miHeredadoDe}</b>, traído tal cual para que
+    cambies lo que quieras en vez de armarlo de cero.${S.miPerdidos
+      ? ` <b>${S.miPerdidos}</b> ${S.miPerdidos === 1 ? 'jugador ya no está' : 'jugadores ya no están'} en la lista
+          (se fueron del torneo o cambiaron de club): ${S.miPerdidos === 1 ? 'quedó un hueco' : 'quedaron huecos'} en la cancha.`
+      : ''} La fecha ${S.miHeredadoDe} queda guardada como estaba.</div>` : '';
+
   return `
   <div class="vs">
+    ${avisoHeredado}
     <div class="vs-cab">
       <div class="vs-cab-txt"><h2>La fecha, como un partido</h2>
         <p>El once del motor contra el que armaste vos. Los puntos salen de las fichas de Planeta y
@@ -5283,7 +5488,27 @@ function pintarPantallaLiga() {
     </tr>` + (sel ? `<tr class="lg-detalle-fila"><td colspan="7">${detalleEquipo(m)}</td></tr>` : '');
   }).join('');
 
+  // ¿LOS EQUIPOS SON DE ESTA FECHA? (17/09)
+  // Los onces se cargan cuando arranca la fecha. Apenas el motor pasa a la
+  // siguiente, dataLiga.js sigue teniendo los de la anterior y la pantalla los
+  // muestra como si fueran los de hoy, con proyección y todo: 78 puntos para
+  // un equipo que nadie armó. Se compara contra el primer partido de la fecha.
+  const equiposViejos = (() => {
+    const ed = LIGA_BASE && LIGA_BASE.equiposEditado;
+    if (!ed || !D.partidos || !D.partidos.length) return null;
+    const t = new Date(ed).getTime();
+    const arranca = Math.min(...D.partidos.map(m => new Date(m.cuando).getTime()).filter(isFinite));
+    if (!isFinite(arranca) || !isFinite(t) || t >= arranca) return null;
+    return { ed, arranca };
+  })();
+  const avisoViejos = equiposViejos ? `<div class="lg-viejos">
+    <b>Ojo: estos equipos son de la fecha anterior.</b> <code>equipos.txt</code> no se toca desde el
+    ${fechaCorta(equiposViejos.ed)} y la fecha ${D.fechaObjetivo} arranca el ${fechaCorta(equiposViejos.arranca)}.
+    Lo de abajo —proyección, chances, todo— sale de onces que nadie confirmó todavía para esta fecha.
+    Se arregla cargando los equipos nuevos en <code>equipos.txt</code> y corriendo <b>ARMAR_LIGA.bat</b>.</div>` : '';
+
   cont.innerHTML = `
+    ${avisoViejos}
     ${cabecera('Torneo de amigos', 'Fecha ' + (D.fechaObjetivo ?? '–') + ' · ' + eqs.length + (eqs.length === 1 ? ' equipo' : ' equipos'),
       `<div class="est ${enJuego ? 'est-abierta' : 'est-neutra'}" title="${esc(VIVO
         ? 'Bajado el ' + fechaCorta(VIVO.generado) + '. Corré SYNC_VIVO.bat para actualizar.'
@@ -6932,7 +7157,37 @@ function detalleFP(d, desvio, fecha) {
 // entera: nombres, equipos, puntos y esperados adentro del propio registro. No
 // depende de datos.js, así que sigue estando cuando el motor ya está en la 9.
 const CLAVE_HIST = 'gdt_hist_v1';
+
+// ════════════════════════════════════════════════════════════════════════════
+//  LAS FOTOS VIENEN DE UN ARCHIVO (17/09)
+//  ------------------------------------------------------------------------
+//  dataFotos.js lo escribe foto.cjs desde datos.js + dataVivo.js + dataHist.js
+//  + dataLiga.js, con las reglas del juego. Antes esto se calculaba aca y se
+//  guardaba en el localStorage, con tres consecuencias que se sufrieron todas:
+//  en Vercel cada visitante abria SU localStorage vacio y no veia NINGUN
+//  historial; la foto salia cuando uno abria la pagina, asi que una fecha a
+//  medio publicar quedaba clavada para siempre; y ningun auditor la podia
+//  revisar porque no era un archivo.
+//
+//  EL ARCHIVO MANDA. Si una fecha esta en dataFotos.js, esa es la buena: la
+//  calculo la cadena con los datos completos, es igual para todos y esta
+//  auditada. El localStorage queda solo para las fechas que el archivo todavia
+//  no tiene (por ejemplo la que se esta jugando ahora).
+function fotosDeArchivo() {
+  const F = (typeof window !== 'undefined') ? window.FOTOS : null;
+  return (F && typeof F === 'object') ? F : {};
+}
+const fotoEsDeArchivo = n => !!fotosDeArchivo()[n];
+
 function leerHist() {
+  const arch = fotosDeArchivo();
+  try {
+    const x = JSON.parse(localStorage.getItem(CLAVE_HIST) || '{}');
+    const local = (x && typeof x === 'object') ? x : {};
+    return Object.assign({}, local, arch);   // el archivo pisa al navegador
+  } catch (e) { return Object.assign({}, arch); }
+}
+function leerHistLocal() {
   try { const x = JSON.parse(localStorage.getItem(CLAVE_HIST) || '{}'); return (x && typeof x === 'object') ? x : {}; }
   catch (e) { return {}; }
 }
@@ -7009,10 +7264,19 @@ window.capturarFecha = function (silencio, fechaForzada) {
     equipos: equiposTorneo().filter(t => (onceDe(t) || []).length).map(fotoOnce),
     jugadores: jug
   };
-  const h = leerHist(); h[n] = foto;
+  // La foto de archivo manda: la calculo la cadena con los datos completos y es
+  // la que ven todos. Pisarla con una sacada a mano seria volver al problema.
+  if (fotoEsDeArchivo(n)) {
+    if (!silencio) alert('La fecha ' + n + ' ya está guardada en el archivo (dataFotos.js), que es el que ven todos.\n\n' +
+      'Esa foto la calcula la cadena con la fecha terminada, así que no hace falta sacarla a mano. ' +
+      'Si está mal, corré  foto.cjs  de nuevo.');
+    return fotosDeArchivo()[n];
+  }
+  const h = leerHistLocal(); h[n] = foto;
   const ok = guardarHist(h);
   if (!silencio) {
-    if (ok) alert('Guardada la fecha ' + n + '. Queda en Revisión aunque el motor pase a la que viene.');
+    if (ok) alert('Guardada la fecha ' + n + ' en este navegador.\n\n' +
+      'Ojo: esta foto es tuya y no la ven los demás. La definitiva la escribe foto.cjs cuando cierra la fecha.');
     else alert('No entró en el navegador: hay demasiadas fechas guardadas.');
   }
   return ok ? foto : null;
@@ -7075,6 +7339,7 @@ function autoCapturar() {
   } catch (e) { }
   try {
     if (!D || !VIVO || D.fechaObjetivo == null) return;
+    if (fotoEsDeArchivo(D.fechaObjetivo)) return;   // la buena ya esta en el archivo
     const h = leerHist(), y = h[D.fechaObjetivo];
     const hay = (VIVO.partidos || []).length;
     // LA FOTO DE LA FECHA EN CURSO SE REFRESCA SOLA (13/09).
@@ -7098,7 +7363,13 @@ window.verRevision = function (n) { REV_FECHA = +n; pintarRevision(); };
 // pisa cualquier intento posterior. Sin un boton para tirarla, el unico camino
 // era vaciar el localStorage entero y perder tambien las buenas.
 window.borrarFoto = function (n) {
-  const h = leerHist();
+  if (fotoEsDeArchivo(n)) {
+    alert('La fecha ' + n + ' viene del archivo dataFotos.js, no de este navegador.\n\n' +
+      'No se puede borrar desde acá, y es a propósito: es la foto que ven todos. ' +
+      'Si quedó mal, se rehace corriendo  foto.cjs  con esa fecha.');
+    return;
+  }
+  const h = leerHistLocal();
   if (!h[n]) return;
   if (!confirm('¿Borrar la foto de la fecha ' + n + '?\n\n' +
     'Se puede volver a sacar mientras dataVivo.js siga siendo de esa fecha. ' +
@@ -7154,11 +7425,12 @@ function pintarRevision() {
   const resc = estadoRescate();
   const f = hs[REV_FECHA];
   const enCurso = !!(D && D.fechaObjetivo === f.fecha);
+  const deArchivo = fotoEsDeArchivo(f.fecha);
 
   const selector = `<div class="rev-sel">${ns.map(n => `<button class="chip-filtro${n === REV_FECHA ? ' on' : ''}"
       onclick="verRevision(${n})">Fecha ${n}</button>`).join('')}
-      <button class="chip-filtro rev-borrar" onclick="borrarFoto(${f.fecha})"
-        title="${esc('Tirar la foto de la fecha ' + f.fecha + '. Sirve cuando quedó mal sacada.')}">✕ borrar esta foto</button>
+      ${deArchivo ? '' : `<button class="chip-filtro rev-borrar" onclick="borrarFoto(${f.fecha})"
+        title="${esc('Tirar la foto de la fecha ' + f.fecha + '. Sirve cuando quedó mal sacada.')}">✕ borrar esta foto</button>`}
     </div>`;
 
   // UNA FOTO POBRE HAY QUE DECIRLA (13/09). Si la mayoría del once no tiene
@@ -7173,8 +7445,13 @@ function pintarRevision() {
 
   cont.innerHTML = `
     ${cabecera('Revisión', 'Fecha ' + f.fecha + ' · ' + (f.completa ? 'terminada' : f.partidos + ' de ' + f.deTotal + ' partidos') +
-      ' · foto del ' + fechaCorta(f.cuando), `<button class="vs-btn vs-btn-chico" onclick="capturarFecha()"
+      ' · foto del ' + fechaCorta(f.cuando), deArchivo ? '' : `<button class="vs-btn vs-btn-chico" onclick="capturarFecha()"
         title="Vuelve a sacar la foto de la fecha que el motor tiene ahora. Si ya existe, la pisa.">actualizar la foto</button>`)}
+    ${deArchivo ? `<div class="rev-archivo">Esta fecha viene del <b>archivo</b>, no de tu navegador: la calculó
+      la cadena con la fecha terminada y es la misma que ven todos.${f.motor && f.motor.sinBanco
+        ? ' <b>El once del motor va sin suplentes</b>: el banco se empezó a guardar el 17/09 y esta fecha es anterior, así que compitió con 11 contra los 15 de cada equipo.'
+        : ''}</div>` : `<div class="rev-aviso">Esta foto está guardada <b>solo en este navegador</b>: no la ven los demás
+      y se pierde si limpiás Chrome. La definitiva la escribe <b>foto.cjs</b> cuando cierra la fecha.</div>`}
     ${selector}
     ${avisoPobre}
     ${enCurso && !f.completa ? `<div class="rev-aviso">La fecha ${f.fecha} <b>todavía se está jugando</b>:

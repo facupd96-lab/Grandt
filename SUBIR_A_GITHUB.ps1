@@ -132,6 +132,10 @@ foreach ($f in @('datos.js','index.html')) {
 if (-not (Test-Path (Join-Path $carpeta 'dataVivo.js'))) {
   Write-Host "   OJO: no hay dataVivo.js. La pagina va a mostrar los puntos esperados, no los reales." -ForegroundColor Yellow
 }
+if (-not (Test-Path (Join-Path $carpeta 'dataFotos.js'))) {
+  Write-Host "   OJO: no hay dataFotos.js. En la pagina publicada NADIE va a ver el historial" -ForegroundColor Yellow
+  Write-Host "   de las fechas jugadas (Revision). Lo escribe foto.cjs al cerrar la fecha." -ForegroundColor Yellow
+}
 if (-not (Test-Path (Join-Path $carpeta 'dataLiga.js'))) {
   Write-Host "   OJO: no hay dataLiga.js. Tus amigos NO van a ver ningun equipo del torneo." -ForegroundColor Yellow
   Write-Host "        Se baja desde Torneo de amigos -> ... -> Compartir el torneo." -ForegroundColor Yellow

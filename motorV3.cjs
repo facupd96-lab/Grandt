@@ -1430,7 +1430,7 @@ const ESQUEMAS = [
 //    varianza, y ese sale de una simulacion aparte que si la modela.
 //    Asi que el choque dejo de descontar puntos y pasa a INFORMARSE: se cuenta
 //    y se muestra, y la decision es de uno.
-function mejorEsquema(rankings) {
+function mejorEsquema(rankings, presupuesto) {
   const pts = x => (x.EPsiJuega != null ? x.EPsiJuega : x.EP);
   const res = ESQUEMAS.map(f => {
     const arq = rankings.ARQ.slice(0, f[0]);
@@ -1448,7 +1448,99 @@ function mejorEsquema(rankings) {
              sinCapitan: round2(total), capitan: cap, once,
              riesgo: riesgoDelOnce(once) };
   }).sort((a, b) => b.total - a.total);
-  return { optimo: res[0], todos: res };
+  const optimo = res[0];
+  if (optimo) optimo.banco = mejorBanco(rankings, optimo.once, presupuesto);
+  return { optimo, todos: res };
+}
+
+// ── EL BANCO (17/09) ───────────────────────────────────────────────────────
+// Hasta hoy el motor recomendaba ONCE jugadores y nada mas. En el Gran DT eso
+// no es un equipo: son once titulares y CUATRO suplentes, uno por puesto, y al
+// titular que juega menos de 20 minutos lo reemplaza su suplente.
+//
+// No es cosmetico. En la fecha 9 el once del motor hizo 72 puntos con "8 de 11
+// jugaron": Ascacibar, Alexis Castro y Guido Carrillo no jugaron y esos tres
+// lugares valieron cero. Los equipos del torneo de amigos, que si tienen banco,
+// recuperaron esos puntos — Atilio Chara metio 5 con Lencioni entrando por
+// Velasco. El motor competia con tres jugadores menos.
+//
+// COMO SE ELIGE (corregido el 17/09). El primer intento los ordenaba por EP —el
+// puntaje descontado por la chance de que el tipo juegue— con la idea de que un
+// suplente vale como seguro. ESTA MAL para este proyecto, y el pedido fue
+// explicito: el suplente no es un seguro, es UNA ALTERNATIVA DE TITULAR. Tienen
+// que ser cuatro jugadores que tranquilamente podrian estar en el once.
+//
+// Asi que se miden EXACTAMENTE IGUAL que los titulares: por EPsiJuega, lo que
+// suman si entran a la cancha, sin descontar por minutos ni por chance de
+// jugar. Son, literalmente, el mejor de cada puesto que no entro en el once.
+//
+// Esto ademas es coherente con la regla de fondo de todo el proyecto: el motor
+// no penaliza a nadie por creer que no va a jugar. Eso lo decide el usuario
+// tildandolo en la pantalla.
+//
+// El presupuesto no descarta a nadie —el pedido es explicito: nunca dejar de
+// recomendar por plata— pero se informa cuanto sale, y si los cuatro mejores no
+// entran en lo que sobra se avisa y se ofrece tambien una version que si entra.
+function mejorBanco(rankings, once, presupuesto) {
+  const enOnce = new Set(once.map(x => x.id));
+  const pr = x => num(x.precio) || 0;
+  const costoOnce = once.reduce((s, x) => s + pr(x), 0);
+  const tope = num(presupuesto) || 0;
+
+  // el mismo numero con el que se arma el once: lo que suma SI entra
+  const pts = x => (x.EPsiJuega != null ? num(x.EPsiJuega) : num(x.EP));
+
+  const elegir = (pos, maxPrecio) => {
+    const cands = (rankings[pos] || [])
+      .filter(x => !enOnce.has(x.id))
+      .filter(x => maxPrecio == null || pr(x) <= maxPrecio);
+    if (!cands.length) return null;
+    return cands.slice().sort((a, b) => (pts(b) - pts(a)) || (pr(a) - pr(b)))[0];
+  };
+
+  const arma = max => ['ARQ', 'DEF', 'VOL', 'DEL']
+    .map(pos => { const x = elegir(pos, max); return x ? { pos, j: x } : { pos, j: null }; });
+
+  const mejores = arma(null);
+  const costoMejores = mejores.reduce((s, b) => s + (b.j ? pr(b.j) : 0), 0);
+  const sobra = tope ? tope - costoOnce : 0;
+  const entra = !tope || (costoOnce + costoMejores) <= tope;
+
+  // la alternativa que SI entra: se reparte lo que sobra en partes iguales y
+  // se busca el mejor de cada puesto por debajo de eso. No es optimo, es
+  // honesto y alcanza para tener una opcion que no rompa el presupuesto.
+  let ajustado = null;
+  if (!entra && sobra > 0) {
+    const porPuesto = sobra / 4;
+    const a = arma(porPuesto);
+    if (a.every(b => b.j)) {
+      ajustado = {
+        jugadores: a.map(b => ({ pos: b.pos, id: b.j.id, nombre: b.j.nombre, equipo: b.j.equipo,
+          precio: pr(b.j), pts: round2(pts(b.j)), pJuega: num(b.j.pJuega) })),
+        costo: a.reduce((s, b) => s + pr(b.j), 0)
+      };
+    }
+  }
+
+  return {
+    jugadores: mejores.map(b => b.j ? {
+      pos: b.pos, id: b.j.id, nombre: b.j.nombre, equipo: b.j.equipo,
+      precio: pr(b.j),
+      // el MISMO numero que ordena a los titulares: lo que suma si entra
+      pts: round2(pts(b.j)),
+      // se informa, no se usa para elegir: el tilde lo pone el usuario
+      pJuega: num(b.j.pJuega)
+    } : { pos: b.pos, id: null, nombre: null }),
+    costo: costoMejores,
+    costoOnce: round2(costoOnce),
+    costoTotal: round2(costoOnce + costoMejores),
+    presupuesto: tope || null,
+    entraEnPresupuesto: entra,
+    sobraba: tope ? round2(sobra) : null,
+    // lo que suman los cuatro si entran, con el mismo criterio que el once
+    puntos: round2(mejores.reduce((s, b) => s + (b.j ? pts(b.j) : 0), 0)),
+    ajustado
+  };
 }
 
 // QUE RIESGOS TIENE UN ONCE. Nada de esto le baja el puntaje esperado —no
@@ -1527,6 +1619,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { RG, CAL, valorEfectivoGol, recalibrarPartidos, fichaLimpia,
     bonosAcumulados, validarFichas, devig, lambdasDesdeMercado, lambdasPartido,
     amenazaIndividual, sharesDeEquipo, figurasDeEquipo, evaluar,
-    scoreARQ, scoreDEF, scoreOfensivo, mejorEsquema, correrMotor, ESQUEMAS, probFicha, perfilMinutos, minutosEstimados, minutosCuandoJuega, partidosDeTitular, perfilDeMinutos,
+    scoreARQ, scoreDEF, scoreOfensivo, mejorEsquema, mejorBanco, correrMotor, ESQUEMAS, probFicha, perfilMinutos, minutosEstimados, minutosCuandoJuega, partidosDeTitular, perfilDeMinutos,
     suerteDefensiva };
 }

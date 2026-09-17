@@ -54,9 +54,10 @@ salida = salida.replace(
   '    <script>document.write(\'<script src="dataVivo.js?v=\' + Date.now() + \'"><\\/script>\');</script>\n' +
   '    <script>document.write(\'<script src="dataHist.js?v=\' + Date.now() + \'"><\\/script>\');</script>\n' +
   '    <script>document.write(\'<script src="dataLiga.js?v=\' + Date.now() + \'"><\\/script>\');</script>\n' +
-  // dataManual.js es opcional: son los puntajes que se cargaron a mano mientras
-  // Planeta no publica. Si el archivo no existe, el 404 no rompe nada.
-  '    <script>document.write(\'<script src="dataManual.js?v=\' + Date.now() + \'"><\\/script>\');</script>\n' +
+  // dataFotos.js: como termino cada fecha, calculado por foto.cjs desde los
+  // archivos. Antes esto vivia SOLO en el localStorage de cada navegador, o sea
+  // que en Vercel los amigos no veian ningun historial. Ahora viaja con la app.
+  '    <script>document.write(\'<script src="dataFotos.js?v=\' + Date.now() + \'"><\\/script>\');</script>\n' +
   '    <script>\n' + seguro(registry) + '\n</script>\n' +
   '    <script>\n' + seguro(app) + '\n</script>');
 

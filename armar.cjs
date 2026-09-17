@@ -1172,7 +1172,7 @@ out.presupuesto = 65000000;
   ['ARQ','DEF','VOL','DEL'].forEach(p=>{ limpio[p]=out.rankings[p].filter(x=>!fuera(x)); });
   const antes = new Set(out.esquema.optimo.once.map(x=>x.id));
   out.rankingsSinBajas = limpio;
-  out.esquema = M.mejorEsquema(limpio);
+  out.esquema = M.mejorEsquema(limpio, out.presupuesto);
   const sacados = bajas.filter(x=>antes.has(x.id));
   console.log('ONCE — '+bajas.length+' jugadores quedaron afuera del once por estar lesionados, suspendidos o expulsados'+
     (sacados.length? '. Estaban en el once recomendado: '+sacados.map(x=>x.nombre+' ('+
@@ -1932,7 +1932,8 @@ const paraApp={
   fechaEnCurso: FECHA_EN_CURSO,
   rankings:{ARQ:out.rankings.ARQ.map(slim),DEF:out.rankings.DEF.map(slim),
             VOL:out.rankings.VOL.map(slim),DEL:out.rankings.DEL.map(slim)},
-  esquema:{optimo:{esquema:out.esquema.optimo.esquema,once:out.esquema.optimo.once.map(x=>({id:x.id}))},
+  esquema:{optimo:{esquema:out.esquema.optimo.esquema,once:out.esquema.optimo.once.map(x=>({id:x.id})),
+                   banco:out.esquema.optimo.banco||null},
            todos:out.esquema.todos.map(e=>({e:e.esquema,ids:e.once.map(x=>x.id),total:e.total}))},
   arriesgado: out.arriesgado ? {
     esquema: out.arriesgado.esquema, objetivo: out.arriesgado.objetivo,
@@ -1996,6 +1997,17 @@ try{
     foto.onceK = out.esquema.optimo.once.map(x=>porId[x.id]).filter(Boolean).map(CLAVE_JUG);
     const cap = out.esquema.optimo.capitan;
     foto.capitanK = (cap && porId[cap.id]) ? CLAVE_JUG(porId[cap.id]) : null;
+    // EL BANCO TAMBIEN (17/09). Sin esto, cuando Revision rearma una fecha el
+    // once del motor sale SIN suplentes y compite con 11 contra los 15 de cada
+    // amigo: en la fecha 9 quedo en "8 de 11 jugaron, 72 puntos" porque tres no
+    // jugaron y no habia con quien reemplazarlos. Las fechas anteriores al
+    // 17/09 no lo tienen y se marcan como tales en la foto.
+    const bk = out.esquema.optimo.banco;
+    if(bk && Array.isArray(bk.jugadores)){
+      const b={};
+      bk.jugadores.forEach(j=>{ if(j && j.id && porId[j.id]) b[j.pos]=CLAVE_JUG(porId[j.id]); });
+      if(Object.keys(b).length) foto.bancoK = b;
+    }
   }
   fs.writeFileSync(archivo,JSON.stringify(foto,null,1));
   console.log((yaEstaba?'  (actualizada) ':'  ')+'foto guardada: '+archivo+
@@ -2024,7 +2036,7 @@ try{
       H[x.fecha]={fecha:x.fecha, generado:x.generado, esquema:x.esquema||null, esperados:esp,
                   n:Object.keys(esp).length,
                   // el once que recomendaba el motor ESA fecha, en claves
-                  once:x.onceK, capitan:(x.capitanK||null)};
+                  once:x.onceK, capitan:(x.capitanK||null), banco:(x.bancoK||null)};
     }catch(e){}
   });
   // solo las ultimas 8: mas que eso es peso muerto en cada carga de la pagina

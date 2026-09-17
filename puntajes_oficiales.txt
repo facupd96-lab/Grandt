@@ -1,0 +1,58 @@
+# LA TABLA OFICIAL DEL GRAN DT — la unica verdad contra la que medirnos.
+#
+# Pega aca la tabla DE LA FECHA tal cual la copias del juego, sin tocar nada.
+# El parser se ancla en la linea "Modifico equipo", asi que no importa como
+# queden los saltos de linea ni estas lineas que empiezan con #.
+#
+# Despues corre AUDITAR_TORNEO.bat: te dice, equipo por equipo, si nuestra
+# cuenta da igual que la del juego. Si a alguno le falta o le sobra, casi
+# siempre es un jugador mal identificado en equipos.txt (un apellido repetido,
+# un club equivocado) o un cambio que ese DT hizo a mitad de fecha.
+#
+# Ejemplo real: en la fecha 9 daba 106 para El Favorito de la Tati y el juego
+# decia 115. Los 9 de diferencia eran el arquero: equipos.txt decia
+# "Ledesma (instituto)" —Marcos, 0 puntos— y hay otro Ledesma, Jeremias, de
+# Rosario Central, que esa fecha hizo exactamente 9.
+#
+# ─────────────────────────────────────────────────────────────────────────
+Agustín Barquin Gauna
+El Favorito de la Tati
+Modificó equipo
+2 veces
+115
+2
+Leandro Monaco
+La Aplanadora Danesa
+Modificó equipo
+0 veces
+111
+3
+Francisco Vittar Allones
+La Bestia fc.
+Modificó equipo
+1 vez
+111
+4
+Martin Giraudo
+Giri FC
+Modificó equipo
+0 veces
+107
+5
+Jose Gauna
+ATILIO CHARA FC
+Modificó equipo
+1 vez
+98
+6
+Lautaro Mansilla
+Falcón de Ramón
+Modificó equipo
+0 veces
+98
+7
+César Emmanuel Moreno
+Runnero atómico
+Modificó equipo
+1 vez
+96

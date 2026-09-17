@@ -1,10 +1,20 @@
 {
-  "_comentario": "PlanetaGranDT publica una planilla NUEVA cada fecha, con un ID distinto. Cuando te pasen el link nuevo, pegá acá el pedazo que va entre /d/e/ y /pubhtml. No hay que tocar ningún .ps1.",
-  "id": "2PACX-1vTKYjnioPob8f3-Gnt6I1_mjOlqCILKTpAQKp6QxFVNGF-2uxSg3qXve9j934hXHh9jj8lWkGy0Qj_0",
-  "fecha": 8,
-  "actualizado": "2026-09-10",
-  "anteriores": [
-    { "fecha": 7, "id": "2PACX-1vQUnWA7eYlnlhVDpfYVCfOXJo5ivL084sAtZOX8z51MSru3mjo7EjrAHWcAyyxdaSwchWXT9_lMozZe" },
-    { "fecha": 6, "id": "2PACX-1vQWGNjh7CL09RS5jbryuvTL88q8AYF6yV5kJqmraLlASvJeyK6jYJlb8XulTFWOuEXwIOhHhVBu1CpY" }
-  ]
+    "_comentario":  "Lo actualiza solo SYNC_PLANETA leyendo el post \"Estadisticas\" del blog. Si alguna vez hay que forzarlo a mano, se cambia el campo id.",
+    "id":  "2PACX-1vReb2FM33VbNuH5tTxL_33ZtTLMGnl8C46jQbIe-gaCXJaQ1LEclYRjnfpqOahZgqyOlalsiXqhB7J2",
+    "fecha":  9,
+    "actualizado":  "2026-09-16",
+    "anteriores":  [
+                       {
+                           "fecha":  8,
+                           "id":  "2PACX-1vTKYjnioPob8f3-Gnt6I1_mjOlqCILKTpAQKp6QxFVNGF-2uxSg3qXve9j934hXHh9jj8lWkGy0Qj_0"
+                       },
+                       {
+                           "fecha":  7,
+                           "id":  "2PACX-1vQUnWA7eYlnlhVDpfYVCfOXJo5ivL084sAtZOX8z51MSru3mjo7EjrAHWcAyyxdaSwchWXT9_lMozZe"
+                       },
+                       {
+                           "fecha":  6,
+                           "id":  "2PACX-1vQWGNjh7CL09RS5jbryuvTL88q8AYF6yV5kJqmraLlASvJeyK6jYJlb8XulTFWOuEXwIOhHhVBu1CpY"
+                       }
+                   ]
 }

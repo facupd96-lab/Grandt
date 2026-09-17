@@ -14,6 +14,13 @@
 #  que dataVivo.js.
 # =============================================================================
 
+# -Fecha 9         -> rearma los puntos de la fecha 9 (los posts siguen en el feed)
+# -Fecha cerrada   -> la ultima fecha con los 15 partidos jugados. Es lo que usa
+#                     CERRAR_FECHA: si corre sin esto DESPUES de que el motor
+#                     paso a la fecha siguiente, dataVivo.js se rehace para la
+#                     fecha nueva (vacia) y los puntos de la que cerro se pierden.
+param([string]$Fecha = '')
+
 Set-StrictMode -Off
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $ErrorActionPreference = 'Continue'
@@ -69,7 +76,13 @@ Write-Host ("   feed bajado: {0:N0} KB" -f ($texto.Length / 1024)) -ForegroundCo
 # ---- parsear ----
 $node = Join-Path $carpeta 'node.exe'
 if (-not (Test-Path $node)) { $node = 'node' }
-& $node (Join-Path $carpeta 'vivo.cjs')
+if ($Fecha -and $Fecha -match '^(?i)cerrada$') {
+  & $node (Join-Path $carpeta 'vivo.cjs') '--cerrada'
+} elseif ($Fecha) {
+  & $node (Join-Path $carpeta 'vivo.cjs') $Fecha
+} else {
+  & $node (Join-Path $carpeta 'vivo.cjs')
+}
 if ($LASTEXITCODE -ne 0) {
   Write-Host "  vivo.cjs termino con error. Mira lo que dijo aca arriba." -ForegroundColor Red
   exit $LASTEXITCODE

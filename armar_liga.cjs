@@ -161,6 +161,14 @@ const salida = equipos.map(eq => {
 const paquete = {
   v: 5,
   fecha: D.fechaObjetivo,
+  // CUANDO SE EDITO equipos.txt POR ULTIMA VEZ (17/09).
+  // "fecha" es la del MOTOR, no la de los equipos, y eso enganaba: los onces se
+  // cargan cuando arranca la fecha, asi que apenas el motor pasa a la siguiente
+  // el archivo dice "fecha 10" con los equipos de la 9 y la pantalla proyecta
+  // 78 puntos para onces que ya no existen. Con esto la app puede comparar
+  // contra cuando empieza la fecha y avisar en vez de mentir.
+  equiposEditado: (() => { try { return new Date(fs.statSync(rutaTxt).mtimeMs).toISOString(); }
+                          catch (e) { return null; } })(),
   publicado: new Date().toISOString(),
   fichas: {},
   dts: [],

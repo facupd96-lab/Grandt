@@ -288,8 +288,35 @@ function main() {
   // Sirve para rearmar una fecha que quedo sin foto: el motor ya paso a la 9 y
   // los posts de la 8 siguen estando en el feed. Los ids salen del datos.js de
   // AHORA, que es lo que necesita la app para no cruzarle los puntos a otro.
-  const pedida = process.argv.slice(2).map(x => parseInt(x, 10)).find(x => !isNaN(x));
-  const fecha = (pedida != null) ? pedida : D.fechaObjetivo;
+  //
+  //   node vivo.cjs --cerrada
+  // La ULTIMA FECHA CON LOS 15 PARTIDOS JUGADOS. Es lo que hay que usar al
+  // cerrar una fecha (17/09). El problema que arreglo: CERRAR_FECHA corria
+  // SYNC_VIVO DESPUES de ACTUALIZAR_TODO, o sea despues de que el motor ya
+  // habia pasado a la fecha siguiente. Entonces dataVivo.js se rehacia para la
+  // fecha nueva —vacia— y los puntos de la fecha que acababa de cerrar
+  // desaparecian del archivo. Revision quedaba clavada con la foto incompleta
+  // que se hubiera sacado antes, y ya no habia forma de rehacerla: autoCapturar
+  // solo toca la fecha que el motor tiene AHORA. Asi se perdio la fecha 9.
+  const args = process.argv.slice(2);
+  const quiereCerrada = args.some(a => /^--?cerrada$/i.test(a));
+  let cerrada = null;
+  if (quiereCerrada) {
+    const porFecha = {};
+    (D.fixtureCompleto || []).forEach(m => {
+      if (m.numeroFecha == null) return;
+      const z = porFecha[m.numeroFecha] = porFecha[m.numeroFecha] || { total: 0, jug: 0 };
+      z.total++; if (m.terminado === true) z.jug++;
+    });
+    Object.keys(porFecha).map(Number).sort((a, b) => a - b).forEach(n => {
+      const z = porFecha[n];
+      if (z.total > 0 && z.jug === z.total) cerrada = n;
+    });
+    if (cerrada == null) console.log('  no encontre ninguna fecha con todos los partidos jugados.');
+    else console.log('  (--cerrada) la ultima fecha completa es la ' + cerrada);
+  }
+  const pedida = args.map(x => parseInt(x, 10)).find(x => !isNaN(x));
+  const fecha = (pedida != null) ? pedida : (cerrada != null ? cerrada : D.fechaObjetivo);
   if (pedida != null) console.log('  (a pedido) se leen los posts de la fecha ' + pedida);
   const jugadores = [].concat(D.rankings.ARQ, D.rankings.DEF, D.rankings.VOL, D.rankings.DEL);
   const porClub = armarIndice(jugadores);

@@ -419,7 +419,10 @@
       // dataLiga.js son los equipos del torneo de amigos publicados con la app,
       // para que el que entra los vea sin importar nada. Si no existe, 404 en la
       // consola y la pagina anda igual: cada uno carga los suyos.
-      ['teamsRegistry.js', 'datos.js', 'dataVivo.js', 'dataHist.js', 'dataLiga.js', 'appV3.js'].forEach(function (f) {
+      // dataFotos.js es como termino cada fecha, hecho por foto.cjs desde los
+      // archivos. Antes la foto vivia solo en el localStorage de cada uno: en
+      // Vercel los amigos no veian ningun historial. Ahora viaja con la app.
+      ['teamsRegistry.js', 'datos.js', 'dataVivo.js', 'dataHist.js', 'dataLiga.js', 'dataFotos.js', 'appV3.js'].forEach(function (f) {
         document.write('<script src="' + f + '?v=' + v + '"><\/script>');
       });
     })();
