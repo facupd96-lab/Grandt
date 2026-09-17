@@ -142,6 +142,32 @@ function repintarTodo() {
   if (document.getElementById('pantalla-liga') && S.liga) pintarPantallaLiga();
   pintarMenuFuera();
 }
+// ── ¿ESTE TIPO JUEGA? (17/09) ──────────────────────────────────────────────
+// Los estados los escribe el ayudante de campo del Gran DT, no nosotros.
+// "Habilitado" es el generico: no esta lesionado, pero tampoco dice que vaya a
+// jugar. Los otros cuatro son senales activas de que esta en el radar del DT.
+const ESTADO_SIEMPRE_VISIBLE = new Set(['Posible Titular', 'En duda', 'Juega Copa', 'Jugó Copa']);
+const ESTADO_OCULTABLE = new Set(['Habilitado', 'Lesionado']);
+const FECHAS_MIRAR = 5;
+const MIN_PARA_FICHA = 20;   // los que exige el juego para darle ficha a un jugador
+function jugoUltimasFechas(x) {
+  const l = (x.dlog || []).slice(-FECHAS_MIRAR);
+  if (!l.length) return true;            // sin log no se puede afirmar nada: se muestra
+  return l.some(e => e && (e.m || 0) >= MIN_PARA_FICHA);
+}
+// UNA SOLA REGLA (18/09). Estaba escrita dos veces: una para decidir a quien se
+// muestra y otra, distinta, para numerar los puestos. Resultado: Teo Rodríguez
+// Pagano aparecia en la tabla SIN numero, porque pasaba el filtro de la lista y
+// no el de la numeracion. Ahora las dos preguntan lo mismo.
+function esCandidato(x) {
+  const est = (x.disp && x.disp.estado) || '';
+  if (ESTADO_SIEMPRE_VISIBLE.has(est)) return true;
+  if (ESTADO_OCULTABLE.has(est) && !jugoUltimasFechas(x)) return false;
+  const q = x.pmin, min = (x.ind && x.ind.minutos) || 0;
+  if (!q) return true;
+  return q.arranques >= 2 || min >= 270;
+}
+
 function toggleFuera(id, ev) {
   if (ev) { ev.stopPropagation(); ev.preventDefault(); }
   if (S.fuera.has(id)) S.fuera.delete(id); else S.fuera.add(id);
@@ -942,6 +968,84 @@ window.volverAlOnceDelMotor = function () {
   pintarPantallaOnce();
 };
 
+// ════════════════════════════════════════════════════════════════════════════
+//  EXPORTAR TU ONCE A equipos.txt (18/09)
+//  ------------------------------------------------------------------------
+//  Tu once vive en el localStorage de ESTE navegador. Eso quiere decir que si
+//  lo armas en la PC de casa y despues abris la pagina en el laburo, o en el
+//  celular, o en Vercel, no esta: localStorage es por navegador Y por origen,
+//  asi que hasta abrir el index.html local y abrir la version publicada son
+//  dos cajones distintos en la misma maquina.
+//
+//  Lo que SI viaja con la app son los archivos: dataLiga.js (el torneo) y
+//  dataFotos.js (el historial). Por eso la salida de todo esto es un archivo:
+//  pegas este bloque en equipos.txt, corres ARMAR_LIGA.bat, y tu once pasa a
+//  ser un equipo mas del torneo — auditado, publicado y visible desde cualquier
+//  maquina, igual que los de tus amigos.
+//
+//  SIEMPRE SE ESCRIBE EL CLUB. equipos.txt lo permite omitir, pero omitirlo es
+//  exactamente lo que hizo perder 9 puntos en la fecha 9: habia dos Ledesma
+//  arqueros y el archivo decia solo "Ledesma (instituto)". Con el club puesto
+//  en las quince lineas, esa ambiguedad no puede volver a pasar.
+function apellidoDe(n) {
+  const s = String(n || '').trim();
+  return s.includes(',') ? s.split(',')[0].trim() : (s.split(/\s+/).slice(-1)[0] || s);
+}
+function bloqueEquiposTxt(nombreEquipo) {
+  const cap = S.capitan;
+  const linea = (id, esCap) => {
+    const p = TODOS[id]; if (!p) return null;
+    return apellidoDe(p.n) + ' (' + NOM(p.eq) + ')' + (esCap ? ' (C)' : '');
+  };
+  const orden = { ARQ: 0, DEF: 1, VOL: 2, DEL: 3 };
+  const tit = S.once.slice().filter(id => TODOS[id])
+    .sort((a, b) => orden[TODOS[a].pos] - orden[TODOS[b].pos])
+    .map(id => linea(id, id === cap)).filter(Boolean);
+  const banco = ['ARQ', 'DEF', 'VOL', 'DEL']
+    .map(pos => (S_ONCE.banco && S_ONCE.banco[pos]) ? linea(S_ONCE.banco[pos], false) : null)
+    .filter(Boolean);
+  const faltaCap = !tit.some(l => / \(C\)$/.test(l));
+  return {
+    txt: '= ' + (nombreEquipo || 'Mi equipo') + '\n' + tit.join('\n') +
+         (banco.length ? '\n-- suplentes\n' + banco.join('\n') : '') + '\n',
+    nTit: tit.length, nBanco: banco.length, faltaCap
+  };
+}
+window.exportarMiOnce = function () {
+  const guardado = (() => { try { return localStorage.getItem('gdt_mi_nombre_equipo') || ''; } catch (e) { return ''; } })();
+  const nombre = prompt('¿Cómo se llama tu equipo en el Gran DT?\n\n' +
+    'Tiene que ser igual al del juego: así el auditor lo cruza con la tabla oficial.', guardado || '');
+  if (nombre == null) return;
+  try { localStorage.setItem('gdt_mi_nombre_equipo', nombre); } catch (e) { }
+  const b = bloqueEquiposTxt(nombre);
+  const avisos = [];
+  if (b.nTit !== 11) avisos.push('Tu once tiene <b>' + b.nTit + '</b> titulares y tienen que ser 11.');
+  if (b.nBanco !== 4) avisos.push('Tenés <b>' + b.nBanco + '</b> suplentes y tienen que ser 4, uno por puesto.');
+  if (b.faltaCap) avisos.push('No hay capitán marcado: poné la <b>C</b> en alguno antes de exportar.');
+  modalTexto('Tu once para el torneo', `
+    ${avisos.length ? `<div class="exp-mal">${avisos.join('<br>')}</div>` : ''}
+    <p class="exp-p">Copiá esto y pegalo al final de <code>equipos.txt</code>. Después corré
+      <b>ARMAR_LIGA.bat</b> y tu equipo entra al torneo como uno más: lo audita
+      <code>AUDITAR_TORNEO.bat</code> contra la tabla oficial y lo ven tus amigos desde cualquier máquina.</p>
+    <textarea id="exp-txt" class="exp-txt" readonly rows="${b.nTit + b.nBanco + 3}">${esc(b.txt)}</textarea>
+    <div class="exp-botones">
+      <button class="vs-btn vs-btn-fuerte" onclick="copiarMiOnce()">copiar al portapapeles</button>
+      <span id="exp-ok" class="exp-ok"></span>
+    </div>
+    <p class="exp-p exp-chico">El club va escrito en las quince líneas a propósito. En la fecha 9 había dos
+      Ledesma arqueros, el archivo no aclaraba cuál era y esos 9 puntos no aparecían por ningún lado.</p>`);
+};
+window.copiarMiOnce = function () {
+  const t = $('exp-txt'); if (!t) return;
+  t.select(); t.setSelectionRange(0, 99999);
+  const ok = $('exp-ok');
+  const listo = () => { if (ok) { ok.textContent = '✓ copiado'; setTimeout(() => { ok.textContent = ''; }, 2500); } };
+  // el portapapeles moderno no anda en file://, asi que queda el de siempre
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t.value).then(listo, () => { try { document.execCommand('copy'); listo(); } catch (e) { } });
+  } else { try { document.execCommand('copy'); listo(); } catch (e) { } }
+};
+
 function armarBanco() {
   // EL BANCO LO ELIGE EL MOTOR (17/09). Antes se armaba solo aca, en el
   // navegador, y por eso no existia en ningun archivo: no entraba en salida.json,
@@ -1166,11 +1270,17 @@ function pintarPantallaOnce() {
 
   // Si el once es tuyo hay que decirlo, y hay que poder volver al del motor.
   // Sin esto, "guardado" seria indistinguible de "el motor cambio de opinion".
+  const btnExportar = esR ? '' : `<button class="vs-btn vs-btn-chico" onclick="exportarMiOnce()"
+      title="Genera el bloque para pegar en equipos.txt. Es lo que hace que tu once deje de vivir sólo en este navegador.">guardar mi once para el torneo</button>`;
   const avisoEditado = (S_ONCE.editado && !esR) ? `<div class="once-guardado">
     <span><b>Este es tu once</b>, no el que recomienda el motor: quedó guardado solo con los cambios que hiciste${
       S_ONCE.heredadoDe != null ? `, y viene de la <b>fecha ${S_ONCE.heredadoDe}</b>` : ''}.${
       S_ONCE.perdidos ? ` <b>${S_ONCE.perdidos}</b> ${S_ONCE.perdidos === 1 ? 'jugador ya no está' : 'jugadores ya no están'} en la lista y ${S_ONCE.perdidos === 1 ? 'fue reemplazado' : 'fueron reemplazados'}.` : ''}</span>
-    <button class="vs-btn vs-btn-chico" onclick="volverAlOnceDelMotor()">volver al del motor</button></div>` : '';
+    <button class="vs-btn vs-btn-chico" onclick="volverAlOnceDelMotor()">volver al del motor</button>
+    ${btnExportar}</div>`
+    : (btnExportar ? `<div class="once-guardado once-exportar"><span>Tu once vive sólo en <b>este navegador</b>.
+        Pasalo a <code>equipos.txt</code> y lo vas a ver desde cualquier máquina, como los de tus amigos.</span>
+        ${btnExportar}</div>` : '');
 
   cont.innerHTML = `
     ${avisoEditado}
@@ -3214,11 +3324,27 @@ function pintarRankings() {
   // Con "arrancó alguna vez" alcanzaba para que se colara el arquero suplente
   // que jugó un partido. La regla es: arrancó al menos DOS veces, o jugó tres
   // partidos enteros. Los dos números se pueden comprobar en la columna.
-  if (!S.verTodos && !S.busqueda) lista = lista.filter(x => {
-    const q = x.pmin, min = (x.ind && x.ind.minutos) || 0;
-    if (!q) return true;
-    return q.arranques >= 2 || min >= 270;
-  });
+  // LO QUE DICE EL GRAN DT + LAS ULTIMAS 5 FECHAS (17/09).
+  // La regla de temporada de arriba mira TODO el torneo, y por eso dejaba
+  // pasar al que jugo las fechas 1 a 3 y despues no aparecio nunca mas. Al
+  // ordenar por "tiros por 90" la tabla se llenaba de defensores que hace un
+  // mes que no pisan la cancha: con 8 minutos jugados, un tiro da 11 por 90.
+  //
+  // Se suma la unica fuente que sabe si el tipo va a jugar HOY, que es el
+  // ayudante de campo del propio juego:
+  //   · "Posible Titular", "En duda", "Juega Copa", "Jugó Copa"  → SIEMPRE se
+  //     muestran, aunque la regla de temporada los sacara. Si el juego lo tiene
+  //     en el radar, es candidato.
+  //   · "Habilitado" o "Lesionado" + ni un partido de 20 minutos en las ultimas
+  //     cinco fechas → se oculta. "Habilitado" es el estado generico, el que
+  //     tiene el que no esta lesionado y tampoco lo van a poner.
+  //
+  // Los 20 minutos NO son un numero inventado: son los que exige el juego para
+  // darle ficha a un jugador. Si en cinco fechas nunca llego a puntuar, no
+  // juega, y punto.
+  // Nada de esto le baja el puntaje a nadie: es un filtro de la vista y se
+  // apaga con el mismo interruptor de siempre.
+  if (!S.verTodos && !S.busqueda) lista = lista.filter(esCandidato);
   S.filtrados = total - lista.length;
 
   // PUESTO DE VERDAD, no el numero de fila.
@@ -3239,12 +3365,11 @@ function pintarRankings() {
   // es el 4to defensor de la liga. Ahora el universo es el mismo que se ve, con
   // la regla de futbol —arranco dos veces o jugo tres partidos enteros— y sin
   // los que yo tilde como que no juegan.
+  // EL MISMO FILTRO QUE LA LISTA, o la tabla muestra filas sin numero.
   const universo = D.rankings[S.pos].filter(x => {
     if (estaFuera(x)) return false;
     if (S.verTodos) return true;
-    const q = x.pmin, min = (x.ind && x.ind.minutos) || 0;
-    if (!q) return true;
-    return q.arranques >= 2 || min >= 270;
+    return esCandidato(x);
   });
   const cmp = (a, b) => {
     const va = valorCol(a, S.ordCol), vb = valorCol(b, S.ordCol);
@@ -3264,7 +3389,7 @@ function pintarRankings() {
       ${escondidos.length
         ? `${escondidos.length === 1 ? 'El único que coincide está' : 'Los que coinciden están'} afuera de la tabla${escondidos.some(x => !esBaja(x)) ? ' porque los tildaste con la <b>✕</b>' : ' porque el juego los marca como baja'} — mirá el renglón de arriba.`
         : `No hay ${S.pos === 'ARQ' ? 'arqueros' : S.pos === 'DEF' ? 'defensores' : S.pos === 'VOL' ? 'volantes' : 'delanteros'} de ${esc(quien)} que entren en el corte.
-           ${S.filtrados ? `Hay ${S.filtrados} que arrancaron menos de dos veces: marcá «ver también los suplentes».` : ''}`}</td></tr>`;
+           ${S.filtrados ? `Hay ${S.filtrados} escondidos —los que arrancaron menos de dos veces, y los que el Gran DT da por «Habilitado» o «Lesionado» y hace cinco fechas que no juegan 20 minutos—: marcá «ver también los suplentes».` : ''}`}</td></tr>`;
   } else
   body.innerHTML = lista.slice(0, 120).map((x, i) =>
     `<tr class="${(S.puestoDe[x.id] || 99) <= 10 ? 'fila-top' : ''}" style="cursor:pointer;" onclick="auditar('${x.id}')">` +
@@ -4857,7 +4982,7 @@ function bloqueVersus() {
 
   const estadoFecha = VIVO
     ? `${(VIVO.partidos || []).length} de ${(D.partidos || []).length} partidos publicados`
-    : (VIVO_VIEJO ? 'los puntajes que hay bajados son de otra fecha' : 'todavía sin puntajes: corré SYNC_VIVO');
+    : (VIVO_VIEJO ? 'sin puntajes de esta fecha: corré SYNC_VIVO' : 'todavía sin puntajes: corré SYNC_VIVO');
 
   const costoMi = S.mi11.reduce((t, id) => t + ((TODOS[id] || {}).pr || 0), 0);
   const cabMi = hayMio ? `
@@ -5462,7 +5587,7 @@ function pintarPantallaLiga() {
 
   const estadoFecha = VIVO
     ? `${(VIVO.partidos || []).length} de ${(D.partidos || []).length} partidos publicados`
-    : (VIVO_VIEJO ? 'los puntajes bajados son de otra fecha' : 'todavía sin puntajes: corré SYNC_VIVO');
+    : (VIVO_VIEJO ? 'sin puntajes de esta fecha: corré SYNC_VIVO' : 'todavía sin puntajes: corré SYNC_VIVO');
 
   const filas = orden.map(({ m, i }, pos) => {
     const t = m.t, sel = S.ligaAbierto === t.id;
@@ -5501,11 +5626,28 @@ function pintarPantallaLiga() {
     if (!isFinite(arranca) || !isFinite(t) || t >= arranca) return null;
     return { ed, arranca };
   })();
-  const avisoViejos = equiposViejos ? `<div class="lg-viejos">
-    <b>Ojo: estos equipos son de la fecha anterior.</b> <code>equipos.txt</code> no se toca desde el
-    ${fechaCorta(equiposViejos.ed)} y la fecha ${D.fechaObjetivo} arranca el ${fechaCorta(equiposViejos.arranca)}.
-    Lo de abajo —proyección, chances, todo— sale de onces que nadie confirmó todavía para esta fecha.
-    Se arregla cargando los equipos nuevos en <code>equipos.txt</code> y corriendo <b>ARMAR_LIGA.bat</b>.</div>` : '';
+  // NO SE MUESTRAN LOS EQUIPOS DE LA FECHA ANTERIOR (18/09).
+  // Antes salia un cartel de advertencia y abajo la tabla igual, con proyeccion
+  // y chance de ganar para onces que nadie confirmo. El pedido fue claro: en la
+  // pantalla de la fecha que viene no va NADA de la fecha pasada. Los equipos
+  // viejos no se pierden — estan en Revision, que es donde corresponde mirarlos.
+  if (equiposViejos) {
+    cont.innerHTML = `
+      ${cabecera('Torneo de amigos', 'Fecha ' + (D.fechaObjetivo ?? '–'), '')}
+      <div class="card tr-card vac">
+        <div class="vac-ic">🏆</div>
+        <h2>Todavía no están los equipos de la fecha ${D.fechaObjetivo}</h2>
+        <p>Los onces se cargan cuando arranca la fecha. Los últimos que hay en
+        <code>equipos.txt</code> son del ${fechaCorta(equiposViejos.ed)}, o sea de la fecha anterior,
+        y no se muestran acá a propósito: proyectar una fecha con onces que nadie confirmó
+        es inventar.</p>
+        <p>Cuando los tengas, pegalos en <code>equipos.txt</code> y corré <b>ARMAR_LIGA.bat</b>.
+        Tu propio once lo sacás del botón <b>«guardar mi once para el torneo»</b> en Mejor 11.</p>
+        <button class="vs-btn vs-btn-fuerte" onclick="mostrarSeccion('revision')">ver las fechas que ya se jugaron</button>
+      </div>`;
+    return;
+  }
+  const avisoViejos = '';
 
   cont.innerHTML = `
     ${avisoViejos}
@@ -7447,10 +7589,18 @@ function pintarRevision() {
     ${cabecera('Revisión', 'Fecha ' + f.fecha + ' · ' + (f.completa ? 'terminada' : f.partidos + ' de ' + f.deTotal + ' partidos') +
       ' · foto del ' + fechaCorta(f.cuando), deArchivo ? '' : `<button class="vs-btn vs-btn-chico" onclick="capturarFecha()"
         title="Vuelve a sacar la foto de la fecha que el motor tiene ahora. Si ya existe, la pisa.">actualizar la foto</button>`)}
-    ${deArchivo ? `<div class="rev-archivo">Esta fecha viene del <b>archivo</b>, no de tu navegador: la calculó
+    ${deArchivo ? (f.recuperada ? `<div class="rev-archivo rev-recuperada">
+      <b>Fecha recuperada.</b> Esto es el once que el motor recomendó esa semana —guardado antes de que se
+      jugara— contra lo que pagó cada uno según la planilla. Lo que <b>no</b> hay, y no se inventa:
+      la <b>cinta</b> (la planilla no guarda la ficha fecha por fecha), el <b>torneo de amigos</b>
+      (equipos.txt tiene los onces de ahora, no los de entonces) y el <b>banco</b>.
+      ${f.escalaDudosa ? `<br><b>Ojo con esta fecha:</b> el once se reconstruyó a mano y sus esperados salen
+        de una versión anterior del motor —esperaba ${f.motor ? n1(f.motor.esperado) : '–'} cuando en las
+        siguientes esperaba entre 58 y 66—. La diferencia contra lo real no es comparable con las otras fechas.` : ''}
+      </div>` : `<div class="rev-archivo">Esta fecha viene del <b>archivo</b>, no de tu navegador: la calculó
       la cadena con la fecha terminada y es la misma que ven todos.${f.motor && f.motor.sinBanco
         ? ' <b>El once del motor va sin suplentes</b>: el banco se empezó a guardar el 17/09 y esta fecha es anterior, así que compitió con 11 contra los 15 de cada equipo.'
-        : ''}</div>` : `<div class="rev-aviso">Esta foto está guardada <b>solo en este navegador</b>: no la ven los demás
+        : ''}</div>`) : `<div class="rev-aviso">Esta foto está guardada <b>solo en este navegador</b>: no la ven los demás
       y se pierde si limpiás Chrome. La definitiva la escribe <b>foto.cjs</b> cuando cierra la fecha.</div>`}
     ${selector}
     ${avisoPobre}

@@ -33,7 +33,8 @@
 //  NO inventa nada: si falta un dato, lo dice y no escribe.
 // ════════════════════════════════════════════════════════════════════════════
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const P = f => path.join(__dirname, f);
+const P_ = f => path.join(__dirname, f);
+const P = P_;
 const leer = f => { const c = { window: {} }; vm.createContext(c);
   vm.runInContext(fs.readFileSync(P(f), 'utf8'), c); return c.window; };
 const r1 = v => Math.round(v * 10) / 10;
@@ -50,6 +51,149 @@ try { L = leer('dataLiga.js').LIGA_BASE || null; } catch (e) { L = null; }
 
 console.log('');
 console.log('-- la foto de la fecha, desde los archivos --');
+
+// ════════════════════════════════════════════════════════════════════════════
+//  MODO --viejas : RECUPERAR LAS FECHAS QUE YA PASARON
+//  ------------------------------------------------------------------------
+//  Las fotos de historial/fecha_N.json de antes del 13/09 no traen el esperado
+//  de los 772 jugadores, pero SI traen dos cosas que valen oro: el once que el
+//  motor recomendo esa semana (con nombre, EP, pJuega y precio) y el top 25 de
+//  cada puesto. Son predicciones hechas ANTES de que se jugara la fecha, que es
+//  justo lo que no se puede reconstruir despues.
+//
+//  Los puntos reales salen de dataPlaneta.json, que guarda el puntaje de cada
+//  jugador fecha por fecha (F1..F18). O sea que se puede medir el acierto del
+//  motor en esas fechas sin inventar nada.
+//
+//  LO QUE NO SE PUEDE, Y NO SE VA A FINGIR:
+//   · la CINTA. La planilla no guarda la ficha fecha por fecha, solo el puntaje
+//     total. Sin la ficha del capitan no hay forma de saber cuanto pago la
+//     cinta, asi que estas fotos van SIN cinta y lo dicen.
+//   · el TORNEO DE AMIGOS. equipos.txt tiene los onces de ahora, no los de la
+//     fecha 7. Poner los de hoy con los puntos de entonces seria un equipo que
+//     nunca existio.
+//   · el BANCO. Se empezo a guardar el 17/09.
+//
+//  Tampoco se vuelve a correr el motor sobre una fecha vieja: usaria el xG y la
+//  forma de partidos que en ese momento no se habian jugado, y el motor
+//  acertaria de mas por construccion. Se usa lo que dijo entonces, o nada.
+if (process.argv.includes('--viejas')) { recuperarViejas(); process.exit(0); }
+
+function recuperarViejas() {
+  let P;
+  try { P = JSON.parse(fs.readFileSync(P_('dataPlaneta.json'), 'utf8')); }
+  catch (e) { morir('no pude leer dataPlaneta.json: ' + e.message); }
+
+  const norm = z => String(z || '').toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+  // el plantel de hoy, para colgarle la clave estable a cada uno
+  const hoy = {};
+  PUESTOS.forEach(p => (D.rankings[p] || []).forEach(x => {
+    const kk = norm(x.n) + '|' + p;
+    (hoy[kk] = hoy[kk] || []).push(x);
+  }));
+  // la planilla, que es de donde salen los puntos reales de esas fechas
+  const plan = {};
+  (P.jugadores || []).forEach(j => {
+    const kk = norm(j.nombre) + '|' + j.posicion;
+    (plan[kk] = plan[kk] || []).push(j);
+  });
+  const buscar = (tabla, nombre, pos, equipo) => {
+    const c = tabla[norm(nombre) + '|' + pos];
+    if (!c || !c.length) return null;
+    if (c.length === 1) return c[0];
+    // nombre repetido: desempata el club
+    const e = norm(equipo);
+    return c.find(x => norm(x.equipo || x.eq).startsWith(e.slice(0, 6))) || null;
+  };
+
+  let previas = {};
+  try { previas = leer('dataFotos.js').FOTOS || {}; } catch (e) { }
+
+  const hechas = [], saltadas = [];
+  fs.readdirSync(P_('historial')).filter(f => /^fecha_\d+\.json$/.test(f)).forEach(f => {
+    const n = parseInt(f.match(/\d+/)[0], 10);
+    if (previas[n] && previas[n].fuente === 'foto.cjs') return;   // ya la tenemos completa
+    let j;
+    try { j = JSON.parse(fs.readFileSync(P_(path.join('historial', f)), 'utf8')); } catch (e) { return; }
+    const once = Array.isArray(j.once) ? j.once : [];
+    if (once.length < 7) { saltadas.push(n + ' (no guardo el once del motor)'); return; }
+    // ¿la planilla tiene los puntos de esa fecha?
+    const conPts = (P.jugadores || []).filter(x => (x.puntajes || [])[n - 1] != null).length;
+    if (conPts < 200) { saltadas.push(n + ' (la planilla no tiene sus puntajes)'); return; }
+
+    let real = 0, jugaron = 0, sinCruce = 0;
+    const det = once.map(o => {
+      const h = buscar(hoy, o.nombre, o.pos, o.equipo);
+      const pl = buscar(plan, o.nombre, o.pos, o.equipo);
+      const pts = pl ? (pl.puntajes || [])[n - 1] : null;
+      // OJO: "no lo encontre en la planilla" NO es lo mismo que "hizo 0".
+      // El que no cruza queda en null y sale de la comparacion; ponerlo en cero
+      // le inventaria una mala fecha al motor, que es el error espejo del que
+      // ya me comi al reves. Solo el que SI aparece con 0 cuenta como 0.
+      if (pts == null) sinCruce++;
+      else { real += pts; if (pts !== 0) jugaron++; }
+      return { k: h ? h.k : null, n: String(o.nombre).split(',')[0].trim(), eq: o.equipo, pos: o.pos,
+               esp: o.EP != null ? r2(o.EP) : null, real: pts == null ? null : pts,
+               jugo: pts != null && pts !== 0, cap: false };
+    });
+    const conEsp = det.filter(x => x.esp != null && x.real != null);
+    const foto = {
+      fecha: n, cuando: j.generado || null, fuente: 'foto.cjs --viejas',
+      partidos: Array.isArray(j.partidos) ? j.partidos.length : null,
+      deTotal: Array.isArray(j.partidos) ? j.partidos.length : 15,
+      completa: true, recuperada: true, sinCinta: true, sinTorneo: true,
+      // LA ESCALA CAMBIO EN EL CAMINO (17/09). La fecha 6 se reconstruyo a mano
+      // y sus EP salen de una version anterior del motor: el once esperaba 80.4
+      // cuando en la 7, 8 y 9 esperaba entre 58 y 66. Ese salto no es que el
+      // motor fuera mas optimista, es que el numero significaba otra cosa. Sin
+      // esta marca, "esperaba 80.4 e hizo 68" se leeria como un error del
+      // modelo de 12 puntos y seria mentira.
+      reconstruida: !!j.reconstruida,
+      escalaDudosa: !!j.reconstruida,
+      notaFecha: j.nota || null,
+      nota: 'Recuperada de historial/fecha_' + n + '.json (lo que el motor recomendo esa semana) y de ' +
+            'dataPlaneta.json (lo que pago cada uno). Va SIN cinta: la planilla no guarda la ficha fecha ' +
+            'por fecha. Va SIN el torneo de amigos: equipos.txt tiene los onces de ahora, no los de entonces.',
+      motor: {
+        nombre: 'El motor', motor: true, esq: j.esquema || null,
+        once: det, banco: [],
+        cinta: { estado: 'sindato', valor: 0, quien: null },
+        total: r1(real),
+        esperado: r1(det.reduce((a, x) => a + (x.esp || 0), 0)),
+        sinEsp: det.filter(x => x.esp == null).length,
+        espHecho: r1(conEsp.reduce((a, x) => a + x.esp, 0)),
+        espHechoDe: conEsp.length,
+        realDeEsos: r1(conEsp.reduce((a, x) => a + (x.real || 0), 0)),
+        jugaron, n: det.length, sinBanco: true,
+        conReal: conEsp.length
+      },
+      mio: null, equipos: [], jugadores: []
+    };
+    if (sinCruce) foto.motor.sinCruzar = sinCruce;
+    previas[n] = foto;
+    hechas.push({ n, total: foto.motor.total, esp: foto.motor.esperado, jug: jugaron, de: det.length, sinCruce });
+  });
+
+  if (!hechas.length) {
+    console.log('  no habia ninguna fecha vieja para recuperar.');
+    if (saltadas.length) saltadas.forEach(x => console.log('   fecha ' + x));
+    console.log('');
+    return;
+  }
+  const ord = {};
+  Object.keys(previas).map(Number).sort((a, b) => a - b).forEach(k => { ord[k] = previas[k]; });
+  fs.writeFileSync(P_('dataFotos.js'), 'window.FOTOS=' + JSON.stringify(ord) + ';');
+  console.log('  recuperadas (el once del motor contra lo que pago la realidad):');
+  hechas.sort((a, b) => a.n - b.n).forEach(h => console.log('   fecha ' + String(h.n).padStart(2) +
+    ' · esperaba ' + String(h.esp).padStart(5) + ' · hizo ' + String(h.total).padStart(5) +
+    ' · ' + (h.total - h.esp >= 0 ? '+' : '') + r1(h.total - h.esp) +
+    '   (' + h.jug + ' de ' + h.de + ' sumaron)' + (h.sinCruce ? '  OJO: ' + h.sinCruce + ' no cruzan' : '')));
+  saltadas.forEach(x => console.log('   fecha ' + x + ': se salta'));
+  console.log('');
+  console.log('OK -> dataFotos.js  (' + Object.keys(ord).length + ' fechas)');
+  console.log('');
+}
 
 const pedida = process.argv.slice(2).map(x => parseInt(x, 10)).find(x => !isNaN(x));
 const fecha = pedida != null ? pedida : V.fecha;
@@ -158,6 +302,30 @@ function marcador(equipo) {
   };
 }
 
+// ── LA TABLA OFICIAL MANDA (17/09) ──────────────────────────────────────────
+// Nuestro total sale de sumar el once de equipos.txt. Ese archivo lo escribe
+// una persona a mano, asi que un apellido repetido o un club mal puesto da un
+// total creible y equivocado — paso en la fecha 9: dabamos 106 para El Favorito
+// de la Tati y el juego decia 115. El once tambien se puede cambiar a mitad de
+// fecha, y ahi equipos.txt directamente no se entera.
+//
+// Asi que el numero que se muestra y que queda en la historia es EL DEL JUEGO.
+// El nuestro se guarda al lado como "asi se compone", y cuando no coinciden la
+// foto se lo lleva escrito: no se tapa, se avisa.
+const norm = z => String(z || '').toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+const flat = z => norm(z).replace(/(.)\1+/g, '$1');
+let OFICIAL = null;
+try {
+  OFICIAL = require('./parsear_oficial.cjs')(fs.readFileSync(P_('puntajes_oficiales.txt'), 'utf8'));
+  if (!OFICIAL.length) OFICIAL = null;
+} catch (e) { OFICIAL = null; }
+const oficialDe = nombre => {
+  if (!OFICIAL) return null;
+  return OFICIAL.find(o => norm(o.equipo) === norm(nombre))
+      || OFICIAL.find(o => flat(o.equipo) === flat(nombre)) || null;
+};
+
 // ── los equipos ─────────────────────────────────────────────────────────────
 const equipos = [];
 let motor = null;
@@ -175,9 +343,19 @@ if (hist && Array.isArray(hist.once) && hist.once.length >= 7) {
 
 if (L && Array.isArray(L.equipos)) {
   L.equipos.forEach(e => {
-    equipos.push(marcador({ nombre: e.nombre, dt: e.dt || null, once: e.kOnce,
-                            banco: e.kBanco || null, cap: e.kCap || null, esq: e.esq || null,
-                            mio: !!e.mio }));
+    const m = marcador({ nombre: e.nombre, dt: e.dt || null, once: e.kOnce,
+                         banco: e.kBanco || null, cap: e.kCap || null, esq: e.esq || null,
+                         mio: !!e.mio });
+    const o = oficialDe(e.nombre);
+    if (o) {
+      m.calculado = m.total;     // lo que da sumar el once que tenemos cargado
+      m.total = o.pts;           // lo que dice el juego: esto es lo que vale
+      m.oficial = true;
+      m.dt = m.dt || o.dt || null;
+      m.modifico = o.veces != null ? o.veces : null;
+      if (m.calculado !== o.pts) m.difiere = r1(o.pts - m.calculado);
+    }
+    equipos.push(m);
   });
   equipos.sort((a, b) => b.total - a.total);
 }
@@ -213,9 +391,11 @@ if (motor) console.log('  el motor: ' + motor.total + ' puntos, ' + motor.jugaro
   (motor.cinta.estado === 'ok' ? ' · cinta +' + motor.cinta.valor : ' · cinta ' + motor.cinta.estado));
 else console.log('  OJO — no hay once del motor guardado para esta fecha: la foto va sin el.');
 equipos.forEach((e, i) => console.log('   ' + (i + 1) + '. ' + e.nombre.slice(0, 24).padEnd(25) +
-  String(e.total).padStart(6) + '   ' + e.jugaron + '/' + e.n + ' jugaron' +
+  String(e.total).padStart(6) + (e.oficial ? ' (oficial)' : '          ') + '   ' + e.jugaron + '/' + e.n + ' jugaron' +
   (e.cinta.estado === 'ok' ? ' · cinta +' + e.cinta.valor : ' · cinta ' + e.cinta.estado) +
+  (e.difiere ? '   OJO: nuestro once da ' + e.calculado + ', ' + (e.difiere > 0 ? 'faltan ' + e.difiere : 'sobran ' + (-e.difiere)) : '') +
   (e.sinCruzar ? '   OJO: ' + e.sinCruzar + ' del once no cruzan' : '')));
+if (!OFICIAL) console.log('   (sin puntajes_oficiales.txt: los totales son los que calculamos, sin cruzar contra el juego)');
 console.log('');
 console.log('OK -> dataFotos.js  (' + Object.keys(ordenado).length + ' fecha(s) guardada(s)' +
   (habia ? ', ' + habia + ' que ya estaban' : '') + ')');
