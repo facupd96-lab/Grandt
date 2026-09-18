@@ -148,6 +148,42 @@ if(GID_CORTE!=null){
     p.xgPorPartido      = l.length? +(p.xg/l.length).toFixed(3) : 0;
     p.titularidad       = l.length? +(l.filter(x=>(x.min||0)>=60).length/l.length).toFixed(2) : null;
   });
+
+  // GOLES RECIBIDOS, RECORTADOS AL TORNEO ACTUAL (18/09).
+  // golesRecibidos, salvadas y penalesAtajados vienen de 365Scores como total
+  // de CARRERA en el archivo: Cardozo figura con 18 goles recibidos en 23
+  // partidos cuando en este torneo lleva 8. Mostrar eso al lado de los tiros y
+  // los goles —que si estan recortados— es mezclar dos escalas en la misma
+  // fila, que es justo el tipo de error silencioso que veniamos cazando.
+  //
+  // golesRecibidos SI se puede rehacer: son los goles que hizo el rival en cada
+  // partido que el arquero jugo, y los goles por partido salen del log de todos
+  // los jugadores. salvadas y penalesAtajados NO se pueden — el log no los trae
+  // partido por partido — asi que esas dos quedan como total de carrera y la
+  // app lo dice donde se muestran.
+  {
+    const golesPorGid = {};
+    Object.values(S.jugadores).forEach(j => (j.log||[]).forEach(l => {
+      if(!l.min) return;
+      const k = l.gid + '|' + j.equipo;
+      golesPorGid[k] = (golesPorGid[k] || 0) + (l.goles || 0);
+    }));
+    let rehechos = 0;
+    Object.values(S.jugadores).forEach(j => {
+      if(j.golesRecibidos == null) return;
+      const suyos = (j.log||[]).filter(l => l.gid > GID_CORTE && l.min > 0);
+      if(!suyos.length) { j.golesRecibidosTorneo = 0; return; }
+      let gc = 0, sinDato = 0;
+      suyos.forEach(l => {
+        const g = golesPorGid[l.gid + '|' + l.vs];
+        if(g == null) sinDato++; else gc += g;
+      });
+      j.golesRecibidosTorneo = sinDato > suyos.length / 2 ? null : gc;
+      if(j.golesRecibidosTorneo != null) rehechos++;
+    });
+    if(rehechos) console.log('  goles recibidos recortados al torneo actual en '+rehechos+' jugadores '+
+      '(365Scores los trae de carrera; salvadas y penales atajados no se pueden recortar y quedan de carrera)');
+  }
   if(tocados) console.log('  '+tocados+' jugadores traian los dos torneos sumados. Totales rehechos desde el log: '+
     'el que mas partidos tenia pasa de '+antesMax+' a '+despuesMax+'.');
 
@@ -890,8 +926,43 @@ let xgDe=(k,cond)=>null;
 const ROT={};
 Object.values(COPAS.equipos||{}).forEach(e=>{ROT[CT(e.equipo)]=e;});
 {const sinCruce=Object.values(COPAS.equipos||{}).filter(e=>!ROT[CT(e.equipo)]).length;
- console.log('rotacion por copas: '+Object.keys(ROT).length+' equipos cruzados'+(sinCruce?', '+sinCruce+' SIN cruzar':''));}
-const rotDe=k=>{const e=ROT[k];return e?Number(e.indiceRotacion)||0:0;};
+ console.log('rotacion por copas: '+Object.keys(ROT).length+' equipos cruzados'+(sinCruce?', '+sinCruce+' SIN cruzar':''));
+}
+// ── CUANDO LA COPA (O EL CANSANCIO) IMPORTAN DE VERDAD (18/09) ──────────────
+// Hasta hoy bastaba con que el proximo partido fuera de copa para rotar, sin
+// mirar CUANDO es. Resultado, medido en la fecha 10: los ocho equipos con
+// rotacion > 0 eran falsos. Boca rotaba por una Copa Argentina a SIETE dias,
+// Platense a ONCE, y cuatro equipos "venian cansados" de descansar CINCO dias,
+// que es una semana normal.
+//
+// Y no era un cartel: el indice entra en ajustarPorRotacion() y a un titular de
+// 85 minutos le recortaba 3.4. O sea que le bajaba el puntaje esperado a todo
+// el plantel de Boca por un partido de la semana que viene.
+//
+// Los cortes salen del calendario real, no de un numero lindo:
+//   · la copa pesa si cae DENTRO de los proximos 4 dias — el clasico
+//     sabado-miercoles. A 7 dias no hay DT que guarde a nadie.
+//   · el cansancio pesa con 3 dias de descanso o menos. Con 4 o 5 estas en el
+//     ritmo normal de la liga.
+const DIAS_COPA_ENCIMA = 4;
+const DIAS_CANSANCIO = 3;
+function rotacionCuenta(e){
+  if(!e) return false;
+  if(!(Number(e.indiceRotacion)||0)) return false;
+  if(e.proximoEsCopa){
+    const d=Number(e.diasHastaProximo);
+    return isFinite(d) && d<=DIAS_COPA_ENCIMA;
+  }
+  const d=Number(e.diasDescanso);
+  return isFinite(d) && d<=DIAS_CANSANCIO;
+}
+const rotDe=k=>{const e=ROT[k];return rotacionCuenta(e)?(Number(e.indiceRotacion)||0):0;};
+{const conRot=Object.values(COPAS.equipos||{}).filter(e=>(Number(e.indiceRotacion)||0)>0);
+ const comoEsta=e=>e.equipo+' ('+(e.proximoEsCopa?('copa en '+e.diasHastaProximo+'d'):(e.diasDescanso+'d de descanso'))+')';
+ const cuentan=conRot.filter(rotacionCuenta), lejos=conRot.filter(e=>!rotacionCuenta(e));
+ if(cuentan.length) console.log('  rotan de verdad: '+cuentan.map(comoEsta).join(' · '));
+ if(lejos.length) console.log('  '+lejos.length+' equipo(s) traian rotacion pero su partido esta lejos: no se les toca nada. '+
+   lejos.map(comoEsta).join(' · '));}
 const notaDe=k=>{const e=ROT[k];return e?e.detalle:'';};
 // POR QUE rota, no solo cuanto. La app mostraba "COPA" en cualquier equipo con
 // indice > 0, y River aparecia con COPA despues de quedar afuera de todas: su
@@ -900,6 +971,7 @@ const notaDe=k=>{const e=ROT[k];return e?e.detalle:'';};
 //   'guarda'   -> tiene copa ENCIMA, es probable que ponga suplentes
 //   'cansancio'-> viene de jugar hace poco, llega fundido pero pone titulares
 const motivoRot=k=>{const e=ROT[k]; if(!e) return null;
+  if(!rotacionCuenta(e)) return null;          // ver el comentario de arriba
   const ind=Number(e.indiceRotacion)||0; if(ind<=0) return null;
   if(e.proximoEsCopa) return {tipo:'guarda', dias:Number(e.diasHastaProximo)||null,
     torneo:e.proximoTorneo||'copa', indice:ind};
@@ -1096,6 +1168,16 @@ P.jugadores.forEach(j=>{ precio[clavePrecio(j)]=j.cotizacion; precioSoloNombre[j
       puntosTorneo: pl.totalPoints||0,
       promedioTorneo: pl.matchesRated? +((pl.totalPoints||0)/pl.matchesRated).toFixed(2) : null,
       asistencias: (pl._m&&pl._m.asistencias)||0,
+      // DATOS DE ARQUERO (18/09). Estaban en data365 y no llegaban a la app:
+      // para un arquero, los penales que ataja y los goles que le hacen dicen
+      // mucho mas que "cuantas veces arranco".
+      // penalesAtajados y salvadas son de CARRERA (365Scores no los da partido a
+      // partido y no hay forma de recortarlos). golesRecibidos SI se recorta al
+      // torneo actual, arriba. La app aclara cual es cual.
+      penalesAtajados: (pl._m&&pl._m.penalesAtajados)||0,
+      salvadas: (pl._m&&pl._m.salvadas)||0,
+      golesRecibidos: (pl._m && pl._m.golesRecibidosTorneo != null)
+                        ? pl._m.golesRecibidosTorneo : null,
       minutos: pl.minutes365||0, minutosPorPartido: pl.matches365? Math.round((pl.minutes365||0)/pl.matches365):0,
       titularidad: pl.titularidad!=null? pl.titularidad : null
     };
@@ -1192,16 +1274,33 @@ try {
     onceSeguro: out.esquema.optimo.once, esquemaSeguro: out.esquema.optimo.esquema
   });
   const a = out.arriesgado;
+  // QUE MOSTRAR (18/09). Este informe mostraba "objetivo 125 puntos" y cuatro
+  // columnas de P>=100/120/140/160, de las cuales las dos ultimas dan 0.000% en
+  // todas las corridas. Eso hace parecer que el once arriesgado no sirve, y no
+  // es cierto: el buscador NO optimiza P(>=objetivo) —lo dice riesgo.cjs, se
+  // cambio justamente porque con 30 exitos sobre 50.000 la busqueda ajustaba
+  // ruido— sino el CUANTIL 99.5, o sea "cuanto hace en su mejor fecha de cada
+  // 200", que se mide con 250 casos. Asi que se muestra eso, que es lo que el
+  // optimizador de verdad esta maximizando, y se deja el objetivo como
+  // referencia entre parentesis.
   console.log('ONCE ARRIESGADO — ' + a.simulaciones.toLocaleString('es-AR') + ' fechas simuladas en ' +
-    ((Date.now() - t0) / 1000).toFixed(1) + 's | objetivo ' + a.objetivo + ' puntos');
+    ((Date.now() - t0) / 1000).toFixed(1) + 's');
   const fila = (n, d) => console.log('  ' + n.padEnd(12) +
     String(d.media.toFixed(1)).padStart(7) + String(d.sd.toFixed(1)).padStart(7) +
+    String((d.p995 != null ? d.p995 : d.p99).toFixed(0)).padStart(9) +
     String(d.p99.toFixed(0)).padStart(7) + String(d.max.toFixed(0)).padStart(7) +
-    ((100 * d.p100).toFixed(2) + '%').padStart(9) + ((100 * d.p120).toFixed(2) + '%').padStart(9) +
-    ((100 * d.p140).toFixed(3) + '%').padStart(9) + ((100 * d.p160).toFixed(3) + '%').padStart(9));
-  console.log('               media     sd    p99    max   P>=100   P>=120   P>=140   P>=160');
+    ((100 * d.p100).toFixed(2) + '%').padStart(10));
+  console.log('               media     sd   1 de 200    p99    max   P>=100');
   if (a.conservador) fila('conservador', a.conservador);
   fila('arriesgado', a.dist);
+  {
+    const c = a.conservador, r = a.dist;
+    const q = d => (d && d.p995 != null) ? d.p995 : (d ? d.p99 : null);
+    if (c && q(c) != null && q(r) != null)
+      console.log('  o sea: en su mejor fecha de cada 200, el arriesgado hace ' +
+        (q(r) - q(c) >= 0 ? '+' : '') + (q(r) - q(c)).toFixed(1) + ' puntos que el solido' +
+        ' (' + q(r).toFixed(0) + ' contra ' + q(c).toFixed(0) + '). Eso es lo que se esta maximizando.');
+  }
   console.log('  arriesgado: ' + a.esquema + ', $' + (a.costo / 1e6).toFixed(1) + 'M — ' +
     a.once.map(x => x.nombre.split(',')[0]).join(', '));
 } catch (e) {

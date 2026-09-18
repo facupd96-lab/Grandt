@@ -40,6 +40,11 @@ const S = {
   // NO son por fecha: siguen cargados la semana que viene.
   liga: null, ligaAbierto: null, caraA: null, caraB: null,
   analista: true,          // ver todas las columnas. Se guarda en el navegador.
+  // QUE NUMERO MANDA en las columnas Tiros y xG: 'prom' (por partido),
+  // '90' (por 90 minutos en la cancha) o 'tot' (todo el torneo). El que manda
+  // es el numero grande Y por el que ordena la tabla; el otro va abajo en
+  // chico. Se elige desde el encabezado y se guarda en el navegador.
+  modoT: 'prom', modoX: 'prom',
 
   // Arranca ordenada por la BRECHA de puntos POR PARTIDO entre local y
   // visitante, que es la pregunta que se le hace a esta tabla: quien es muy
@@ -164,8 +169,85 @@ function esCandidato(x) {
   if (ESTADO_SIEMPRE_VISIBLE.has(est)) return true;
   if (ESTADO_OCULTABLE.has(est) && !jugoUltimasFechas(x)) return false;
   const q = x.pmin, min = (x.ind && x.ind.minutos) || 0;
+  // JUGÓ LA FECHA PASADA (18/09). El corte era "arrancó dos veces o lleva 270
+  // minutos", y eso deja afuera justo al caso que más interesa: el que vuelve.
+  // Ángel Romero se perdió siete fechas lesionado, volvió de titular, jugó 71
+  // minutos y sumó — y la tabla lo mostraba sin número de puesto, como si lo
+  // hubiéramos borrado. Con UN arranque nunca llegaba a los dos que pedía la
+  // regla. Son 26 jugadores en esa situación hoy (Brey, Palacios, Ávila,
+  // Arambarri, Ricca...): todos volvieron o debutaron hace poco.
+  // Que la chance de que juegue sea baja es otra cosa, y para eso está la
+  // columna de minutos. Esconderlo no es estimar: es decidir por vos.
+  const ult = Array.isArray(x.mlog) && x.mlog.length ? (x.mlog[x.mlog.length - 1] || 0) : 0;
+  if (ult >= 20) return true;
   if (!q) return true;
   return q.arranques >= 2 || min >= 270;
+}
+
+// ── MI ONCE, DESDE LA LISTA ────────────────────────────────────────────────
+function enMi11(id) { if (S.mi11 == null) cargarMi11(); return S.mi11.includes(id); }
+function cuantosMi(pos) {
+  if (S.mi11 == null) cargarMi11();
+  return S.mi11.filter(q => (TODOS[q] || {}).pos === pos).length;
+}
+window.miSumar = function (id, ev) {
+  if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+  if (S.mi11 == null) cargarMi11();
+  const p = TODOS[id]; if (!p) return;
+  S.miAviso = null;
+  const i = S.mi11.indexOf(id);
+  if (i >= 0) {
+    S.mi11.splice(i, 1);
+    if (S.miCap === id) S.miCap = null;
+    S.miAviso = `Sacaste a ${nombreCorto(p.n)} de tu once.`;
+  } else {
+    const c = cuentaPos(S.miEsq || '1-4-4-2');
+    if (cuantosMi(p.pos) >= c[p.pos]) {
+      // NO SE HACE NADA EN SILENCIO. Un boton que no responde se lee como un
+      // bug; lo que pasa es que la formacion no da, y eso tiene arreglo arriba.
+      const uno = c[p.pos] === 1;
+      S.miAviso = `No entra: con ${esquemaLindo(S.miEsq)} ${uno ? 'va 1' : 'van ' + c[p.pos]} ${NOMBRE_POS_SING[p.pos]}${uno ? '' : 's'} y ya ${uno ? 'lo tenés' : 'los tenés'}. Cambiá la formación acá arriba, o sacá a uno con el ✓.`;
+      pintarSelectorOrden(); return;
+    }
+    S.mi11.push(id);
+    S.miAviso = `${nombreCorto(p.n)} entró a tu once.`;
+  }
+  normalizarMi11(); guardarMi11();
+  pintarRankings();
+};
+window.miFormacionLista = function (e) {
+  S.miEsq = esquemaValido(e); S.miAviso = null;
+  normalizarMi11(); guardarMi11(); pintarRankings();
+};
+// La tira de arriba de la tabla: como va quedando el equipo mientras mirás.
+function barraMi11() {
+  if (S.mi11 == null) cargarMi11();
+  const c = cuentaPos(S.miEsq || '1-4-4-2');
+  const costo = S.mi11.reduce((t, id) => t + ((TODOS[id] || {}).pr || 0), 0);
+  const esperado = S.mi11.reduce((t, id) => {
+    const p = TODOS[id]; return t + (p ? (p.epsj != null ? p.epsj : p.ep) || 0 : 0); }, 0);
+  const cuadros = ['ARQ', 'DEF', 'VOL', 'DEL'].map(pos => {
+    const n = cuantosMi(pos), full = n >= c[pos];
+    return `<span class="m11-p${full ? ' m11-p-full' : ''}${pos === S.pos ? ' m11-p-aca' : ''}"
+      title="${esc(n + ' de ' + c[pos] + ' ' + NOMBRE_POS_SING[pos] + (c[pos] === 1 ? '' : 's') + ' con la formación ' + esquemaLindo(S.miEsq))}">${pos} <b>${n}/${c[pos]}</b></span>`;
+  }).join('');
+  const total = S.mi11.length;
+  return `<div class="m11-barra">
+    <span class="m11-tit" title="Tu equipo de esta fecha. Se guarda en ESTE navegador, por fecha, y es el mismo que ves en «La fecha».">MI 11</span>
+    ${cuadros}
+    <span class="m11-sep"></span>
+    <select class="m11-sel" id="m11-esq" title="Formación de tu once. Cambiarla acá es lo que te habilita a poner otro delantero o un volante más.">
+      ${ESQUEMAS_11.map(e => `<option value="${e}"${e === S.miEsq ? ' selected' : ''}>${esquemaLindo(e)}</option>`).join('')}
+    </select>
+    <span class="m11-plata${costo > (D.presupuesto || 65e6) ? ' m11-plata-mal' : ''}"
+      title="${esc('Lo que sale tu once. El tope del juego es ' + plata(D.presupuesto || 65e6) + '. Pasarse no rompe nada acá: el aviso es para que lo veas antes de cargarlo en el juego.')}">$${(costo / 1e6).toFixed(1)}M</span>
+    ${total ? `<span class="m11-esp" title="Suma de los puntos que el motor espera de los que ya pusiste. Con el once incompleto es una suma parcial, no una comparación.">${n1(esperado)} esp.</span>` : ''}
+    <span class="m11-sep"></span>
+    <button class="m11-btn" id="m11-ver" title="Ir a la cancha, ver el detalle y elegir el capitán y los suplentes">ver la cancha</button>
+    <button class="m11-btn" id="m11-motor" title="Reemplaza tu once por el que armó el motor. Después lo retocás.">copiar el del motor</button>
+    ${total ? `<button class="m11-btn" id="m11-vaciar" title="Vaciar tu once y el banco">vaciar</button>` : ''}
+    ${S.miAviso ? `<span class="m11-aviso">${esc(S.miAviso)}</span>` : ''}
+  </div>`;
 }
 
 function toggleFuera(id, ev) {
@@ -404,9 +486,9 @@ function avisosJugador(x) {
   // los que no cruzan por nombre con el Ayudante de campo, y hasta hoy se veian
   // igual que uno habilitado (03/09).
   if (!x.disp || !x.disp.estado) a.push(['SIN DATO DEL JUEGO', '#8b5cf6',
-    'El Ayudante de campo del Gran DT no lo cruza por nombre, así que no sabemos si está habilitado, lesionado o suspendido. No es que esté bien: es que no lo sabemos. Miralo en el juego antes de ponerlo.']);
-  if (x.jug) a.push(['YA SE JUGÓ', '#94a3b8', 'Este partido de la fecha ya terminó: la recomendación es de referencia, no accionable']);
-  if (x.sf) a.push(['SIN FICHA', '#8b5cf6', 'Jugó, pero la planilla de Planeta no le registra ningún partido calificado. Su ficha no es un dato suyo: es el promedio de la liga']);
+    'El Ayudante de campo del Gran DT no lo cruza por nombre, así que no sabemos si está habilitado, lesionado o suspendido. No es que esté bien: es que no lo sabemos. Miralo en el juego antes de ponerlo.', 's/d']);
+  if (x.jug) a.push(['YA SE JUGÓ', '#94a3b8', 'Este partido de la fecha ya terminó: la recomendación es de referencia, no accionable', 'FIN']);
+  if (x.sf) a.push(['SIN FICHA', '#8b5cf6', 'Jugó, pero la planilla de Planeta no le registra ningún partido calificado. Su ficha no es un dato suyo: es el promedio de la liga', 'SF']);
   const d = x.disp;
   if (d) {
     // El estado sale del Ayudante de campo del propio Gran DT. No es una
@@ -425,7 +507,7 @@ function avisosJugador(x) {
           ? `Debe ${t.fechas} fecha${t.fechas > 1 ? 's' : ''} desde la ${t.desde}. Fuente: ${t.fuente}`
           : `Roja en la fecha ${d.fechaUltimaRoja}: no juega la próxima`)]);
     }
-    else if (d.enDuda) a.push(['EN DUDA', '#f59e0b', 'El Gran DT lo pone en duda para esta fecha. No cambia el puntaje esperado: es información, la decisión es tuya']);
+    else if (d.enDuda) a.push(['EN DUDA', '#eab308', 'El Gran DT lo pone en duda para esta fecha. No cambia el puntaje esperado: es información, la decisión es tuya']);
     else if (d.posibleTitular) a.push(['POSIBLE TITULAR', '#10b981', 'El Gran DT lo da como probable titular. No cambia el puntaje esperado: es información']);
     // NINGÚN ESTADO SE COME LA PANTALLA (03/09).
     // Antes solo se pintaban cuatro estados y el resto quedaba en blanco, que
@@ -451,26 +533,36 @@ function avisosJugador(x) {
       const desp = /despues juega ([^-]*)/i.exec(nota);
       const copaDespues = copa && desp && /copa|conmebol|libertadores|sudamericana/i.test(desp[1]);
       const etq = copa ? (copaDespues ? 'COPA DESPUÉS' : 'VIENE DE COPA') : e.toUpperCase();
-      a.push([etq, copa ? (copaDespues ? '#f59e0b' : '#64748b') : '#64748b',
+      // HABILITADO es el estado que el 90% de la lista tiene: va completo y en
+      // naranja, porque es el que uno busca. Los de copa pasan a cuadradito
+      // amarillo — el texto largo ya lo dice el globito.
+      const hab = /^habilitad/i.test(e);
+      a.push([etq, copa ? '#eab308' : hab ? '#f97316' : '#64748b',
         copa ? (copaDespues
-          ? `Tiene copa DESPUÉS de esta fecha: ${desp[1].trim()}. Es el caso en que lo pueden guardar. ${nota}`
-          : `Ya jugó la copa y después de esta fecha le toca liga, así que no hay motivo para que lo guarden. ${nota}`)
+          ? `${etq}. Tiene copa DESPUÉS de esta fecha: ${desp[1].trim()}. Es el caso en que lo pueden guardar. ${nota}`
+          : `${etq}. Ya jugó la copa y después de esta fecha le toca liga, así que no hay motivo para que lo guarden. ${nota}`)
              : `El Gran DT lo marca como "${e}" para esta fecha. No hay nada anotado en contra: ni lesión, ni suspensión, ni duda.`]);
     }
-    if (!d.suspendido && d.aUnaDeSuspension) a.push([`${d.amarillas}ª AMARILLA`, '#f59e0b', `Lleva ${d.amarillas} amarillas. A la quinta son una fecha de suspensión`]);
-    if (d.exClub) a.push(['LEY DEL EX', '#38bdf8', `Jugó en ${d.exClub}, que es justo el rival de hoy. No cambia el puntaje: no hay evidencia de que la ley del ex exista`]);
+    if (!d.suspendido && d.aUnaDeSuspension) a.push([`${d.amarillas}ª AMARILLA`, '#f59e0b', `Lleva ${d.amarillas} amarillas. A la quinta son una fecha de suspensión`, '🟨' + d.amarillas]);
+    if (d.exClub) a.push(['LEY DEL EX', '#38bdf8', `LEY DEL EX: jugó en ${d.exClub}, que es justo el rival de hoy. No cambia el puntaje: no hay evidencia de que la ley del ex exista`, 'EX']);
   }
   // PASE CARGADO A MANO. Distinto del pase normal, que no se avisa porque no
   // cambia ninguna decisión: acá el club, el rival y la condición los pusimos
   // nosotros porque las fuentes todavía no los tienen. Si Gran DT no lo movió,
   // en el juego sigue siendo jugador del club viejo.
-  if (x.tr && x.tr.manual) a.push(['PASE RECIENTE', '#f97316',
-    `Pasó de ${x.tr.desde} a ${x.tr.hacia}${x.tr.cuando ? ' el ' + x.tr.cuando : ''}. Ni la planilla ni el Ayudante de campo lo tienen todavía: el club, el rival y la condición se cargaron a mano. Sus minutos, tiros y xG son los que hizo en ${x.tr.desde}. Fijate en el juego antes de ponerlo.`]);
+  if (x.tr && x.tr.manual) a.push(['PASE RECIENTE', '#c4b5fd',
+    `PASE RECIENTE. Pasó de ${x.tr.desde} a ${x.tr.hacia}${x.tr.cuando ? ' el ' + x.tr.cuando : ''}. Ni la planilla ni el Ayudante de campo lo tienen todavía: el club, el rival y la condición se cargaron a mano. Sus minutos, tiros y xG son los que hizo en ${x.tr.desde}. Fijate en el juego antes de ponerlo.`, '⇄']);
   return a;
 }
+/** Van COMPLETOS los estados que publica el Gran DT —HABILITADO (naranja),
+ *  POSIBLE TITULAR (verde), EN DUDA (amarillo), VIENE DE COPA / JUGÓ COPA
+ *  (amarillo)— y los que directamente no juegan (lesionado, suspendido, se
+ *  fue). Esos son los que uno lee antes de poner a alguien. El resto es
+ *  contexto y va en cuadradito, con el texto entero en el globito. */
 function pintarAvisos(x) {
-  return avisosJugador(x).map(([t, c, tip]) =>
-    `<span class="aviso-pill" style="color:${c};border-color:${c}55;background:${c}1a;" title="${esc(tip)}">${esc(t)}</span>`).join('');
+  return avisosJugador(x).map(([t, c, tip, corto]) => corto
+    ? `<span class="aviso-pill aviso-cuad" style="color:${c};border-color:${c}66;background:${c}1f;" title="${esc(tip)}">${esc(corto)}</span>`
+    : `<span class="aviso-pill" style="color:${c};border-color:${c}55;background:${c}1a;" title="${esc(tip)}">${esc(t)}</span>`).join('');
 }
 
 function nombreCorto(n) {
@@ -523,6 +615,11 @@ function iniciar() {
   S.esquema = D.esquema.optimo.esquema;
   S.once = D.esquema.optimo.once.map(x => x.id);
   try { S.analista = localStorage.getItem('gdt_analista') !== '0'; } catch (e) { }
+  try {
+    const mt = localStorage.getItem('gdt_modoT'), mx = localStorage.getItem('gdt_modoX');
+    if (['prom', '90', 'tot'].includes(mt)) S.modoT = mt;
+    if (['prom', '90', 'tot'].includes(mx)) S.modoX = mx;
+  } catch (e) { }
   cargarMano();                        // los puntajes que cargaste a mano
   rearmarResueltos();                  // ahora si, con TODOS lleno, se puede contar
   cargarFuera(); cargarCapitan();      // los tildados de esta fecha, guardados en el navegador
@@ -604,12 +701,13 @@ function pillCond(x) {
   const arriba = d.puesto <= 5, abajo = d.puesto > d.total - 5;
   if (!arriba && !abajo) return '';
   const ic = cond === 'local' ? '🏠' : '✈️';
-  const txt = `${d.puesto}º DE ${cond === 'local' ? 'LOCAL' : 'VISITANTE'}`;
+  // Antes decia "1º DE VISITANTE": el avion ya dice de visitante.
+  const txt = `${d.puesto}º`;
   const ay = `${NOM(x.eq)} de ${cond}: ${d.pts} puntos en ${d.pj} partidos (${d.pg}G ${d.pe}E ${d.pp}P), ${d.gf} a favor y ${d.gc} en contra. `
     + `Puesto ${d.puesto} de ${d.total} de la liga en esa condición.`
     + (r && r.pj >= 2 ? ` El rival, ${NOM(x.riv)} de ${condR}: ${r.pts} puntos en ${r.pj} (puesto ${r.puesto}).` : '')
     + ' Es un dato del torneo, no entra en el puntaje.';
-  return `<span class="pill-alerta ${arriba ? 'pill-cond-bien' : 'pill-cond-mal'}" title="${esc(ay)}">${ic} ${txt}</span>`;
+  return `<span class="pill-alerta pill-cuad ${arriba ? 'pill-cond-bien' : 'pill-cond-mal'}" title="${esc(`${d.puesto}º de ${cond} de la liga. ` + ay)}">${ic} ${txt}</span>`;
 }
 // Tabla chica para la lupita: los dos equipos, en la condicion que les toca.
 function bloqueCondicion(x) {
@@ -797,7 +895,7 @@ function pintarOportunidades() {
       <td class="text-center"><b>${i + 1}</b></td>
       <td><div class="player-info"><div class="player-name">${esc(nombreCorto(x.n))}${x.pEP ? `<span class="op-pep${x.pEP > 30 ? ' op-pep-lejos' : ''}" title="${esc(`En el ranking de PUNTOS de su puesto va ${x.pEP}º. Esta pantalla está ordenada por amenaza de gol, que es una sola pieza del puntaje: el resto es la ficha, la valla y la chance de jugar. Un número muy alto acá quiere decir que genera gol pero el puntaje esperado no lo acompaña.`)}">${x.pEP}º en puntos</span>` : ''}</div>
         <div class="player-sub">${esc(NOM(x.eq))} · ${x.cond === 'L' ? 'L' : 'V'} vs ${esc(NOM(x.riv))}</div>
-        <div class="player-tags">${x.tr && x.tr.manual ? `<span class="pill-alerta pill-pase" title="${esc(`Pasó de ${x.tr.desde} a ${x.tr.hacia}${x.tr.cuando ? ' el ' + x.tr.cuando : ''}. Ni la planilla ni el Ayudante de campo lo tienen todavía: el club, el rival y la condición se cargaron a mano. Fijate en el juego antes de ponerlo.`)}">PASE RECIENTE</span>` : ''}${pintarAvisos(x)}${pillCond(x)}${x.pen > 0 ? `<span class="pill-alerta pill-penal">⚫ PENALES ${x.pen}</span>` : ''}</div></div></td>
+        <div class="player-tags">${x.tr && x.tr.manual ? `<span class="pill-alerta pill-pase" title="${esc(`Pasó de ${x.tr.desde} a ${x.tr.hacia}${x.tr.cuando ? ' el ' + x.tr.cuando : ''}. Ni la planilla ni el Ayudante de campo lo tienen todavía: el club, el rival y la condición se cargaron a mano. Fijate en el juego antes de ponerlo.`)}">PASE RECIENTE</span>` : ''}${pintarAvisos(x)}${pillCond(x)}${x.pen > 0 ? `<span class="pill-alerta pill-cuad pill-penal" title="${esc('Patea los penales: ' + x.pen + ' penal' + (x.pen > 1 ? 'es' : '') + ' en el torneo, ' + x.penC + ' convertido' + (x.penC === 1 ? '' : 's') + (x.penE ? ', ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : '') + '. Un penal convertido paga 3 fijos (5 de visitante) y no depende del juego.')}">⚽ ${x.pen}</span>` : ''}</div></div></td>
       <td class="text-center">
         <div class="op-am">${String(+x.am.toFixed(3))}</div>
         <div class="op-cuenta" title="Su parte del ataque de su equipo, por los goles que se espera que ese equipo meta hoy.">${x.sh != null ? pc0(x.sh) : '—'} × <span style="color:${x.lam && x.lam.f >= 1.6 ? 'var(--success)' : x.lam && x.lam.f <= 1 ? 'var(--danger)' : 'inherit'};">${n2(x.lam && x.lam.f)}</span></div>
@@ -808,8 +906,8 @@ function pintarOportunidades() {
             <span class="cruce-l"><b>${c.def.puesto}º</b> el rival recibe <i>${c.def.pj}pj</i></span>
           </span>`
         : '<span class="text-muted">—</span>'}</td>
-      <td class="text-center">${por90(x, 'tiros', 't90', v => n1(v))}</td>
-      <td class="text-center">${por90(x, 'xg', 'x90', v => String(+Number(v).toFixed(2)))}</td>
+      <td class="text-center">${celdaMet(x, 'tiros')}</td>
+      <td class="text-center">${celdaMet(x, 'xg')}</td>
       <td class="text-center"><b>${i2.goles || 0}</b></td>
       <td class="text-center"><b style="color:${debe > 0.5 ? 'var(--success)' : debe < -0.5 ? 'var(--danger)' : ''};">${debe > 0 ? '+' : ''}${String(+debe.toFixed(2))}</b></td>
       <td class="text-center">${i2.minutos}'${i2.partidosSinDato ? `<div class="op-cuenta dato-parcial" title="A 365Scores le faltan ${i2.partidosSinDato} partido(s) suyos: los minutos y los tiros salen de menos fútbol del que jugó.">le faltan ${i2.partidosSinDato}</div>` : ''}</td>
@@ -2293,11 +2391,11 @@ function pillRotacion(m, chico) {
   if (m.tipo === 'guarda') {
     const d = num(m.dias);
     const t = `Juega ${m.torneo} en ${d} días: es probable que ponga suplentes en la liga`;
-    return `<span class="pill-alerta pill-copa" title="${esc(t)}">${chico ? '🏆 ' + d + 'd' : 'COPA en ' + d + ' días'}</span>`;
+    return `<span class="pill-alerta pill-cuad pill-copa" title="${esc(t)}">🏆 ${d}d</span>`;
   }
   const d = num(m.dias);
   const t = `Vino de jugar ${m.torneo} hace ${d} días. Llega con poco descanso, pero no necesariamente rota`;
-  return `<span class="pill-alerta pill-cansado" title="${esc(t)}">${chico ? '😴 ' + d + 'd' : d + ' días de descanso'}</span>`;
+  return `<span class="pill-alerta pill-cuad pill-cansado" title="${esc(t)}">😴 ${d}d</span>`;
 }
 
 function abrirModal(id) {
@@ -2602,16 +2700,31 @@ function abrirTablaCompleta() {
 //     ficha. Fuera del resto: al central le da igual.
 // No cambia ningun puntaje: son columnas para mirar.
 const COLS = {
-  ARQ: [['#', ''], ['Arquero', 'n'], ['Rol', 'rol'], ['Valla', 'pvi'], ['GC', 'lamc'], ['Ficha', 'fi'], ['Arr.', 'arr'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['', 'fuera']],
-  // TIROS/90 VUELVE A DEFENSORES (07/09). La habia sacado para que la tabla
-  // entrara a lo ancho, y era justo la columna con la que se decide un caso
-  // real: Ávila patea mucho con poco xG y Obando patea poco pero clarisimo.
-  // El modelo pesa el xG, pero el volumen de tiros es informacion propia —
-  // sobre todo en un defensor, donde un tiro de afuera no aparece en el xG y
-  // el gol paga 9. Volantes y delanteros la tenian; defensores no, sin motivo.
-  DEF: [['#', ''], ['Defensor', 'n'], ['Rol', 'rol'], ['Valla', 'pvi'], ['Tiros', 'tiros'], ['xG', 'xg'], ['Gol', 'lg'], ['Ficha', 'fi'], ['Arr.', 'arr'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Crn+', 'crnF'], ['Crn−', 'crnC'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['', 'fuera']],
-  VOL: [['#', ''], ['Volante', 'n'], ['Rol', 'rol'], ['Tiros', 'tiros'], ['xG', 'xg'], ['Gol', 'lg'], ['%Gol', 'delgol'], ['Ficha', 'fi'], ['Arr.', 'arr'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Pos%', 'pose'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['', 'fuera']],
-  DEL: [['#', ''], ['Delantero', 'n'], ['Rol', 'rol'], ['Tiros', 'tiros'], ['xG', 'xg'], ['Gol', 'lg'], ['%Gol', 'delgol'], ['Ficha', 'fi'], ['Arr.', 'arr'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Crn+', 'crnF'], ['Crn−', 'crnC'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['', 'fuera']]
+  // ARQUEROS, SIN LOS TOTALES DEL TORNEO (18/09). Duraron un dia. Los penales
+  // atajados que publica 365Scores son de CARRERA, no del torneo, y los goles
+  // recibidos hubo que recalcularlos partido por partido porque el total
+  // tambien venia de carrera (Cardozo figuraba con 18 en 7 partidos). Dos
+  // columnas que habia que explicar con un asterisco cada una no valen lo que
+  // ocupan. Si el Gran DT oficial publica esos numeros por torneo, vuelven.
+  ARQ: [['#', ''], ['Arquero', 'n'], ['Rol', 'rol'], ['Valla', 'pvi'], ['GC', 'lamc'], ['Ficha', 'fi'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['+', 'mi'], ['', 'fuera']],
+  // JUGADORES DE CAMPO (18/09). El pedido fue: chance de gol, xG por partido,
+  // tiros por partido y xG total, todo SIN entrar en modo analista. Para que
+  // entren sin que la tabla se vaya de ancho salieron cuatro columnas que
+  // estaban midiendo poco o nada:
+  //   · "Tir tot" — los tiros del torneo ya se leen en Tiros (el chiquito de
+  //     abajo dice el ritmo por 90 y el globito el total).
+  //   · "Crn+" y "Crn−" — medido este mes: los córners del equipo explican los
+  //     goles de sus defensores con r = 0.272 ± 0.38, o sea nada. Lo que sí
+  //     sirve —el cruce del que más genera contra el que más concede— quedó
+  //     en la 🚩 al lado del nombre.
+  //   · "Pos%" — la posesión del equipo tampoco separa volantes.
+  // Y el 18/09 a la tarde se fue tambien "xG tot": era el mismo dato que ya
+  // muestra la celda de xG abajo en chico, puesto dos veces al lado. Lo mismo
+  // con los tiros. Neto contra el lunes: DEF y DEL tienen TRES columnas menos
+  // y VOL dos, y encima ahora se ve el total, que antes no estaba en ninguna.
+  DEF: [['#', ''], ['Defensor', 'n'], ['Rol', 'rol'], ['Valla', 'pvi'], ['Ficha', 'fi'], ['Gol', 'lg'], ['Tiros', 'tiros'], ['xG', 'xg'], ['Gol tot', 'golTot'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['+', 'mi'], ['', 'fuera']],
+  VOL: [['#', ''], ['Volante', 'n'], ['Rol', 'rol'], ['Ficha', 'fi'], ['Gol', 'lg'], ['%Gol', 'delgol'], ['Tiros', 'tiros'], ['xG', 'xg'], ['Gol tot', 'golTot'], ['Fig', 'figs'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['+', 'mi'], ['', 'fuera']],
+  DEL: [['#', ''], ['Delantero', 'n'], ['Rol', 'rol'], ['Ficha', 'fi'], ['Gol', 'lg'], ['%Gol', 'delgol'], ['Tiros', 'tiros'], ['xG', 'xg'], ['Gol tot', 'golTot'], ['Últimas 5', 'msj'], ['12+', 'p12'], ['Hizo', 'hizo'], ['PTS', 'epsj'], ['+', 'mi'], ['', 'fuera']]
 };
 // Ordenar por lo MISMO que se muestra. Cuando la columna paso a ser por 90
 // minutos, el orden seguia usando el valor por partido: la tabla mostraba
@@ -2641,8 +2754,7 @@ const medianaDe = (pos, campo) => {
   const k = 'med|' + pos + '|' + String(campo);
   if (S[k] != null) return S[k];
   const v = (D.rankings[pos] || [])
-    .filter(y => { const q = y.pmin, min = (y.ind && y.ind.minutos) || 0;
-                   return !q || q.arranques >= 2 || min >= 270; })
+    .filter(esCandidato)
     .map(campo).filter(x => x != null && !isNaN(x)).sort((a, b) => a - b);
   return (S[k] = v.length ? v[Math.floor(v.length / 2)] : null);
 };
@@ -2774,11 +2886,18 @@ const valorCol = (x, k) =>
   k === 'p12' ? (x.p12 ?? null) :
   k === 'lg' ? meteGol(x) :
   k === 'arr' ? arranquesDe(x) :
+  // Totales del torneo. Se ordenan por el numero crudo, sin dividir por nada:
+  // es lo que pidio el usuario y es lo que el numero dice.
+  k === 'tirTot' ? ((x.ind && x.ind.tiros) ?? null) :
+  k === 'golTot' ? ((x.ind && x.ind.goles) ?? null) :
+  k === 'figs'   ? ((x.ind && x.ind.figuras) ?? null) :
   k === 'fuera' ? (S.fuera.has(x.id) ? 1 : 0) :
+  k === 'mi' ? (enMi11(x.id) ? 1 : 0) :
   k === 'delgol' ? delGol(x) :
   k === 'pj' ? x.pj_ :
-  k === 'tiros' ? ritmo90(x, 'tiros') :
-  k === 'xg' ? ritmo90(x, 'xg') :
+  // Se ordena por el numero GRANDE de la celda, sea cual sea el que elegiste.
+  k === 'tiros' ? valorMet(x, 'tiros', S.modoT) :
+  k === 'xg' ? valorMet(x, 'xg', S.modoX) :
   k === 'lamc' ? -x.lam.c :
   k === 'lamf' ? (x.lam ? x.lam.f : null) :
   // El contexto se mide distinto segun el puesto: al arquero y al defensor les
@@ -2802,6 +2921,26 @@ function celda(x, k, i) {
         '. Puesto ' + pu + ' de ' + tot + ' en esa condición; la mediana de la liga es ' +
         (k === 'pose' ? n1(med) + '%' : n1(med)) + '. Sobre ' + p.pj + ' partidos.')}">${
         k === 'pose' ? n1(v) : n1(v)}<i>${pu}º</i></span>`;
+    }
+    // TOTALES DEL TORNEO (18/09). Reemplazan a "Arr.", que decia cuantas veces
+    // arranco de titular: un dato que en la practica es 0 o "todas" y no separa
+    // a nadie. Estos son acumulados crudos, sin dividir por minutos ni por
+    // partidos — cuando uno quiere el ritmo ya tiene las columnas Tiros y xG,
+    // que son por 90. Aca la pregunta es otra: cuanto lleva hecho en el torneo.
+    case 'tirTot': case 'golTot': case 'figs': {
+      const campo = { tirTot: 'tiros', golTot: 'goles', figs: 'figuras' }[k];
+      const v = (x.ind && x.ind[campo] != null) ? x.ind[campo] : null;
+      if (v == null) return '<span class="text-muted">–</span>';
+      const pj = (x.ind && x.ind.pj) || 0;
+      const ay = {
+        tirTot: 'Tiros que pateó en todo el torneo' + (pj ? ', en ' + pj + ' partidos' : '') + '.',
+        golTot: 'Goles que hizo en todo el torneo' + (x.ind && x.ind.golesPenal ? ', ' + x.ind.golesPenal + ' de penal' : '') + '.',
+        figs:   'Veces que fue la figura de su equipo. Cada una paga 4 puntos.'
+      }[k];
+      // el cero se apaga: una columna llena de ceros en negro no deja ver los
+      // pocos numeros que importan
+      const cls = v === 0 ? 'text-muted' : 'tot-bueno';
+      return `<span class="${cls}" title="${esc(ay)}">${v}</span>`;
     }
     case 'hizo': {
       const h = hizoDe(x);
@@ -2896,7 +3035,7 @@ function celda(x, k, i) {
       const etq = [];
       // El que patea los penales del equipo. Un penal convertido paga 3 fijos
       // (+2 de visitante) y es la unica fuente de gol que no depende del juego.
-      if (x.pen > 0) etq.push(`<span class="pill-alerta pill-penal" title="Pateó ${x.pen} penal${x.pen > 1 ? 'es' : ''} en el torneo: ${x.penC} convertido${x.penC === 1 ? '' : 's'}${x.penE ? ', ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : ''}. Es el pateador del equipo.">⚫ PENALES ${x.pen}</span>`);
+      if (x.pen > 0) etq.push(`<span class="pill-alerta pill-cuad pill-penal" title="${esc('Patea los penales: ' + x.pen + ' penal' + (x.pen > 1 ? 'es' : '') + ' en el torneo, ' + x.penC + ' convertido' + (x.penC === 1 ? '' : 's') + (x.penE ? ', ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : '') + '. Un penal convertido paga 3 fijos (5 de visitante) y no depende del juego.')}">⚽ ${x.pen}</span>`);
       // Transferido en el mercado: la planilla de Gran DT ya lo pasó al club
       // nuevo, pero los minutos, los tiros y el xG que le mostramos los hizo en
       // el club anterior. Sirven para saber si es titular, pero no dicen nada
@@ -2904,8 +3043,8 @@ function celda(x, k, i) {
       const pc = pillCond(x); if (pc) etq.push(pc);
       const pcr = pillCorners(x); if (pcr) etq.push(pcr);
       if (x.mrot) etq.push(pillRotacion(x.mrot));
-      else if (x.rot > 0) etq.push(`<span class="pill-alerta pill-copa">ROTA</span>`);
-      if (x.mrotr) etq.push(`<span class="pill-alerta pill-copa-rival" title="Al rival le pasa esto: ${x.mrotr.tipo === 'guarda' ? 'juega copa en ' + x.mrotr.dias + ' días' : 'viene de jugar hace ' + x.mrotr.dias + ' días'}">RIVAL ${x.mrotr.tipo === 'guarda' ? 'CON COPA' : 'CANSADO'}</span>`);
+      else if (x.rot > 0) etq.push(`<span class="pill-alerta pill-cuad pill-copa" title="Su equipo rota gente por la copa.">🔄</span>`);
+      if (x.mrotr) etq.push(`<span class="pill-alerta pill-cuad pill-copa-rival" title="${esc('EL RIVAL: ' + (x.mrotr.tipo === 'guarda' ? 'juega copa en ' + x.mrotr.dias + ' días, puede poner suplentes' : 'viene de jugar hace ' + x.mrotr.dias + ' días'))}">${x.mrotr.tipo === 'guarda' ? 'R🏆' : 'R😴'}</span>`);
       const avisos = pintarAvisos(x);
       return `<div class="player-info">
         <div class="player-name">${esc(nombreCorto(x.n))}</div>
@@ -2948,10 +3087,24 @@ function celda(x, k, i) {
     // que mostraba otra cosa, asi que en pantalla parecia flojo un jugador que
     // el algoritmo veia bien. El globito aclara de donde sale y, cuando el
     // motor lo achica por tener pocos minutos, con que numero se queda.
-    case 'tiros': return por90(x, 'tiros', 't90', v => n1(v));
-    // Dos decimales y listo: "0.0021 de xG por 90" es precision falsa, y con
-    // cuatro decimales la columna deja de leerse de un vistazo.
-    case 'xg':    return por90(x, 'xg',    'x90', v => String(+Number(v).toFixed(2)));
+    case 'tiros': case 'xg': return celdaMet(x, k === 'tiros' ? 'tiros' : 'xg');
+    // ARMAR EL EQUIPO DESDE LA LISTA (18/09). Antes el once propio solo se
+    // tocaba desde la cancha de "La fecha": abrias un hueco, se abria un
+    // selector y ahi adentro buscabas. O sea, para elegir un volante tenias que
+    // salir de la pantalla donde estan TODOS los volantes con sus numeros.
+    // Ahora se arma donde se mira, como en el Gran DT oficial.
+    case 'mi': {
+      const dentro = enMi11(x.id);
+      const c = cuentaPos(S.miEsq || '1-4-4-2');
+      const puestos = c[x.pos], tiene = cuantosMi(x.pos);
+      const lleno = !dentro && tiene >= puestos;
+      const ay = dentro
+        ? `${nombreCorto(x.n)} ya está en tu once. Tocá para sacarlo.`
+        : lleno
+          ? `Ya tenés ${tiene} ${NOMBRE_POS_SING[x.pos]}${tiene === 1 ? '' : 's'} y la formación ${esquemaLindo(S.miEsq)} lleva ${puestos}. Sacá a uno, o cambiá la formación arriba.`
+          : `Sumarlo a tu once de esta fecha (${tiene} de ${puestos} ${NOMBRE_POS_SING[x.pos]}${puestos === 1 ? '' : 's'} puestos). Se guarda en este navegador y lo ves en «La fecha».`;
+      return `<button class="m11-add${dentro ? ' m11-on' : ''}${lleno ? ' m11-llena' : ''}" onclick="miSumar('${x.id}', event)" title="${esc(ay)}">${dentro ? '✓' : '+'}</button>`;
+    }
     case 'fi': return n1(x.fi);
     // El numero grande es el de SI ENTRA A LA CANCHA: cuantos puntos hace
     // contando los minutos que se espera que juegue, sin descontar la chance de
@@ -3046,48 +3199,93 @@ function celdaMinutos(x) {
     ${tiraMinutos(x)}</span>`;
 }
 
-function por90(x, campo, campoMotor, fmt) {
+// PROMEDIO POR PARTIDO (18/09). El numero que se pidio para ver de un vistazo.
+// Ojo con la trampa que ya conocemos: divide por partidos jugados, no por
+// minutos, asi que el que vuelve de una lesion y entro 20 minutos tres veces se
+// ve flojo aunque su ritmo sea alto. Por eso la celda muestra los DOS: arriba
+// el promedio por partido y abajo, en chico, el ritmo por 90 — que es el que
+// usa el motor. Los partidos son los que 365Scores le registra (pj365).
+// LAS TRES FORMAS DE LEER TIROS Y xG, y cual se muestra grande.
+//   prom = por partido ....... lo que hace cada domingo. Castiga al que volvio
+//                              de una lesion y entro veinte minutos.
+//   90   = por 90 en cancha ... el ritmo. Es el que usa el motor. Infla al
+//                              suplente que entro diez minutos y pateo una vez.
+//   tot  = todo el torneo ..... cuanto lleva hecho. No es ritmo: el titular fijo
+//                              siempre le gana al que jugo la mitad.
+// Ninguna es "la correcta": contestan preguntas distintas. Por eso se elige.
+const MODOS_MET = ['prom', '90', 'tot'];
+const NOMBRE_MODO = { prom: 'por partido', '90': 'cada 90′', tot: 'total del torneo' };
+const CORTO_MODO  = { prom: 'x partido', '90': 'x 90′', tot: 'total' };
+function modoDe(campo) { return campo === 'tiros' ? S.modoT : S.modoX; }
+function totalMet(x, campo) {
+  const i = x.ind; if (!i) return null;
+  return campo === 'tiros' ? (i.tiros ?? null) : (x.xgT != null ? x.xgT : (i.xg ?? null));
+}
+function valorMet(x, campo, modo) {
+  const i = x.ind; if (!i) return null;
+  const tot = totalMet(x, campo); if (tot == null) return null;
+  if (modo === 'tot') return tot;
+  if (modo === '90') { const m = i.minutos || 0; return m ? tot / (m / 90) : null; }
+  const pj = i.pj365 || 0; return pj ? tot / pj : null;
+}
+const fmtMet = (campo, v) => v == null ? '–'
+  : campo === 'tiros' ? (Number.isInteger(v) ? String(v) : n1(v))
+  : String(+Number(v).toFixed(2));
+
+function porPartido(x, campo) {
+  const i = x.ind; if (!i) return null;
+  const pj = i.pj365 || 0; if (!pj) return null;
+  const total = campo === 'tiros' ? (i.tiros || 0) : (x.xgT != null ? x.xgT : (i.xg || 0));
+  return total / pj;
+}
+
+// LA CELDA DE TIROS Y DE xG. Un numero grande —el que vos elegiste en el
+// encabezado— y abajo en chico el OTRO que mas se usa: si arriba va un ritmo,
+// abajo va el total del torneo; si arriba va el total, abajo el promedio por
+// partido. Los tres valores y todas las advertencias estan en el globito.
+function celdaMet(x, campo) {
   const i = x.ind; if (!i) return 's/d';
   const min = i.minutos || 0;
   if (!min) return '<span class="text-muted" title="No cruzó con 365Scores: no tenemos sus minutos.">s/d</span>';
-  // El xG que se muestra es el MISMO que usa el modelo: sin penales.
-  // Un penal pateado vale 0.79 de xG y no dice nada de si el tipo genera juego.
-  // Módica mostraba 0.79 de xG/90 con dos penales encima; el modelo lo veía en
-  // 0.50. Que la tabla diga una cosa y el ranking use otra fue el problema
-  // original de esta columna.
-  const total = campo === 'tiros' ? (i.tiros || 0) : (x.xgT != null ? x.xgT : (i.xg || 0));
-  const crudo = total / (min / 90);
-  const delMotor = x[campoMotor];
-  const flojo = min < 180;
-  // EL NUMERO REAL, NO UN "s/d" (03/09).
-  // Estuvo un rato mostrando s/d cuando a 365 le faltaba algún partido, y era
-  // peor: Sergio Ojeda tiene SEIS partidos medidos con cero tiros en 483
-  // minutos — eso es un dato durísimo, no una ausencia. Lo único que falta es
-  // un partido. Así que se muestra lo que hay, con el aviso de cuántos faltan.
+  // El xG que se muestra es el MISMO que usa el modelo: sin penales. Un penal
+  // pateado vale 0.79 de xG y no dice nada de si el tipo genera juego. Módica
+  // mostraba 0.79 de xG/90 con dos penales encima y el modelo lo veía en 0.50:
+  // que la tabla diga una cosa y el ranking use otra fue el problema original.
+  const modo = modoDe(campo);
+  const F = v => fmtMet(campo, v);
+  const total = totalMet(x, campo) || 0;
+  const v90 = valorMet(x, campo, '90'), vpp = valorMet(x, campo, 'prom');
+  const grande = valorMet(x, campo, modo);
+  const chico  = modo === 'tot' ? vpp : total;
+  const etqChico = modo === 'tot' ? 'x partido' : 'total';
+  const flojo = min < 180 && modo !== 'tot';
   const partes = [];
+  partes.push(`${F(vpp)} por partido (${i.pj365} partidos) · ${F(v90)} por cada 90 minutos en la cancha · ${F(total)} en todo el torneo`);
+  // EL NUMERO REAL, NO UN "s/d" (03/09). Sergio Ojeda tiene SEIS partidos
+  // medidos con cero tiros en 483 minutos: eso es un dato durísimo, no una
+  // ausencia. Se muestra lo que hay, con el aviso de cuántos partidos faltan.
   if (x.dpar) partes.push(`OJO: son ${i.pj365} de sus ${i.pj} partidos — a 365Scores le falta${i.partidosSinDato === 1 ? '' : 'n'} ${i.partidosSinDato}`);
   if (x.dimp) partes.push(`En los que sí tenemos no pateó nunca, pero la planilla le cuenta ${i.goles} gol${i.goles === 1 ? '' : 'es'}: el gol fue en un partido que 365Scores no tiene`);
-  partes.push(campo === 'tiros'
-    ? `${total} tiros en ${min} minutos`
-    : `${total} de xG en ${min} minutos`);
-
   if (campo === 'xg' && x.pen > 0 && x.xgT != null && i.xg != null)
     partes.push(`ya sin los ${x.pen} penal${x.pen > 1 ? 'es' : ''} que pateó (${i.xg} crudo − ${(i.xg - x.xgT).toFixed(2)})`);
-  if (flojo) partes.push('menos de 180 minutos: con tan poca cancha el ritmo por 90 es poco confiable, por eso va en gris');
-  // LA CONCENTRACION DEL xG (06/09). Dejo de ser columna propia: nunca fue un
-  // dato aparte, es una ADVERTENCIA sobre este numero. Franco Vázquez tiene
-  // 0.25 de xG/90 y el 95% salio de un solo partido: el numero es correcto y
-  // la conclusion que uno saca de el, no. Va acá, pegado al numero que corrige.
+  if (flojo) partes.push('menos de 180 minutos: con tan poca cancha el ritmo es poco confiable, por eso va en gris');
+  // LA CONCENTRACION DEL xG (06/09). Nunca fue un dato aparte: es una
+  // ADVERTENCIA sobre este numero. Franco Vázquez tiene 0.25 de xG/90 y el 95%
+  // salió de un solo partido — el número es correcto y la conclusión, no.
   if (campo === 'xg' && x.conc) {
-    const v = x.conc.pico;
-    partes.push(v >= 0.8
-      ? `OJO: el ${(v * 100).toFixed(0)}% de ese xG salió de UN SOLO partido — sin ese partido le quedan ${x.conc.sinPico}. Es una tarde, no una costumbre (la mediana de la liga es 53%)`
-      : `repartido en ${x.conc.partidos} partidos con remate; el mejor aporta el ${(v * 100).toFixed(0)}% (mediana de la liga 53%)`);
+    const c = x.conc.pico;
+    partes.push(c >= 0.8
+      ? `OJO: el ${(c * 100).toFixed(0)}% de ese xG salió de UN SOLO partido — sin ese partido le quedan ${x.conc.sinPico}. Es una tarde, no una costumbre (la mediana de la liga es 53%)`
+      : `repartido en ${x.conc.partidos} partidos con remate; el mejor aporta el ${(c * 100).toFixed(0)}% (mediana de la liga 53%)`);
   }
-  if (delMotor != null && Math.abs(delMotor - crudo) > 0.05)
-    partes.push(`el modelo lo achica a ${fmt(delMotor)} por 90`);
+  const delMotor = x[campo === 'tiros' ? 't90' : 'x90'];
+  if (delMotor != null && v90 != null && Math.abs(delMotor - v90) > 0.05)
+    partes.push(`el modelo lo achica a ${F(delMotor)} por 90`);
   const conc = (campo === 'xg' && x.conc && x.conc.pico >= 0.8) ? ' xg-concentrado' : '';
-  return `<span class="${flojo ? 'ritmo-flojo' : ''}${x.dpar ? ' dato-parcial' : ''}${conc}" title="${esc(partes.join('. ') + '.')}">${fmt(crudo)}${conc ? '<sup class="conc-mark" title="casi todo de un partido">!</sup>' : ''}${x.dpar ? `<sup class="falta-mark">−${i.partidosSinDato}</sup>` : ''}</span>`;
+  return `<span class="${flojo ? 'ritmo-flojo' : ''}${x.dpar ? ' dato-parcial' : ''}${conc}" title="${esc(partes.join('. ') + '.')}">${
+    F(grande)}${conc ? '<sup class="conc-mark" title="casi todo de un partido">!</sup>' : ''}${
+    x.dpar ? `<sup class="falta-mark">−${i.partidosSinDato}</sup>` : ''}${
+    chico != null ? `<i class="x90">${F(chico)} ${etqChico}</i>` : ''}</span>`;
 }
 
 // AYUDAS DE CADA COLUMNA. Antes habia una barra "ORDENAR POR" con cinco
@@ -3098,6 +3296,9 @@ function por90(x, campo, campoMotor, fmt) {
 // flecha marcando por cual esta ordenado y la explicacion en el globito.
 const AYUDA_COL = {
   pose: 'Posesión del EQUIPO del jugador, en la condición que le toca esta fecha (local o visitante). Sale de los partidos ya jugados, contados. El número chiquito es el puesto entre los 30 en esa misma condición.',
+  tirTot: 'Tiros que pateó en TODO el torneo, acumulados.',
+  golTot: 'Goles que hizo en todo el torneo, penales incluidos.',
+  figs: 'Veces que fue la figura de su equipo en el torneo. Cada figura paga 4 puntos.',
   crnF: 'Córners a favor por partido que genera su equipo, en la condición que juega esta fecha. El número chiquito es el puesto entre los 30.',
   crnC: 'Córners en contra por partido que concede su equipo, en la condición que juega esta fecha. Puesto 1 = el que menos concede.',
   hizo: 'Los puntos que sumó DE VERDAD en esta fecha, según las fichas de Planeta. Un punto gris quiere decir que su partido todavía no se jugó. La columna PUNTOS de al lado es lo que el motor ESPERA, que es otra cosa.',
@@ -3117,8 +3318,8 @@ const AYUDA_COL = {
   mesp: 'Minutos esperados = chance de jugar × minutos que juega cuando entra',
   msj:  'Arriba, los minutos que juega CUANDO ARRANCA de titular — para eso se miran solo los partidos en los que arrancó. Abajo, las últimas CINCO FECHAS del torneo tal cual pasaron: verde completó, ámbar salió sobre el final, gris lo sacaron antes, gris punteado entró desde el banco, ✕ rojo no jugó. Esa tira es solo para mirar, no entra en ninguna cuenta',
   pj:   'Chance de llegar a los 20 minutos que exige la ficha. Es información: no ordena el ranking ni descuenta puntos',
-  tiros: 'Tiros por cada 90 minutos EN LA CANCHA, no por partido',
-  xg:   'Goles esperados por cada 90 minutos EN LA CANCHA, no por partido',
+  tiros: 'Cuánto patea. Tocá el renglón chiquito del título para elegir si el número grande es POR PARTIDO, POR CADA 90 MINUTOS en la cancha (el que usa el motor) o el TOTAL del torneo; abajo queda el otro. Ninguno gana siempre: el promedio por partido castiga al que volvió de una lesión y entró 20 minutos, el ritmo por 90 infla al suplente que entró y pateó una vez, y el total premia al que más jugó. La tabla ordena por el número grande',
+  xg:   'Cuánta chance de gol se le genera, SIN PENALES (un penal vale 0.79 de xG y no dice nada de si genera juego). Tocá el renglón chiquito del título para elegir si el número grande es por partido, por cada 90 minutos en la cancha o el total del torneo; abajo queda el otro. La tabla ordena por el número grande',
   pr:   'Lo que cuesta en el Gran DT',
   gc:   'Goles que se espera que le hagan a su equipo',
   lamc: 'GOLES EN CONTRA: los que se espera que le hagan a su equipo en este partido, salidos de las cuotas de hoy. El rival ya está adentro del número.',
@@ -3127,7 +3328,7 @@ function pintarSelectorOrden() {
   const cont = $('orden-ranking'); if (!cont) return;
   const hayEpsj = !!((D.rankings.VOL || [])[0] || {}).epsj;
   if (!hayEpsj && S.ordCol === 'epsj') S.ordCol = 'ep';
-  cont.innerHTML =
+  cont.innerHTML = barraMi11() +
     `<span class="orden-lbl">Tocá el título de una columna para ordenar por esa</span>
      <label class="orden-check" title="${esc('Prendido ves todas las columnas: posesión y córners del equipo en su condición, tiros, xG, rol y chance de fecha grande. ' +
        'Apagado quedan sólo las que cuentan la historia — para cuando le mostrás la app a alguien de afuera. No cambia ningún número.')}">
@@ -3145,6 +3346,10 @@ function pintarSelectorOrden() {
   if (chk) chk.onchange = () => { S.verTodos = chk.checked; pintarRankings(); };
   const cha = $('chk-analista');
   if (cha) cha.onchange = () => modoAnalista(cha.checked);
+  { const e = $('m11-esq'); if (e) e.onchange = () => miFormacionLista(e.value); }
+  { const b = $('m11-ver'); if (b) b.onclick = () => mostrarSeccion('fecha'); }
+  { const b = $('m11-motor'); if (b) b.onclick = () => { miCopiarDelMotor(); S.miAviso = 'Copiaste el once del motor. Cambiá lo que quieras.'; pintarRankings(); }; }
+  { const b = $('m11-vaciar'); if (b) b.onclick = () => { miVaciar(); S.miAviso = 'Once vacío.'; pintarRankings(); }; }
 }
 
 // Chequeo de que datos.js este al dia. Cuando falta un campo la pagina no se
@@ -3250,7 +3455,12 @@ function pintarRankings() {
   // se la mostras a alguien de afuera, catorce columnas son ruido. En vez de
   // hacer dos apps, hay un interruptor: prendido ves todo, apagado quedan las
   // que cuentan la historia. Arranca PRENDIDO, que es como se usa.
-  const PROFUNDAS = new Set(['rol', 'tiros', 'xg', 'delgol', 'p12', 'pose', 'crnF', 'crnC', 'lamc']);
+  // TIROS Y xG SALEN DE "MODO ANALISTA" (18/09). Eran el motivo por el que
+  // habia que prender el modo analista para ver algo, y el modo analista
+  // prende OTRAS ocho columnas de una: abruma. Ahora los dos datos que se
+  // miran siempre —cuanto patea y cuanto xG genera— estan a la vista sin
+  // tocar nada, igual que la chance de gol y el xG del torneo.
+  const PROFUNDAS = new Set(['rol', 'delgol', 'p12', 'lamc']);
   const cols = COLS[S.pos].filter(c =>
     (c[1] !== 'hizo' || (VIVO && FECHA_EMPEZO)) &&
     (S.analista || !PROFUNDAS.has(c[1])));
@@ -3264,7 +3474,9 @@ function pintarRankings() {
   // asi que la tabla ENTRA siempre, sin scroll de costado y sin cortar PUNTOS.
   const PESO = { '': 3.4, n: 21, rol: 6.2, pvi: 5, lamc: 4.6, tiros: 5.6, xg: 5.2,
                  lg: 5.6, delgol: 5.6, fi: 5, arr: 4, msj: 11.5, p12: 4.4,
-                 pose: 5.4, crnF: 4.8, crnC: 4.8, hizo: 5, epsj: 7.2, fuera: 3.2 };
+                 pose: 5.4, crnF: 4.8, crnC: 4.8, hizo: 5, epsj: 7.2, fuera: 3.2,
+                 // los totales del torneo: numeros de una o dos cifras, angostos
+                 tirTot: 4.6, golTot: 4.6, figs: 3.8, mi: 3.6 };
   // EN PIXELES, NO EN PORCENTAJE. Con porcentajes + min-width el navegador
   // redondeaba distinto el ancho de cada columna y el total, y las dos ultimas
   // terminaban SUPERPUESTAS: la ✕ se dibujaba encima del puntaje y el puntaje
@@ -3286,9 +3498,19 @@ function pintarRankings() {
   thead.innerHTML = '<tr>' + cols.map((c, i) => {
     const act = S.ordCol === c[1];
     const flecha = act ? `<span class="orden-flecha">${S.ordDir === -1 ? '▼' : '▲'}</span>` : '';
+    // TIROS Y xG: EL TITULO TAMBIEN ELIGE QUE NUMERO MANDA (18/09).
+    // Son tres lecturas del mismo dato y ninguna gana siempre, asi que la
+    // decision es de quien mira. Tocás el nombre y ordena, tocás el renglon de
+    // abajo y cambiás cuál es el número grande — y la tabla se reordena por el
+    // que quedó, porque ordenar por algo que no se ve es lo peor de los dos.
+    const met = (c[1] === 'tiros' || c[1] === 'xg') ? c[1] : null;
+    const cambia = met
+      ? `<i class="col-modo" data-met="${met}" title="${esc('Ahora manda el ' + NOMBRE_MODO[modoDe(met)] +
+          '. Tocá acá para pasar al siguiente: por partido → cada 90 minutos en la cancha → total del torneo. El que elegís es el número grande y por el que ordena la tabla; el otro queda abajo en chico.')}">${CORTO_MODO[modoDe(met)]} ⇄</i>`
+      : '';
     return `<th class="${c[1] === 'n' || c[1] === 'perf' ? '' : 'text-center'}${act ? ' col-ordenada' : ''}${c[1] ? ' col-ordenable' : ''}"
       data-k="${c[1]}" title="${esc(AYUDA_COL[c[1]] || 'Tocá para ordenar por esta columna')}"
-      style="cursor:pointer;width:${anchos[i]}px;">${c[0]}${flecha}</th>`;
+      style="cursor:pointer;width:${anchos[i]}px;">${c[0]}${flecha}${cambia}</th>`;
   }).join('') + '</tr>';
   // Si hay muchas columnas y la ventana es chica, en vez de espachurrar las
   // celdas hasta cortarlas la tabla toma un ancho minimo y scrollea de costado.
@@ -3297,6 +3519,13 @@ function pintarRankings() {
   thead.querySelectorAll('th').forEach(th => th.onclick = () => {
     const k = th.dataset.k;
     if (S.ordCol === k) S.ordDir *= -1; else { S.ordCol = k; S.ordDir = -1; }
+    pintarRankings();
+  });
+  thead.querySelectorAll('.col-modo').forEach(el => el.onclick = ev => {
+    ev.stopPropagation(); ev.preventDefault();
+    const met = el.dataset.met, clave = met === 'tiros' ? 'modoT' : 'modoX';
+    S[clave] = MODOS_MET[(MODOS_MET.indexOf(S[clave]) + 1) % MODOS_MET.length];
+    try { localStorage.setItem(met === 'tiros' ? 'gdt_modoT' : 'gdt_modoX', S[clave]); } catch (e) { }
     pintarRankings();
   });
   // FILTRO DE CANDIDATOS REALES.
@@ -3392,7 +3621,7 @@ function pintarRankings() {
            ${S.filtrados ? `Hay ${S.filtrados} escondidos —los que arrancaron menos de dos veces, y los que el Gran DT da por «Habilitado» o «Lesionado» y hace cinco fechas que no juegan 20 minutos—: marcá «ver también los suplentes».` : ''}`}</td></tr>`;
   } else
   body.innerHTML = lista.slice(0, 120).map((x, i) =>
-    `<tr class="${(S.puestoDe[x.id] || 99) <= 10 ? 'fila-top' : ''}" style="cursor:pointer;" onclick="auditar('${x.id}')">` +
+    `<tr class="${(S.puestoDe[x.id] || 99) <= 10 ? 'fila-top' : ''}${enMi11(x.id) ? ' fila-mia' : ''}" style="cursor:pointer;" onclick="auditar('${x.id}')">` +
     cols.map(c => `<td class="cl-${c[1] || 'num'}${c[1] === 'n' || c[1] === 'perf' ? '' : ' text-center'}">${celda(x, c[1], i)}</td>`).join('') +
     '</tr>').join('')
     // EL CORTE SE DICE. Se muestran 120 y habia 161: los 41 que faltaban
@@ -3638,7 +3867,7 @@ window.auditar = function (id) {
       <div>
         <div class="ficha-nombre">${esc(nombreCorto(x.n))}</div>
         <div class="ficha-sub">${esc(NOM(x.eq))} · ${x.cond === 'L' ? 'Local' : 'Visitante'} vs ${esc(NOM(x.riv))} · ${plata(x.pr)}</div>
-        <div class="ficha-pills">${pintarAvisos(x)}${pillCond(x)}${x.pen > 0 ? `<span class="pill-alerta pill-penal">⚫ PENALES ${x.pen}</span>` : ''}</div>
+        <div class="ficha-pills">${pintarAvisos(x)}${pillCond(x)}${x.pen > 0 ? `<span class="pill-alerta pill-cuad pill-penal" title="${esc('Patea los penales: ' + x.pen + ' penal' + (x.pen > 1 ? 'es' : '') + ' en el torneo, ' + x.penC + ' convertido' + (x.penC === 1 ? '' : 's') + (x.penE ? ', ' + x.penE + ' errado' + (x.penE === 1 ? '' : 's') : '') + '. Un penal convertido paga 3 fijos (5 de visitante) y no depende del juego.')}">⚽ ${x.pen}</span>` : ''}</div>
       </div>
       <div class="ficha-puntos">
         <div class="ficha-ep">${n2(x.epsj)}</div>
@@ -5069,9 +5298,15 @@ window.miCopiarDelMotor = function () {
 };
 window.miVaciar = function () {
   S.mi11 = []; S.miCap = null;
+  // EL BANCO TAMBIEN (18/09). "Vaciar" limpiaba los once titulares y dejaba los
+  // cuatro suplentes puestos, asi que el equipo quedaba en un estado que no es
+  // ni vacio ni armado: cuatro tipos sueltos en la cancha sin nadie adelante.
+  const t = equipoMio();
+  if (t) t.banco = {};
   // vaciar tiene que dejarlo COMO NUEVO: si no se toca la formacion, un once
   // que quedo con quince huecos sigue con quince huecos despues de vaciarlo.
   S.miEsq = esquemaValido(S.miEsq);
+  guardarLiga();
   repintarVersus();
 };
 // Abre el mismo pegador que usan los equipos del torneo, apuntado al tuyo. El
@@ -6710,7 +6945,7 @@ function pillCorners(x) {
   if (x.pos === 'ARQ') return '';   // la chance del corner es cabecear: el arquero no
   const c = cornersFecha().porEquipo[claveEquipo(x.eq)];
   if (!c) return '';
-  return `<span class="pill-alerta pill-corner" title="${esc(cornersAyuda(c))}">🚩 CÓRNERS +${n1(c.vent)}</span>`;
+  return `<span class="pill-alerta pill-cuad pill-corner" title="${esc('Córners de más para su equipo en este partido: +' + n1(c.vent) + '. ' + cornersAyuda(c))}">🚩 +${n1(c.vent)}</span>`;
 }
 
 // El cartelito de la tarjeta del fixture.

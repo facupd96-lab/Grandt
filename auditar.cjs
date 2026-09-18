@@ -387,7 +387,15 @@ if(Array.isArray(OUT.partidos) && Array.isArray(OUT.fixtureCompleto)){
 if(CU && Array.isArray(CU.cuotas) && CU.generado){
   const gen=Date.parse(CU.generado);
   const tarde=CU.cuotas.filter(c=>{ const t=Date.parse(c.cuando); return isFinite(t)&&isFinite(gen)&&t<gen; });
-  const margenRaro=CU.cuotas.filter(c=>typeof c.margenCasa==='number' && c.margenCasa<0);
+  // MARGEN NEGATIVO, PERO CON TOLERANCIA (18/09).
+  // El control disparaba con cualquier valor bajo cero y saltaba por un -0.003,
+  // o sea tres decimas por MIL. Eso no es una cuota en vivo: es el redondeo de
+  // promediar varias casas. El caso real que este control tiene que agarrar fue
+  // Huracan-Racing con -0.46, o sea ciento cincuenta veces mas grande. Con el
+  // umbral pegado a cero, el aviso se vuelve ruido y uno deja de leerlo, que es
+  // la peor forma de perder un control.
+  const TOLERANCIA_MARGEN = -0.01;   // -1%: por debajo de eso ya no es redondeo
+  const margenRaro=CU.cuotas.filter(c=>typeof c.margenCasa==='number' && c.margenCasa<TOLERANCIA_MARGEN);
   if(tarde.length){
     P_(tarde.length+' partido(s) tienen la cuota bajada DESPUES de que empezaron, asi que son cuotas EN VIVO, '+
       'no un pronostico: '+tarde.slice(0,4).map(c=>c.local+'-'+c.visitante+' ('+
@@ -396,7 +404,7 @@ if(CU && Array.isArray(CU.cuotas) && CU.generado){
       'Corré SYNC_CUOTAS.bat ANTES de que arranque la fecha.');
   } else OK('ninguna cuota se bajo con el partido ya empezado');
   if(margenRaro.length){
-    A_(margenRaro.length+' partido(s) con margen de casa negativo ('+
+    A_(margenRaro.length+' partido(s) con margen de casa netamente negativo ('+
       margenRaro.slice(0,3).map(c=>c.local+'-'+c.visitante+' '+c.margenCasa).join(' · ')+
       '). Eso no existe en un mercado previo: casi seguro se mezclaron cuotas en vivo con cuotas viejas.');
   }

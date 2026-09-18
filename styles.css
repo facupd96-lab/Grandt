@@ -1477,6 +1477,20 @@ tr.tb-jugado:hover { opacity: 1; }
     font-size: 0.62rem; font-weight: 800; letter-spacing: 0.04em;
     line-height: 1.5; white-space: nowrap;
 }
+/* CUADRADITOS (18/09). Abajo de cada nombre habia hasta seis etiquetas con la
+   palabra entera —"1º DE VISITANTE", "CÓRNERS +1.5", "PENALES 3", "COPA en 4
+   días"— y se comian dos renglones por jugador. Lo que cambia la decision
+   (HABILITADO, POSIBLE TITULAR, LESIONADO, SUSPENDIDO) sigue completo; el resto
+   queda en un cuadradito con el icono y el numero, y el texto entero pasa al
+   globito del mouse. Nada se perdio: se movio. */
+.pill-cuad, .aviso-cuad {
+    letter-spacing: 0 !important;
+    padding: 1px 5px !important;
+    font-size: 0.66rem !important;
+    cursor: help;
+    text-align: center;
+}
+.aviso-cuad { min-width: 20px; }
 .pill-copa { color: #f59e0b; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); }
 .pill-copa-rival { color: #10b981; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); }
 .pill-cansado { color: #a78bfa; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.35); }
@@ -1507,7 +1521,9 @@ tr.tb-jugado:hover { opacity: 1; }
 .min-barra i { display: block; width: 60%; border-radius: 3px 3px 0 0; }
 .min-num { font-size: 0.72rem; font-weight: 800; margin-top: 3px; }
 .min-f { font-size: 0.62rem; color: var(--text-muted); }
-.pill-penal { color: #e2e8f0; background: rgba(148,163,184,0.18); border: 1px solid rgba(148,163,184,0.45); }
+/* Antes era una bolita gris (⚫) sobre fondo gris: no se veia. Ahora la pelota
+   de futbol, que el sistema pinta sola, y el numero de penales al lado. */
+.pill-penal { color: #f1f5f9; background: rgba(148,163,184,0.22); border: 1px solid rgba(148,163,184,0.6); }
 
 /* Transferido: la planilla de Gran DT ya lo pasó al club nuevo pero los
    minutos y el xG son del club anterior. Violeta, para que no se confunda
@@ -1692,6 +1708,82 @@ tr.tb-jugado:hover { opacity: 1; }
 .orden-lbl { font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.03em; }
 /* Ritmo por 90 calculado sobre pocos minutos: se muestra, pero apagado. */
 .ritmo-flojo { color: var(--text-muted); border-bottom: 1px dotted var(--border-light); cursor: help; }
+/* El ritmo por 90 debajo del promedio por partido. Son dos preguntas distintas
+   —cuanto hace cada domingo y a que ritmo juega cuando esta en la cancha— y
+   cada una miente sola: la primera castiga al que volvio de una lesion, la
+   segunda infla al suplente que entro diez minutos y pateo una vez. Juntas no. */
+.x90 {
+    display: block; font-style: normal; font-weight: 600;
+    font-size: 0.58rem; color: var(--text-muted); line-height: 1.2; margin-top: 1px;
+}
+/* El selector del titulo: que numero de Tiros / xG es el grande. Va debajo del
+   nombre de la columna, en chico, y NO ordena — ordena el nombre de arriba. */
+.col-modo {
+    display: block; font-style: normal; font-weight: 700;
+    font-size: 0.52rem; letter-spacing: 0.02em; text-transform: none;
+    color: var(--text-muted); line-height: 1.3; margin-top: 2px;
+    border-bottom: 1px dotted var(--border-light); cursor: pointer;
+}
+.col-modo:hover { color: var(--primary); border-bottom-color: var(--primary); }
+
+/* ═══ ARMAR EL EQUIPO DESDE LA LISTA ════════════════════════════════════════
+   Como en el Gran DT oficial: la lista de jugadores a la vista y el equipo
+   armandose al lado. Antes habia que ir a la cancha, abrir un hueco y buscar
+   adentro de un selector — o sea, salir de la pantalla donde estan todos los
+   numeros para elegir por nombre. */
+.m11-barra {
+    flex: 1 1 100%; display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+    padding: 7px 10px; margin: 0 0 8px; border-radius: 10px;
+    background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.22);
+}
+.m11-tit {
+    font-size: 0.64rem; font-weight: 900; letter-spacing: 0.1em;
+    color: #38bdf8; cursor: help;
+}
+.m11-p {
+    font-size: 0.66rem; font-weight: 700; color: var(--text-muted);
+    background: rgba(148,163,184,0.12); border: 1px solid rgba(148,163,184,0.28);
+    border-radius: 6px; padding: 2px 7px; cursor: help; white-space: nowrap;
+}
+.m11-p b { color: var(--text-main); font-weight: 800; }
+.m11-p-full { color: #34d399; background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.4); }
+.m11-p-full b { color: #34d399; }
+.m11-p-aca { box-shadow: 0 0 0 1px rgba(56,189,248,0.55); }
+.m11-sep { width: 1px; height: 18px; background: rgba(148,163,184,0.28); }
+.m11-sel {
+    font-size: 0.68rem; font-weight: 700; padding: 2px 6px; border-radius: 6px;
+    background: var(--bg-card); color: var(--text-main);
+    border: 1px solid rgba(148,163,184,0.35); cursor: pointer;
+}
+.m11-plata { font-size: 0.68rem; font-weight: 800; color: #f59e0b; cursor: help; white-space: nowrap; }
+.m11-plata-mal { color: #f87171; }
+.m11-esp { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); cursor: help; white-space: nowrap; }
+.m11-btn {
+    font-size: 0.64rem; font-weight: 700; padding: 3px 8px; border-radius: 6px;
+    background: rgba(148,163,184,0.12); color: var(--text-muted);
+    border: 1px solid rgba(148,163,184,0.3); cursor: pointer; white-space: nowrap;
+}
+.m11-btn:hover { color: var(--text-main); border-color: rgba(148,163,184,0.6); }
+.m11-aviso {
+    flex: 1 1 100%; font-size: 0.68rem; color: #38bdf8; font-weight: 600; padding-top: 2px;
+}
+/* El boton de cada fila */
+.m11-add {
+    width: 24px; height: 24px; border-radius: 7px; cursor: pointer;
+    font-size: 0.85rem; font-weight: 900; line-height: 1;
+    background: rgba(56,189,248,0.12); color: #38bdf8;
+    border: 1px solid rgba(56,189,248,0.4);
+}
+.m11-add:hover { background: rgba(56,189,248,0.26); }
+.m11-on { background: rgba(16,185,129,0.18); color: #34d399; border-color: rgba(16,185,129,0.55); }
+.m11-on:hover { background: rgba(244,63,94,0.18); color: #fb7185; border-color: rgba(244,63,94,0.5); }
+/* Lleno NO es "deshabilitado": clickearlo te dice por que no entra y como
+   arreglarlo. Un boton muerto se lee como un bug. */
+.m11-llena { background: rgba(148,163,184,0.10); color: var(--text-muted); border-color: rgba(148,163,184,0.25); }
+.m11-llena:hover { color: #f59e0b; border-color: rgba(245,158,11,0.5); }
+/* La fila de los que ya estan en tu once */
+tr.fila-mia { background: rgba(16,185,129,0.055); }
+tr.fila-mia td:first-child { box-shadow: inset 3px 0 0 #10b981; }
 
 /* Referencia al pie de la tabla de rankings. */
 .tabla-referencia {
@@ -4856,3 +4948,9 @@ th[data-k="rol"] { white-space: nowrap; }
     color: var(--text-muted); font-size: 0.78rem; line-height: 1.55;
 }
 .exp-mal b { color: var(--text-main); }
+
+/* Totales del torneo (tiros, goles, figuras, penales atajados, goles recibidos).
+   El cero va apagado: una columna llena de ceros en negro tapa los pocos
+   números que importan. */
+.tot-bueno { font-weight: 700; color: var(--text-main); }
+.tot-malo  { font-weight: 700; color: #f97316; }

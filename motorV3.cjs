@@ -778,6 +778,33 @@ function minutosCuandoJuega(p, minEst) {
   // porque tenia entradas de 15 y 22 minutos.
   // Si nunca arrancó, lo unico que hay son sus entradas desde el banco, y eso
   // SI contesta la pregunta para el: cuanto juega cuando entra.
+  // ¿SIGUE SIENDO TITULAR? (18/09)
+  // ------------------------------------------------------------------------
+  // Antes esto era `comoTitular.length >= 1`: con UN arranque en toda su
+  // historia, el motor miraba solo sus arranques y descartaba entero lo que
+  // viene haciendo. Caso real de la fecha 10: Ramiro Ruiz Rodriguez arranco en
+  // las fechas 2, 3 y 4 (89', 74', 90') y desde entonces entra del banco
+  // (11', 20', 10', 45'). El motor le daba 89 MINUTOS "si juega" y con eso se
+  // le iba el puntaje al techo: quedaba PRIMERO entre los delanteros.
+  //
+  // La pregunta correcta no es "¿alguna vez arranco?" sino "si hoy entra a la
+  // cancha, ¿como entra?". Y eso es una mezcla:
+  //
+  //     minutos si juega = P(arranca) x minutos cuando arranca
+  //                      + P(entra)   x minutos cuando entra
+  //
+  // P(arranca) sale de la MISMA muestra ponderada por recencia que ya se usa
+  // (DECAY_TITULAR), asi que un tipo que arrancaba y dejo de arrancar baja
+  // solo, y uno que acaba de ganarse el puesto sube solo. Con eso, Ruiz
+  // Rodriguez pasa de 89 minutos a los ~25 que viene jugando de verdad.
+  const pesoTit = comoTitular.reduce((a, x) => a + x.w, 0);
+  const pesoTot = jugados.reduce((a, x) => a + x.w, 0);
+  const desdeBanco = jugados.filter(x => !comoTitular.includes(x));
+  // Se encoge hacia "no arranca" con poca muestra: un solo arranque viejo no
+  // alcanza para declararlo titular.
+  const K_TIT = 1.5;
+  const pArranca = pesoTot > 0 ? pesoTit / (pesoTot + K_TIT) : 0;
+
   const esTitular = comoTitular.length >= 1;
   let usar = esTitular ? comoTitular : jugados;
   if (usar.length === 0) return minutosSiJuega(minEst);
@@ -791,17 +818,28 @@ function minutosCuandoJuega(p, minEst) {
     if (enteros.length) usar = enteros;
   }
 
-  if (usar.length === 1) return clamp(usar[0].m, 20, 90);
-  // CON DOS, EL PROMEDIO. La mediana ponderada de dos valores es el ultimo, y
-  // el ultimo es el peor predictor que hay (medido). Ver la tabla de arriba.
-  if (usar.length === 2) return clamp(Math.round((usar[0].m + usar[1].m) / 2), 20, 90);
-  // CON TRES O MAS, LA MEDIANA PONDERADA: aguanta un partido suelto raro sin
-  // mover el numero, y le gana al promedio con margen.
-  const orden = usar.slice().sort((a, b) => a.m - b.m);
-  const total = orden.reduce((s, x) => s + x.w, 0);
-  let acum = 0, mediana = orden[orden.length - 1].m;
-  for (const x of orden) { acum += x.w; if (acum >= total / 2) { mediana = x.m; break; } }
-  return clamp(mediana, 20, 90);
+  // El numero de una muestra: mediana ponderada con 3 o mas, promedio con 2.
+  const resumen = (arr) => {
+    if (!arr.length) return null;
+    if (arr.length === 1) return arr[0].m;
+    if (arr.length === 2) return Math.round((arr[0].m + arr[1].m) / 2);
+    const orden = arr.slice().sort((a, b) => a.m - b.m);
+    const total = orden.reduce((s, x) => s + x.w, 0);
+    let acum = 0, med = orden[orden.length - 1].m;
+    for (const x of orden) { acum += x.w; if (acum >= total / 2) { med = x.m; break; } }
+    return med;
+  };
+
+  const mTit = resumen(usar);                 // cuanto juega CUANDO ARRANCA
+  const mBanco = resumen(desdeBanco);         // cuanto juega CUANDO ENTRA
+
+  // Si nunca arranco, o si no tiene entradas desde el banco, no hay mezcla que
+  // hacer: la unica muestra que hay es la que contesta la pregunta.
+  if (!esTitular || mBanco == null) return clamp(mTit != null ? mTit : minutosSiJuega(minEst), 20, 90);
+  if (mTit == null) return clamp(mBanco, 20, 90);
+
+  const mezcla = pArranca * mTit + (1 - pArranca) * mBanco;
+  return clamp(Math.round(mezcla), 20, 90);
 }
 
 // EL PERFIL DE MINUTOS (03/09).
@@ -1008,8 +1046,67 @@ function evaluar(p, ctx, eq) {
   //                             ficha, que es justo lo que tiene que pasar.
   // Sigue yendo a la MITAD por lado, porque la ficha promedio ya mezcla
   // partidos de local y de visitante.
-  const AJUSTE_CONDICION = { ARQ: 0.13, DEF: 0.00, VOL: 0.32, DEL: 0.13 }[pos] ?? 0.13;
+  // OJO (18/09): este ajuste por condicion se MIDIO BIEN pero medía, en
+  // realidad, otra cosa. El gap de ficha local/visitante existe porque el local
+  // GANA MAS, y eso ahora lo captura el ajuste por diferencia de gol de abajo,
+  // que ademas sabe CUANTO favorito es cada uno. Controlando por la diferencia
+  // de gol, de la localia queda un residuo de +0.033 en toda la liga (contra el
+  // +0.32 que este ajuste le daba a un volante). Asi que se deja solo el
+  // residuo, partido a la mitad por lado, y el trabajo lo hace el de abajo.
+  const AJUSTE_CONDICION = 0.017;
   f.ficha = round2(clamp(f.ficha + (ctx.esLocal ? AJUSTE_CONDICION : -AJUSTE_CONDICION), 1, 10));
+
+  // LA FICHA SUBE SI TU EQUIPO GANA (18/09, medido).
+  // ------------------------------------------------------------------------
+  // Lo que mas explica la nota de Clarin de un partido no es como viene el
+  // jugador: es el resultado. Medido sobre 9.045 partidos-jugador de 20+
+  // minutos, la diferencia de gol correlaciona 0.370 con la nota, contra 0.172
+  // del promedio historico del propio jugador. Ganando promedia 6.99 y
+  // perdiendo 6.49.
+  //
+  // El coeficiente sale de una regresion con EFECTOS FIJOS POR JUGADOR (a cada
+  // uno se le resta su propia media, que es exactamente la forma en que se
+  // aplica: f.ficha es su media y esto es el ajuste), controlando por localia
+  // para no contar dos veces lo de arriba. n=8.648, 683 jugadores:
+  //
+  //     gana   +0.481 ± 0.030      empata  +0.281 ± 0.030     (base: pierde)
+  //     local  +0.039  -> chico, y el motor ya lo ajusta por separado
+  //
+  // Centrado con el reparto tipico de la liga (38% G / 26% E / 36% P) para no
+  // correrle la media a nadie, queda +0.225 / +0.025 / -0.256.
+  //
+  // ESTO YA EXISTIA PERO ESTABA MAL DE DOS FORMAS (las dos corregidas aca):
+  //   1. Los coeficientes eran +0.824 / +0.128 / -0.569, un rango de 1.393
+  //      contra el 0.481 medido: 2.9 veces de mas. A un jugador de un equipo
+  //      favorito le regalaba ~0.25 de ficha donde los datos bancan ~0.04.
+  //   2. Solo se usaba para ELEGIR CAPITAN (fichaCapitan). Los puntos esperados
+  //      de los otros diez salian de la ficha historica sin mirar el partido,
+  //      siendo que la ficha es el grueso del puntaje.
+  // MEJORADO EL MISMO DIA: NO ES GANAR, ES POR CUANTO (18/09).
+  // La primera version usaba ganar/empatar/perder. Pero no es lo mismo ser
+  // favorito por poco que por mucho, y con tres categorias los dos cobraban
+  // parecido. Medido sobre los mismos 8.648 partidos-jugador, el desvio de la
+  // nota respecto del propio promedio sale asi:
+  //
+  //     dif de gol   -4     -3     -2     -1      0     +1     +2     +3     +4
+  //     desvio     -0.68  -0.45  -0.32  -0.15  +0.03  +0.16  +0.29  +0.39  +0.43
+  //
+  // Es una recta con una leve saturacion en los extremos: +0.170 de nota por
+  // cada gol de diferencia. Y en regresion con efectos fijos le gana al modelo
+  // de tres categorias por 18% de R2 (0.138 vs 0.117) usando UN solo parametro.
+  //
+  // La entrada es la diferencia de gol ESPERADA del partido, que sale de las
+  // cuotas y ya la calcula el motor. Eso la hace proporcional de verdad: en la
+  // fecha 10, Belgrano (espera ganar por 1.09) cobra +0.185 y Union (por 0.24)
+  // cobra +0.041. Con el modelo viejo los dos cobraban casi lo mismo.
+  //
+  // Se capa en ±3 porque mas alla de ahi la recta se aplana y ademas son cuatro
+  // partidos por torneo: extrapolar una goleada de 5 seria inventar.
+  const AJ_POR_GOL = 0.170, TOPE_DIF = 3;
+  {
+    const dif = clamp(num(lam.lamFor) - num(lam.lamAgainst), -TOPE_DIF, TOPE_DIF);
+    f.ficha = round2(clamp(f.ficha + dif * AJ_POR_GOL, 1, 10));
+  }
   const share = shares[key(p)]?.share ?? PRIOR_SHARE[pos];
   const amen = shares[key(p)]?.amenaza || {};
 
@@ -1222,8 +1319,10 @@ function evaluar(p, ctx, eq) {
     // OJO CON LA MUESTRA: son 93 jugador-fecha. El efecto es claro y el signo no
     // esta en discusion, pero el tamano del coeficiente conviene revisarlo con
     // mas fechas encima.
-    fichaCapitan: round2(f.ficha + lam.pWin * 0.824 + lam.pDraw * 0.128
-                                 + Math.max(0, 1 - lam.pWin - lam.pDraw) * (-0.569)),
+    // El ajuste por resultado ya esta adentro de f.ficha (ver arriba), asi que
+    // la ficha esperada en este partido ES f.ficha. Se sigue publicando con
+    // este nombre porque la app y mejorEsquema eligen el capitan con el.
+    fichaCapitan: round2(f.ficha),
     pVI: lam.pVI, lamGol: round3(lamJug + lamPen), lamJugada: round3(lamJug),
     lamGolBruto: round3(lamGol), pFigura: round3(pFig),
     lamPen: round3(lamPen),
