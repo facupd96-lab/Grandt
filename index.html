@@ -4965,8 +4965,12 @@ th[data-k="rol"] { white-space: nowrap; }
 .tot-bueno { font-weight: 700; color: var(--text-main); }
 .tot-malo  { font-weight: 700; color: #f97316; }
 
+/* "devolvelos a todos": destilda de una todos los que escondiste con la ✕.
+   Va al lado de los nombres, que ya son destildables uno por uno. */
+.pie-link-fuerte { color: #38bdf8 !important; font-weight: 800; }
+
 </style>
-    <meta name="gdt-build" content="8142cf0c79b7 | 2026-09-17 22:57">
+    <meta name="gdt-build" content="75d9c81426b3 | 2026-09-18 16:21">
 </head>
 <body>
     <!-- UNA SOLA BARRA.
@@ -5961,35 +5965,40 @@ const CLAVE_FUERA = () => 'gdt_fuera_f' + ((typeof D !== 'undefined' && D && D.f
 // Planeta: cambia cada vez que Planeta publica una planilla nueva. O sea que un
 // tilde puesto el viernes podia terminar escondiendo a OTRO jugador el domingo,
 // sin que nadie se enterara. Se guardan por nombre+club+puesto, como la liga.
+// LA ✕ NO CRUZA DE FECHA (18/09). ESTO ESTUVO MAL UN DIA Y HAY QUE DEJARLO
+// ESCRITO. El 17/09 le puse arrastre: si no habia lista para la fecha de hoy,
+// se copiaba la de la fecha anterior. El motivo era real —tildabas el martes,
+// ACTUALIZAR_TODO pasaba a la fecha siguiente el viernes y perdias los tildes—
+// pero la cura era peor que la enfermedad, porque la ✕ NO QUIERE DECIR "este
+// jugador no me gusta": quiere decir "este no juega ESTA fecha". Arrastrarla es
+// esconder al que volvio.
+// Lo que paso: en la fecha 10, Ascacibar y Velasco —dos titulares de Boca que
+// juegan todas— quedaron invisibles porque venian tildados de cuando Boca tenia
+// la Sudamericana entre semana. Y encima callado: aparecian en un renglon gris
+// al pie de la tabla, no en el lugar donde uno los busca.
+// Ahora cada fecha arranca limpia. El formato lleva la fecha adentro, asi que
+// una lista de otra fecha se descarta aunque quedara escrita bajo esta clave —
+// que es justo lo que hizo el arrastre de ayer, y se limpia solo al abrir.
+// Lo que la ✕ tenia que resolver (lesionados, suspendidos) ya lo hace el
+// Ayudante de campo del juego por su cuenta: la ✕ es para lo que VOS sabes.
 function cargarFuera() {
   S.fuera = new Set();
+  const fObj = (D && D.fechaObjetivo != null) ? D.fechaObjetivo : null;
   try {
-    // LOS DESCARTES SE ARRASTRAN (17/09). Se guardaban por fecha, y el armado
-    // se hace justo cuando el motor cambia de fecha: todo lo que tildabas el
-    // martes desaparecia el viernes. Si no hay nada para la fecha de hoy, se
-    // toma la ultima que si tenga. Se reescribe bajo la fecha nueva, asi que la
-    // vieja queda como estaba.
-    let r = JSON.parse(localStorage.getItem(CLAVE_FUERA()) || 'null');
-    if (!Array.isArray(r) && D && D.fechaObjetivo != null) {
-      for (let f = D.fechaObjetivo - 1; f >= D.fechaObjetivo - 6 && f >= 1; f--) {
-        const v = JSON.parse(localStorage.getItem('gdt_fuera_f' + f) || 'null');
-        if (Array.isArray(v) && v.length) { r = v; break; }
-      }
-    }
-    if (Array.isArray(r)) {
-      r.forEach(v => {
-        // formato viejo: el id pelado. Se acepta una vez y se reescribe por clave.
-        const p = porClave(v) || TODOS[v];
-        if (p) S.fuera.add(p.id);
-      });
+    const r = JSON.parse(localStorage.getItem(CLAVE_FUERA()) || 'null');
+    // Solo el formato con sello de fecha, y solo si el sello es de ESTA fecha.
+    // Un array pelado es del formato viejo (o del arrastre del 17/09): se tira.
+    if (r && Array.isArray(r.k) && r.f === fObj) {
+      r.k.forEach(v => { const p = porClave(v) || TODOS[v]; if (p) S.fuera.add(p.id); });
     }
   } catch (e) { }   // storage bloqueado en file://: anda igual, sin memoria
-  // se reescribe ya en el formato nuevo, para que la migracion pase una sola vez
-  if (S.fuera.size) guardarFuera();
 }
 function guardarFuera() {
-  try { localStorage.setItem(CLAVE_FUERA(), JSON.stringify([...S.fuera].map(id => claveDe(id) || id))); }
-  catch (e) { }
+  const fObj = (D && D.fechaObjetivo != null) ? D.fechaObjetivo : null;
+  try {
+    localStorage.setItem(CLAVE_FUERA(), JSON.stringify(
+      { f: fObj, k: [...S.fuera].map(id => claveDe(id) || id) }));
+  } catch (e) { }
 }
 const CLAVE_CAP = () => 'gdt_capitan_f' + ((typeof D !== 'undefined' && D && D.fechaObjetivo != null) ? D.fechaObjetivo : 'x');
 function cargarCapitan() {
@@ -9551,7 +9560,9 @@ function pintarRankings() {
       if (tild.length) trozos.push(`${tild.length} ${tild.length === 1 ? 'escondido' : 'escondidos'} por tu ✕: ` +
         tild.slice(0, 8).map(x => `<button class="pie-link" onclick="event.stopPropagation();toggleFuera('${x.id}', event)"
           title="Destildarlo y devolverlo a la tabla">${esc(nombreCorto(x.n))}</button>`).join(' ') +
-        (tild.length > 8 ? ` +${tild.length - 8}` : ''));
+        (tild.length > 8 ? ` +${tild.length - 8}` : '') +
+        ` <button class="pie-link pie-link-fuerte" onclick="event.stopPropagation();limpiarFuera()"
+            title="Destildar a todos de una y devolverlos a la tabla">devolvelos a todos</button>`);
       if (baj.length) trozos.push(`${baj.length} que el juego marca como baja: ` +
         baj.slice(0, 8).map(x => esc(nombreCorto(x.n))).join(' · ') + (baj.length > 8 ? ` +${baj.length - 8}` : ''));
       body.insertAdjacentHTML('beforeend',

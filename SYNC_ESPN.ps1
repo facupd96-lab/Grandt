@@ -49,8 +49,15 @@ $encabezados = @{
   'Sec-Fetch-Site'  = 'same-site'
   'Sec-Fetch-Mode'  = 'cors'
   'Sec-Fetch-Dest'  = 'empty'
-  'Connection'      = 'keep-alive'
 }
+# NO PONER 'Connection' ACA (18/09). Windows PowerShell 5.1 lo rechaza porque es
+# un encabezado restringido del framework, y revienta ANTES de salir a la red:
+#   "Keep-Alive y Close no se pueden establecer con esta propiedad."
+# O sea que el modo 1 -el unico que manda encabezados de navegador, el unico que
+# ESPN acepta- nunca llego a ejecutarse. El script probaba los tres modos, los
+# tres fallaban y parecia que ESPN nos habia bloqueado, cuando en realidad el
+# bueno fallaba por un error nuestro de una linea. Lo mismo vale para Host,
+# Content-Length, Date, Accept-Encoding y User-Agent en algunas versiones.
 
 # DIAGNOSTICO (06/09). La primera version se comia los errores con un catch
 # mudo y el resultado fue "58 semanas revisadas, 0 partidos" sin ninguna pista
@@ -73,12 +80,23 @@ function Pedir-Modo([string]$direccion, [int]$modo) {
   } else {
     $exe = Join-Path $env:SystemRoot 'System32\curl.exe'
     if (-not (Test-Path $exe)) { throw 'curl.exe no esta en este Windows' }
-    $txt = & $exe -s -L --compressed --max-time 25 `
+    # SIN --compressed (18/09). Devolvia el cuerpo comprimido sin descomprimir y
+    # ConvertFrom-Json moria con "Primitivo JSON no valido: .", que no dice nada
+    # de lo que pasa. Se pide sin comprimir y, si igual no es JSON, se muestra el
+    # principio de la respuesta: casi siempre es una pagina de bloqueo en HTML.
+    $txt = & $exe -s -L --max-time 25 `
              -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' `
              -H 'Accept: application/json, text/plain, */*' `
+             -H 'Accept-Language: es-AR,es;q=0.9,en;q=0.8' `
+             -H 'Accept-Encoding: identity' `
              -H 'Referer: https://www.espn.com.ar/' `
+             -H 'Origin: https://www.espn.com.ar' `
              $direccion 2>$null
+    if ($txt -is [array]) { $txt = ($txt -join '') }
     if (-not $txt) { throw 'curl.exe no devolvio nada' }
+    if ($txt.TrimStart()[0] -ne '{') {
+      throw ('curl.exe no devolvio JSON, empieza con: ' + $txt.Substring(0, [Math]::Min(160, $txt.Length)))
+    }
     return ($txt | ConvertFrom-Json)
   }
 }
@@ -132,9 +150,16 @@ Write-Host ""
 Write-Host "   probando la conexion con ESPN..."
 $prueba = Obtener-Json ($baseScore + '?limit=50')
 if ($null -eq $prueba) {
-  Write-Host "   No pude conectarme a ESPN. Copiame el error de arriba y lo arreglo." -ForegroundColor Red
-  Write-Host "   (probalo tambien pegando esta URL en el navegador:)" -ForegroundColor Yellow
-  Write-Host ("   " + $baseScore + "?limit=50") -ForegroundColor Yellow
+  Write-Host "   No pude conectarme a ESPN desde PowerShell." -ForegroundColor Red
+  Write-Host ""
+  Write-Host "   SALIDA POR EL NAVEGADOR (siempre funciona):" -ForegroundColor Cyan
+  Write-Host "     1. abri BAJAR_ESPN.html (doble clic) y aprieta Empezar" -ForegroundColor Yellow
+  Write-Host "     2. te descarga dataEspn.json: movelo a esta carpeta, pisando el viejo" -ForegroundColor Yellow
+  Write-Host "     3. corre RECALCULAR.bat" -ForegroundColor Yellow
+  Write-Host ""
+  Write-Host "   ESPN le contesta 403 a PowerShell pero al navegador lo deja entrar:" -ForegroundColor DarkGray
+  Write-Host "   la pagina pide exactamente lo mismo, desde una pestana de Chrome." -ForegroundColor DarkGray
+  Write-Host ("   La URL, por si la queres mirar a mano: " + $baseScore + "?limit=50") -ForegroundColor DarkGray
   exit
 }
 $cuantos = 0

@@ -4954,3 +4954,7 @@ th[data-k="rol"] { white-space: nowrap; }
    números que importan. */
 .tot-bueno { font-weight: 700; color: var(--text-main); }
 .tot-malo  { font-weight: 700; color: #f97316; }
+
+/* "devolvelos a todos": destilda de una todos los que escondiste con la ✕.
+   Va al lado de los nombres, que ya son destildables uno por uno. */
+.pie-link-fuerte { color: #38bdf8 !important; font-weight: 800; }

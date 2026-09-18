@@ -110,27 +110,40 @@ let d7=0; T.forEach(x=>{ if(!x.lam||!x.minSiJuega) return;
   if(!cerca(bruto,(x.share||0)*x.lam.lamFor*(x.minSiJuega/90),0.02)) d7++; });
 d7? P.push(d7+' jugadores donde el gol no escala con los minutos') : OK.push('el gol escala con los minutos que juega; la ficha y la valla no (piden 20 minutos, no 90)');
 
-// 8. los minutos "si juega" salen de partidos donde ARRANCO.
+// 8. los minutos "si juega" tienen que caer dentro de lo que el tipo JUGO.
 // Ya NO se exige que el numero sea uno de sus arranques exacto: con dos
 // arranques el motor usa el PROMEDIO de los dos, que casi nunca coincide con
-// ninguno (medido: 9.06 de error contra 10.07 de la mediana ponderada). Lo que
-// si tiene que valer es que el numero caiga DENTRO de lo que jugo, sin contar
-// los arranques cortados por lesion o roja, y con el piso de 20 y el techo 90.
+// ninguno (medido: 9.06 de error contra 10.07 de la mediana ponderada).
+//
+// LOS PARTIDOS DE SUPLENTE TAMBIEN CUENTAN (18/09).
+// Este control miraba SOLO los arranques y por eso marcaba 143 jugadores sanos.
+// Desde el 18/09 el motor ya no decide "arranco alguna vez -> es titular": pesa
+// cuanto arranca ULTIMAMENTE y mezcla los dos regimenes. Misael Aguirre arranco
+// las fechas 1 a 4 (90, 58, 79, 60) y hace cinco que entra desde el banco (13,
+// 20, 21, 23): sus 32 minutos son correctos, y contra el rango de los arranques
+// daban "fuera". El que estaba viejo era el control, no el motor — el bug que
+// arregla ese cambio es el de Ruiz Rodriguez, que con TRES arranques de hace
+// seis fechas figuraba primero entre los delanteros con 89 minutos.
+// El rango valido es el de TODO lo que jugo, arrancando o entrando, con el piso
+// de 20 y el techo de 90. Sigue cazando lo que tiene que cazar: un numero
+// inventado que no sale de ningun partido suyo.
 const ej8=[];
 let d8=0,d8b=0; T.forEach(x=>{ const q=x.perfilMin; if(!q) return;
   if(q.arranques>=1){
     const cortados=q.cortados||[];
     let base=q.todos.filter(m=>!cortados.includes(m));
     if(!base.length) base=q.todos;
+    base=base.concat(q.entrando||[]);
     const lo=Math.max(20,Math.min(...base)), hi=Math.min(90,Math.max(...base));
     if(x.minSiJuega < lo-0.5 || x.minSiJuega > hi+0.5){
-      d8++; if(ej8.length<3) ej8.push(x.nombre+' '+x.minSiJuega+"' con arranques de "+q.todos.join(', '));
+      d8++; if(ej8.length<3) ej8.push(x.nombre+' '+x.minSiJuega+"' con arranques de "+q.todos.join(', ')+
+        ((q.entrando||[]).length? ' y entrando '+q.entrando.join(', ') : ''));
     }
   }
   // "nunca arranco" incluye al que directamente no tiene log de minutos: ahi
   // los minutos salen del estimado de Planeta, que es lo unico que hay.
   if(q.arranques===0 && q.todos.length>0 && x.minSiJuega>60) d8b++; });
-d8? P.push(d8+' jugadores cuyos minutos "si juega" caen fuera de lo que jugo: '+ej8.join(', ')) : OK.push('los minutos "si juega" caen siempre dentro de lo que jugo de titular');
+d8? P.push(d8+' jugadores cuyos minutos "si juega" caen fuera de lo que jugo: '+ej8.join(', ')) : OK.push('los minutos "si juega" caen siempre dentro de lo que jugo, arrancando o entrando');
 d8b? A.push(d8b+' jugadores que nunca arrancaron y sin embargo se les estiman mas de 60 minutos') : OK.push('a los que nunca arrancaron no se les inventan minutos de titular');
 
 // 9. coherencia del ranking: el puntaje ordena igual que la suma de sus partes

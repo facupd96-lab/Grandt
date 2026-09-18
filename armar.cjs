@@ -1499,8 +1499,45 @@ out.equiposCond = null;
 try {
   const rawEspn = fs.readFileSync('dataEspn.json','utf8').replace(/^﻿/,'');
   const ESPN = JSON.parse(rawEspn);
-  const filas = (ESPN.filas||[]).filter(f=>f.terminado);
+  let filas = (ESPN.filas||[]).filter(f=>f.terminado);
   if (!filas.length) throw new Error('dataEspn.json no tiene partidos terminados');
+
+  // ── CORTE EN LA FECHA QUE SE VIENE (18/09) ────────────────────────────────
+  // ESPN publica el partido apenas termina, antes que la planilla de Planeta.
+  // Si la fecha objetivo ya arranco, sus resultados entrarian a la tabla de
+  // local/visitante y no al resto de la app: la pantalla Datos contaria un
+  // partido que para el motor todavia no existe. Se cortan.
+  // Este corte es lo que hace SEGURO correr SYNC_ESPN dentro de ACTUALIZAR_TODO,
+  // que es donde tiene que estar: hasta hoy ESPN solo se bajaba en
+  // CERRAR_FECHA, y como CERRAR_FECHA no se corre todas las semanas,
+  // dataEspn.json se quedo DOCE DIAS viejo sin que nadie se enterara. Resultado:
+  // Atletico Tucuman figuraba con 4 partidos de local cuando llevaba 5, y el
+  // 1-2 con River de la fecha 9 no estaba en ningun lado de la pantalla Datos.
+  {
+    const arranque = (out.partidos||[]).map(m=>m.cuando).filter(Boolean).sort()[0];
+    if (arranque) {
+      const antes = filas.length;
+      filas = filas.filter(f => !f.cuando || f.cuando < arranque);
+      if (antes !== filas.length) console.log('  ESPN — se descartan '+(antes-filas.length)+
+        ' filas de partidos de la fecha '+out.fechaObjetivo+', que todavia no esta en la planilla.');
+    }
+  }
+  if (!filas.length) throw new Error('dataEspn.json no tiene partidos anteriores a esta fecha');
+
+  // ── ¿ESTA AL DIA? (18/09) ─────────────────────────────────────────────────
+  // Se compara contra el fixture, que si se actualiza todas las semanas. Si
+  // ESPN viene atrasado, TODA la tabla de local/visitante —puntos, goles,
+  // tiros, corners, posesion— esta atrasada con el, y eso no se nota mirandola.
+  {
+    const ultEspn = filas.map(f=>f.cuando).filter(Boolean).sort().slice(-1)[0] || '';
+    const jugados = (out.fixtureCompleto||[]).filter(m=>m.terminado && m.fecha);
+    const ultFix = jugados.map(m=>m.fecha).sort().slice(-1)[0] || '';
+    const dias = (ultEspn && ultFix)
+      ? Math.round((new Date(ultFix) - new Date(ultEspn)) / 86400000) : 0;
+    if (dias >= 4) console.log('  OJO ESPN — dataEspn.json llega hasta el '+ultEspn.slice(0,10)+
+      ' y el fixture tiene partidos hasta el '+ultFix.slice(0,10)+' ('+dias+' dias de atraso). '+
+      'La tabla de local y visitante de la pantalla Datos esta atrasada lo mismo. Corre SYNC_ESPN.bat.');
+  }
 
   // --- cruce de nombres: los 30 clubes de ESPN contra los nuestros ---
   const nuestros = {}; out.tabla.forEach(t=>{ nuestros[CT(t.equipo)] = t.equipo; });

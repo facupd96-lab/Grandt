@@ -97,8 +97,18 @@ Write-Host ("   {0}" -f $arranque.ToString('dddd dd/MM/yyyy HH:mm'))
 $pasos = @(
   @{ archivo = 'SYNC_PLANETA.ps1'; que = 'planilla oficial: puntos, cotizaciones, goles, tarjetas' },
   @{ archivo = 'SYNC_365.ps1';     que = 'tiros, xG y minutos por jugador, mas tarjetas con fecha' },
+  @{ archivo = 'SYNC_ROLES.ps1';   que = 'el puesto real de cada jugador (central, lateral, enganche...)' },
   @{ archivo = 'SYNC_CUOTAS.ps1';  que = 'cuotas 1X2 y Over/Under de la proxima fecha' },
   @{ archivo = 'SYNC_COPAS.ps1';   que = 'calendario de liga y copas, fixture y rotacion' },
+  # ESPN ENTRA ACA (18/09). Antes solo se bajaba en CERRAR_FECHA, para que no
+  # metiera resultados de la fecha en curso que la planilla todavia no tiene.
+  # El problema es que CERRAR_FECHA no se corre todas las semanas: dataEspn.json
+  # se quedo DOCE DIAS viejo y con el toda la tabla de local y visitante de la
+  # pantalla Datos. Atletico Tucuman figuraba con 4 partidos de local llevando 5
+  # -faltaba el 1-2 con River de la fecha 9- y nada avisaba.
+  # Ahora se baja siempre, y el corte lo hace armar.cjs: descarta las filas de
+  # partidos de la fecha objetivo, que son justo las que no hay que contar.
+  @{ archivo = 'SYNC_ESPN.ps1';    que = 'corners, posesion y tiros por equipo, de local y de visitante' },
   # El ayudante de campo va ULTIMO a proposito: es el que mas cambia (los
   # lesionados y las formaciones se mueven hasta una hora antes del partido),
   # asi que conviene que sea el dato mas fresco cuando corre el motor. Ademas

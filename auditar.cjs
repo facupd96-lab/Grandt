@@ -441,6 +441,36 @@ if(S && FX && GID_CORTE!=null){
   if(parc) A_(parc+' jugadores con menos partidos en 365 que en la planilla: su ritmo por 90 sale de menos futbol del que jugaron. Van marcados.');
 }
 
+// ── ¿LA TABLA DE LOCAL Y VISITANTE ESTA AL DIA? (18/09) ─────────────────────
+// Toda la pantalla Datos —puntos, goles, tiros, corners y posesion separados
+// por condicion— sale de dataEspn.json, y ESE archivo no se bajaba en
+// ACTUALIZAR_TODO: solo en CERRAR_FECHA. Como CERRAR_FECHA no se corre todas
+// las semanas, quedo doce dias viejo y NADIE lo noto, porque una tabla
+// atrasada se ve igual de bien que una al dia. Atletico Tucuman figuraba con 4
+// partidos de local llevando 5: faltaba el 1-2 con River de la fecha 9.
+// Este control compara, equipo por equipo, los partidos que la tabla dice
+// contra los que el fixture dice que jugo. Es el control que tendria que haber
+// existido: el archivo viejo no avisa, hay que ir a buscarlo.
+if(Array.isArray(OUT.equiposCond) && Array.isArray(OUT.fixtureCompleto) && FJ!=null){
+  const jug={};
+  OUT.fixtureCompleto.filter(m=>m.numeroFecha!=null && m.numeroFecha<=FJ && m.golesLocal!=null)
+    .forEach(m=>{ jug[CT(m.local)]=(jug[CT(m.local)]||0)+1; jug[CT(m.visitante)]=(jug[CT(m.visitante)]||0)+1; });
+  const atrasados=[];
+  OUT.equiposCond.forEach(e=>{
+    if(!e.actual) return;
+    const enTabla=(e.actual.local.pj||0)+(e.actual.visitante.pj||0);
+    const reales=jug[CT(e.equipo)]||0;
+    if(reales-enTabla>=1) atrasados.push({e:e.equipo, t:enTabla, r:reales});
+  });
+  if(atrasados.length){
+    const peor=Math.max(...atrasados.map(x=>x.r-x.t));
+    P_(atrasados.length+' equipo(s) con la tabla de local/visitante ATRASADA (hasta '+peor+' partido(s) de menos): '+
+      atrasados.slice(0,5).map(x=>x.e+' '+x.t+' de '+x.r).join(' · ')+
+      '.  → dataEspn.json esta viejo: corré SYNC_ESPN.bat y despues RECALCULAR.bat. '+
+      'Afecta puntos, goles, tiros, córners y posesión por condición en la pantalla Datos.');
+  } else OK('la tabla de local y visitante tiene todos los partidos jugados de los 30 equipos');
+}
+
 // ── informe ─────────────────────────────────────────────────────────────────
 L('');
 if(problemas.length){

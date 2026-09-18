@@ -105,17 +105,20 @@ let d=0, dj=0; T.forEach(x=>{ if(x.lamGolBruto==null||!x.lam||!x.minSiJuega) ret
 d? P.push(d+' jugadores donde el gol bruto != parte del ataque x goles del equipo x minutos') : OK.push('el gol bruto de cada uno = su parte del ataque x los goles de su equipo x lo que juega');
 dj? P.push(dj+' jugadores donde el gol total no es la suma del gol de jugada y el de penal') : OK.push('el gol que muestra la tabla es la suma exacta del gol de jugada y el de penal');
 
-// 4. minutos si juega: tiene que caer dentro de lo que jugo de titular.
+// 4. minutos si juega: tiene que caer dentro de lo que el tipo JUGO.
 // Con dos arranques el motor usa el promedio de los dos, asi que exigir que
-// coincida con un partido exacto ya no aplica (03/09). Lo que se controla es
-// que no se invente un numero fuera de rango, sin contar los arranques que se
-// cortaron por lesion o roja.
+// coincida con un partido exacto ya no aplica (03/09).
+// Y desde el 18/09 tampoco alcanza con mirar los arranques: el motor mezcla los
+// partidos de titular con los de suplente segun cuanto arranca ULTIMAMENTE, asi
+// que el que perdio el puesto tiene menos minutos que su peor arranque y esta
+// bien que asi sea. El rango es el de todo lo que jugo, con piso 20 y techo 90.
 let m2=0; T.forEach(x=>{ const q=x.perfilMin; if(!q||q.arranques<2) return;
   const cort=q.cortados||[];
   let base=q.todos.filter(m=>!cort.includes(m)); if(!base.length) base=q.todos;
+  base=base.concat(q.entrando||[]);
   const lo=Math.max(20,Math.min(...base)), hi=Math.min(90,Math.max(...base));
   if(x.minSiJuega<lo-0.5 || x.minSiJuega>hi+0.5) m2++; });
-m2? A.push(m2+' jugadores con minutos "si juega" fuera del rango de sus arranques') : OK.push('los minutos "si juega" caen siempre dentro de lo que jugo de titular');
+m2? A.push(m2+' jugadores con minutos "si juega" fuera de todo lo que jugaron') : OK.push('los minutos "si juega" caen siempre dentro de lo que jugo, arrancando o entrando');
 
 // 5. tiros y xG por 90. El motor NO divide por los minutos a secas: usa un
 // piso de 180' en el divisor para que el que entro tres veces doce minutos y
