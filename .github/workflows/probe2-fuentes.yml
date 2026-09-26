@@ -1,0 +1,93 @@
+# ============================================================================
+#  PROBE 2 — afinar lo que el probe 1 dejó abierto.
+#
+#  Lo que aprendimos en la corrida del 26/09 desde el runner (IP 52.161.75.168):
+#    · ESPN SIN encabezados .......... 200
+#    · ESPN CON encabezados de Chrome  403  <- al revés de lo que suponíamos
+#    · 365Scores ..................... 200
+#    · Planilla / Planeta ............ 200
+#    · Clarín ........................ 403  <- pero probé la URL equivocada
+#    · Cuotas ........................ 401 (correcto: falta la clave)
+#
+#  Este probe contesta dos cosas:
+#    1. ¿CUÁL de los encabezados le molesta a ESPN? (sospecha: Origin)
+#    2. Clarín: el probe 1 pidió el DIRECTORIO /ayudante/, que es normal que
+#       esté prohibido. Los sync no piden eso: piden dos archivos .gdt puntuales.
+#       Hay que probar esos.
+#  Y de paso los endpoints POR PARTIDO, que son los que más se usan y pueden
+#  tener otra política que los de listado.
+# ============================================================================
+name: probe 2 de fuentes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probar:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Afinar ESPN y Clarin
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+          QB='appTypeId=5&langId=29&timezoneName=America/Argentina/Buenos_Aires&userCountryId=11'
+          SELLO=$(date +%s)
+          SALIDA=tabla.txt
+          : > $SALIDA
+
+          probar () {
+            nombre="$1"; url="$2"; shift 2
+            res=$(curl -s -o cuerpo.bin -w '%{http_code} %{size_download}' --max-time 30 "$@" "$url" || echo "000 0")
+            code=$(echo "$res" | cut -d' ' -f1); size=$(echo "$res" | cut -d' ' -f2)
+            ini=$(head -c 46 cuerpo.bin 2>/dev/null | tr -d '\r\n' || true)
+            if [ "$code" = "200" ]; then m="OK "; else m="MAL"; fi
+            printf '%s  %-34s HTTP %-4s %9s   %s\n' "$m" "$nombre" "$code" "$size" "$ini" | tee -a $SALIDA
+          }
+
+          echo "IP del runner: $(curl -s --max-time 10 https://api.ipify.org || echo '?')" | tee -a $SALIDA
+          echo "" | tee -a $SALIDA
+          echo "--- ESPN: de a un encabezado por vez ---------------------------" | tee -a $SALIDA
+          E='https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?limit=50'
+          probar "ESPN pelado (UA de curl)"        "$E"
+          probar "ESPN + UA Chrome"                "$E" -A "$UA"
+          probar "ESPN + UA + Accept"              "$E" -A "$UA" -H 'Accept: application/json, text/plain, */*'
+          probar "ESPN + UA + Referer"             "$E" -A "$UA" -H 'Referer: https://www.espn.com.ar/'
+          probar "ESPN + UA + Origin"              "$E" -A "$UA" -H 'Origin: https://www.espn.com.ar'
+          probar "ESPN + UA + Referer + Origin"    "$E" -A "$UA" -H 'Referer: https://www.espn.com.ar/' -H 'Origin: https://www.espn.com.ar'
+
+          echo "" | tee -a $SALIDA
+          echo "--- ESPN: el endpoint por partido (el que mas se usa) ----------" | tee -a $SALIDA
+          EV=$(curl -s --max-time 25 "$E" | grep -o '"id":"[0-9]\{6,\}"' | head -1 | grep -o '[0-9]\{6,\}' || true)
+          echo "    (evento de prueba: ${EV:-no encontrado})" | tee -a $SALIDA
+          if [ -n "$EV" ]; then
+            probar "ESPN summary pelado" "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/summary?event=$EV"
+          fi
+
+          echo "" | tee -a $SALIDA
+          echo "--- CLARIN: los archivos DE VERDAD, no el directorio ------------" | tee -a $SALIDA
+          C='https://www.grandt.clarin.com/ayudante/'
+          probar "Clarin directorio (referencia)"  "$C" -A "$UA"
+          probar "Clarin estatico + UA"            "${C}tmpCentralRefuerzosEstatico.gdt?v=$SELLO" -A "$UA"
+          probar "Clarin estatico pelado"          "${C}tmpCentralRefuerzosEstatico.gdt?v=$SELLO"
+          probar "Clarin dinamico + UA"            "${C}tmpCentralRefuerzosDinamico.gdt?v=$SELLO" -A "$UA"
+          probar "Clarin dinamico pelado"          "${C}tmpCentralRefuerzosDinamico.gdt?v=$SELLO"
+          probar "Clarin dinamico + UA + Referer"  "${C}tmpCentralRefuerzosDinamico.gdt?v=$SELLO" -A "$UA" -H "Referer: $C"
+
+          echo "" | tee -a $SALIDA
+          echo "--- 365Scores por partido --------------------------------------" | tee -a $SALIDA
+          GID=$(curl -s --max-time 25 -A "$UA" -H 'Referer: https://www.365scores.com/' \
+                "https://webws.365scores.com/web/games/results/?${QB}&competitions=72" \
+                | grep -o '"id":[0-9]\{7,\}' | head -1 | grep -o '[0-9]\{7,\}' || true)
+          echo "    (partido de prueba: ${GID:-no encontrado})" | tee -a $SALIDA
+          if [ -n "$GID" ]; then
+            probar "365 game + UA + Referer" "https://webws.365scores.com/web/game/?${QB}&gameId=$GID" \
+              -A "$UA" -H 'Referer: https://www.365scores.com/'
+          fi
+
+          # Que la tabla se vea en la pagina del run, sin tener que abrir el log.
+          {
+            echo '## Resultado del probe 2'
+            echo ''
+            echo '```'
+            cat $SALIDA
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
