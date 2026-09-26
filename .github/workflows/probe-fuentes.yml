@@ -1,0 +1,79 @@
+# ============================================================================
+#  PROBE DE FUENTES — ¿nos contestan desde un servidor, o solo desde tu casa?
+#
+#  Esto NO actualiza nada. Solo le toca la puerta a cada fuente desde un
+#  servidor de GitHub y dice qué contestó. Es el primer paso antes de mover
+#  los sync a la nube, porque hay una pregunta que no se puede contestar
+#  desde la PC: varias de estas APIs tratan distinto a una casa que a un
+#  datacenter. ESPN ya nos contestó 403 a PowerShell estando en tu casa.
+#
+#  Cómo correrlo: GitHub -> pestaña Actions -> "probe de fuentes" -> Run workflow.
+#  Tarda menos de un minuto. Copiame la tabla que imprime.
+# ============================================================================
+name: probe de fuentes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tocarle la puerta a cada fuente
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+          QB='appTypeId=5&langId=29&timezoneName=America/Argentina/Buenos_Aires&userCountryId=11'
+
+          probar () {
+            nombre="$1"; url="$2"; shift 2
+            res=$(curl -s -o cuerpo.bin -w '%{http_code} %{size_download}' --max-time 30 "$@" "$url" || echo "000 0")
+            code=$(echo "$res" | cut -d' ' -f1)
+            size=$(echo "$res" | cut -d' ' -f2)
+            ini=$(head -c 50 cuerpo.bin 2>/dev/null | tr -d '\r\n' || true)
+            if [ "$code" = "200" ]; then marca="OK  "; else marca="MAL "; fi
+            printf '%s %-24s HTTP %-4s %9s bytes   %s\n' "$marca" "$nombre" "$code" "$size" "$ini"
+          }
+
+          echo "================================================================"
+          echo "  ¿Qué fuentes contestan desde un servidor de GitHub?"
+          echo "  $(date -u '+%Y-%m-%d %H:%M UTC')   ·   IP: $(curl -s --max-time 10 https://api.ipify.org || echo '?')"
+          echo "================================================================"
+          echo
+
+          probar "ESPN (sin headers)" \
+            "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?limit=50"
+
+          probar "ESPN (con headers)" \
+            "https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?limit=50" \
+            -A "$UA" -H 'Accept: application/json, text/plain, */*' \
+            -H 'Referer: https://www.espn.com.ar/' -H 'Origin: https://www.espn.com.ar'
+
+          probar "365Scores (results)" \
+            "https://webws.365scores.com/web/games/results/?${QB}&competitions=72" \
+            -A "$UA" -H 'Referer: https://www.365scores.com/'
+
+          probar "Planilla (Google Sheets)" \
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vReb2FM33VbNuH5tTxL_33ZtTLMGnl8C46jQbIe-gaCXJaQ1LEclYRjnfpqOahZgqyOlalsiXqhB7J2/pub?output=csv" \
+            -A "$UA" -L
+
+          probar "Planeta Gran DT (feed)" \
+            "https://www.planetagrandt.com.ar/feeds/posts/default/-/Estad%C3%ADsticas?alt=json&max-results=3" \
+            -A "$UA"
+
+          probar "Ayudante (Clarin)" \
+            "https://www.grandt.clarin.com/ayudante/" \
+            -A "$UA"
+
+          # Sin clave contesta 401: alcanza para saber que el host nos atiende.
+          # La clave real va como secreto del repo, NUNCA escrita acá.
+          probar "Cuotas (the-odds-api)" \
+            "https://api.the-odds-api.com/v4/sports/" \
+            -A "$UA"
+
+          echo
+          echo "----------------------------------------------------------------"
+          echo "  200 = nos atiende.  403 = nos bloquea por venir de un servidor."
+          echo "  401 en las cuotas es CORRECTO: falta la clave, el host responde."
+          echo "  Cualquier 403 se resuelve, pero cambia el plan: hay que sacar"
+          echo "  esa fuente con un navegador headless en vez de con curl."
+          echo "----------------------------------------------------------------"
