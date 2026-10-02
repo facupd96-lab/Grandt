@@ -1,0 +1,84 @@
+# ============================================================================
+#  PRUEBA DE FUEGO — ¿corren los sync de verdad en un servidor Linux?
+#
+#  El probe 1 y 2 ya contestaron que las fuentes nos atienden. Falta la otra
+#  mitad: los sync están escritos en PowerShell de Windows. PowerShell 7 viene
+#  instalado en los runners de GitHub y es multiplataforma, pero "debería
+#  andar" no es lo mismo que "anda".
+#
+#  Esto corre TRES sync reales y muestra qué escribió cada uno. NO commitea
+#  nada, no toca el repo: solo prueba y cuenta.
+#
+#  Se eligieron los tres que no dependen de archivos de corridas anteriores:
+#    GRANDT  — dos llamadas, sin estado. El más simple.
+#    PLANETA — lee planilla.json (que sí está en el repo).
+#    ESPN    — se rehace entero cada vez. Prueba el arreglo de encabezados.
+#  SYNC_365 y SYNC_COPAS quedan para después: trabajan de forma incremental
+#  sobre archivos grandes que no están en el repo, y eso hay que resolverlo
+#  aparte (cache entre corridas).
+# ============================================================================
+name: prueba de sync
+
+on:
+  workflow_dispatch:
+
+jobs:
+  correr:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version de PowerShell y de node
+        shell: bash
+        run: |
+          pwsh -v || echo "SIN PWSH"
+          node -v
+          echo "archivos .ps1 que llegaron al repo:"
+          ls -1 SYNC_*.ps1 2>/dev/null || echo "  ninguno"
+
+      - name: SYNC_GRANDT (ayudante de campo)
+        continue-on-error: true
+        shell: pwsh
+        run: ./SYNC_GRANDT.ps1
+
+      - name: SYNC_PLANETA (planilla oficial)
+        continue-on-error: true
+        shell: pwsh
+        run: ./SYNC_PLANETA.ps1
+
+      - name: SYNC_ESPN (corners y posesion)
+        continue-on-error: true
+        shell: pwsh
+        run: ./SYNC_ESPN.ps1
+
+      - name: Que quedo escrito
+        if: always()
+        shell: bash
+        run: |
+          SAL=res.txt; : > $SAL
+          ver () {
+            if [ -f "$1" ]; then
+              b=$(stat -c%s "$1")
+              # ¿es JSON válido y tiene adentro lo que tiene que tener?
+              if node -e "const o=require('./$1'); const k=Object.keys(o); console.log(' claves: '+k.slice(0,6).join(', '))" > tmp.txt 2>/dev/null; then
+                printf 'OK   %-22s %10s bytes %s\n' "$1" "$b" "$(cat tmp.txt)" | tee -a $SAL
+              else
+                printf 'MAL  %-22s %10s bytes  (no es JSON valido)\n' "$1" "$b" | tee -a $SAL
+              fi
+            else
+              printf 'MAL  %-22s     no se escribio\n' "$1" | tee -a $SAL
+            fi
+          }
+          echo "--- lo que escribieron los sync -------------------------------" | tee -a $SAL
+          ver dataGranDT.json
+          ver dataPlaneta.json
+          ver dataEspn.json
+          echo "" | tee -a $SAL
+          echo "(nada de esto se commitea: el runner se tira a la basura al terminar)" | tee -a $SAL
+          {
+            echo '## Prueba de sync'
+            echo ''
+            echo '```'
+            cat $SAL
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -37,18 +37,28 @@ if (-not $carpeta) { $carpeta = (Get-Location).Path }
 $liga = 'arg.1'
 $baseScore = "https://site.api.espn.com/apis/site/v2/sports/soccer/$liga/scoreboard"
 $baseSum   = "https://site.api.espn.com/apis/site/v2/sports/soccer/$liga/summary"
-# ESPN devolvio 403 con los encabezados minimos. Su CDN mira mas cosas que el
-# User-Agent: quiere Referer y Origin de espn.com, el Accept-Language y los
-# Sec-Fetch-*, que es lo que manda un navegador de verdad.
+# ══ LO QUE MOLESTA ES EL DISFRAZ, NO EL CLIENTE (26/09) ════════════════════
+# Durante semanas creimos lo contrario y fuimos en la direccion exactamente
+# equivocada. Medido desde un runner de GitHub, pidiendo lo MISMO seis veces y
+# cambiando un solo encabezado por vez:
+#
+#   curl pelado (User-Agent 'curl/8.x') ......... 200, 32.923 bytes
+#   + User-Agent de Chrome ...................... 403 Access Denied
+#   + User-Agent + Accept ....................... 403
+#   + User-Agent + Referer ...................... 403
+#   + User-Agent + Origin ....................... 403
+#   + User-Agent + Referer + Origin ............. 403
+#
+# El culpable es EL USER-AGENT DE CHROME, solo. Y tiene logica: un navegador de
+# verdad llega con cookies, con su huella de TLS y desde una IP de casa. Decir
+# "soy Chrome" sin nada de eso no parece un navegador, parece alguien imitando
+# uno, que es justo lo que busca el filtro. Un cliente que dice la verdad sobre
+# lo que es pasa sin problema.
+#
+# Asi que ya no se manda disfraz. Ni User-Agent, ni Referer, ni Origin.
+# El endpoint pesado (summary, 392 KB por partido) tambien pasa pelado.
 $encabezados = @{
-  'User-Agent'      = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
-  'Accept'          = 'application/json, text/plain, */*'
-  'Accept-Language' = 'es-AR,es;q=0.9,en;q=0.8'
-  'Referer'         = 'https://www.espn.com.ar/'
-  'Origin'          = 'https://www.espn.com.ar'
-  'Sec-Fetch-Site'  = 'same-site'
-  'Sec-Fetch-Mode'  = 'cors'
-  'Sec-Fetch-Dest'  = 'empty'
+  'Accept' = 'application/json, text/plain, */*'
 }
 # NO PONER 'Connection' ACA (18/09). Windows PowerShell 5.1 lo rechaza porque es
 # un encabezado restringido del framework, y revienta ANTES de salir a la red:
@@ -69,7 +79,7 @@ $script:modo = 0          # 0 = todavia no se cual anda
 # ESPN contesto 403 a Invoke-RestMethod con encabezados minimos. No se puede
 # adivinar cual es el que le molesta, asi que se prueban tres y se usa la que
 # funcione, avisando cual fue:
-#   1) Invoke-RestMethod con encabezados de navegador completos
+#   1) Invoke-RestMethod PELADO (desde el 26/09: es el que anda)
 #   2) Invoke-RestMethod sin ningun encabezado (a veces el UA falso es el problema)
 #   3) curl.exe, que viene con Windows 10/11 y tiene otra huella de TLS
 function Pedir-Modo([string]$direccion, [int]$modo) {
@@ -78,19 +88,18 @@ function Pedir-Modo([string]$direccion, [int]$modo) {
   } elseif ($modo -eq 2) {
     return Invoke-RestMethod -Uri $direccion -TimeoutSec 25 -UseBasicParsing
   } else {
-    $exe = Join-Path $env:SystemRoot 'System32\curl.exe'
-    if (-not (Test-Path $exe)) { throw 'curl.exe no esta en este Windows' }
+    # En Windows esta en System32; en Linux (el runner de GitHub) esta en el PATH.
+    $exe = if ($env:SystemRoot) { Join-Path $env:SystemRoot 'System32/curl.exe' } else { 'curl' }
+    if ($env:SystemRoot -and -not (Test-Path $exe)) { throw 'curl.exe no esta en este Windows' }
     # SIN --compressed (18/09). Devolvia el cuerpo comprimido sin descomprimir y
     # ConvertFrom-Json moria con "Primitivo JSON no valido: .", que no dice nada
     # de lo que pasa. Se pide sin comprimir y, si igual no es JSON, se muestra el
     # principio de la respuesta: casi siempre es una pagina de bloqueo en HTML.
+    # Pelado a proposito: ver el bloque de arriba. El User-Agent de Chrome es
+    # justo lo que hace que ESPN corte; el de curl pasa.
     $txt = & $exe -s -L --max-time 25 `
-             -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36' `
              -H 'Accept: application/json, text/plain, */*' `
-             -H 'Accept-Language: es-AR,es;q=0.9,en;q=0.8' `
              -H 'Accept-Encoding: identity' `
-             -H 'Referer: https://www.espn.com.ar/' `
-             -H 'Origin: https://www.espn.com.ar' `
              $direccion 2>$null
     if ($txt -is [array]) { $txt = ($txt -join '') }
     if (-not $txt) { throw 'curl.exe no devolvio nada' }
@@ -112,7 +121,7 @@ function Obtener-Json([string]$direccion) {
       $r = Pedir-Modo $direccion $m
       if ($null -ne $r) {
         $script:modo = $m
-        $nombre = @{1='Invoke-RestMethod con encabezados de navegador';2='Invoke-RestMethod sin encabezados';3='curl.exe de Windows'}[$m]
+        $nombre = @{1='Invoke-RestMethod pelado';2='Invoke-RestMethod sin encabezados';3='curl.exe'}[$m]
         Write-Host ("   conexion por: {0}" -f $nombre) -ForegroundColor Green
         return $r
       }
@@ -229,20 +238,38 @@ foreach ($id in ($ids | Sort-Object)) {
   if ($s.header -and $s.header.competitions -and $s.header.competitions[0].date) {
     $cuando = [string]$s.header.competitions[0].date
   }
+  # ══ TERMINADO Y GOLES (02/10) ══════════════════════════════════════════
+  # Faltaban los dos, y nadie se entero por una razon incomoda: este script
+  # nunca habia llegado a correr entero. ESPN lo cortaba por el User-Agent, asi
+  # que el dataEspn.json que usabamos lo generaba BAJAR_ESPN.html, que SI
+  # escribe estos campos. El 02/10, con la conexion arreglada, el .ps1 corrio
+  # por primera vez de punta a punta, escribio 1148 filas... y armar.cjs las
+  # tiro todas: filtra por `terminado` y ninguna lo tenia. Encima piso el
+  # archivo bueno. Dos formatos distintos para el mismo archivo es una trampa
+  # que espera; ahora los dos escriben lo mismo.
+  $terminado = $false
+  if ($s.header -and $s.header.competitions -and $s.header.competitions[0].status `
+      -and $s.header.competitions[0].status.type) {
+    $terminado = [bool]$s.header.competitions[0].status.type.completed
+  }
   $equipos = @()
   foreach ($t in $s.boxscore.teams) {
-    $nom = ''; $corto = ''; $esLocal = $null
+    $nom = ''; $corto = ''; $esLocal = $null; $gol = $null
     if ($t.team) {
       if ($t.team.displayName) { $nom = [string]$t.team.displayName }
       if ($t.team.shortDisplayName) { $corto = [string]$t.team.shortDisplayName }
     }
-    # el lado sale del header, que marca homeAway por equipo
+    # el lado y el marcador salen del header, que los trae por equipo
     if ($s.header -and $s.header.competitions) {
       foreach ($c in $s.header.competitions[0].competitors) {
-        if ($t.team -and $c.id -eq $t.team.id) { $esLocal = ($c.homeAway -eq 'home') }
+        if ($t.team -and $c.id -eq $t.team.id) {
+          $esLocal = ($c.homeAway -eq 'home')
+          $m = [regex]::Match([string]$c.score, '\d+')
+          if ($m.Success) { $gol = [int]$m.Value }
+        }
       }
     }
-    $equipos += ,@{ t = $t; nombre = $nom; corto = $corto; esLocal = $esLocal }
+    $equipos += ,@{ t = $t; nombre = $nom; corto = $corto; esLocal = $esLocal; goles = $gol }
   }
   if ($equipos.Count -ne 2) { $sinStats++; continue }
 
@@ -256,6 +283,8 @@ foreach ($id in ($ids | Sort-Object)) {
     $f | Add-Member NoteProperty corto    $yo.corto
     $f | Add-Member NoteProperty rival    $otro.nombre
     $f | Add-Member NoteProperty esLocal  $yo.esLocal
+    $f | Add-Member NoteProperty terminado $terminado
+    $f | Add-Member NoteProperty goles     $yo.goles
     $vistas = 0
     foreach ($st in $yo.t.statistics) {
       if ($null -eq $st -or $null -eq $st.name) { continue }
@@ -300,6 +329,20 @@ if (Test-Path $destino) {
   } catch { }
 }
 
+# ══ NO PISAR EL ARCHIVO BUENO CON UNO INSERVIBLE (02/10) ═══════════════════
+# armar.cjs se queda SOLO con las filas que tienen terminado=true. Un archivo
+# con mil filas y cero terminadas pasa cualquier control de tamano y deja la
+# pantalla Datos en blanco igual. Eso fue exactamente lo que paso hoy.
+$conFin = @($filas | Where-Object { $_.terminado }).Count
+if ($conFin -eq 0) {
+  Write-Host ""
+  Write-Host "   NO ESCRIBO dataEspn.json: bajaron $($filas.Count) filas pero NINGUNA es de un partido terminado." -ForegroundColor Red
+  Write-Host "   El motor descarta las no terminadas, asi que este archivo dejaria la pantalla Datos vacia." -ForegroundColor Yellow
+  Write-Host "   Se conserva el dataEspn.json anterior. Si el problema sigue, usa BAJAR_ESPN.html." -ForegroundColor Yellow
+  Write-Host ""
+  exit 1
+}
+
 $salida = New-Object PSObject
 $salida | Add-Member NoteProperty generado (Get-Date).ToString('o')
 $salida | Add-Member NoteProperty fuente   'ESPN site API'
@@ -309,7 +352,7 @@ $salida | Add-Member NoteProperty filas    $filas
 $salida | ConvertTo-Json -Depth 6 -Compress | Set-Content -Path $destino -Encoding UTF8
 
 Write-Host ("   Guardado: {0}" -f (Split-Path $destino -Leaf)) -ForegroundColor Green
-Write-Host ("   {0} filas equipo-partido de {1} partidos" -f $filas.Count, $conStats)
+Write-Host ("   {0} filas equipo-partido de {1} partidos  ·  {2} filas de partidos TERMINADOS (son las que usa el motor)" -f $filas.Count, $conStats, $conFin)
 if ($sinStats -gt 0) { Write-Host ("   {0} partidos sin estadisticas (no jugados o sin cobertura)" -f $sinStats) -ForegroundColor Yellow }
 Write-Host ""
 Write-Host "   ESTADISTICAS QUE TRAJO:" -ForegroundColor Cyan
