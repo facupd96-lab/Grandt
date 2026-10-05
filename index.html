@@ -4970,7 +4970,7 @@ th[data-k="rol"] { white-space: nowrap; }
 .pie-link-fuerte { color: #38bdf8 !important; font-weight: 800; }
 
 </style>
-    <meta name="gdt-build" content="75d9c81426b3 | 2026-09-18 16:21">
+    <meta name="gdt-build" content="ac5e6cbf387e | 2026-10-05 19:29">
 </head>
 <body>
     <!-- UNA SOLA BARRA.
@@ -11302,7 +11302,10 @@ window.miPoner = function (pos, saliendo, entra) {
 const CLAVE_LIGA = 'gdt_liga_v1';
 const PUESTOS = ['ARQ', 'DEF', 'VOL', 'DEL'];
 
-function ligaVacia() { return { equipos: [] }; }
+// `fechaBase` = de que fecha son los onces que estan guardados en ESTE
+// navegador. Sin eso no se puede distinguir "me editaron algo" de "quedo
+// viejo", que es justo la diferencia que importa (ver cargarLiga).
+function ligaVacia() { return { equipos: [], fechaBase: null }; }
 // LA LIGA PUBLICADA (dataLiga.js).
 // Los equipos viven en el localStorage de cada navegador, asi que un amigo que
 // abre la app no ve ninguno. Este archivo es la forma de que los vea sin tener
@@ -11339,6 +11342,7 @@ function cargarLiga() {
   } catch (e) { S.liga = ligaVacia(); }
   S.ligaPerdidos = [];
   S.ligaHayNueva = false;
+  S.ligaActualizada = null;
   let sembrada = false;
   if (LIGA_BASE) {
     const propios = S.liga.equipos.filter(t => !t.mio).length;
@@ -11352,11 +11356,37 @@ function cargarLiga() {
       if (LIGA_BASE.dts && LIGA_BASE.dts.length) S.liga.dts = LIGA_BASE.dts;
       if (LIGA_BASE.camp) S.liga.camp = LIGA_BASE.camp;
       S.liga.publicado = LIGA_BASE.publicado || null;
+      S.liga.fechaBase = LIGA_BASE.fecha ?? null;
       sembrada = true;
     } else if (LIGA_BASE.publicado && LIGA_BASE.publicado !== S.liga.publicado) {
-      // hay una version mas nueva, pero NO se pisa lo que el tipo tenga cargado:
-      // se avisa y decide el
-      S.ligaHayNueva = true;
+      // ══ SI CAMBIO LA FECHA, LOS ONCES VIEJOS NO SIRVEN (06/10) ════════════
+      // Hasta hoy esto SIEMPRE se quedaba esperando que alguien apretara un
+      // boton, para no pisar lo que cada uno tuviera cargado. La intencion
+      // estaba bien y el resultado estaba mal: cargue los siete equipos de la
+      // fecha 11, los publique, y en la pantalla seguian apareciendo Correa,
+      // Driussi y Almada — onces de la fecha 9 — en los dos navegadores, cada
+      // uno con una version vieja distinta. El cartel para traerla estaba al
+      // final de la tabla, abajo de todo, donde no se ve.
+      // La distincion que faltaba: un once del torneo es DE UNA FECHA. Si la
+      // publicada es de una fecha mas nueva, lo guardado no es "tu version",
+      // es basura — el tipo ya cambio su equipo en el juego. Eso se trae solo.
+      // Si es la MISMA fecha (una correccion), se sigue preguntando: ahi si
+      // puede haber una edicion a mano que valga mas que el archivo.
+      // El equipo propio (t.mio) no se toca en ningun caso.
+      const nueva = LIGA_BASE.fecha, vieja = S.liga.fechaBase;
+      const cambioDeFecha = nueva != null && (vieja == null || nueva > vieja);
+      if (cambioDeFecha) {
+        S.liga.equipos = S.liga.equipos.filter(t => t.mio).concat(equiposDesdePaquete(LIGA_BASE));
+        S.liga.fichas = Object.assign({}, LIGA_BASE.fichas || {}, S.liga.fichas || {});
+        if (LIGA_BASE.dts && LIGA_BASE.dts.length) S.liga.dts = LIGA_BASE.dts;
+        if (LIGA_BASE.camp) S.liga.camp = LIGA_BASE.camp;
+        S.liga.publicado = LIGA_BASE.publicado || null;
+        S.liga.fechaBase = nueva;
+        S.ligaActualizada = { a: nueva, de: vieja };
+        sembrada = true;
+      } else {
+        S.ligaHayNueva = true;
+      }
     }
   }
   S.liga.fichas = S.liga.fichas || {};
@@ -11401,6 +11431,7 @@ function cargarLiga() {
 function guardarLiga() {
   try {
     const guardar = { fichas: S.liga.fichas || {}, publicado: S.liga.publicado || null,
+      fechaBase: S.liga.fechaBase ?? null,
       dts: S.liga.dts || [], camp: S.liga.camp || null, misPuntos: S.liga.misPuntos ?? null,
       onces: S.liga.onces || {}, equipos: S.liga.equipos.map(t => {
       const kBanco = {};
@@ -11802,6 +11833,16 @@ function pintarPantallaLiga() {
       </div>
       <p class="vac-nota">Tu once y el del motor no entran acá: están más abajo, en <b>el laboratorio</b>.</p>
     </div>` : ''}
+    ${S.ligaActualizada ? `<div class="lg-perdidos lg-nueva">
+      Traje los equipos de la <b>fecha ${S.ligaActualizada.a}</b> que publicaste con la app${
+        S.ligaActualizada.de != null ? `: los que estaban acá eran de la fecha ${S.ligaActualizada.de}` : ''}.
+      Los onces del torneo son de cada fecha, así que los viejos ya no servían. Tu equipo no se tocó.
+    </div>` : ''}
+    ${S.ligaHayNueva ? `<div class="lg-perdidos lg-nueva">
+      Hay una <b>versión más nueva</b> del torneo publicada con la app${LIGA_BASE.fecha != null ? ' (fecha ' + LIGA_BASE.fecha + ')' : ''},
+      de la misma fecha que la que tenés. No te la traje sola por si editaste algo a mano.
+      <button class="vs-btn vs-btn-chico" onclick="traerLigaPublicada()">traer la publicada</button>
+    </div>` : ''}
     ${bloquePodio(ms, ch)}
     ${bloqueTitulares(ms, _PROP, ch)}
 
@@ -11817,11 +11858,6 @@ function pintarPantallaLiga() {
         </tr></thead>
         <tbody>${filas}</tbody>
       </table>
-      ${S.ligaHayNueva ? `<div class="lg-perdidos lg-nueva">
-        Hay una <b>versión más nueva</b> del torneo publicada con la app${LIGA_BASE.fecha != null ? ' (fecha ' + LIGA_BASE.fecha + ')' : ''}.
-        No te la traje sola para no pisarte lo que tengas cargado.
-        <button class="vs-btn vs-btn-chico" onclick="traerLigaPublicada()">traer la publicada</button>
-      </div>` : ''}
       ${(S.ligaPerdidos && S.ligaPerdidos.length) ? `<div class="lg-perdidos">
         <b>Ojo:</b> ${S.ligaPerdidos.map(x => x.n + ' jugador' + (x.n > 1 ? 'es' : '') + ' de <b>' + esc(x.eq) + '</b>').join(', ')}
         ${S.ligaPerdidos.length === 1 && S.ligaPerdidos[0].n === 1 ? 'no está' : 'no están'} en el <code>datos.js</code> de ahora.
@@ -12054,6 +12090,7 @@ window.traerLigaPublicada = function () {
   if (LIGA_BASE.dts && LIGA_BASE.dts.length) S.liga.dts = LIGA_BASE.dts;
   if (LIGA_BASE.camp) S.liga.camp = LIGA_BASE.camp;
   S.liga.publicado = LIGA_BASE.publicado || null;
+  S.liga.fechaBase = LIGA_BASE.fecha ?? null;
   S.ligaHayNueva = false;
   guardarLiga(); cargarLiga(); pintarPantallaLiga();
 };
