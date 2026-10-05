@@ -6,132 +6,142 @@
 #   Apellido (C)                 <- el capitan
 #   -- suplentes                 <- de aca para abajo, el banco (uno por puesto)
 #   Apellido (club)              <- si hay dos con el mismo apellido, aclara el club
+#   Apellido Nombre (club)       <- si el club tampoco alcanza, el nombre de pila
 #
 # El orden no importa: el script pone a cada uno en su puesto y deduce el esquema.
 # Las lineas que empiezan con # se ignoran.
+#
+# CARGADO DE LAS CAPTURAS DE LA FECHA 11 (05/10/2026).
+# Los siete equipos juegan 3-3-4 esta fecha. Cinco apellidos necesitaron el
+# nombre de pila porque el club no alcanzaba para distinguirlos:
+#   Martinez David (DEF de Def. y Justicia)  vs  Martinez Thiago (DEF del mismo club)
+#   Fernandez Leandro (DEL de Def. y Justicia) vs Fernandez Damian (DEF del mismo club)
+#   Martinez Adrian (DEL de Racing)          vs  Martinez Mateo (DEF de Racing)
+#   Palacios Tiago (VOL de Estudiantes LP)   vs  Palacios Tomas (DEF del mismo club)
+#   Zelarayan Lucas (VOL de Belgrano)        vs  Zelarayan Gonzalo (VOL del mismo club)
 
 = Falcon de ramon
-Ledesma (instituto)
-Alarcon (instituto)
-Cerato
-Montiel (river)
+Arce (riestra)
+Blondel (huracan)
+Di Lollo (boca)
+Vallejo (atl tucuman)
+Luna (instituto)
+Ascacibar (boca)
+Lucco (def y justicia)
+Fernandez (ind rivadavia) (C)
+Martinez (velez)
+Veron (argentinos)
+Martinez Adrian (racing)
+-- suplentes
+Ingolotti (atl tucuman)
+Silvero (velez)
+Di Maria (rosario)
+Merentiel (boca)
+
+= La Aplanadora Danesa
+Ingolotti (atl tucuman)
+Escudero (racing)
+Martinez David (def y justicia)
+Silvero (velez)
+Di Maria (rosario) (C)
+Gaitan (aldosivi)
+Luna (instituto)
+Vombergar (aldosivi)
+Fernandez Leandro (def y justicia)
+Martinez (velez)
+Modica (gimnasia mza)
+-- suplentes
+Acosta (aldosivi)
+Cerato (instituto)
+Barbona (def y justicia)
+Coccaro (newells)
+
+= Runnero atomico
+Ingolotti (atl tucuman)
+Blondel (huracan)
+Lozano (boca)
+Avila (rosario)
+Farias (san lorenzo)
+Palacios Tiago (estudiantes)
+Paredes (boca) (C)
+Martinez Adrian (racing)
+Martinez (velez)
+Merentiel (boca)
+Auzmendi (gimnasia lp)
+-- suplentes
+Bolcato (ind rivadavia)
+Escudero (racing)
+Meza (independiente)
+Modica (gimnasia mza)
+
+= Atilio Chara FC
+Borgogno (def y justicia)
+Cerato (instituto)
+Martinez David (def y justicia)
+Vallejo (atl tucuman)
+Ascacibar (boca)
+Di Maria (rosario) (C)
 Florentin (ind rivadavia)
-Luna (instituto)
-Mavilla
-Arce (ind rivadavia)
-Caicedo
-Correa (river) (C)
-Lima
+Merentiel (boca)
+Modica (gimnasia mza)
+Martinez Adrian (racing)
+Martinez (velez)
 -- suplentes
-Bolcato
-Zabala (independiente)
-Barbona
-Valencia
+Ingolotti (atl tucuman)
+Ovando (rosario)
+Lanzini (velez)
+Coccaro (newells)
 
-= Runero Atomico
-Ledesma (instituto)
-Pellegrino
-Elordi
-Cerato
-Luna (instituto) (C)
-Mavilla
-Di Maria
-Coccaro
-Valencia
-Modica
-Arce (ind rivadavia)
+= El Favorito de la Tati
+Ingolotti (atl tucuman)
+Martinez David (def y justicia)
+Izquierdoz (lanus)
+Lopez Lisandro (belgrano)
+Lanzini (velez)
+Zelarayan Lucas (belgrano) (C)
+Di Maria (rosario)
+Tarragona (union)
+Passerini (belgrano)
+Modica (gimnasia mza)
+Veron (argentinos)
 -- suplentes
-Ayala (sarmiento)
-Arrayago
-Fernandez (gimnasia mza)
-Diaz (atl tucuman)
+Marchiori (velez)
+Avila (rosario)
+Lopez Munoz (argentinos)
+Copetti (rosario)
 
-= La aplanadora danesa
-Ledesma (instituto)
-Cerato
-Otamendi
-Blondel
-Andrada (river)
-Luna (instituto)
-Malcorra
-Almada
-Correa (river) (C)
-Arce (ind rivadavia)
-Modica
+= Giri FC
+Cambeses (racing)
+Cannavo (racing)
+Escudero (racing)
+Cerato (instituto)
+Lanzini (velez)
+Di Maria (rosario)
+Florentin (ind rivadavia)
+Merentiel (boca) (C)
+Modica (gimnasia mza)
+Martinez (velez)
+Martinez Adrian (racing)
 -- suplentes
-Bolcato
-Mosevich
-Cuello (union)
-Estigarribia
+Marchiori (velez)
+Rak (barracas)
+Barbona (def y justicia)
+Russo (tigre)
 
-= Atilio chara fc
-Ledesma (instituto)
-Cerato
-Arrayago
-Montiel (river)
-Luna (instituto)
-Malcorra
-Velasco
-Arce (ind rivadavia)
-Modica
-Correa (river) (C)
-Caicedo
--- suplentes
-Ayala (sarmiento)
-Sosa (instituto)
-Lencioni
-Coccaro
-
-= La bestia fc
-Ledesma (instituto)
-Cerato
-Elordi
-Montiel (river)
-Di Maria
-Lanzini
-Mavilla
-Almada (C)
-Arce (ind rivadavia)
-Correa (river)
-Molina
+= La Bestia FC
+Marchiori (velez)
+Di Lollo (boca)
+Gomez (velez)
+Silvero (velez)
+Di Maria (rosario) (C)
+Lanzini (velez)
+Zelarayan Lucas (belgrano)
+Martinez Adrian (racing)
+Fernandez Leandro (def y justicia)
+Auzmendi (gimnasia lp)
+Modica (gimnasia mza)
 -- suplentes
 Ayala (sarmiento)
 Munoz (gimnasia mza)
-Martinez (sarmiento)
-Marabel
-
-= Giri fc
-Mino (barracas)
-Rak
-Martinez (barracas)
-Cerato
-Lanzini
-Di Maria
-Mavilla
-Arce (ind rivadavia) (C)
-Driussi
-Martinez (velez)
-Caicedo
--- suplentes
-Marchiori
-Blondel
-Barbona
-Correa (river)
-
-= El favorito de la tati
-Ledesma (instituto)
-Montiel (river)
-Ovando
-Silvero
-Lopez Munoz
-Lanzini
-Di Maria (C)
-Almada
-Driussi
-Arce (ind rivadavia)
-Correa (river)
--- suplentes
-Werner
-Palazzo
-Lencioni
-Molina
+Florentin (ind rivadavia)
+Tarragona (union)
