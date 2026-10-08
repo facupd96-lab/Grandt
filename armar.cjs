@@ -291,6 +291,30 @@ let fechaObjetivo=null;
 Object.keys(rondas).map(Number).sort((a,b)=>a-b).forEach(r=>{
   if(fechaObjetivo===null && rondas[r].jugados < rondas[r].total) fechaObjetivo=r;
 });
+// ══ PERO LA FECHA LA DICE EL JUEGO (08/10) ═════════════════════════════════
+// La regla de arriba —"la primera que no esta completa"— se rompe cuando un
+// partido se reprograma. Paso el 08/10: Sarmiento-River de la fecha 11 quedo
+// para el 14, asi que la 11 nunca llegaba a 15 de 15 y el motor se quedo
+// clavado proyectando una fecha ya jugada mientras la 12 arrancaba al dia
+// siguiente. El index mostraba el ranking de la fecha equivocada, 14 partidos
+// aparecian "sin cuota de mercado" y hasta el corte de ESPN se iba al diablo,
+// porque descarta los partidos de la fecha objetivo y esa fecha ya se habia
+// jugado: 30 equipos quedaron con la tabla de local/visitante atrasada.
+// El Ayudante de campo del Gran DT publica QUE FECHA se esta jugando. Es la
+// autoridad: es el juego diciendo cuando abren los cambios. Si lo tenemos, se
+// usa. Solo se avanza, nunca se retrocede, por si el ayudante viene atrasado.
+const FECHA_GDT = (function(){ try{
+  const g = JSON.parse(fs.readFileSync('dataGranDT.json','utf8').replace(/^﻿/,''));
+  const n = g && g.dinamico && g.dinamico.fechaActual && g.dinamico.fechaActual.nombre;
+  const m = /(\d+)/.exec(String(n||''));
+  return m ? parseInt(m[1],10) : null;
+}catch(e){ return null; } })();
+if(FECHA_GDT!=null && rondas[FECHA_GDT] && (fechaObjetivo==null || FECHA_GDT>fechaObjetivo)){
+  console.log('FECHA — el Ayudante de campo del Gran DT dice que se juega la fecha '+FECHA_GDT+
+    ', y la regla de "la primera incompleta" daba la '+fechaObjetivo+
+    ' (le falta algun partido reprogramado). Manda el juego: se proyecta la '+FECHA_GDT+'.');
+  fechaObjetivo = FECHA_GDT;
+}
 // cuotas de esa fecha, cruzadas por el par de equipos
 const paresObjetivo = fechaObjetivo!==null ? rondas[fechaObjetivo].pares : null;
 let f6=[];
@@ -1519,7 +1543,7 @@ try {
       const antes = filas.length;
       filas = filas.filter(f => !f.cuando || f.cuando < arranque);
       if (antes !== filas.length) console.log('  ESPN — se descartan '+(antes-filas.length)+
-        ' filas de partidos de la fecha '+out.fechaObjetivo+', que todavia no esta en la planilla.');
+        ' filas de partidos de la fecha '+fechaObjetivo+', que todavia no esta en la planilla.');
     }
   }
   if (!filas.length) throw new Error('dataEspn.json no tiene partidos anteriores a esta fecha');

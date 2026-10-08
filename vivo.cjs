@@ -462,6 +462,25 @@ function main() {
       console.log('');
       return;
     }
+    // ══ UN ARCHIVO VACIO TAMPOCO PISA A UNO CON PUNTAJES (08/10) ════════════
+    // La guarda de arriba miraba solo el numero de fecha, y el agujero era el
+    // otro caso: la fecha 12 todavia no empezo, asi que este script arma un
+    // dataVivo.js VACIO y lo escribe encima del de la 11, que tenia 384
+    // jugadores puntuados. Para el numero de fecha eso es "ir para adelante",
+    // pero para el que abre la pagina es perder los resultados de la fecha
+    // pasada: Revision y el Torneo de amigos se quedan en blanco. Es el mismo
+    // motivo por el que la pagina publicada estuvo semanas sin puntajes.
+    // Lo ultimo que se jugo se conserva hasta que la fecha nueva tenga algo.
+    if (guardada != null && Object.keys(puntos).length === 0 && pedida == null) {
+      console.log('');
+      console.log('  NO ESCRIBO dataVivo.js: la fecha ' + fecha + ' todavia no tiene ningun puntaje publicado,');
+      console.log('  y el archivo de ahora tiene los de la fecha ' + guardada + '. Si lo pisara, la pantalla');
+      console.log('  Revision y el Torneo de amigos se quedarian en blanco para todos.');
+      console.log('  Se conserva la fecha ' + guardada + '. En cuanto Planeta publique el primer partido de la ' +
+                  fecha + ', esto entra solo.');
+      console.log('');
+      return;
+    }
   }
   fs.writeFileSync(P('dataVivo.js'), 'window.VIVO=' + JSON.stringify(salida) + ';');
   console.log('');

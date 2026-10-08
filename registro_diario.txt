@@ -8457,3 +8457,81 @@ ADVERTENCIA: no se pudo sacar la foto de la fecha. Mira el log.
    HAY 3 PROBLEMA(S). No confies en los numeros hasta arreglarlos.
   ══════════════════════════════════════════════════════════════
 
+
+======================================================================
+  1. Reviso que este todo listo
+======================================================================
+   git instalado: OK
+   la carpeta es un repositorio: OK
+   sos: facupd96-lab <facupd96@gmail.com>
+
+======================================================================
+  2. Rehago index.html con lo ultimo de la carpeta
+======================================================================
+sello del build: a795b440e9c6 | 2026-10-08 19:29
+index.html armado — 735 KB  (css 200 KB + registry 16 KB + app 496 KB)
+Lo unico que queda afuera es datos.js, que lo regenera ACTUALIZAR_TODO.
+   sello del build: a795b440e9c6 | 2026-10-08 19:29
+
+======================================================================
+  3. Preparo la lista (no toco ningun archivo de tu disco)
+======================================================================
+   105 archivos quedan en el repo, 10 cambiaron desde la ultima vez.
+   control: no se colo ningun archivo pesado ni la clave
+   estas parado en la rama: main
+
+======================================================================
+  4. Esto es lo que va a subir
+======================================================================
+   SE SUBEN (nuevos o modificados):
+   + appV3.js
+   + BUILD.txt
+   + dataHist.js
+   + dataLiga.js
+   + datos.js
+   + historial/fecha_11.json
+   + index.html
+   + planilla.json
+   + registro_diario.txt
+   + vivo.cjs
+
+   Total: 105 archivos en el repo.
+
+   (modo automatico: subo sin preguntar)
+
+======================================================================
+  5. Guardando los cambios
+======================================================================
+[main ca98b17] Actualizacion 2026-10-08 20:02 - build a795b440e9c6 | 2026-10-08 19:29
+ 10 files changed, 3811 insertions(+), 2750 deletions(-)
+
+======================================================================
+  6. Subiendo a GitHub
+======================================================================
+   Si te pide usuario y contrasena, se abre una ventana de GitHub.
+
+To https://github.com/facupd96-lab/Grandt.git
+   8faf3b7..ca98b17  main -> main
+
+======================================================================
+  7. Compruebo que lo que hay publicado sea esto
+======================================================================
+   sello de tu carpeta : a795b440e9c6 | 2026-10-08 19:29
+
+   EL REPOSITORIO
+      sello: a795b440e9c6 | 2026-10-08 19:29
+      COMPROBADO: tiene exactamente tu index.html
+
+   LA PAGINA (lo que abren tus amigos)
+      sello: ac5e6cbf387e | 2026-10-05 19:29
+      todavia sirve el build ac5e6cbf387e | 2026-10-05 19:29.
+      GitHub tarda entre uno y dos minutos en rehacer la pagina. Espera y recarga.
+
+   Repo:    https://github.com/facupd96-lab/Grandt
+   Pagina:  https://facupd96-lab.github.io/Grandt/
+
+   OJO con la cache: GitHub sirve el index guardado hasta 10 minutos.
+   Si abris la pagina y ves el sello viejo, espera un rato y recarga con Ctrl+F5.
+   El sello se ve en el menu (...) de arriba a la derecha, abajo de todo.
+
+LISTO jue 08/10/2026 20:02:40,22 
