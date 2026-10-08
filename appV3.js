@@ -5483,7 +5483,23 @@ function cargarLiga() {
       // El equipo propio (t.mio) no se toca en ningun caso.
       const nueva = LIGA_BASE.fecha, vieja = S.liga.fechaBase;
       const cambioDeFecha = nueva != null && (vieja == null || nueva > vieja);
-      if (cambioDeFecha) {
+      // PERO SOLO SI LOS ONCES SON DE ESTA FECHA (08/10).
+      // CERRAR_FECHA corre ARMAR_LIGA despues de que el motor paso a la fecha
+      // siguiente, asi que dataLiga.js sale sellado "fecha 12" con los onces
+      // que se cargaron para la 11. Sin este control, el arreglo de ayer los
+      // traeria solo y en silencio, que es peor que lo que venia pasando: al
+      // menos antes preguntaba. Se compara contra el primer partido de la
+      // fecha, igual que el aviso de "equipos viejos" de la tabla.
+      const onceFresco = (() => {
+        const ed = LIGA_BASE.equiposEditado;
+        const ps = (typeof D !== 'undefined' && D && D.partidos) || [];
+        if (!ed || !ps.length) return true;          // sin con que comparar, se trae
+        const t = new Date(ed).getTime();
+        const arranca = Math.min(...ps.map(m => new Date(m.cuando).getTime()).filter(isFinite));
+        if (!isFinite(t) || !isFinite(arranca)) return true;
+        return t >= arranca;
+      })();
+      if (cambioDeFecha && onceFresco) {
         S.liga.equipos = S.liga.equipos.filter(t => t.mio).concat(equiposDesdePaquete(LIGA_BASE));
         S.liga.fichas = Object.assign({}, LIGA_BASE.fichas || {}, S.liga.fichas || {});
         if (LIGA_BASE.dts && LIGA_BASE.dts.length) S.liga.dts = LIGA_BASE.dts;

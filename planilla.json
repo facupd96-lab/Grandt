@@ -1,9 +1,13 @@
 {
     "_comentario":  "Lo actualiza solo SYNC_PLANETA leyendo el post \"Estadisticas\" del blog. Si alguna vez hay que forzarlo a mano, se cambia el campo id.",
-    "id":  "2PACX-1vTsGBMdioZJc0Zu3Lx8Vn275JoyaCrthXs1YjIrrGkaSEkiKWSkzNHq1QoBmcK2Po_WoT6UTSQor-uU",
-    "fecha":  10,
-    "actualizado":  "2026-10-02",
+    "id":  "2PACX-1vSK991dNQX3BvoU5gNy11nuyR83glcxYqshzO3z1PwTNtrrYSJu9xHU4F4k-aygO14rtxfNxXqF9UqY",
+    "fecha":  11,
+    "actualizado":  "2026-10-08",
     "anteriores":  [
+                       {
+                           "fecha":  10,
+                           "id":  "2PACX-1vTsGBMdioZJc0Zu3Lx8Vn275JoyaCrthXs1YjIrrGkaSEkiKWSkzNHq1QoBmcK2Po_WoT6UTSQor-uU"
+                       },
                        {
                            "fecha":  9,
                            "id":  "2PACX-1vReb2FM33VbNuH5tTxL_33ZtTLMGnl8C46jQbIe-gaCXJaQ1LEclYRjnfpqOahZgqyOlalsiXqhB7J2"
@@ -15,10 +19,6 @@
                        {
                            "fecha":  7,
                            "id":  "2PACX-1vQUnWA7eYlnlhVDpfYVCfOXJo5ivL084sAtZOX8z51MSru3mjo7EjrAHWcAyyxdaSwchWXT9_lMozZe"
-                       },
-                       {
-                           "fecha":  6,
-                           "id":  "2PACX-1vQWGNjh7CL09RS5jbryuvTL88q8AYF6yV5kJqmraLlASvJeyK6jYJlb8XulTFWOuEXwIOhHhVBu1CpY"
                        }
                    ]
 }

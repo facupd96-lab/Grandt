@@ -437,9 +437,35 @@ function main() {
     fichas,
     cruce: { filas: filas.length, cruzadas, pct, sinCruzar, fichas: Object.keys(fichas).length }
   };
+  // ══ NO PISAR UNA FECHA BUENA CON UNA ANTERIOR (08/10) ════════════════════
+  // `--cerrada` elige la ultima fecha donde TODOS los partidos figuran
+  // terminados. Suena bien hasta que una fecha queda con un partido
+  // suspendido: la 11 tiene 14 jugados y Sarmiento-River sin jugar, asi que
+  // nunca va a dar 15 de 15 y `--cerrada` se va a la 10. Y como esto escribe
+  // sin preguntar, el dataVivo.js de la 11 —con 384 jugadores puntuados— se
+  // perderia reemplazado por el de una fecha vieja, en silencio.
+  // La regla es simple: para atras no se va, salvo que lo pidas a mano con el
+  // numero de fecha (ahi sabes lo que estas haciendo).
+  {
+    let guardada = null;
+    try {
+      const w = {}; new Function('window', fs.readFileSync(P('dataVivo.js'), 'utf8'))(w);
+      const v = w.VIVO;
+      if (v && v.fecha != null && Object.keys(v.puntos || {}).length) guardada = v.fecha;
+    } catch (e) { }
+    if (guardada != null && fecha < guardada && pedida == null) {
+      console.log('');
+      console.log('  NO ESCRIBO dataVivo.js: iba a poner la fecha ' + fecha +
+                  ' encima de la ' + guardada + ', que ya tiene puntajes cargados.');
+      console.log('  Pasa cuando una fecha queda con un partido suspendido y --cerrada se va para atras.');
+      console.log('  Si de verdad la queres, pedila a mano:  SYNC_VIVO.bat ' + fecha);
+      console.log('');
+      return;
+    }
+  }
   fs.writeFileSync(P('dataVivo.js'), 'window.VIVO=' + JSON.stringify(salida) + ';');
   console.log('');
-  console.log('OK -> dataVivo.js');
+  console.log('OK -> dataVivo.js  (fecha ' + fecha + ', ' + Object.keys(puntos).length + ' jugadores con puntaje)');
 }
 
 if (require.main === module) main();
