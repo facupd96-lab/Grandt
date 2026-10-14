@@ -30,9 +30,16 @@ $carpeta = $PSScriptRoot
 if (-not $carpeta) { $carpeta = (Get-Location).Path }
 Set-Location $carpeta
 
-# Cuantos posts traer. Planeta publica uno por dia de partidos, asi que con 10
-# sobra para cubrir una fecha entera (viernes a lunes) con margen.
-$cuantos = 10
+# Cuantos posts traer. Planeta publica uno por dia de partidos, asi que una
+# fecha entera (viernes a lunes) son 4 o 5 posts.
+# ERA 10 Y SE PERDIAN FOTOS (14/10). Con 10 el feed cubria justo dos fechas y
+# media: el dia que se bajaba el feed de una fecha nueva, los posts de la fecha
+# de hace dos se caian del feed y la foto de esa fecha NO se podia recuperar
+# nunca mas (foto.cjs la saca de aca, no de la planilla). Asi se perdio la de
+# la fecha 10: el 14/10 el feed tenia la 9, la 10 y la 11, y bastaba con bajarlo
+# una vez mas para que la 10 desapareciera. Con 40 entran unas diez fechas.
+# Blogger acepta hasta 500 en max-results, asi que no hay nada que optimizar.
+$cuantos = 40
 $url = "https://www.planetagrandt.com.ar/feeds/posts/default/-/Puntajes?alt=json&max-results=$cuantos"
 
 Write-Host ""
