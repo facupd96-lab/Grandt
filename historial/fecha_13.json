@@ -1,13 +1,13 @@
 {
  "fecha": 13,
- "generado": "2026-10-14T19:46:38.229Z",
+ "generado": "2026-10-15T19:43:29.499Z",
  "ultimaFechaJugada": 12,
  "once": [
   {
    "nombre": "Marchiori, Tomás",
    "pos": "ARQ",
    "equipo": "Vélez",
-   "EP": 5.36,
+   "EP": 5.39,
    "pJuega": 0.92,
    "precio": 5500000
   },
@@ -15,7 +15,7 @@
    "nombre": "Ferreira, Clever",
    "pos": "DEF",
    "equipo": "Atl. Tucumán",
-   "EP": 4.47,
+   "EP": 4.49,
    "pJuega": 0.67,
    "precio": 2100000
   },
@@ -23,7 +23,7 @@
    "nombre": "Cabrera, Bruno",
    "pos": "DEF",
    "equipo": "Newell's",
-   "EP": 5.04,
+   "EP": 5.05,
    "pJuega": 0.75,
    "precio": 1600000
   },
@@ -39,7 +39,7 @@
    "nombre": "Ascacíbar, Santiago",
    "pos": "VOL",
    "equipo": "Boca",
-   "EP": 4.43,
+   "EP": 4.42,
    "pJuega": 0.58,
    "precio": 6400000
   },
@@ -47,7 +47,7 @@
    "nombre": "Di María, Ángel",
    "pos": "VOL",
    "equipo": "Rosario Ctral.",
-   "EP": 6.62,
+   "EP": 6.59,
    "pJuega": 0.88,
    "precio": 7000000
   },
@@ -55,7 +55,7 @@
    "nombre": "Luna, Alex",
    "pos": "VOL",
    "equipo": "Instituto",
-   "EP": 6.56,
+   "EP": 6.5,
    "pJuega": 0.88,
    "precio": 3000000
   },
@@ -63,7 +63,7 @@
    "nombre": "Vombergar, Andrés",
    "pos": "DEL",
    "equipo": "Aldosivi",
-   "EP": 2.11,
+   "EP": 2.16,
    "pJuega": 0.27,
    "precio": 2500000
   },
@@ -71,7 +71,7 @@
    "nombre": "Martínez, Ronaldo",
    "pos": "DEL",
    "equipo": "Vélez",
-   "EP": 6.82,
+   "EP": 6.86,
    "pJuega": 0.88,
    "precio": 6000000
   },
@@ -79,7 +79,7 @@
    "nombre": "Verón, Gastón",
    "pos": "DEL",
    "equipo": "Argentinos",
-   "EP": 6.18,
+   "EP": 6.17,
    "pJuega": 0.82,
    "precio": 2000000
   },
@@ -98,15 +98,15 @@
    {
     "nombre": "Marchiori, Tomás",
     "equipo": "Vélez",
-    "EP": 5.36,
+    "EP": 5.39,
     "pJuega": 0.92,
-    "ficha": 5.42,
+    "ficha": 5.43,
     "precio": 5500000
    },
    {
     "nombre": "Reinatti, Josué",
     "equipo": "Newell's",
-    "EP": 5.33,
+    "EP": 5.35,
     "pJuega": 0.92,
     "ficha": 5.37,
     "precio": 900000
@@ -114,8 +114,8 @@
    {
     "nombre": "Ayala, Thyago",
     "equipo": "Sarmiento",
-    "EP": 4.55,
-    "pJuega": 0.79,
+    "EP": 5.29,
+    "pJuega": 0.91,
     "ficha": 5.33,
     "precio": 700000
    },
@@ -130,15 +130,15 @@
    {
     "nombre": "Muslera, Fernando",
     "equipo": "Estudiantes LP",
-    "EP": 3.13,
+    "EP": 3.15,
     "pJuega": 0.55,
-    "ficha": 5.25,
+    "ficha": 5.26,
     "precio": 6000000
    },
    {
     "nombre": "Arce, Ignacio",
     "equipo": "Dep. Riestra",
-    "EP": 5.22,
+    "EP": 5.24,
     "pJuega": 0.92,
     "ficha": 5.29,
     "precio": 4800000
@@ -148,15 +148,15 @@
     "equipo": "Vélez",
     "EP": 0.7,
     "pJuega": 0.12,
-    "ficha": 5.31,
+    "ficha": 5.32,
     "precio": 2400000
    },
    {
     "nombre": "Iacovich, Fabricio",
     "equipo": "Estudiantes LP",
-    "EP": 3.06,
+    "EP": 3.08,
     "pJuega": 0.54,
-    "ficha": 5.22,
+    "ficha": 5.23,
     "precio": 900000
    },
    {
@@ -194,18 +194,10 @@
    {
     "nombre": "Cambeses, Facundo",
     "equipo": "Racing",
-    "EP": 5.09,
+    "EP": 5.08,
     "pJuega": 0.92,
-    "ficha": 5.35,
+    "ficha": 5.34,
     "precio": 6300000
-   },
-   {
-    "nombre": "Galíndez, Hernán",
-    "equipo": "Huracán",
-    "EP": 4.38,
-    "pJuega": 0.79,
-    "ficha": 5.27,
-    "precio": 6000000
    },
    {
     "nombre": "Losada, Nahuel",
@@ -216,25 +208,9 @@
     "precio": 5200000
    },
    {
-    "nombre": "Ledesma, Jeremías",
-    "equipo": "Rosario Ctral.",
-    "EP": 4.58,
-    "pJuega": 0.85,
-    "ficha": 5.26,
-    "precio": 4600000
-   },
-   {
-    "nombre": "Meza, Sebastián",
-    "equipo": "Huracán",
-    "EP": 1.48,
-    "pJuega": 0.28,
-    "ficha": 5.21,
-    "precio": 1900000
-   },
-   {
     "nombre": "Cozzani, Juan Pablo",
     "equipo": "Platense",
-    "EP": 4.88,
+    "EP": 4.9,
     "pJuega": 0.91,
     "ficha": 5.23,
     "precio": 3800000
@@ -242,10 +218,34 @@
    {
     "nombre": "Beltrán, Santiago",
     "equipo": "River",
-    "EP": 4.21,
-    "pJuega": 0.79,
-    "ficha": 5.16,
+    "EP": 4.92,
+    "pJuega": 0.92,
+    "ficha": 5.15,
     "precio": 6200000
+   },
+   {
+    "nombre": "Ledesma, Jeremías",
+    "equipo": "Rosario Ctral.",
+    "EP": 4.54,
+    "pJuega": 0.85,
+    "ficha": 5.26,
+    "precio": 4600000
+   },
+   {
+    "nombre": "Galíndez, Hernán",
+    "equipo": "Huracán",
+    "EP": 4.24,
+    "pJuega": 0.79,
+    "ficha": 5.27,
+    "precio": 6000000
+   },
+   {
+    "nombre": "Acosta, Lucas",
+    "equipo": "Aldosivi",
+    "EP": 3.42,
+    "pJuega": 0.64,
+    "ficha": 5.2,
+    "precio": 1500000
    },
    {
     "nombre": "Siri Payer, Gonzalo",
@@ -256,17 +256,17 @@
     "precio": 800000
    },
    {
-    "nombre": "Herrera, Lautaro",
-    "equipo": "Estudiantes RC",
-    "EP": 3.66,
-    "pJuega": 0.69,
+    "nombre": "Sumavil, Nicolás",
+    "equipo": "Platense",
+    "EP": 0.66,
+    "pJuega": 0.12,
     "ficha": 5.2,
-    "precio": 500000
+    "precio": 700000
    },
    {
     "nombre": "Werner, Axel",
     "equipo": "Rosario Ctral.",
-    "EP": 1.1,
+    "EP": 1.09,
     "pJuega": 0.21,
     "ficha": 5.21,
     "precio": 2000000
@@ -280,27 +280,27 @@
     "precio": 3600000
    },
    {
-    "nombre": "Lastra, Agustín",
-    "equipo": "Estudiantes RC",
-    "EP": 1.04,
-    "pJuega": 0.2,
-    "ficha": 5.16,
-    "precio": 700000
+    "nombre": "Chicco, Ignacio",
+    "equipo": "Aldosivi",
+    "EP": 2.33,
+    "pJuega": 0.44,
+    "ficha": 5.15,
+    "precio": 1800000
    },
    {
-    "nombre": "Sumavil, Nicolás",
-    "equipo": "Platense",
-    "EP": 0.66,
-    "pJuega": 0.12,
-    "ficha": 5.2,
-    "precio": 700000
+    "nombre": "Meza, Sebastián",
+    "equipo": "Huracán",
+    "EP": 1.44,
+    "pJuega": 0.28,
+    "ficha": 5.21,
+    "precio": 1900000
    }
   ],
   "DEF": [
    {
     "nombre": "Ferreira, Clever",
     "equipo": "Atl. Tucumán",
-    "EP": 4.47,
+    "EP": 4.49,
     "pJuega": 0.67,
     "ficha": 5.44,
     "precio": 2100000
@@ -308,7 +308,7 @@
    {
     "nombre": "Cabrera, Bruno",
     "equipo": "Newell's",
-    "EP": 5.04,
+    "EP": 5.05,
     "pJuega": 0.75,
     "ficha": 5.24,
     "precio": 1600000
@@ -324,7 +324,7 @@
    {
     "nombre": "Álvarez, Francisco",
     "equipo": "Argentinos",
-    "EP": 6.05,
+    "EP": 6.04,
     "pJuega": 0.92,
     "ficha": 5.69,
     "precio": 4500000
@@ -332,7 +332,7 @@
    {
     "nombre": "Di Lollo, Lautaro",
     "equipo": "Boca",
-    "EP": 5.13,
+    "EP": 5.12,
     "pJuega": 0.78,
     "ficha": 5.5,
     "precio": 5200000
@@ -348,71 +348,39 @@
    {
     "nombre": "Marcich, Sasha",
     "equipo": "Lanús",
-    "EP": 5.98,
+    "EP": 5.97,
     "pJuega": 0.92,
     "ficha": 5.36,
     "precio": 4000000
    },
    {
+    "nombre": "Meza, Eric",
+    "equipo": "Estudiantes LP",
+    "EP": 2.28,
+    "pJuega": 0.35,
+    "ficha": 5.32,
+    "precio": 4100000
+   },
+   {
+    "nombre": "Silvero, Thiago",
+    "equipo": "Vélez",
+    "EP": 5.96,
+    "pJuega": 0.92,
+    "ficha": 5.64,
+    "precio": 1200000
+   },
+   {
     "nombre": "Blondel, Lucas",
     "equipo": "Huracán",
-    "EP": 5.97,
+    "EP": 5.95,
     "pJuega": 0.92,
     "ficha": 5.33,
     "precio": 3000000
    },
    {
-    "nombre": "Valenti, Matías",
-    "equipo": "Estudiantes RC",
-    "EP": 5.27,
-    "pJuega": 0.81,
-    "ficha": 5.01,
-    "precio": 600000
-   },
-   {
-    "nombre": "Silvero, Thiago",
-    "equipo": "Vélez",
-    "EP": 5.94,
-    "pJuega": 0.92,
-    "ficha": 5.63,
-    "precio": 1200000
-   },
-   {
-    "nombre": "Meza, Eric",
-    "equipo": "Estudiantes LP",
-    "EP": 2.27,
-    "pJuega": 0.35,
-    "ficha": 5.31,
-    "precio": 4100000
-   },
-   {
-    "nombre": "Cerato, Giuliano",
-    "equipo": "Instituto",
-    "EP": 4.64,
-    "pJuega": 0.72,
-    "ficha": 5.31,
-    "precio": 1900000
-   },
-   {
-    "nombre": "Sosa, Diego",
-    "equipo": "Instituto",
-    "EP": 5.92,
-    "pJuega": 0.92,
-    "ficha": 5.36,
-    "precio": 1000000
-   },
-   {
-    "nombre": "Ovando, Ignacio",
-    "equipo": "Rosario Ctral.",
-    "EP": 5.84,
-    "pJuega": 0.91,
-    "ficha": 5.61,
-    "precio": 3000000
-   },
-   {
     "nombre": "Elordi, Juan Manuel",
     "equipo": "Ind. Rivadavia",
-    "EP": 5.8,
+    "EP": 5.79,
     "pJuega": 0.9,
     "ficha": 5.28,
     "precio": 1100000
@@ -420,15 +388,47 @@
    {
     "nombre": "Ortega, Martín",
     "equipo": "Newell's",
-    "EP": 5.84,
+    "EP": 5.85,
     "pJuega": 0.91,
     "ficha": 5.41,
     "precio": 1200000
    },
    {
+    "nombre": "Ovando, Ignacio",
+    "equipo": "Rosario Ctral.",
+    "EP": 5.81,
+    "pJuega": 0.91,
+    "ficha": 5.61,
+    "precio": 3000000
+   },
+   {
+    "nombre": "Cerato, Giuliano",
+    "equipo": "Instituto",
+    "EP": 4.59,
+    "pJuega": 0.72,
+    "ficha": 5.3,
+    "precio": 1900000
+   },
+   {
+    "nombre": "Sosa, Diego",
+    "equipo": "Instituto",
+    "EP": 5.86,
+    "pJuega": 0.92,
+    "ficha": 5.35,
+    "precio": 1000000
+   },
+   {
+    "nombre": "Valenti, Matías",
+    "equipo": "Estudiantes RC",
+    "EP": 5.16,
+    "pJuega": 0.81,
+    "ficha": 4.99,
+    "precio": 600000
+   },
+   {
     "nombre": "Blanco, Lautaro",
     "equipo": "Boca",
-    "EP": 5.2,
+    "EP": 5.19,
     "pJuega": 0.82,
     "ficha": 5.58,
     "precio": 5700000
@@ -436,34 +436,42 @@
    {
     "nombre": "Ávila, Gastón",
     "equipo": "Rosario Ctral.",
-    "EP": 5.79,
+    "EP": 5.76,
     "pJuega": 0.91,
     "ficha": 5.4,
     "precio": 4800000
    },
    {
-    "nombre": "Palacios, Tomás",
-    "equipo": "Estudiantes LP",
-    "EP": 3.22,
-    "pJuega": 0.51,
-    "ficha": 5.39,
-    "precio": 4800000
-   },
-   {
     "nombre": "Montiel, Gonzalo",
     "equipo": "River",
-    "EP": 4.78,
-    "pJuega": 0.77,
-    "ficha": 5.21,
+    "EP": 5.69,
+    "pJuega": 0.9,
+    "ficha": 5.2,
     "precio": 6100000
    },
    {
-    "nombre": "Quiroga, Agustín",
-    "equipo": "Estudiantes RC",
-    "EP": 2.81,
-    "pJuega": 0.45,
-    "ficha": 4.95,
-    "precio": 800000
+    "nombre": "Palacios, Tomás",
+    "equipo": "Estudiantes LP",
+    "EP": 3.23,
+    "pJuega": 0.51,
+    "ficha": 5.4,
+    "precio": 4800000
+   },
+   {
+    "nombre": "Vallejo, Luciano",
+    "equipo": "Atl. Tucumán",
+    "EP": 5.67,
+    "pJuega": 0.92,
+    "ficha": 5.19,
+    "precio": 300000
+   },
+   {
+    "nombre": "Orihuela, Renzo",
+    "equipo": "Sarmiento",
+    "EP": 5.67,
+    "pJuega": 0.92,
+    "ficha": 5.23,
+    "precio": 1700000
    },
    {
     "nombre": "Gorosito, Dylan",
@@ -474,35 +482,27 @@
     "precio": 700000
    },
    {
-    "nombre": "Orihuela, Renzo",
-    "equipo": "Sarmiento",
-    "EP": 4.88,
-    "pJuega": 0.79,
-    "ficha": 5.23,
-    "precio": 1700000
+    "nombre": "Martínez, David",
+    "equipo": "Def. y Justicia",
+    "EP": 5.61,
+    "pJuega": 0.91,
+    "ficha": 5.44,
+    "precio": 3000000
    },
    {
-    "nombre": "Alarcón, Fernando",
-    "equipo": "Instituto",
-    "EP": 4.69,
-    "pJuega": 0.76,
-    "ficha": 5.51,
-    "precio": 3800000
-   },
-   {
-    "nombre": "Vallejo, Luciano",
-    "equipo": "Atl. Tucumán",
-    "EP": 5.65,
-    "pJuega": 0.92,
-    "ficha": 5.19,
-    "precio": 300000
+    "nombre": "Izquierdoz, Carlos",
+    "equipo": "Lanús",
+    "EP": 5.6,
+    "pJuega": 0.91,
+    "ficha": 5.37,
+    "precio": 5000000
    }
   ],
   "VOL": [
    {
     "nombre": "Ascacíbar, Santiago",
     "equipo": "Boca",
-    "EP": 4.43,
+    "EP": 4.42,
     "pJuega": 0.58,
     "ficha": 5.68,
     "precio": 6400000
@@ -510,7 +510,7 @@
    {
     "nombre": "Di María, Ángel",
     "equipo": "Rosario Ctral.",
-    "EP": 6.62,
+    "EP": 6.59,
     "pJuega": 0.88,
     "ficha": 5.78,
     "precio": 7000000
@@ -518,18 +518,26 @@
    {
     "nombre": "Luna, Alex",
     "equipo": "Instituto",
-    "EP": 6.56,
+    "EP": 6.5,
     "pJuega": 0.88,
-    "ficha": 5.7,
+    "ficha": 5.69,
     "precio": 3000000
    },
    {
     "nombre": "López Muñoz, Hernán",
     "equipo": "Argentinos",
-    "EP": 4.6,
+    "EP": 4.59,
     "pJuega": 0.66,
     "ficha": 5.54,
     "precio": 4700000
+   },
+   {
+    "nombre": "Lanzini, Manuel",
+    "equipo": "Vélez",
+    "EP": 2.32,
+    "pJuega": 0.34,
+    "ficha": 5.79,
+    "precio": 5000000
    },
    {
     "nombre": "Aranda, Tomás",
@@ -537,14 +545,6 @@
     "EP": 1.79,
     "pJuega": 0.26,
     "ficha": 5.51,
-    "precio": 5000000
-   },
-   {
-    "nombre": "Lanzini, Manuel",
-    "equipo": "Vélez",
-    "EP": 2.31,
-    "pJuega": 0.34,
-    "ficha": 5.78,
     "precio": 5000000
    },
    {
@@ -558,7 +558,7 @@
    {
     "nombre": "Florentín, José",
     "equipo": "Ind. Rivadavia",
-    "EP": 6.08,
+    "EP": 6.06,
     "pJuega": 0.91,
     "ficha": 5.57,
     "precio": 4000000
@@ -566,7 +566,7 @@
    {
     "nombre": "Peña Biafore, Felipe",
     "equipo": "Lanús",
-    "EP": 1.82,
+    "EP": 1.81,
     "pJuega": 0.28,
     "ficha": 5.35,
     "precio": 2600000
@@ -576,7 +576,7 @@
     "equipo": "Belgrano",
     "EP": 5.83,
     "pJuega": 0.89,
-    "ficha": 5.66,
+    "ficha": 5.67,
     "precio": 6700000
    },
    {
@@ -588,68 +588,68 @@
     "precio": 5400000
    },
    {
-    "nombre": "Galván, Tomás",
-    "equipo": "River",
-    "EP": 4.85,
-    "pJuega": 0.74,
-    "ficha": 5.17,
-    "precio": 2500000
-   },
-   {
     "nombre": "Lencioni, Facundo",
     "equipo": "Gimnasia Mza",
-    "EP": 5.32,
+    "EP": 5.3,
     "pJuega": 0.82,
-    "ficha": 5.45,
+    "ficha": 5.44,
     "precio": 1000000
    },
    {
     "nombre": "Mavilla, Julián",
     "equipo": "Sarmiento",
-    "EP": 4.91,
-    "pJuega": 0.76,
+    "EP": 5.65,
+    "pJuega": 0.87,
     "ficha": 5.71,
     "precio": 800000
    },
    {
     "nombre": "Barbona, David",
     "equipo": "Def. y Justicia",
-    "EP": 5.16,
+    "EP": 5.21,
     "pJuega": 0.81,
-    "ficha": 5.7,
+    "ficha": 5.71,
     "precio": 2900000
+   },
+   {
+    "nombre": "Gaitán, Nicolás",
+    "equipo": "Aldosivi",
+    "EP": 5.67,
+    "pJuega": 0.88,
+    "ficha": 5.23,
+    "precio": 2500000
+   },
+   {
+    "nombre": "Galván, Tomás",
+    "equipo": "River",
+    "EP": 5.55,
+    "pJuega": 0.87,
+    "ficha": 5.16,
+    "precio": 2500000
    },
    {
     "nombre": "Godoy, Lautaro",
     "equipo": "Atl. Tucumán",
-    "EP": 5.71,
+    "EP": 5.73,
     "pJuega": 0.9,
     "ficha": 5.54,
     "precio": 500000
    },
    {
-    "nombre": "Gaitán, Nicolás",
-    "equipo": "Aldosivi",
-    "EP": 5.58,
-    "pJuega": 0.88,
-    "ficha": 5.21,
-    "precio": 2500000
+    "nombre": "Aliendro, Rodrigo",
+    "equipo": "Vélez",
+    "EP": 5.76,
+    "pJuega": 0.91,
+    "ficha": 5.69,
+    "precio": 4000000
    },
    {
     "nombre": "Alanís, Gabriel",
     "equipo": "Estudiantes RC",
-    "EP": 5.76,
+    "EP": 5.67,
     "pJuega": 0.91,
-    "ficha": 5.2,
+    "ficha": 5.18,
     "precio": 2000000
-   },
-   {
-    "nombre": "Aliendro, Rodrigo",
-    "equipo": "Vélez",
-    "EP": 5.74,
-    "pJuega": 0.91,
-    "ficha": 5.68,
-    "precio": 4000000
    },
    {
     "nombre": "Velasco, Alan",
@@ -662,7 +662,7 @@
    {
     "nombre": "Fernández, Ignacio",
     "equipo": "Gimnasia LP",
-    "EP": 5.63,
+    "EP": 5.68,
     "pJuega": 0.91,
     "ficha": 5.95,
     "precio": 4500000
@@ -670,26 +670,26 @@
    {
     "nombre": "Castro, Lucas",
     "equipo": "Aldosivi",
-    "EP": 5.27,
+    "EP": 5.34,
     "pJuega": 0.86,
-    "ficha": 5.44,
+    "ficha": 5.46,
     "precio": 3000000
-   },
-   {
-    "nombre": "Farías, Facundo",
-    "equipo": "San Lorenzo",
-    "EP": 5.24,
-    "pJuega": 0.86,
-    "ficha": 5.3,
-    "precio": 4900000
    },
    {
     "nombre": "Iacobellis, Marco",
     "equipo": "Ctral. Córdoba",
-    "EP": 5.54,
+    "EP": 5.53,
     "pJuega": 0.91,
     "ficha": 5.37,
     "precio": 2200000
+   },
+   {
+    "nombre": "Farías, Facundo",
+    "equipo": "San Lorenzo",
+    "EP": 5.21,
+    "pJuega": 0.86,
+    "ficha": 5.29,
+    "precio": 4900000
    },
    {
     "nombre": "Paredes, Leandro",
@@ -704,23 +704,23 @@
    {
     "nombre": "Vombergar, Andrés",
     "equipo": "Aldosivi",
-    "EP": 2.11,
+    "EP": 2.16,
     "pJuega": 0.27,
-    "ficha": 5.16,
+    "ficha": 5.18,
     "precio": 2500000
    },
    {
     "nombre": "Martínez, Ronaldo",
     "equipo": "Vélez",
-    "EP": 6.82,
+    "EP": 6.86,
     "pJuega": 0.88,
-    "ficha": 5.57,
+    "ficha": 5.58,
     "precio": 6000000
    },
    {
     "nombre": "Verón, Gastón",
     "equipo": "Argentinos",
-    "EP": 6.18,
+    "EP": 6.17,
     "pJuega": 0.82,
     "ficha": 5.66,
     "precio": 2000000
@@ -736,15 +736,15 @@
    {
     "nombre": "Correa, Ángel",
     "equipo": "River",
-    "EP": 5.81,
-    "pJuega": 0.78,
-    "ficha": 5.97,
+    "EP": 6.74,
+    "pJuega": 0.91,
+    "ficha": 5.96,
     "precio": 6800000
    },
    {
     "nombre": "Arce, Alex",
     "equipo": "Ind. Rivadavia",
-    "EP": 3.04,
+    "EP": 3.03,
     "pJuega": 0.42,
     "ficha": 5.7,
     "precio": 4900000
@@ -752,7 +752,7 @@
    {
     "nombre": "Campaz, Jaminton",
     "equipo": "Rosario Ctral.",
-    "EP": 4.7,
+    "EP": 4.68,
     "pJuega": 0.66,
     "ficha": 5.74,
     "precio": 5600000
@@ -760,23 +760,23 @@
    {
     "nombre": "Marabel, Junior",
     "equipo": "Sarmiento",
-    "EP": 5.1,
-    "pJuega": 0.73,
+    "EP": 6.19,
+    "pJuega": 0.89,
     "ficha": 5.56,
     "precio": 3000000
    },
    {
     "nombre": "Módica, Agustín",
     "equipo": "Gimnasia Mza",
-    "EP": 5.94,
+    "EP": 5.91,
     "pJuega": 0.85,
-    "ficha": 5.65,
+    "ficha": 5.64,
     "precio": 1200000
    },
    {
     "nombre": "Flores, Leonel",
     "equipo": "Boca",
-    "EP": 4.96,
+    "EP": 4.95,
     "pJuega": 0.71,
     "ficha": 5.81,
     "precio": 500000
@@ -792,7 +792,7 @@
    {
     "nombre": "Fernández, Matías",
     "equipo": "Ind. Rivadavia",
-    "EP": 5.75,
+    "EP": 5.73,
     "pJuega": 0.84,
     "ficha": 5.76,
     "precio": 4000000
@@ -800,7 +800,7 @@
    {
     "nombre": "Merentiel, Miguel Ángel",
     "equipo": "Boca",
-    "EP": 3.86,
+    "EP": 3.85,
     "pJuega": 0.57,
     "ficha": 5.33,
     "precio": 6500000
@@ -808,7 +808,7 @@
    {
     "nombre": "Molina, Tomás",
     "equipo": "Argentinos",
-    "EP": 6.12,
+    "EP": 6.11,
     "pJuega": 0.91,
     "ficha": 5.21,
     "precio": 4100000
@@ -816,7 +816,7 @@
    {
     "nombre": "Santos, Michael",
     "equipo": "Ctral. Córdoba",
-    "EP": 3.75,
+    "EP": 3.74,
     "pJuega": 0.56,
     "ficha": 5.39,
     "precio": 3500000
@@ -832,15 +832,23 @@
    {
     "nombre": "Almada, Thiago",
     "equipo": "River",
-    "EP": 2.27,
-    "pJuega": 0.34,
-    "ficha": 5.6,
+    "EP": 3.96,
+    "pJuega": 0.6,
+    "ficha": 5.59,
     "precio": 7000000
+   },
+   {
+    "nombre": "Auzmendi, Agustín",
+    "equipo": "Gimnasia LP",
+    "EP": 5.89,
+    "pJuega": 0.89,
+    "ficha": 5.38,
+    "precio": 2500000
    },
    {
     "nombre": "Aquino, Dylan",
     "equipo": "Lanús",
-    "EP": 0.96,
+    "EP": 0.95,
     "pJuega": 0.14,
     "ficha": 5.37,
     "precio": 2900000
@@ -848,7 +856,7 @@
    {
     "nombre": "Tarragona, Cristian",
     "equipo": "Unión",
-    "EP": 5.77,
+    "EP": 5.75,
     "pJuega": 0.88,
     "ficha": 5.3,
     "precio": 4000000
@@ -856,47 +864,39 @@
    {
     "nombre": "Montiel, Santiago",
     "equipo": "Independiente",
-    "EP": 5.89,
+    "EP": 5.9,
     "pJuega": 0.91,
-    "ficha": 5.38,
+    "ficha": 5.39,
     "precio": 4700000
    },
    {
     "nombre": "Driussi, Sebastián",
     "equipo": "River",
-    "EP": 4.18,
-    "pJuega": 0.64,
-    "ficha": 5.34,
+    "EP": 5.36,
+    "pJuega": 0.83,
+    "ficha": 5.33,
     "precio": 6400000
-   },
-   {
-    "nombre": "Copetti, Enzo",
-    "equipo": "Rosario Ctral.",
-    "EP": 5.56,
-    "pJuega": 0.86,
-    "ficha": 5.14,
-    "precio": 4700000
    },
    {
     "nombre": "Salvio, Eduardo",
     "equipo": "Lanús",
-    "EP": 5.71,
+    "EP": 5.7,
     "pJuega": 0.88,
     "ficha": 5.39,
     "precio": 5200000
    },
    {
-    "nombre": "Auzmendi, Agustín",
-    "equipo": "Gimnasia LP",
-    "EP": 5.79,
-    "pJuega": 0.89,
-    "ficha": 5.38,
-    "precio": 2500000
+    "nombre": "Copetti, Enzo",
+    "equipo": "Rosario Ctral.",
+    "EP": 5.53,
+    "pJuega": 0.86,
+    "ficha": 5.14,
+    "precio": 4700000
    },
    {
     "nombre": "Orsini, Nicolás",
     "equipo": "Barracas Ctral.",
-    "EP": 3.53,
+    "EP": 3.52,
     "pJuega": 0.55,
     "ficha": 5.38,
     "precio": 2500000
@@ -907,31 +907,31 @@
   {
    "local": "Atlético Huracán",
    "visitante": "Gimnasia La Plata",
-   "pGolLocal": 0.687,
-   "pGolVisitante": 0.617,
-   "pVallaLocal": 0.383,
-   "pVallaVisitante": 0.313,
-   "golesEsperadosLocal": 1.16,
-   "golesEsperadosVisitante": 0.96
+   "pGolLocal": 0.708,
+   "pGolVisitante": 0.647,
+   "pVallaLocal": 0.353,
+   "pVallaVisitante": 0.292,
+   "golesEsperadosLocal": 1.23,
+   "golesEsperadosVisitante": 1.04
   },
   {
    "local": "Defensa y Justicia",
    "visitante": "Instituto de Córdoba",
-   "pGolLocal": 0.674,
-   "pGolVisitante": 0.68,
-   "pVallaLocal": 0.32,
-   "pVallaVisitante": 0.326,
-   "golesEsperadosLocal": 1.12,
-   "golesEsperadosVisitante": 1.14
+   "pGolLocal": 0.69,
+   "pGolVisitante": 0.67,
+   "pVallaLocal": 0.33,
+   "pVallaVisitante": 0.31,
+   "golesEsperadosLocal": 1.17,
+   "golesEsperadosVisitante": 1.11
   },
   {
    "local": "Boca Juniors",
    "visitante": "Talleres",
-   "pGolLocal": 0.779,
+   "pGolLocal": 0.777,
    "pGolVisitante": 0.592,
    "pVallaLocal": 0.408,
-   "pVallaVisitante": 0.221,
-   "golesEsperadosLocal": 1.509,
+   "pVallaVisitante": 0.223,
+   "golesEsperadosLocal": 1.5,
    "golesEsperadosVisitante": 0.896
   },
   {
@@ -947,129 +947,129 @@
   {
    "local": "Independiente Rivadavia",
    "visitante": "CA Tigre BA",
-   "pGolLocal": 0.751,
+   "pGolLocal": 0.746,
    "pGolVisitante": 0.581,
    "pVallaLocal": 0.419,
-   "pVallaVisitante": 0.249,
-   "golesEsperadosLocal": 1.39,
+   "pVallaVisitante": 0.254,
+   "golesEsperadosLocal": 1.37,
    "golesEsperadosVisitante": 0.87
   },
   {
    "local": "Platense",
    "visitante": "Lanus",
    "pGolLocal": 0.625,
-   "pGolVisitante": 0.632,
-   "pVallaLocal": 0.368,
+   "pGolVisitante": 0.628,
+   "pVallaLocal": 0.372,
    "pVallaVisitante": 0.375,
    "golesEsperadosLocal": 0.98,
-   "golesEsperadosVisitante": 1
+   "golesEsperadosVisitante": 0.99
   },
   {
    "local": "Atlético Tucuman",
    "visitante": "Rosario Central",
-   "pGolLocal": 0.628,
-   "pGolVisitante": 0.696,
-   "pVallaLocal": 0.304,
-   "pVallaVisitante": 0.372,
-   "golesEsperadosLocal": 0.99,
-   "golesEsperadosVisitante": 1.19
+   "pGolLocal": 0.636,
+   "pGolVisitante": 0.69,
+   "pVallaLocal": 0.31,
+   "pVallaVisitante": 0.364,
+   "golesEsperadosLocal": 1.01,
+   "golesEsperadosVisitante": 1.17
   },
   {
    "local": "Velez Sarsfield BA",
    "visitante": "Gimnasia Mendoza",
-   "pGolLocal": 0.783,
-   "pGolVisitante": 0.585,
-   "pVallaLocal": 0.415,
-   "pVallaVisitante": 0.217,
-   "golesEsperadosLocal": 1.53,
-   "golesEsperadosVisitante": 0.88
+   "pGolLocal": 0.788,
+   "pGolVisitante": 0.581,
+   "pVallaLocal": 0.419,
+   "pVallaVisitante": 0.212,
+   "golesEsperadosLocal": 1.55,
+   "golesEsperadosVisitante": 0.87
   },
   {
    "local": "Racing Club",
    "visitante": "Independiente",
-   "pGolLocal": 0.746,
+   "pGolLocal": 0.743,
    "pGolVisitante": 0.625,
    "pVallaLocal": 0.375,
-   "pVallaVisitante": 0.254,
-   "golesEsperadosLocal": 1.37,
+   "pVallaVisitante": 0.257,
+   "golesEsperadosLocal": 1.36,
    "golesEsperadosVisitante": 0.98
   },
   {
    "local": "Estudiantes de Río Cuarto",
    "visitante": "Aldosivi Mar del Plata",
-   "pGolLocal": 0.65,
-   "pGolVisitante": 0.625,
-   "pVallaLocal": 0.375,
-   "pVallaVisitante": 0.35,
-   "golesEsperadosLocal": 1.05,
-   "golesEsperadosVisitante": 0.98
+   "pGolLocal": 0.628,
+   "pGolVisitante": 0.643,
+   "pVallaLocal": 0.357,
+   "pVallaVisitante": 0.372,
+   "golesEsperadosLocal": 0.99,
+   "golesEsperadosVisitante": 1.03
   },
   {
    "local": "Estudiantes",
    "visitante": "San Lorenzo",
-   "pGolLocal": 0.705,
-   "pGolVisitante": 0.568,
-   "pVallaLocal": 0.432,
-   "pVallaVisitante": 0.295,
-   "golesEsperadosLocal": 1.22,
-   "golesEsperadosVisitante": 0.84
+   "pGolLocal": 0.708,
+   "pGolVisitante": 0.564,
+   "pVallaLocal": 0.436,
+   "pVallaVisitante": 0.292,
+   "golesEsperadosLocal": 1.23,
+   "golesEsperadosVisitante": 0.83
   },
   {
    "local": "Belgrano de Cordoba",
    "visitante": "River Plate",
-   "pGolLocal": 0.632,
-   "pGolVisitante": 0.719,
-   "pVallaLocal": 0.281,
-   "pVallaVisitante": 0.368,
-   "golesEsperadosLocal": 1,
-   "golesEsperadosVisitante": 1.27
+   "pGolLocal": 0.625,
+   "pGolVisitante": 0.702,
+   "pVallaLocal": 0.298,
+   "pVallaVisitante": 0.375,
+   "golesEsperadosLocal": 0.98,
+   "golesEsperadosVisitante": 1.21
   },
   {
    "local": "Sarmiento de Junin",
    "visitante": "Barracas Central",
-   "pGolLocal": 0.696,
-   "pGolVisitante": 0.585,
-   "pVallaLocal": 0.415,
-   "pVallaVisitante": 0.304,
-   "golesEsperadosLocal": 1.19,
-   "golesEsperadosVisitante": 0.88
+   "pGolLocal": 0.69,
+   "pGolVisitante": 0.581,
+   "pVallaLocal": 0.419,
+   "pVallaVisitante": 0.31,
+   "golesEsperadosLocal": 1.17,
+   "golesEsperadosVisitante": 0.87
   },
   {
    "local": "Newells Old Boys",
    "visitante": "Central Córdoba",
    "pGolLocal": 0.741,
-   "pGolVisitante": 0.585,
-   "pVallaLocal": 0.415,
+   "pGolVisitante": 0.581,
+   "pVallaLocal": 0.419,
    "pVallaVisitante": 0.259,
    "golesEsperadosLocal": 1.35,
-   "golesEsperadosVisitante": 0.88
+   "golesEsperadosVisitante": 0.87
   },
   {
    "local": "Deportivo Riestra",
    "visitante": "Union Santa Fe",
    "pGolLocal": 0.69,
-   "pGolVisitante": 0.589,
-   "pVallaLocal": 0.411,
+   "pGolVisitante": 0.585,
+   "pVallaLocal": 0.415,
    "pVallaVisitante": 0.31,
    "golesEsperadosLocal": 1.17,
-   "golesEsperadosVisitante": 0.89
+   "golesEsperadosVisitante": 0.88
   }
  ],
  "todos": [
   {
    "k": "marchiori tomas@velez@ARQ",
-   "EP": 5.36,
+   "EP": 5.39,
    "pj": 0.92
   },
   {
    "k": "reinatti josue@newells@ARQ",
-   "EP": 5.33,
+   "EP": 5.35,
    "pj": 0.92
   },
   {
    "k": "ayala thyago@sarmiento@ARQ",
-   "EP": 4.55,
-   "pj": 0.79
+   "EP": 5.29,
+   "pj": 0.91
   },
   {
    "k": "bolcato nicolas@ind-rivadavia@ARQ",
@@ -1078,12 +1078,12 @@
   },
   {
    "k": "muslera fernando@estudiantes-lp@ARQ",
-   "EP": 3.13,
+   "EP": 3.15,
    "pj": 0.55
   },
   {
    "k": "arce ignacio@riestra@ARQ",
-   "EP": 5.22,
+   "EP": 5.24,
    "pj": 0.92
   },
   {
@@ -1093,7 +1093,7 @@
   },
   {
    "k": "iacovich fabricio@estudiantes-lp@ARQ",
-   "EP": 3.06,
+   "EP": 3.08,
    "pj": 0.54
   },
   {
@@ -1118,13 +1118,8 @@
   },
   {
    "k": "cambeses facundo@racing@ARQ",
-   "EP": 5.09,
+   "EP": 5.08,
    "pj": 0.92
-  },
-  {
-   "k": "galindez hernan@huracan@ARQ",
-   "EP": 4.38,
-   "pj": 0.79
   },
   {
    "k": "losada nahuel@lanus@ARQ",
@@ -1132,24 +1127,29 @@
    "pj": 0.92
   },
   {
-   "k": "ledesma jeremias@rosario-central@ARQ",
-   "EP": 4.58,
-   "pj": 0.85
-  },
-  {
-   "k": "meza sebastian@huracan@ARQ",
-   "EP": 1.48,
-   "pj": 0.28
-  },
-  {
    "k": "cozzani juan pablo@platense@ARQ",
-   "EP": 4.88,
+   "EP": 4.9,
    "pj": 0.91
   },
   {
    "k": "beltran santiago@river@ARQ",
-   "EP": 4.21,
+   "EP": 4.92,
+   "pj": 0.92
+  },
+  {
+   "k": "ledesma jeremias@rosario-central@ARQ",
+   "EP": 4.54,
+   "pj": 0.85
+  },
+  {
+   "k": "galindez hernan@huracan@ARQ",
+   "EP": 4.24,
    "pj": 0.79
+  },
+  {
+   "k": "acosta lucas@aldosivi@ARQ",
+   "EP": 3.42,
+   "pj": 0.64
   },
   {
    "k": "siri payer gonzalo@argentinos@ARQ",
@@ -1157,13 +1157,13 @@
    "pj": 0.28
   },
   {
-   "k": "herrera lautaro@estudiantes-rc@ARQ",
-   "EP": 3.66,
-   "pj": 0.69
+   "k": "sumavil nicolas@platense@ARQ",
+   "EP": 0.66,
+   "pj": 0.12
   },
   {
    "k": "werner axel@rosario-central@ARQ",
-   "EP": 1.1,
+   "EP": 1.09,
    "pj": 0.21
   },
   {
@@ -1172,44 +1172,34 @@
    "pj": 0.79
   },
   {
-   "k": "lastra agustin@estudiantes-rc@ARQ",
-   "EP": 1.04,
-   "pj": 0.2
-  },
-  {
-   "k": "sumavil nicolas@platense@ARQ",
-   "EP": 0.66,
-   "pj": 0.12
-  },
-  {
-   "k": "bruera lucas@estudiantes-rc@ARQ",
-   "EP": 1.31,
-   "pj": 0.25
-  },
-  {
-   "k": "acosta lucas@aldosivi@ARQ",
-   "EP": 3.32,
-   "pj": 0.64
-  },
-  {
-   "k": "borgogno matias@defensa@ARQ",
-   "EP": 4.69,
-   "pj": 0.92
-  },
-  {
    "k": "chicco ignacio@aldosivi@ARQ",
-   "EP": 2.27,
+   "EP": 2.33,
    "pj": 0.44
   },
   {
-   "k": "ledesma marcos@instituto@ARQ",
-   "EP": 4.59,
+   "k": "meza sebastian@huracan@ARQ",
+   "EP": 1.44,
+   "pj": 0.28
+  },
+  {
+   "k": "borgogno matias@defensa@ARQ",
+   "EP": 4.76,
    "pj": 0.92
   },
   {
-   "k": "insfran nelson@gimnasia-lp@ARQ",
-   "EP": 4.59,
-   "pj": 0.92
+   "k": "herrera lautaro@estudiantes-rc@ARQ",
+   "EP": 3.58,
+   "pj": 0.69
+  },
+  {
+   "k": "lastra agustin@estudiantes-rc@ARQ",
+   "EP": 1.02,
+   "pj": 0.2
+  },
+  {
+   "k": "bruera lucas@estudiantes-rc@ARQ",
+   "EP": 1.28,
+   "pj": 0.25
   },
   {
    "k": "mansilla matias@union@ARQ",
@@ -1218,32 +1208,42 @@
   },
   {
    "k": "ingolotti luis@atl-tucuman@ARQ",
-   "EP": 4.48,
+   "EP": 4.51,
    "pj": 0.92
   },
   {
-   "k": "insua juan pablo@barracas@ARQ",
-   "EP": 0.95,
-   "pj": 0.2
+   "k": "ledesma marcos@instituto@ARQ",
+   "EP": 4.49,
+   "pj": 0.92
+  },
+  {
+   "k": "insfran nelson@gimnasia-lp@ARQ",
+   "EP": 4.46,
+   "pj": 0.92
   },
   {
    "k": "vicentini manuel@belgrano@ARQ",
-   "EP": 3.28,
+   "EP": 3.36,
    "pj": 0.69
   },
   {
    "k": "cardozo thiago@belgrano@ARQ",
-   "EP": 1.84,
+   "EP": 1.89,
    "pj": 0.39
   },
   {
+   "k": "insua juan pablo@barracas@ARQ",
+   "EP": 0.96,
+   "pj": 0.2
+  },
+  {
    "k": "mino marcelo@barracas@ARQ",
-   "EP": 4.31,
+   "EP": 4.34,
    "pj": 0.92
   },
   {
    "k": "devecchi jose@san-lorenzo@ARQ",
-   "EP": 4.28,
+   "EP": 4.25,
    "pj": 0.91
   },
   {
@@ -1257,14 +1257,14 @@
    "pj": 0.9
   },
   {
+   "k": "rey rodrigo@independiente@ARQ",
+   "EP": 4.09,
+   "pj": 0.92
+  },
+  {
    "k": "vallejos javier@central-cordoba@ARQ",
    "EP": 0.53,
    "pj": 0.12
-  },
-  {
-   "k": "rey rodrigo@independiente@ARQ",
-   "EP": 4.06,
-   "pj": 0.92
   },
   {
    "k": "cano thiago@banfield@ARQ",
@@ -1272,8 +1272,18 @@
    "pj": 0.15
   },
   {
+   "k": "zenobio felipe@tigre@ARQ",
+   "EP": 4.03,
+   "pj": 0.91
+  },
+  {
    "k": "gill orlando@san-lorenzo@ARQ",
    "EP": 0.54,
+   "pj": 0.12
+  },
+  {
+   "k": "morales lautaro@tigre@ARQ",
+   "EP": 0.53,
    "pj": 0.12
   },
   {
@@ -1282,33 +1292,23 @@
    "pj": 0.13
   },
   {
-   "k": "zenobio felipe@tigre@ARQ",
-   "EP": 3.98,
-   "pj": 0.91
-  },
-  {
-   "k": "morales lautaro@tigre@ARQ",
-   "EP": 0.53,
-   "pj": 0.12
-  },
-  {
    "k": "unsain ezequiel@talleres@ARQ",
-   "EP": 3.96,
+   "EP": 3.97,
    "pj": 0.92
   },
   {
    "k": "rigamonti cesar@gimnasia-mza@ARQ",
-   "EP": 3.92,
+   "EP": 3.88,
    "pj": 0.92
   },
   {
    "k": "ferreira clever@atl-tucuman@DEF",
-   "EP": 4.47,
+   "EP": 4.49,
    "pj": 0.67
   },
   {
    "k": "cabrera bruno@newells@DEF",
-   "EP": 5.04,
+   "EP": 5.05,
    "pj": 0.75
   },
   {
@@ -1318,12 +1318,12 @@
   },
   {
    "k": "alvarez francisco@argentinos@DEF",
-   "EP": 6.05,
+   "EP": 6.04,
    "pj": 0.92
   },
   {
    "k": "di lollo lautaro@boca@DEF",
-   "EP": 5.13,
+   "EP": 5.12,
    "pj": 0.78
   },
   {
@@ -1333,78 +1333,83 @@
   },
   {
    "k": "marcich sasha@lanus@DEF",
-   "EP": 5.98,
-   "pj": 0.92
-  },
-  {
-   "k": "blondel lucas@huracan@DEF",
    "EP": 5.97,
    "pj": 0.92
   },
   {
-   "k": "valenti matias@estudiantes-rc@DEF",
-   "EP": 5.27,
-   "pj": 0.81
-  },
-  {
-   "k": "silvero thiago@velez@DEF",
-   "EP": 5.94,
-   "pj": 0.92
-  },
-  {
    "k": "meza eric@estudiantes-lp@DEF",
-   "EP": 2.27,
+   "EP": 2.28,
    "pj": 0.35
   },
   {
-   "k": "cerato giuliano@instituto@DEF",
-   "EP": 4.64,
-   "pj": 0.72
-  },
-  {
-   "k": "sosa diego@instituto@DEF",
-   "EP": 5.92,
+   "k": "silvero thiago@velez@DEF",
+   "EP": 5.96,
    "pj": 0.92
   },
   {
-   "k": "ovando ignacio@rosario-central@DEF",
-   "EP": 5.84,
-   "pj": 0.91
+   "k": "blondel lucas@huracan@DEF",
+   "EP": 5.95,
+   "pj": 0.92
   },
   {
    "k": "elordi juan manuel@ind-rivadavia@DEF",
-   "EP": 5.8,
+   "EP": 5.79,
    "pj": 0.9
   },
   {
    "k": "ortega martin@newells@DEF",
-   "EP": 5.84,
+   "EP": 5.85,
    "pj": 0.91
   },
   {
+   "k": "ovando ignacio@rosario-central@DEF",
+   "EP": 5.81,
+   "pj": 0.91
+  },
+  {
+   "k": "cerato giuliano@instituto@DEF",
+   "EP": 4.59,
+   "pj": 0.72
+  },
+  {
+   "k": "sosa diego@instituto@DEF",
+   "EP": 5.86,
+   "pj": 0.92
+  },
+  {
+   "k": "valenti matias@estudiantes-rc@DEF",
+   "EP": 5.16,
+   "pj": 0.81
+  },
+  {
    "k": "blanco lautaro@boca@DEF",
-   "EP": 5.2,
+   "EP": 5.19,
    "pj": 0.82
   },
   {
    "k": "avila gaston@rosario-central@DEF",
-   "EP": 5.79,
+   "EP": 5.76,
    "pj": 0.91
   },
   {
+   "k": "montiel gonzalo@river@DEF",
+   "EP": 5.69,
+   "pj": 0.9
+  },
+  {
    "k": "palacios tomas@estudiantes-lp@DEF",
-   "EP": 3.22,
+   "EP": 3.23,
    "pj": 0.51
   },
   {
-   "k": "montiel gonzalo@river@DEF",
-   "EP": 4.78,
-   "pj": 0.77
+   "k": "vallejo luciano@atl-tucuman@DEF",
+   "EP": 5.67,
+   "pj": 0.92
   },
   {
-   "k": "quiroga agustin@estudiantes-rc@DEF",
-   "EP": 2.81,
-   "pj": 0.45
+   "k": "orihuela renzo@sarmiento@DEF",
+   "EP": 5.67,
+   "pj": 0.92
   },
   {
    "k": "gorosito dylan@boca@DEF",
@@ -1412,24 +1417,9 @@
    "pj": 0.36
   },
   {
-   "k": "orihuela renzo@sarmiento@DEF",
-   "EP": 4.88,
-   "pj": 0.79
-  },
-  {
-   "k": "alarcon fernando@instituto@DEF",
-   "EP": 4.69,
-   "pj": 0.76
-  },
-  {
-   "k": "vallejo luciano@atl-tucuman@DEF",
-   "EP": 5.65,
-   "pj": 0.92
-  },
-  {
-   "k": "acuna marcos@river@DEF",
-   "EP": 4.48,
-   "pj": 0.73
+   "k": "martinez david@defensa@DEF",
+   "EP": 5.61,
+   "pj": 0.91
   },
   {
    "k": "izquierdoz carlos@lanus@DEF",
@@ -1438,13 +1428,8 @@
   },
   {
    "k": "escudero gonzalo@racing@DEF",
-   "EP": 5.01,
+   "EP": 5,
    "pj": 0.82
-  },
-  {
-   "k": "pellegrino marco@boca@DEF",
-   "EP": 3.91,
-   "pj": 0.64
   },
   {
    "k": "silva torrejon pedro@gimnasia-lp@DEF",
@@ -1452,13 +1437,33 @@
    "pj": 0.57
   },
   {
-   "k": "martinez david@defensa@DEF",
-   "EP": 5.56,
-   "pj": 0.91
+   "k": "alarcon fernando@instituto@DEF",
+   "EP": 4.64,
+   "pj": 0.76
+  },
+  {
+   "k": "pellegrino marco@boca@DEF",
+   "EP": 3.91,
+   "pj": 0.64
+  },
+  {
+   "k": "quiroga agustin@estudiantes-rc@DEF",
+   "EP": 2.75,
+   "pj": 0.45
+  },
+  {
+   "k": "mancuso eros@estudiantes-lp@DEF",
+   "EP": 3.2,
+   "pj": 0.53
+  },
+  {
+   "k": "magallan lisandro@velez@DEF",
+   "EP": 5.16,
+   "pj": 0.85
   },
   {
    "k": "costa leonard@ind-rivadavia@DEF",
-   "EP": 5.52,
+   "EP": 5.51,
    "pj": 0.91
   },
   {
@@ -1467,24 +1472,24 @@
    "pj": 0.88
   },
   {
-   "k": "mosevich leonel@instituto@DEF",
-   "EP": 5.55,
-   "pj": 0.92
+   "k": "rojo marcos@estudiantes-lp@DEF",
+   "EP": 2.16,
+   "pj": 0.36
   },
   {
-   "k": "mancuso eros@estudiantes-lp@DEF",
-   "EP": 3.19,
-   "pj": 0.53
+   "k": "acuna marcos@river@DEF",
+   "EP": 5.22,
+   "pj": 0.86
   },
   {
-   "k": "magallan lisandro@velez@DEF",
-   "EP": 5.14,
-   "pj": 0.85
+   "k": "nunez santiago@estudiantes-lp@DEF",
+   "EP": 3.53,
+   "pj": 0.58
   },
   {
-   "k": "canale jose maria@lanus@DEF",
-   "EP": 3.77,
-   "pj": 0.62
+   "k": "escobar simon@velez@DEF",
+   "EP": 3.06,
+   "pj": 0.51
   },
   {
    "k": "figal nicolas@boca@DEF",
@@ -1492,24 +1497,29 @@
    "pj": 0.33
   },
   {
+   "k": "otamendi nicolas@river@DEF",
+   "EP": 5.53,
+   "pj": 0.92
+  },
+  {
+   "k": "garcia joaquin@velez@DEF",
+   "EP": 5.53,
+   "pj": 0.92
+  },
+  {
+   "k": "canale jose maria@lanus@DEF",
+   "EP": 3.77,
+   "pj": 0.62
+  },
+  {
    "k": "osella alejo@ind-rivadavia@DEF",
    "EP": 0.88,
    "pj": 0.15
   },
   {
-   "k": "rojo marcos@estudiantes-lp@DEF",
-   "EP": 2.15,
-   "pj": 0.36
-  },
-  {
-   "k": "otamendi nicolas@river@DEF",
-   "EP": 4.77,
-   "pj": 0.79
-  },
-  {
-   "k": "escobar simon@velez@DEF",
-   "EP": 3.05,
-   "pj": 0.51
+   "k": "banegas nahuel@independiente@DEF",
+   "EP": 4.68,
+   "pj": 0.78
   },
   {
    "k": "perez matias@racing@DEF",
@@ -1517,28 +1527,28 @@
    "pj": 0.23
   },
   {
-   "k": "garcia joaquin@velez@DEF",
-   "EP": 5.51,
+   "k": "mosevich leonel@instituto@DEF",
+   "EP": 5.49,
    "pj": 0.92
   },
   {
-   "k": "nunez santiago@estudiantes-lp@DEF",
-   "EP": 3.52,
-   "pj": 0.58
+   "k": "zalazar nicolas@aldosivi@DEF",
+   "EP": 2.97,
+   "pj": 0.5
   },
   {
-   "k": "banegas nahuel@independiente@DEF",
-   "EP": 4.67,
-   "pj": 0.78
+   "k": "lopez lisandro@belgrano@DEF",
+   "EP": 5.48,
+   "pj": 0.92
   },
   {
-   "k": "daniele santiago@banfield@DEF",
-   "EP": 5.17,
-   "pj": 0.87
+   "k": "valdez sebastian@independiente@DEF",
+   "EP": 2.62,
+   "pj": 0.44
   },
   {
    "k": "giannetti lautaro@newells@DEF",
-   "EP": 2.4,
+   "EP": 2.41,
    "pj": 0.4
   },
   {
@@ -1547,14 +1557,9 @@
    "pj": 0.15
   },
   {
-   "k": "cannavo ezequiel@racing@DEF",
-   "EP": 4.9,
-   "pj": 0.82
-  },
-  {
-   "k": "valdez sebastian@independiente@DEF",
-   "EP": 2.61,
-   "pj": 0.44
+   "k": "daniele santiago@banfield@DEF",
+   "EP": 5.17,
+   "pj": 0.87
   },
   {
    "k": "coronel kevin@argentinos@DEF",
@@ -1562,9 +1567,14 @@
    "pj": 0.24
   },
   {
-   "k": "lopez lisandro@belgrano@DEF",
-   "EP": 5.44,
-   "pj": 0.92
+   "k": "cannavo ezequiel@racing@DEF",
+   "EP": 4.89,
+   "pj": 0.82
+  },
+  {
+   "k": "pombo joaquin@aldosivi@DEF",
+   "EP": 3.57,
+   "pj": 0.6
   },
   {
    "k": "saborido juan ignacio@platense@DEF",
@@ -1573,13 +1583,8 @@
   },
   {
    "k": "martinez enzo@gimnasia-lp@DEF",
-   "EP": 5.42,
+   "EP": 5.41,
    "pj": 0.92
-  },
-  {
-   "k": "insaurralde juan manuel@sarmiento@DEF",
-   "EP": 4.65,
-   "pj": 0.79
   },
   {
    "k": "mammana emanuel@velez@DEF",
@@ -1587,39 +1592,39 @@
    "pj": 0.2
   },
   {
-   "k": "vicente marco@rosario-central@DEF",
-   "EP": 4.5,
-   "pj": 0.76
-  },
-  {
-   "k": "soto alexis@rosario-central@DEF",
-   "EP": 1.94,
-   "pj": 0.33
-  },
-  {
-   "k": "zalazar nicolas@aldosivi@DEF",
-   "EP": 2.92,
-   "pj": 0.5
-  },
-  {
-   "k": "carrizo lucas@newells@DEF",
-   "EP": 5.2,
-   "pj": 0.89
-  },
-  {
-   "k": "mendoza mateo@argentinos@DEF",
-   "EP": 1.62,
-   "pj": 0.28
+   "k": "insaurralde juan manuel@sarmiento@DEF",
+   "EP": 5.41,
+   "pj": 0.92
   },
   {
    "k": "loza valentin@defensa@DEF",
-   "EP": 5.33,
+   "EP": 5.37,
    "pj": 0.91
   },
   {
-   "k": "dejesus ronaldo@lanus@DEF",
-   "EP": 2.75,
-   "pj": 0.47
+   "k": "suarez lucas@sarmiento@DEF",
+   "EP": 5.14,
+   "pj": 0.87
+  },
+  {
+   "k": "roman fernando@defensa@DEF",
+   "EP": 2.63,
+   "pj": 0.45
+  },
+  {
+   "k": "gomez elias@velez@DEF",
+   "EP": 5.37,
+   "pj": 0.92
+  },
+  {
+   "k": "carrizo lucas@newells@DEF",
+   "EP": 5.21,
+   "pj": 0.89
+  },
+  {
+   "k": "vicente marco@rosario-central@DEF",
+   "EP": 4.48,
+   "pj": 0.76
   },
   {
    "k": "vazquez ignacio@platense@DEF",
@@ -1627,19 +1632,24 @@
    "pj": 0.29
   },
   {
-   "k": "gomez elias@velez@DEF",
-   "EP": 5.35,
-   "pj": 0.92
-  },
-  {
-   "k": "suarez lucas@sarmiento@DEF",
-   "EP": 4.08,
-   "pj": 0.7
+   "k": "mendoza mateo@argentinos@DEF",
+   "EP": 1.62,
+   "pj": 0.28
   },
   {
    "k": "randazzo juan cruz@riestra@DEF",
-   "EP": 4.04,
+   "EP": 4.05,
    "pj": 0.69
+  },
+  {
+   "k": "dejesus ronaldo@lanus@DEF",
+   "EP": 2.75,
+   "pj": 0.47
+  },
+  {
+   "k": "soto alexis@rosario-central@DEF",
+   "EP": 1.94,
+   "pj": 0.33
   },
   {
    "k": "braida malcom@boca@DEF",
@@ -1647,44 +1657,19 @@
    "pj": 0.5
   },
   {
-   "k": "ojeda sergio@estudiantes-rc@DEF",
-   "EP": 2.91,
-   "pj": 0.5
-  },
-  {
-   "k": "sandez agustin@rosario-central@DEF",
-   "EP": 4.32,
-   "pj": 0.74
-  },
-  {
-   "k": "pombo joaquin@aldosivi@DEF",
-   "EP": 3.51,
-   "pj": 0.6
-  },
-  {
-   "k": "jappert kevin@barracas@DEF",
-   "EP": 4.7,
-   "pj": 0.81
-  },
-  {
-   "k": "aguirre misael@union@DEF",
-   "EP": 1.05,
-   "pj": 0.18
-  },
-  {
-   "k": "studer sheyko@ind-rivadavia@DEF",
-   "EP": 4.85,
-   "pj": 0.83
-  },
-  {
    "k": "arrayago juan miguel@independiente@DEF",
-   "EP": 4.54,
+   "EP": 4.55,
    "pj": 0.78
   },
   {
-   "k": "roman fernando@defensa@DEF",
-   "EP": 2.6,
-   "pj": 0.45
+   "k": "salle santiago@sarmiento@DEF",
+   "EP": 4.44,
+   "pj": 0.76
+  },
+  {
+   "k": "jappert kevin@barracas@DEF",
+   "EP": 4.71,
+   "pj": 0.81
   },
   {
    "k": "goitea nicolas@newells@DEF",
@@ -1692,19 +1677,34 @@
    "pj": 0.12
   },
   {
-   "k": "paz cristian@riestra@DEF",
-   "EP": 5.32,
-   "pj": 0.92
-  },
-  {
-   "k": "maffini gonzalo@estudiantes-rc@DEF",
-   "EP": 5.32,
-   "pj": 0.92
-  },
-  {
    "k": "rak yonatthan@barracas@DEF",
-   "EP": 5.25,
+   "EP": 5.26,
    "pj": 0.9
+  },
+  {
+   "k": "studer sheyko@ind-rivadavia@DEF",
+   "EP": 4.85,
+   "pj": 0.83
+  },
+  {
+   "k": "sandez agustin@rosario-central@DEF",
+   "EP": 4.3,
+   "pj": 0.74
+  },
+  {
+   "k": "aguirre misael@union@DEF",
+   "EP": 1.05,
+   "pj": 0.18
+  },
+  {
+   "k": "paz cristian@riestra@DEF",
+   "EP": 5.33,
+   "pj": 0.92
+  },
+  {
+   "k": "ramirez pedro@riestra@DEF",
+   "EP": 4.38,
+   "pj": 0.75
   },
   {
    "k": "herrera facundo@boca@DEF",
@@ -1712,34 +1712,44 @@
    "pj": 0.47
   },
   {
+   "k": "cufre braian@aldosivi@DEF",
+   "EP": 4.76,
+   "pj": 0.82
+  },
+  {
    "k": "satas matias@boca@DEF",
    "EP": 1.59,
    "pj": 0.27
   },
   {
-   "k": "ramirez pedro@riestra@DEF",
-   "EP": 4.37,
-   "pj": 0.75
-  },
-  {
    "k": "martinez mateo@racing@DEF",
-   "EP": 4.74,
+   "EP": 4.73,
    "pj": 0.82
   },
   {
-   "k": "galvan jonatan@instituto@DEF",
-   "EP": 5.22,
-   "pj": 0.9
-  },
-  {
-   "k": "arboleda danilo@san-lorenzo@DEF",
-   "EP": 5.27,
-   "pj": 0.91
+   "k": "barrionuevo alan@tigre@DEF",
+   "EP": 5.28,
+   "pj": 0.92
   },
   {
    "k": "sansotre nicolas@riestra@DEF",
-   "EP": 5.16,
+   "EP": 5.17,
    "pj": 0.9
+  },
+  {
+   "k": "fedorco juan manuel@independiente@DEF",
+   "EP": 3.41,
+   "pj": 0.59
+  },
+  {
+   "k": "ojeda sergio@estudiantes-rc@DEF",
+   "EP": 2.87,
+   "pj": 0.5
+  },
+  {
+   "k": "gimenez ulises@sarmiento@DEF",
+   "EP": 1.94,
+   "pj": 0.34
   },
   {
    "k": "gianini santino@argentinos@DEF",
@@ -1752,29 +1762,24 @@
    "pj": 0.78
   },
   {
-   "k": "fedorco juan manuel@independiente@DEF",
-   "EP": 3.4,
-   "pj": 0.59
+   "k": "dominguez demian@defensa@DEF",
+   "EP": 3.64,
+   "pj": 0.63
   },
   {
-   "k": "barrionuevo alan@tigre@DEF",
-   "EP": 5.26,
-   "pj": 0.92
+   "k": "arboleda danilo@san-lorenzo@DEF",
+   "EP": 5.25,
+   "pj": 0.91
   },
   {
-   "k": "gimenez ulises@sarmiento@DEF",
-   "EP": 1.93,
-   "pj": 0.34
-  },
-  {
-   "k": "cufre braian@aldosivi@DEF",
-   "EP": 4.7,
-   "pj": 0.82
-  },
-  {
-   "k": "palazzo maximo@huracan@DEF",
+   "k": "maffini gonzalo@estudiantes-rc@DEF",
    "EP": 5.24,
    "pj": 0.92
+  },
+  {
+   "k": "fernandez damian@defensa@DEF",
+   "EP": 5.2,
+   "pj": 0.91
   },
   {
    "k": "conti german@gimnasia-lp@DEF",
@@ -1782,9 +1787,24 @@
    "pj": 0.76
   },
   {
-   "k": "dominguez demian@defensa@DEF",
-   "EP": 3.61,
-   "pj": 0.63
+   "k": "breitenbruch nestor@aldosivi@DEF",
+   "EP": 1.55,
+   "pj": 0.27
+  },
+  {
+   "k": "galvan jonatan@instituto@DEF",
+   "EP": 5.17,
+   "pj": 0.9
+  },
+  {
+   "k": "bracamonte mariano@riestra@DEF",
+   "EP": 4.96,
+   "pj": 0.87
+  },
+  {
+   "k": "benedetti gaston@estudiantes-lp@DEF",
+   "EP": 3.47,
+   "pj": 0.61
   },
   {
    "k": "gomez luciano@ind-rivadavia@DEF",
@@ -1792,14 +1812,9 @@
    "pj": 0.57
   },
   {
-   "k": "fernandez damian@defensa@DEF",
-   "EP": 5.16,
-   "pj": 0.91
-  },
-  {
-   "k": "bracamonte mariano@riestra@DEF",
-   "EP": 4.95,
-   "pj": 0.87
+   "k": "pasquini nicolas@sarmiento@DEF",
+   "EP": 0.92,
+   "pj": 0.16
   },
   {
    "k": "luciano martin@newells@DEF",
@@ -1808,38 +1823,18 @@
   },
   {
    "k": "cuesta victor@platense@DEF",
-   "EP": 5.06,
+   "EP": 5.07,
    "pj": 0.89
   },
   {
-   "k": "benedetti gaston@estudiantes-lp@DEF",
-   "EP": 3.46,
-   "pj": 0.61
-  },
-  {
-   "k": "martinez quarta lucas@river@DEF",
-   "EP": 4.47,
-   "pj": 0.79
-  },
-  {
    "k": "alvarez federico@tigre@DEF",
-   "EP": 4.38,
+   "EP": 4.39,
    "pj": 0.77
   },
   {
-   "k": "pasquini nicolas@sarmiento@DEF",
-   "EP": 0.92,
-   "pj": 0.16
-  },
-  {
-   "k": "salle santiago@sarmiento@DEF",
-   "EP": 2.96,
-   "pj": 0.52
-  },
-  {
-   "k": "breitenbruch nestor@aldosivi@DEF",
-   "EP": 1.53,
-   "pj": 0.27
+   "k": "palazzo maximo@huracan@DEF",
+   "EP": 5.19,
+   "pj": 0.92
   },
   {
    "k": "souto lucas@defensa@DEF",
@@ -1847,24 +1842,24 @@
    "pj": 0.12
   },
   {
+   "k": "martinez quarta lucas@river@DEF",
+   "EP": 5.18,
+   "pj": 0.92
+  },
+  {
    "k": "sporle adrian@belgrano@DEF",
-   "EP": 4.45,
+   "EP": 4.48,
    "pj": 0.79
   },
   {
-   "k": "gonzalez gonzalo@estudiantes-rc@DEF",
-   "EP": 2.55,
-   "pj": 0.45
+   "k": "morales leonardo@belgrano@DEF",
+   "EP": 5.08,
+   "pj": 0.9
   },
   {
-   "k": "di cesare marco@racing@DEF",
-   "EP": 0.67,
-   "pj": 0.12
-  },
-  {
-   "k": "rodriguez maizon@union@DEF",
-   "EP": 0.85,
-   "pj": 0.15
+   "k": "sigali leonardo@aldosivi@DEF",
+   "EP": 4.46,
+   "pj": 0.79
   },
   {
    "k": "lopez fabricio@platense@DEF",
@@ -1872,9 +1867,9 @@
    "pj": 0.13
   },
   {
-   "k": "morales leonardo@belgrano@DEF",
-   "EP": 5.04,
-   "pj": 0.9
+   "k": "di cesare marco@racing@DEF",
+   "EP": 0.67,
+   "pj": 0.12
   },
   {
    "k": "catalan matias@talleres@DEF",
@@ -1882,19 +1877,24 @@
    "pj": 0.9
   },
   {
+   "k": "maldonado alexis@belgrano@DEF",
+   "EP": 4,
+   "pj": 0.71
+  },
+  {
    "k": "zabala facundo@independiente@DEF",
    "EP": 1.77,
    "pj": 0.32
   },
   {
-   "k": "bravo claudio@argentinos@DEF",
-   "EP": 1.51,
+   "k": "lopez elias@aldosivi@DEF",
+   "EP": 1.52,
    "pj": 0.27
   },
   {
-   "k": "gonzalez giovanni@river@DEF",
-   "EP": 0.73,
-   "pj": 0.13
+   "k": "rodriguez maizon@union@DEF",
+   "EP": 0.85,
+   "pj": 0.15
   },
   {
    "k": "pereyra joaquin@estudiantes-lp@DEF",
@@ -1902,14 +1902,19 @@
    "pj": 0.13
   },
   {
-   "k": "antonini juan@estudiantes-rc@DEF",
-   "EP": 4.86,
-   "pj": 0.87
+   "k": "bravo claudio@argentinos@DEF",
+   "EP": 1.51,
+   "pj": 0.27
   },
   {
-   "k": "hernandez gaston@san-lorenzo@DEF",
-   "EP": 1.19,
-   "pj": 0.21
+   "k": "gonzalez pirez leandro@estudiantes-lp@DEF",
+   "EP": 4.89,
+   "pj": 0.88
+  },
+  {
+   "k": "gonzalez giovanni@river@DEF",
+   "EP": 0.73,
+   "pj": 0.13
   },
   {
    "k": "salomon oscar@newells@DEF",
@@ -1917,39 +1922,14 @@
    "pj": 0.12
   },
   {
-   "k": "gonzalez pirez leandro@estudiantes-lp@DEF",
-   "EP": 4.87,
-   "pj": 0.88
-  },
-  {
-   "k": "maldonado alexis@belgrano@DEF",
-   "EP": 3.97,
-   "pj": 0.71
-  },
-  {
    "k": "godoy leonardo@independiente@DEF",
-   "EP": 3.31,
+   "EP": 3.32,
    "pj": 0.6
   },
   {
-   "k": "barinaga juan ignacio@racing@DEF",
-   "EP": 0.77,
-   "pj": 0.14
-  },
-  {
-   "k": "abraham ignacio@banfield@DEF",
-   "EP": 4.95,
-   "pj": 0.89
-  },
-  {
-   "k": "pereyra fabio@huracan@DEF",
-   "EP": 4.77,
-   "pj": 0.86
-  },
-  {
-   "k": "sigali leonardo@aldosivi@DEF",
-   "EP": 4.4,
-   "pj": 0.79
+   "k": "moya santiago@aldosivi@DEF",
+   "EP": 2.97,
+   "pj": 0.54
   },
   {
    "k": "garay martin@tigre@DEF",
@@ -1962,9 +1942,34 @@
    "pj": 0.15
   },
   {
+   "k": "gonzalez gonzalo@estudiantes-rc@DEF",
+   "EP": 2.51,
+   "pj": 0.45
+  },
+  {
+   "k": "hernandez gaston@san-lorenzo@DEF",
+   "EP": 1.18,
+   "pj": 0.21
+  },
+  {
    "k": "villa maximiliano@atl-tucuman@DEF",
    "EP": 0.85,
    "pj": 0.15
+  },
+  {
+   "k": "abraham ignacio@banfield@DEF",
+   "EP": 4.95,
+   "pj": 0.89
+  },
+  {
+   "k": "barinaga juan ignacio@racing@DEF",
+   "EP": 0.77,
+   "pj": 0.14
+  },
+  {
+   "k": "gallo rodrigo@riestra@DEF",
+   "EP": 0.76,
+   "pj": 0.14
   },
   {
    "k": "vargas lautaro@union@DEF",
@@ -1978,38 +1983,43 @@
   },
   {
    "k": "luduena juan pablo@union@DEF",
-   "EP": 5.06,
+   "EP": 5.05,
    "pj": 0.92
   },
   {
-   "k": "gallo rodrigo@riestra@DEF",
-   "EP": 0.76,
-   "pj": 0.14
-  },
-  {
-   "k": "mansilla facundo@central-cordoba@DEF",
-   "EP": 1.59,
-   "pj": 0.29
-  },
-  {
-   "k": "lopez elias@aldosivi@DEF",
-   "EP": 1.5,
-   "pj": 0.27
-  },
-  {
    "k": "laso joaquin@tigre@DEF",
-   "EP": 3.86,
+   "EP": 3.88,
    "pj": 0.7
   },
   {
    "k": "galvan ignacio@atl-tucuman@DEF",
-   "EP": 4.55,
+   "EP": 4.57,
    "pj": 0.83
   },
   {
-   "k": "barros schelotto bautista@gimnasia-lp@DEF",
-   "EP": 4.46,
-   "pj": 0.81
+   "k": "mansilla facundo@central-cordoba@DEF",
+   "EP": 1.58,
+   "pj": 0.29
+  },
+  {
+   "k": "lucero samuel@defensa@DEF",
+   "EP": 0.66,
+   "pj": 0.12
+  },
+  {
+   "k": "rodriguez maximo@defensa@DEF",
+   "EP": 0.65,
+   "pj": 0.12
+  },
+  {
+   "k": "antonini juan@estudiantes-rc@DEF",
+   "EP": 4.79,
+   "pj": 0.87
+  },
+  {
+   "k": "pereyra fabio@huracan@DEF",
+   "EP": 4.73,
+   "pj": 0.86
   },
   {
    "k": "baez gabriel@talleres@DEF",
@@ -2017,9 +2027,19 @@
    "pj": 0.88
   },
   {
-   "k": "moya santiago@aldosivi@DEF",
-   "EP": 2.93,
-   "pj": 0.54
+   "k": "lagos agustin@platense@DEF",
+   "EP": 4.67,
+   "pj": 0.85
+  },
+  {
+   "k": "barros schelotto bautista@gimnasia-lp@DEF",
+   "EP": 4.45,
+   "pj": 0.81
+  },
+  {
+   "k": "vales mateo@aldosivi@DEF",
+   "EP": 1.1,
+   "pj": 0.2
   },
   {
    "k": "chamorro timoteo@talleres@DEF",
@@ -2027,13 +2047,13 @@
    "pj": 0.15
   },
   {
-   "k": "lagos agustin@platense@DEF",
-   "EP": 4.67,
-   "pj": 0.85
+   "k": "gariglio ignacio@riestra@DEF",
+   "EP": 0.82,
+   "pj": 0.15
   },
   {
-   "k": "lucero samuel@defensa@DEF",
-   "EP": 0.65,
+   "k": "gomez thiago@argentinos@DEF",
+   "EP": 0.64,
    "pj": 0.12
   },
   {
@@ -2042,49 +2062,24 @@
    "pj": 0.46
   },
   {
-   "k": "rodriguez maximo@defensa@DEF",
-   "EP": 0.65,
-   "pj": 0.12
-  },
-  {
-   "k": "gomez thiago@argentinos@DEF",
-   "EP": 0.64,
-   "pj": 0.12
-  },
-  {
-   "k": "munoz ezequiel@gimnasia-mza@DEF",
-   "EP": 4.99,
-   "pj": 0.92
-  },
-  {
    "k": "vigo alex@ind-rivadavia@DEF",
-   "EP": 1.71,
+   "EP": 1.7,
    "pj": 0.31
   },
   {
-   "k": "gariglio ignacio@riestra@DEF",
-   "EP": 0.82,
-   "pj": 0.15
+   "k": "santamaria thiago@sarmiento@DEF",
+   "EP": 0.68,
+   "pj": 0.13
   },
   {
-   "k": "campo ignacio@huracan@DEF",
-   "EP": 0.64,
-   "pj": 0.12
-  },
-  {
-   "k": "nervo hugo martin@huracan@DEF",
-   "EP": 1.21,
-   "pj": 0.22
+   "k": "munoz ezequiel@gimnasia-mza@DEF",
+   "EP": 4.97,
+   "pj": 0.92
   },
   {
    "k": "fagioli tomas@union@DEF",
    "EP": 1.08,
    "pj": 0.2
-  },
-  {
-   "k": "lorenzon franco@san-lorenzo@DEF",
-   "EP": 0.64,
-   "pj": 0.12
   },
   {
    "k": "oviedo brandon@banfield@DEF",
@@ -2097,18 +2092,8 @@
    "pj": 0.21
   },
   {
-   "k": "santamaria thiago@sarmiento@DEF",
-   "EP": 0.68,
-   "pj": 0.13
-  },
-  {
    "k": "gonzalez facundo@river@DEF",
    "EP": 0.65,
-   "pj": 0.12
-  },
-  {
-   "k": "guich alvaro@rosario-central@DEF",
-   "EP": 0.64,
    "pj": 0.12
   },
   {
@@ -2117,24 +2102,14 @@
    "pj": 0.12
   },
   {
-   "k": "melluso matias@gimnasia-lp@DEF",
-   "EP": 2.72,
-   "pj": 0.5
+   "k": "silva tomas@platense@DEF",
+   "EP": 4.48,
+   "pj": 0.83
   },
   {
    "k": "rubio tobias@union@DEF",
    "EP": 2.28,
    "pj": 0.42
-  },
-  {
-   "k": "silva tomas@platense@DEF",
-   "EP": 4.47,
-   "pj": 0.83
-  },
-  {
-   "k": "rodriguez fernando@estudiantes-rc@DEF",
-   "EP": 4.19,
-   "pj": 0.78
   },
   {
    "k": "ferrari gianluca@atl-tucuman@DEF",
@@ -2147,8 +2122,28 @@
    "pj": 0.15
   },
   {
+   "k": "guich alvaro@rosario-central@DEF",
+   "EP": 0.64,
+   "pj": 0.12
+  },
+  {
+   "k": "lorenzon franco@san-lorenzo@DEF",
+   "EP": 0.64,
+   "pj": 0.12
+  },
+  {
    "k": "morgantini nicolas@lanus@DEF",
    "EP": 0.63,
+   "pj": 0.12
+  },
+  {
+   "k": "nervo hugo martin@huracan@DEF",
+   "EP": 1.2,
+   "pj": 0.22
+  },
+  {
+   "k": "campo ignacio@huracan@DEF",
+   "EP": 0.64,
    "pj": 0.12
   },
   {
@@ -2162,13 +2157,8 @@
    "pj": 0.12
   },
   {
-   "k": "vales mateo@aldosivi@DEF",
-   "EP": 1.09,
-   "pj": 0.2
-  },
-  {
    "k": "martinez fernando@central-cordoba@DEF",
-   "EP": 4.83,
+   "EP": 4.82,
    "pj": 0.9
   },
   {
@@ -2177,14 +2167,14 @@
    "pj": 0.76
   },
   {
-   "k": "meriano nicolas@banfield@DEF",
-   "EP": 4.86,
-   "pj": 0.91
+   "k": "melluso matias@gimnasia-lp@DEF",
+   "EP": 2.7,
+   "pj": 0.5
   },
   {
-   "k": "de la fuente hernan@instituto@DEF",
-   "EP": 1.94,
-   "pj": 0.36
+   "k": "laurelli federico@aldosivi@DEF",
+   "EP": 0.64,
+   "pj": 0.12
   },
   {
    "k": "quiros santiago@platense@DEF",
@@ -2192,24 +2182,14 @@
    "pj": 0.12
   },
   {
+   "k": "meriano nicolas@banfield@DEF",
+   "EP": 4.86,
+   "pj": 0.91
+  },
+  {
    "k": "mendia mateo@platense@DEF",
-   "EP": 4.42,
+   "EP": 4.43,
    "pj": 0.83
-  },
-  {
-   "k": "giampaoli renzo@gimnasia-lp@DEF",
-   "EP": 1.76,
-   "pj": 0.33
-  },
-  {
-   "k": "lozano raul@estudiantes-rc@DEF",
-   "EP": 0.79,
-   "pj": 0.15
-  },
-  {
-   "k": "rocha matias@union@DEF",
-   "EP": 4.32,
-   "pj": 0.81
   },
   {
    "k": "diaz gabriel@sarmiento@DEF",
@@ -2217,9 +2197,9 @@
    "pj": 0.14
   },
   {
-   "k": "cortazzo juan cruz@gimnasia-lp@DEF",
-   "EP": 0.68,
-   "pj": 0.13
+   "k": "ricca federico@belgrano@DEF",
+   "EP": 1.31,
+   "pj": 0.25
   },
   {
    "k": "demartini nicolas@barracas@DEF",
@@ -2227,14 +2207,24 @@
    "pj": 0.91
   },
   {
+   "k": "rocha matias@union@DEF",
+   "EP": 4.31,
+   "pj": 0.81
+  },
+  {
    "k": "escobar franco@newells@DEF",
-   "EP": 2.44,
+   "EP": 2.45,
    "pj": 0.46
   },
   {
-   "k": "espino alfonso@racing@DEF",
-   "EP": 0.71,
-   "pj": 0.13
+   "k": "giampaoli renzo@gimnasia-lp@DEF",
+   "EP": 1.75,
+   "pj": 0.33
+  },
+  {
+   "k": "burdin ezequiel@defensa@DEF",
+   "EP": 0.79,
+   "pj": 0.15
   },
   {
    "k": "fernandez santiago@talleres@DEF",
@@ -2242,9 +2232,14 @@
    "pj": 0.13
   },
   {
-   "k": "massaccesi agustin@instituto@DEF",
-   "EP": 1.76,
-   "pj": 0.33
+   "k": "rodriguez fernando@estudiantes-rc@DEF",
+   "EP": 4.13,
+   "pj": 0.78
+  },
+  {
+   "k": "funes mori ramiro@estudiantes-lp@DEF",
+   "EP": 2.37,
+   "pj": 0.45
   },
   {
    "k": "mino facundo@riestra@DEF",
@@ -2252,19 +2247,39 @@
    "pj": 0.27
   },
   {
-   "k": "ricca federico@belgrano@DEF",
-   "EP": 1.3,
-   "pj": 0.25
+   "k": "cortazzo juan cruz@gimnasia-lp@DEF",
+   "EP": 0.68,
+   "pj": 0.13
   },
   {
-   "k": "amor emiliano@san-lorenzo@DEF",
-   "EP": 4.17,
-   "pj": 0.79
+   "k": "martinez thiago@defensa@DEF",
+   "EP": 0.64,
+   "pj": 0.12
   },
   {
-   "k": "funes mori ramiro@estudiantes-lp@DEF",
-   "EP": 2.36,
-   "pj": 0.45
+   "k": "gonzalez rodrigo@aldosivi@DEF",
+   "EP": 1.76,
+   "pj": 0.33
+  },
+  {
+   "k": "ortega francisco@river@DEF",
+   "EP": 0.93,
+   "pj": 0.18
+  },
+  {
+   "k": "espino alfonso@racing@DEF",
+   "EP": 0.71,
+   "pj": 0.13
+  },
+  {
+   "k": "campi gaston@barracas@DEF",
+   "EP": 0.65,
+   "pj": 0.12
+  },
+  {
+   "k": "de la fuente hernan@instituto@DEF",
+   "EP": 1.92,
+   "pj": 0.36
   },
   {
    "k": "costa ayrton@boca@DEF",
@@ -2272,12 +2287,12 @@
    "pj": 0.25
   },
   {
-   "k": "burdin ezequiel@defensa@DEF",
-   "EP": 0.78,
-   "pj": 0.15
+   "k": "tobio fernando@barracas@DEF",
+   "EP": 0.65,
+   "pj": 0.12
   },
   {
-   "k": "ortega francisco@river@DEF",
+   "k": "lozano raul@estudiantes-rc@DEF",
    "EP": 0.78,
    "pj": 0.15
   },
@@ -2287,24 +2302,9 @@
    "pj": 0.13
   },
   {
-   "k": "campi gaston@barracas@DEF",
-   "EP": 0.64,
-   "pj": 0.12
-  },
-  {
-   "k": "tobio fernando@barracas@DEF",
-   "EP": 0.65,
-   "pj": 0.12
-  },
-  {
-   "k": "martinez thiago@defensa@DEF",
-   "EP": 0.64,
-   "pj": 0.12
-  },
-  {
-   "k": "laurelli federico@aldosivi@DEF",
-   "EP": 0.63,
-   "pj": 0.12
+   "k": "amor emiliano@san-lorenzo@DEF",
+   "EP": 4.15,
+   "pj": 0.79
   },
   {
    "k": "martirena gaston@racing@DEF",
@@ -2312,29 +2312,19 @@
    "pj": 0.12
   },
   {
-   "k": "perez gonzalo@lanus@DEF",
-   "EP": 1.26,
-   "pj": 0.24
-  },
-  {
    "k": "di placido leonel@atl-tucuman@DEF",
-   "EP": 4.68,
+   "EP": 4.69,
    "pj": 0.89
   },
   {
-   "k": "caceres dario@central-cordoba@DEF",
-   "EP": 4.21,
-   "pj": 0.8
+   "k": "massaccesi agustin@instituto@DEF",
+   "EP": 1.74,
+   "pj": 0.33
   },
   {
-   "k": "cordoba alejo@san-lorenzo@DEF",
-   "EP": 3.69,
-   "pj": 0.7
-  },
-  {
-   "k": "schott augusto@talleres@DEF",
-   "EP": 4.78,
-   "pj": 0.91
+   "k": "perez gonzalo@lanus@DEF",
+   "EP": 1.26,
+   "pj": 0.24
   },
   {
    "k": "pereyra elias@barracas@DEF",
@@ -2342,44 +2332,29 @@
    "pj": 0.85
   },
   {
-   "k": "gonzalez rodrigo@aldosivi@DEF",
-   "EP": 1.74,
-   "pj": 0.33
+   "k": "caceres dario@central-cordoba@DEF",
+   "EP": 4.21,
+   "pj": 0.8
   },
   {
-   "k": "ayala lucas@union@DEF",
-   "EP": 4.48,
-   "pj": 0.86
-  },
-  {
-   "k": "ojeda mariano@gimnasia-lp@DEF",
-   "EP": 0.64,
-   "pj": 0.12
-  },
-  {
-   "k": "lamella lucas@gimnasia-lp@DEF",
-   "EP": 0.61,
-   "pj": 0.12
+   "k": "schott augusto@talleres@DEF",
+   "EP": 4.78,
+   "pj": 0.91
   },
   {
    "k": "moreno valentin@tigre@DEF",
-   "EP": 4.4,
+   "EP": 4.42,
    "pj": 0.85
   },
   {
-   "k": "pintado juan de dios@union@DEF",
-   "EP": 3.29,
-   "pj": 0.63
+   "k": "ayala lucas@union@DEF",
+   "EP": 4.47,
+   "pj": 0.86
   },
   {
-   "k": "blanco nicolas@san-lorenzo@DEF",
-   "EP": 0.64,
-   "pj": 0.12
-  },
-  {
-   "k": "fazzi nazareno@union@DEF",
-   "EP": 0.61,
-   "pj": 0.12
+   "k": "cordoba alejo@san-lorenzo@DEF",
+   "EP": 3.67,
+   "pj": 0.7
   },
   {
    "k": "arzamendia santiago@estudiantes-lp@DEF",
@@ -2387,8 +2362,13 @@
    "pj": 0.25
   },
   {
-   "k": "errecalde gonzalo@gimnasia-lp@DEF",
-   "EP": 0.6,
+   "k": "pintado juan de dios@union@DEF",
+   "EP": 3.29,
+   "pj": 0.63
+  },
+  {
+   "k": "fazzi nazareno@union@DEF",
+   "EP": 0.61,
    "pj": 0.12
   },
   {
@@ -2398,13 +2378,23 @@
   },
   {
    "k": "lomonaco kevin@independiente@DEF",
-   "EP": 0.79,
+   "EP": 0.8,
    "pj": 0.15
   },
   {
-   "k": "cobos facundo@estudiantes-rc@DEF",
-   "EP": 0.67,
-   "pj": 0.13
+   "k": "blanco nicolas@san-lorenzo@DEF",
+   "EP": 0.64,
+   "pj": 0.12
+  },
+  {
+   "k": "ojeda mariano@gimnasia-lp@DEF",
+   "EP": 0.63,
+   "pj": 0.12
+  },
+  {
+   "k": "lamella lucas@gimnasia-lp@DEF",
+   "EP": 0.6,
+   "pj": 0.12
   },
   {
    "k": "alfaro juan luis@banfield@DEF",
@@ -2412,9 +2402,29 @@
    "pj": 0.7
   },
   {
-   "k": "ibanez cesar@huracan@DEF",
-   "EP": 3.9,
-   "pj": 0.76
+   "k": "errecalde gonzalo@gimnasia-lp@DEF",
+   "EP": 0.6,
+   "pj": 0.12
+  },
+  {
+   "k": "roselli nazareno@defensa@DEF",
+   "EP": 0.66,
+   "pj": 0.13
+  },
+  {
+   "k": "arturia gaston@sarmiento@DEF",
+   "EP": 0.68,
+   "pj": 0.13
+  },
+  {
+   "k": "soto guillermo@tigre@DEF",
+   "EP": 0.6,
+   "pj": 0.12
+  },
+  {
+   "k": "maciel alejandro@central-cordoba@DEF",
+   "EP": 4.69,
+   "pj": 0.92
   },
   {
    "k": "veron elias@rosario-central@DEF",
@@ -2422,19 +2432,14 @@
    "pj": 0.24
   },
   {
-   "k": "maciel alejandro@central-cordoba@DEF",
-   "EP": 4.7,
-   "pj": 0.92
-  },
-  {
-   "k": "arturia gaston@sarmiento@DEF",
+   "k": "cobos facundo@estudiantes-rc@DEF",
    "EP": 0.67,
    "pj": 0.13
   },
   {
-   "k": "coronel emanuel@rosario-central@DEF",
-   "EP": 4.18,
-   "pj": 0.82
+   "k": "ibanez cesar@huracan@DEF",
+   "EP": 3.86,
+   "pj": 0.76
   },
   {
    "k": "aguilar felipe@central-cordoba@DEF",
@@ -2442,9 +2447,14 @@
    "pj": 0.69
   },
   {
-   "k": "roselli nazareno@defensa@DEF",
-   "EP": 0.65,
-   "pj": 0.13
+   "k": "coronel emanuel@rosario-central@DEF",
+   "EP": 4.16,
+   "pj": 0.82
+  },
+  {
+   "k": "de irastorza jonathan@independiente@DEF",
+   "EP": 0.6,
+   "pj": 0.12
   },
   {
    "k": "arias nahuel@san-lorenzo@DEF",
@@ -2457,19 +2467,14 @@
    "pj": 0.15
   },
   {
-   "k": "soto guillermo@tigre@DEF",
-   "EP": 0.6,
+   "k": "falcon agustin@belgrano@DEF",
+   "EP": 0.63,
    "pj": 0.12
   },
   {
    "k": "corujo guzman@san-lorenzo@DEF",
-   "EP": 2.35,
+   "EP": 2.34,
    "pj": 0.46
-  },
-  {
-   "k": "mondino diego@gimnasia-mza@DEF",
-   "EP": 4.32,
-   "pj": 0.85
   },
   {
    "k": "paz nehuen@banfield@DEF",
@@ -2477,19 +2482,9 @@
    "pj": 0.14
   },
   {
-   "k": "de irastorza jonathan@independiente@DEF",
-   "EP": 0.6,
-   "pj": 0.12
-  },
-  {
    "k": "baroni thiago@talleres@DEF",
    "EP": 2.59,
    "pj": 0.51
-  },
-  {
-   "k": "garrido nicolas@central-cordoba@DEF",
-   "EP": 0.82,
-   "pj": 0.16
   },
   {
    "k": "infante juan jose@atl-tucuman@DEF",
@@ -2502,9 +2497,14 @@
    "pj": 0.2
   },
   {
-   "k": "falcon agustin@belgrano@DEF",
-   "EP": 0.63,
-   "pj": 0.12
+   "k": "garrido nicolas@central-cordoba@DEF",
+   "EP": 0.82,
+   "pj": 0.16
+  },
+  {
+   "k": "mondino diego@gimnasia-mza@DEF",
+   "EP": 4.3,
+   "pj": 0.85
   },
   {
    "k": "martino ramiro@independiente@DEF",
@@ -2512,14 +2512,19 @@
    "pj": 0.27
   },
   {
-   "k": "guiffrey german@gimnasia-mza@DEF",
-   "EP": 0.99,
-   "pj": 0.2
-  },
-  {
    "k": "lopez marcos@banfield@DEF",
    "EP": 0.77,
    "pj": 0.15
+  },
+  {
+   "k": "guiffrey german@gimnasia-mza@DEF",
+   "EP": 0.98,
+   "pj": 0.2
+  },
+  {
+   "k": "de ritis mathias@san-lorenzo@DEF",
+   "EP": 2.02,
+   "pj": 0.41
   },
   {
    "k": "mallo facundo@rosario-central@DEF",
@@ -2527,39 +2532,24 @@
    "pj": 0.13
   },
   {
-   "k": "paredes luciano@gimnasia-mza@DEF",
-   "EP": 4.51,
-   "pj": 0.9
-  },
-  {
-   "k": "de ritis mathias@san-lorenzo@DEF",
-   "EP": 2.03,
-   "pj": 0.41
-  },
-  {
-   "k": "herrera ezequiel@san-lorenzo@DEF",
-   "EP": 1.46,
-   "pj": 0.29
-  },
-  {
-   "k": "calderon franco@independiente@DEF",
-   "EP": 1.38,
-   "pj": 0.28
-  },
-  {
    "k": "paunero ramiro@atl-tucuman@DEF",
    "EP": 0.59,
    "pj": 0.12
   },
   {
-   "k": "ingenthron celias@platense@DEF",
-   "EP": 1.02,
-   "pj": 0.21
+   "k": "paredes luciano@gimnasia-mza@DEF",
+   "EP": 4.49,
+   "pj": 0.9
   },
   {
-   "k": "pitton bruno@union@DEF",
-   "EP": 0.86,
-   "pj": 0.17
+   "k": "calderon franco@independiente@DEF",
+   "EP": 1.39,
+   "pj": 0.28
+  },
+  {
+   "k": "ingenthron celias@platense@DEF",
+   "EP": 1.03,
+   "pj": 0.21
   },
   {
    "k": "barrios rafael@barracas@DEF",
@@ -2567,23 +2557,23 @@
    "pj": 0.41
   },
   {
-   "k": "zaracho sebastian@rosario-central@DEF",
-   "EP": 0.62,
-   "pj": 0.12
-  },
-  {
    "k": "villalba juan manuel@tigre@DEF",
-   "EP": 1.84,
+   "EP": 1.85,
    "pj": 0.37
   },
   {
-   "k": "cortez ismael@gimnasia-mza@DEF",
-   "EP": 0.59,
-   "pj": 0.12
+   "k": "herrera ezequiel@san-lorenzo@DEF",
+   "EP": 1.45,
+   "pj": 0.29
   },
   {
-   "k": "patritti geronimo@gimnasia-mza@DEF",
-   "EP": 0.57,
+   "k": "pitton bruno@union@DEF",
+   "EP": 0.86,
+   "pj": 0.17
+  },
+  {
+   "k": "zaracho sebastian@rosario-central@DEF",
+   "EP": 0.61,
    "pj": 0.12
   },
   {
@@ -2592,9 +2582,24 @@
    "pj": 0.35
   },
   {
+   "k": "benitez alcides@belgrano@DEF",
+   "EP": 1.89,
+   "pj": 0.39
+  },
+  {
    "k": "steimbach alexis@gimnasia-lp@DEF",
-   "EP": 1.41,
+   "EP": 1.4,
    "pj": 0.29
+  },
+  {
+   "k": "cortez ismael@gimnasia-mza@DEF",
+   "EP": 0.58,
+   "pj": 0.12
+  },
+  {
+   "k": "patritti geronimo@gimnasia-mza@DEF",
+   "EP": 0.57,
+   "pj": 0.12
   },
   {
    "k": "cano lautaro@banfield@DEF",
@@ -2607,19 +2612,14 @@
    "pj": 0.12
   },
   {
-   "k": "benitez alcides@belgrano@DEF",
-   "EP": 1.87,
-   "pj": 0.39
+   "k": "arias santiago@independiente@DEF",
+   "EP": 2.36,
+   "pj": 0.49
   },
   {
    "k": "marchi leonardo@central-cordoba@DEF",
    "EP": 0.84,
    "pj": 0.17
-  },
-  {
-   "k": "arias santiago@independiente@DEF",
-   "EP": 2.36,
-   "pj": 0.49
   },
   {
    "k": "rivero lautaro@river@DEF",
@@ -2643,12 +2643,12 @@
   },
   {
    "k": "franco juan jose@gimnasia-mza@DEF",
-   "EP": 0.64,
+   "EP": 0.63,
    "pj": 0.13
   },
   {
    "k": "lescano leandro@huracan@DEF",
-   "EP": 1.3,
+   "EP": 1.28,
    "pj": 0.28
   },
   {
@@ -2662,14 +2662,14 @@
    "pj": 0.87
   },
   {
-   "k": "carrera lautaro@gimnasia-mza@DEF",
-   "EP": 0.65,
-   "pj": 0.15
-  },
-  {
    "k": "casermeiro yuri@central-cordoba@DEF",
    "EP": 0.76,
    "pj": 0.17
+  },
+  {
+   "k": "carrera lautaro@gimnasia-mza@DEF",
+   "EP": 0.65,
+   "pj": 0.15
   },
   {
    "k": "compagnucci gabriel@atl-tucuman@DEF",
@@ -2678,33 +2678,33 @@
   },
   {
    "k": "ascacibar santiago@boca@VOL",
-   "EP": 4.43,
+   "EP": 4.42,
    "pj": 0.58
   },
   {
    "k": "di maria angel@rosario-central@VOL",
-   "EP": 6.62,
+   "EP": 6.59,
    "pj": 0.88
   },
   {
    "k": "luna alex@instituto@VOL",
-   "EP": 6.56,
+   "EP": 6.5,
    "pj": 0.88
   },
   {
    "k": "lopez munoz hernan@argentinos@VOL",
-   "EP": 4.6,
+   "EP": 4.59,
    "pj": 0.66
+  },
+  {
+   "k": "lanzini manuel@velez@VOL",
+   "EP": 2.32,
+   "pj": 0.34
   },
   {
    "k": "aranda tomas@boca@VOL",
    "EP": 1.79,
    "pj": 0.26
-  },
-  {
-   "k": "lanzini manuel@velez@VOL",
-   "EP": 2.31,
-   "pj": 0.34
   },
   {
    "k": "zenon kevin@boca@VOL",
@@ -2713,12 +2713,12 @@
   },
   {
    "k": "florentin jose@ind-rivadavia@VOL",
-   "EP": 6.08,
+   "EP": 6.06,
    "pj": 0.91
   },
   {
    "k": "pena biafore felipe@lanus@VOL",
-   "EP": 1.82,
+   "EP": 1.81,
    "pj": 0.28
   },
   {
@@ -2732,43 +2732,43 @@
    "pj": 0.15
   },
   {
-   "k": "galvan tomas@river@VOL",
-   "EP": 4.85,
-   "pj": 0.74
-  },
-  {
    "k": "lencioni facundo@gimnasia-mza@VOL",
-   "EP": 5.32,
+   "EP": 5.3,
    "pj": 0.82
   },
   {
    "k": "mavilla julian@sarmiento@VOL",
-   "EP": 4.91,
-   "pj": 0.76
+   "EP": 5.65,
+   "pj": 0.87
   },
   {
    "k": "barbona david@defensa@VOL",
-   "EP": 5.16,
+   "EP": 5.21,
    "pj": 0.81
   },
   {
-   "k": "godoy lautaro@atl-tucuman@VOL",
-   "EP": 5.71,
-   "pj": 0.9
-  },
-  {
    "k": "gaitan nicolas@aldosivi@VOL",
-   "EP": 5.58,
+   "EP": 5.67,
    "pj": 0.88
   },
   {
-   "k": "alanis gabriel@estudiantes-rc@VOL",
+   "k": "galvan tomas@river@VOL",
+   "EP": 5.55,
+   "pj": 0.87
+  },
+  {
+   "k": "godoy lautaro@atl-tucuman@VOL",
+   "EP": 5.73,
+   "pj": 0.9
+  },
+  {
+   "k": "aliendro rodrigo@velez@VOL",
    "EP": 5.76,
    "pj": 0.91
   },
   {
-   "k": "aliendro rodrigo@velez@VOL",
-   "EP": 5.74,
+   "k": "alanis gabriel@estudiantes-rc@VOL",
+   "EP": 5.67,
    "pj": 0.91
   },
   {
@@ -2778,23 +2778,23 @@
   },
   {
    "k": "fernandez ignacio@gimnasia-lp@VOL",
-   "EP": 5.63,
+   "EP": 5.68,
    "pj": 0.91
   },
   {
    "k": "castro lucas@aldosivi@VOL",
-   "EP": 5.27,
-   "pj": 0.86
-  },
-  {
-   "k": "farias facundo@san-lorenzo@VOL",
-   "EP": 5.24,
+   "EP": 5.34,
    "pj": 0.86
   },
   {
    "k": "iacobellis marco@central-cordoba@VOL",
-   "EP": 5.54,
+   "EP": 5.53,
    "pj": 0.91
+  },
+  {
+   "k": "farias facundo@san-lorenzo@VOL",
+   "EP": 5.21,
+   "pj": 0.86
   },
   {
    "k": "paredes leandro@boca@VOL",
@@ -2803,28 +2803,48 @@
   },
   {
    "k": "saralegui jabes@tigre@VOL",
-   "EP": 5.17,
+   "EP": 5.18,
    "pj": 0.86
   },
   {
    "k": "castro alexis@estudiantes-lp@VOL",
-   "EP": 2.98,
+   "EP": 2.99,
    "pj": 0.5
   },
   {
    "k": "gutierrez kevin@argentinos@VOL",
-   "EP": 5.43,
+   "EP": 5.42,
    "pj": 0.91
   },
   {
+   "k": "lucco jeremias@defensa@VOL",
+   "EP": 4.87,
+   "pj": 0.82
+  },
+  {
    "k": "miljevic matko@racing@VOL",
-   "EP": 1.48,
+   "EP": 1.47,
    "pj": 0.25
   },
   {
+   "k": "robertone lucas@velez@VOL",
+   "EP": 5.31,
+   "pj": 0.9
+  },
+  {
    "k": "malcorra ignacio@union@VOL",
-   "EP": 5.09,
+   "EP": 5.08,
    "pj": 0.86
+  },
+  {
+   "k": "garcia martin@aldosivi@VOL",
+   "EP": 5.31,
+   "pj": 0.9
+  },
+  {
+   "k": "delgado milton@boca@VOL",
+   "EP": 4.06,
+   "pj": 0.69
   },
   {
    "k": "porra tomas@barracas@VOL",
@@ -2833,37 +2853,12 @@
   },
   {
    "k": "lodico gaston@racing@VOL",
-   "EP": 5.01,
+   "EP": 5,
    "pj": 0.85
   },
   {
-   "k": "delgado milton@boca@VOL",
-   "EP": 4.06,
-   "pj": 0.69
-  },
-  {
-   "k": "valiente mauro@estudiantes-rc@VOL",
-   "EP": 3.44,
-   "pj": 0.58
-  },
-  {
-   "k": "robertone lucas@velez@VOL",
-   "EP": 5.29,
-   "pj": 0.9
-  },
-  {
-   "k": "andrada tobias@river@VOL",
-   "EP": 3.94,
-   "pj": 0.67
-  },
-  {
-   "k": "lucco jeremias@defensa@VOL",
-   "EP": 4.82,
-   "pj": 0.82
-  },
-  {
    "k": "waller facundo@huracan@VOL",
-   "EP": 4.89,
+   "EP": 4.93,
    "pj": 0.84
   },
   {
@@ -2872,19 +2867,24 @@
    "pj": 0.25
   },
   {
-   "k": "cantizano giovanni@rosario-central@VOL",
-   "EP": 3.38,
+   "k": "perez cesar@defensa@VOL",
+   "EP": 3.93,
+   "pj": 0.67
+  },
+  {
+   "k": "andrada tobias@river@VOL",
+   "EP": 4.97,
+   "pj": 0.85
+  },
+  {
+   "k": "valiente mauro@estudiantes-rc@VOL",
+   "EP": 3.39,
    "pj": 0.58
   },
   {
-   "k": "garcia martin@aldosivi@VOL",
-   "EP": 5.23,
-   "pj": 0.9
-  },
-  {
-   "k": "perez cesar@defensa@VOL",
-   "EP": 3.89,
-   "pj": 0.67
+   "k": "cantizano giovanni@rosario-central@VOL",
+   "EP": 3.37,
+   "pj": 0.58
   },
   {
    "k": "rodriguez alan@rosario-central@VOL",
@@ -2892,18 +2892,18 @@
    "pj": 0.25
   },
   {
-   "k": "watson franco@lanus@VOL",
-   "EP": 1.7,
-   "pj": 0.3
-  },
-  {
    "k": "zapiola franco@platense@VOL",
    "EP": 2.48,
    "pj": 0.43
   },
   {
+   "k": "watson franco@lanus@VOL",
+   "EP": 1.7,
+   "pj": 0.3
+  },
+  {
    "k": "sequeira luis@ind-rivadavia@VOL",
-   "EP": 3.69,
+   "EP": 3.68,
    "pj": 0.65
   },
   {
@@ -2913,13 +2913,18 @@
   },
   {
    "k": "cardozo agustin@lanus@VOL",
-   "EP": 5.18,
+   "EP": 5.17,
    "pj": 0.91
   },
   {
    "k": "oroz nicolas@argentinos@VOL",
-   "EP": 5.09,
+   "EP": 5.08,
    "pj": 0.89
+  },
+  {
+   "k": "martinez mauricio@sarmiento@VOL",
+   "EP": 4.12,
+   "pj": 0.72
   },
   {
    "k": "rios thomas@newells@VOL",
@@ -2928,7 +2933,7 @@
   },
   {
    "k": "rodriguez ignacio@racing@VOL",
-   "EP": 5.11,
+   "EP": 5.1,
    "pj": 0.9
   },
   {
@@ -2942,9 +2947,9 @@
    "pj": 0.44
   },
   {
-   "k": "martinez mauricio@sarmiento@VOL",
-   "EP": 4.08,
-   "pj": 0.72
+   "k": "miramon ignacio@gimnasia-lp@VOL",
+   "EP": 4.78,
+   "pj": 0.85
   },
   {
    "k": "piovi ezequiel@estudiantes-lp@VOL",
@@ -2952,29 +2957,24 @@
    "pj": 0.29
   },
   {
-   "k": "tapia ivan@barracas@VOL",
-   "EP": 5.1,
-   "pj": 0.91
+   "k": "martinez gonzalo@tigre@VOL",
+   "EP": 1,
+   "pj": 0.18
   },
   {
    "k": "perez curci mateo@independiente@VOL",
-   "EP": 4.87,
+   "EP": 4.88,
    "pj": 0.87
   },
   {
    "k": "rodriguez baltasar@estudiantes-lp@VOL",
-   "EP": 3.23,
+   "EP": 3.24,
    "pj": 0.58
   },
   {
-   "k": "martinez gonzalo@tigre@VOL",
-   "EP": 0.99,
-   "pj": 0.18
-  },
-  {
-   "k": "miramon ignacio@gimnasia-lp@VOL",
-   "EP": 4.73,
-   "pj": 0.85
+   "k": "kalinger facundo@huracan@VOL",
+   "EP": 3.94,
+   "pj": 0.7
   },
   {
    "k": "monsalve miguel angel@estudiantes-lp@VOL",
@@ -2982,29 +2982,39 @@
    "pj": 0.53
   },
   {
+   "k": "tapia ivan@barracas@VOL",
+   "EP": 5.09,
+   "pj": 0.91
+  },
+  {
+   "k": "valdes diego@velez@VOL",
+   "EP": 2.5,
+   "pj": 0.45
+  },
+  {
+   "k": "palacios tiago@estudiantes-lp@VOL",
+   "EP": 1.23,
+   "pj": 0.22
+  },
+  {
+   "k": "alarcon williams@boca@VOL",
+   "EP": 3.18,
+   "pj": 0.57
+  },
+  {
    "k": "zaracho matias@racing@VOL",
    "EP": 2.91,
    "pj": 0.52
   },
   {
-   "k": "kalinger facundo@huracan@VOL",
-   "EP": 3.92,
+   "k": "tesuri renzo@atl-tucuman@VOL",
+   "EP": 3.9,
    "pj": 0.7
   },
   {
-   "k": "valdes diego@velez@VOL",
-   "EP": 2.49,
-   "pj": 0.45
-  },
-  {
-   "k": "palacios tiago@estudiantes-lp@VOL",
-   "EP": 1.22,
-   "pj": 0.22
-  },
-  {
-   "k": "alarcon williams@boca@VOL",
-   "EP": 3.19,
-   "pj": 0.57
+   "k": "meza maximiliano@independiente@VOL",
+   "EP": 2.32,
+   "pj": 0.42
   },
   {
    "k": "rey domenech camilo@boca@VOL",
@@ -3013,38 +3023,28 @@
   },
   {
    "k": "pizarro vicente@rosario-central@VOL",
-   "EP": 4.24,
+   "EP": 4.23,
    "pj": 0.76
   },
   {
-   "k": "tesuri renzo@atl-tucuman@VOL",
-   "EP": 3.89,
-   "pj": 0.7
-  },
-  {
-   "k": "meza maximiliano@independiente@VOL",
-   "EP": 2.31,
-   "pj": 0.42
-  },
-  {
-   "k": "cabrera alejandro@estudiantes-rc@VOL",
-   "EP": 5.01,
-   "pj": 0.91
-  },
-  {
-   "k": "maroni gonzalo@barracas@VOL",
-   "EP": 1.43,
-   "pj": 0.26
-  },
-  {
    "k": "godoy ezequiel@atl-tucuman@VOL",
-   "EP": 4.95,
+   "EP": 4.96,
    "pj": 0.9
   },
   {
    "k": "adoryan tomas@banfield@VOL",
    "EP": 4.42,
    "pj": 0.8
+  },
+  {
+   "k": "neves gabriel@estudiantes-lp@VOL",
+   "EP": 1.8,
+   "pj": 0.33
+  },
+  {
+   "k": "maroni gonzalo@barracas@VOL",
+   "EP": 1.43,
+   "pj": 0.26
   },
   {
    "k": "sanchez ganly dariel@riestra@VOL",
@@ -3057,13 +3057,18 @@
    "pj": 0.59
   },
   {
-   "k": "neves gabriel@estudiantes-lp@VOL",
-   "EP": 1.79,
-   "pj": 0.33
+   "k": "amondarain mikel@estudiantes-lp@VOL",
+   "EP": 0.64,
+   "pj": 0.12
+  },
+  {
+   "k": "cabrera alejandro@estudiantes-rc@VOL",
+   "EP": 4.95,
+   "pj": 0.91
   },
   {
    "k": "fernandez esteban@gimnasia-mza@VOL",
-   "EP": 4.79,
+   "EP": 4.78,
    "pj": 0.88
   },
   {
@@ -3072,19 +3077,14 @@
    "pj": 0.36
   },
   {
-   "k": "amondarain mikel@estudiantes-lp@VOL",
-   "EP": 0.64,
-   "pj": 0.12
-  },
-  {
-   "k": "gallardo matias@instituto@VOL",
-   "EP": 4.71,
-   "pj": 0.87
-  },
-  {
    "k": "mainero guido@platense@VOL",
    "EP": 4.05,
    "pj": 0.75
+  },
+  {
+   "k": "fernandez cedres rodrigo@huracan@VOL",
+   "EP": 4.95,
+   "pj": 0.91
   },
   {
    "k": "rios gonzalo@ind-rivadavia@VOL",
@@ -3092,14 +3092,19 @@
    "pj": 0.44
   },
   {
+   "k": "gonzalez santiago@tigre@VOL",
+   "EP": 4.59,
+   "pj": 0.85
+  },
+  {
+   "k": "lamendola nicolas@atl-tucuman@VOL",
+   "EP": 4.4,
+   "pj": 0.81
+  },
+  {
    "k": "guch facundo@newells@VOL",
    "EP": 4.18,
    "pj": 0.77
-  },
-  {
-   "k": "fernandez cedres rodrigo@huracan@VOL",
-   "EP": 4.94,
-   "pj": 0.91
   },
   {
    "k": "herrera rodrigo@newells@VOL",
@@ -3107,19 +3112,19 @@
    "pj": 0.88
   },
   {
-   "k": "gonzalez santiago@tigre@VOL",
-   "EP": 4.58,
-   "pj": 0.85
-  },
-  {
-   "k": "lamendola nicolas@atl-tucuman@VOL",
-   "EP": 4.39,
-   "pj": 0.81
-  },
-  {
    "k": "kociubinski bautista@estudiantes-lp@VOL",
-   "EP": 3.38,
+   "EP": 3.39,
    "pj": 0.63
+  },
+  {
+   "k": "gil leonardo@huracan@VOL",
+   "EP": 2.61,
+   "pj": 0.48
+  },
+  {
+   "k": "gallardo matias@instituto@VOL",
+   "EP": 4.68,
+   "pj": 0.87
   },
   {
    "k": "cristaldo franco@talleres@VOL",
@@ -3127,23 +3132,13 @@
    "pj": 0.54
   },
   {
-   "k": "gil leonardo@huracan@VOL",
-   "EP": 2.6,
-   "pj": 0.48
-  },
-  {
    "k": "bottari tomas@ind-rivadavia@VOL",
    "EP": 4.37,
    "pj": 0.81
   },
   {
-   "k": "ortegoza ulises@racing@VOL",
-   "EP": 3.97,
-   "pj": 0.74
-  },
-  {
    "k": "ibarra franco@rosario-central@VOL",
-   "EP": 4.7,
+   "EP": 4.69,
    "pj": 0.87
   },
   {
@@ -3152,13 +3147,18 @@
    "pj": 0.86
   },
   {
+   "k": "ortegoza ulises@racing@VOL",
+   "EP": 3.96,
+   "pj": 0.74
+  },
+  {
    "k": "gonzalez lucas@central-cordoba@VOL",
    "EP": 4.52,
    "pj": 0.85
   },
   {
    "k": "marcone ivan@independiente@VOL",
-   "EP": 4.86,
+   "EP": 4.87,
    "pj": 0.91
   },
   {
@@ -3173,18 +3173,13 @@
   },
   {
    "k": "vargas matias@gimnasia-mza@VOL",
-   "EP": 3.57,
+   "EP": 3.56,
    "pj": 0.67
   },
   {
-   "k": "abregu gustavo@instituto@VOL",
-   "EP": 4.75,
-   "pj": 0.9
-  },
-  {
-   "k": "ladstatter agustin@san-lorenzo@VOL",
-   "EP": 1.32,
-   "pj": 0.25
+   "k": "gomez lautaro@banfield@VOL",
+   "EP": 1.66,
+   "pj": 0.31
   },
   {
    "k": "viveros emiliano@argentinos@VOL",
@@ -3197,19 +3192,29 @@
    "pj": 0.85
   },
   {
-   "k": "fernandez julian@rosario-central@VOL",
-   "EP": 2.55,
-   "pj": 0.48
-  },
-  {
-   "k": "gomez lautaro@banfield@VOL",
-   "EP": 1.66,
-   "pj": 0.31
-  },
-  {
    "k": "porcel maximiliano@defensa@VOL",
    "EP": 2.58,
    "pj": 0.49
+  },
+  {
+   "k": "ladstatter agustin@san-lorenzo@VOL",
+   "EP": 1.31,
+   "pj": 0.25
+  },
+  {
+   "k": "abregu gustavo@instituto@VOL",
+   "EP": 4.73,
+   "pj": 0.9
+  },
+  {
+   "k": "linares nicolas@aldosivi@VOL",
+   "EP": 2.95,
+   "pj": 0.56
+  },
+  {
+   "k": "fernandez julian@rosario-central@VOL",
+   "EP": 2.55,
+   "pj": 0.48
   },
   {
    "k": "moreno marcelino@lanus@VOL",
@@ -3217,9 +3222,9 @@
    "pj": 0.49
   },
   {
-   "k": "perez leonel@racing@VOL",
-   "EP": 4.57,
-   "pj": 0.87
+   "k": "barros schelotto nicolas@gimnasia-lp@VOL",
+   "EP": 0.94,
+   "pj": 0.18
   },
   {
    "k": "vazquez kevin@ind-rivadavia@VOL",
@@ -3227,9 +3232,9 @@
    "pj": 0.12
   },
   {
-   "k": "sotelo david@newells@VOL",
-   "EP": 0.62,
-   "pj": 0.12
+   "k": "perez leonel@racing@VOL",
+   "EP": 4.56,
+   "pj": 0.87
   },
   {
    "k": "sanchez adrian@belgrano@VOL",
@@ -3237,9 +3242,14 @@
    "pj": 0.78
   },
   {
-   "k": "barros schelotto nicolas@gimnasia-lp@VOL",
-   "EP": 0.93,
+   "k": "elias jalil@estudiantes-lp@VOL",
+   "EP": 0.95,
    "pj": 0.18
+  },
+  {
+   "k": "sotelo david@newells@VOL",
+   "EP": 0.62,
+   "pj": 0.12
   },
   {
    "k": "alcaraz alan@argentinos@VOL",
@@ -3247,14 +3257,9 @@
    "pj": 0.15
   },
   {
-   "k": "linares nicolas@aldosivi@VOL",
-   "EP": 2.93,
-   "pj": 0.56
-  },
-  {
-   "k": "elias jalil@estudiantes-lp@VOL",
-   "EP": 0.95,
-   "pj": 0.18
+   "k": "zabala cristian@sarmiento@VOL",
+   "EP": 4.76,
+   "pj": 0.91
   },
   {
    "k": "medina agustin@lanus@VOL",
@@ -3272,14 +3277,19 @@
    "pj": 0.82
   },
   {
-   "k": "zabala cristian@sarmiento@VOL",
-   "EP": 4.05,
-   "pj": 0.78
+   "k": "garcia manuel@sarmiento@VOL",
+   "EP": 2.19,
+   "pj": 0.42
   },
   {
    "k": "tripichio nicolas@san-lorenzo@VOL",
-   "EP": 4.41,
+   "EP": 4.4,
    "pj": 0.86
+  },
+  {
+   "k": "gomez mattar jeronimo@newells@VOL",
+   "EP": 1.45,
+   "pj": 0.28
   },
   {
    "k": "palacios julian@union@VOL",
@@ -3287,9 +3297,9 @@
    "pj": 0.57
   },
   {
-   "k": "gomez mattar jeronimo@newells@VOL",
-   "EP": 1.45,
-   "pj": 0.28
+   "k": "feler luca@velez@VOL",
+   "EP": 0.93,
+   "pj": 0.18
   },
   {
    "k": "carrizo facundo@argentinos@VOL",
@@ -3302,19 +3312,14 @@
    "pj": 0.26
   },
   {
-   "k": "feler luca@velez@VOL",
-   "EP": 0.93,
-   "pj": 0.18
+   "k": "arias matias@velez@VOL",
+   "EP": 1.82,
+   "pj": 0.36
   },
   {
    "k": "sosa santiago@racing@VOL",
-   "EP": 0.6,
+   "EP": 0.59,
    "pj": 0.12
-  },
-  {
-   "k": "gonzalez tomas@estudiantes-rc@VOL",
-   "EP": 4.37,
-   "pj": 0.85
   },
   {
    "k": "vera matias@central-cordoba@VOL",
@@ -3322,14 +3327,9 @@
    "pj": 0.87
   },
   {
-   "k": "talpone nicolas@estudiantes-rc@VOL",
-   "EP": 0.7,
-   "pj": 0.14
-  },
-  {
-   "k": "arias matias@velez@VOL",
-   "EP": 1.82,
-   "pj": 0.36
+   "k": "bucca leonel@ind-rivadavia@VOL",
+   "EP": 1.07,
+   "pj": 0.21
   },
   {
    "k": "carrera ramiro@lanus@VOL",
@@ -3337,9 +3337,9 @@
    "pj": 0.16
   },
   {
-   "k": "bucca leonel@ind-rivadavia@VOL",
-   "EP": 1.07,
-   "pj": 0.21
+   "k": "gonzalez tomas@estudiantes-rc@VOL",
+   "EP": 4.33,
+   "pj": 0.85
   },
   {
    "k": "cuello brahian@union@VOL",
@@ -3352,14 +3352,19 @@
    "pj": 0.57
   },
   {
+   "k": "talpone nicolas@estudiantes-rc@VOL",
+   "EP": 0.7,
+   "pj": 0.14
+  },
+  {
    "k": "mosqueira joaquin@union@VOL",
    "EP": 2.44,
    "pj": 0.48
   },
   {
-   "k": "romero francisco@estudiantes-rc@VOL",
-   "EP": 0.65,
-   "pj": 0.13
+   "k": "leyes bruno@tigre@VOL",
+   "EP": 4.21,
+   "pj": 0.84
   },
   {
    "k": "tello alejandro@racing@VOL",
@@ -3367,14 +3372,9 @@
    "pj": 0.17
   },
   {
-   "k": "leyes bruno@tigre@VOL",
-   "EP": 4.2,
-   "pj": 0.84
-  },
-  {
-   "k": "vera fausto@river@VOL",
-   "EP": 3.81,
-   "pj": 0.76
+   "k": "romero francisco@estudiantes-rc@VOL",
+   "EP": 0.64,
+   "pj": 0.13
   },
   {
    "k": "baeza claudio@velez@VOL",
@@ -3382,14 +3382,14 @@
    "pj": 0.12
   },
   {
-   "k": "recalde matias@gimnasia-mza@VOL",
-   "EP": 4.57,
-   "pj": 0.92
-  },
-  {
    "k": "gomez ivan@platense@VOL",
    "EP": 2.08,
    "pj": 0.42
+  },
+  {
+   "k": "gimenez elian@sarmiento@VOL",
+   "EP": 1.95,
+   "pj": 0.39
   },
   {
    "k": "lopez garcia santiago@banfield@VOL",
@@ -3397,9 +3397,19 @@
    "pj": 0.29
   },
   {
+   "k": "ojeda emmanuel@huracan@VOL",
+   "EP": 0.64,
+   "pj": 0.13
+  },
+  {
    "k": "cabrera elias@tigre@VOL",
    "EP": 0.59,
    "pj": 0.12
+  },
+  {
+   "k": "recalde matias@gimnasia-mza@VOL",
+   "EP": 4.56,
+   "pj": 0.92
   },
   {
    "k": "gomez lucas@newells@VOL",
@@ -3407,13 +3417,8 @@
    "pj": 0.28
   },
   {
-   "k": "ojeda emmanuel@huracan@VOL",
-   "EP": 0.63,
-   "pj": 0.13
-  },
-  {
    "k": "miloc dardo@barracas@VOL",
-   "EP": 4.51,
+   "EP": 4.5,
    "pj": 0.91
   },
   {
@@ -3422,14 +3427,14 @@
    "pj": 0.54
   },
   {
-   "k": "garcia manuel@sarmiento@VOL",
-   "EP": 1,
-   "pj": 0.2
-  },
-  {
    "k": "fernandez guillermo@rosario-central@VOL",
    "EP": 0.58,
    "pj": 0.12
+  },
+  {
+   "k": "seoane mateo@gimnasia-lp@VOL",
+   "EP": 2.63,
+   "pj": 0.53
   },
   {
    "k": "sepulveda matias@lanus@VOL",
@@ -3437,29 +3442,19 @@
    "pj": 0.27
   },
   {
-   "k": "acevedo jonas@instituto@VOL",
-   "EP": 0.68,
-   "pj": 0.14
-  },
-  {
-   "k": "gimenez elian@sarmiento@VOL",
-   "EP": 1.63,
-   "pj": 0.33
-  },
-  {
    "k": "fernandez julian@atl-tucuman@VOL",
    "EP": 0.57,
    "pj": 0.12
   },
   {
-   "k": "seoane mateo@gimnasia-lp@VOL",
-   "EP": 2.62,
-   "pj": 0.53
+   "k": "vera fausto@river@VOL",
+   "EP": 4.46,
+   "pj": 0.9
   },
   {
-   "k": "rosane siro@estudiantes-rc@VOL",
-   "EP": 0.88,
-   "pj": 0.18
+   "k": "acevedo jonas@instituto@VOL",
+   "EP": 0.67,
+   "pj": 0.14
   },
   {
    "k": "moreyra stefano@ind-rivadavia@VOL",
@@ -3467,24 +3462,29 @@
    "pj": 0.16
   },
   {
+   "k": "cabral luciano@independiente@VOL",
+   "EP": 1.95,
+   "pj": 0.4
+  },
+  {
    "k": "ferreira pablo@platense@VOL",
    "EP": 0.94,
    "pj": 0.19
   },
   {
-   "k": "cabral luciano@independiente@VOL",
-   "EP": 1.94,
-   "pj": 0.4
-  },
-  {
-   "k": "silva lucas@river@VOL",
-   "EP": 0.58,
-   "pj": 0.12
+   "k": "perez juan jose@gimnasia-lp@VOL",
+   "EP": 0.78,
+   "pj": 0.16
   },
   {
    "k": "esquivel santiago@banfield@VOL",
    "EP": 4.29,
    "pj": 0.87
+  },
+  {
+   "k": "rosane siro@estudiantes-rc@VOL",
+   "EP": 0.87,
+   "pj": 0.18
   },
   {
    "k": "garcia mateo@newells@VOL",
@@ -3502,9 +3502,14 @@
    "pj": 0.2
   },
   {
-   "k": "perez juan jose@gimnasia-lp@VOL",
-   "EP": 0.77,
-   "pj": 0.16
+   "k": "sosa jose@estudiantes-lp@VOL",
+   "EP": 0.76,
+   "pj": 0.15
+  },
+  {
+   "k": "silva lucas@river@VOL",
+   "EP": 0.58,
+   "pj": 0.12
   },
   {
    "k": "aguirre santino@racing@VOL",
@@ -3512,19 +3517,9 @@
    "pj": 0.12
   },
   {
-   "k": "sosa jose@estudiantes-lp@VOL",
-   "EP": 0.75,
-   "pj": 0.15
-  },
-  {
    "k": "bussio felipe@platense@VOL",
    "EP": 0.6,
    "pj": 0.12
-  },
-  {
-   "k": "oconnor tomas@gimnasia-mza@VOL",
-   "EP": 1.11,
-   "pj": 0.23
   },
   {
    "k": "pais ignacio@banfield@VOL",
@@ -3537,9 +3532,19 @@
    "pj": 0.15
   },
   {
-   "k": "antonini fermin@gimnasia-mza@VOL",
-   "EP": 3.51,
-   "pj": 0.72
+   "k": "oconnor tomas@gimnasia-mza@VOL",
+   "EP": 1.11,
+   "pj": 0.23
+  },
+  {
+   "k": "mora lautaro@huracan@VOL",
+   "EP": 0.85,
+   "pj": 0.18
+  },
+  {
+   "k": "nadruz agustin@sarmiento@VOL",
+   "EP": 0.57,
+   "pj": 0.12
   },
   {
    "k": "acuna valentino@newells@VOL",
@@ -3552,29 +3557,29 @@
    "pj": 0.12
   },
   {
-   "k": "mendez juan ignacio@instituto@VOL",
-   "EP": 0.97,
-   "pj": 0.2
-  },
-  {
-   "k": "mora lautaro@huracan@VOL",
-   "EP": 0.85,
-   "pj": 0.18
-  },
-  {
-   "k": "nadruz agustin@sarmiento@VOL",
-   "EP": 0.56,
-   "pj": 0.12
-  },
-  {
    "k": "galarza matias alejandro@talleres@VOL",
    "EP": 4.02,
    "pj": 0.83
   },
   {
+   "k": "antonini fermin@gimnasia-mza@VOL",
+   "EP": 3.5,
+   "pj": 0.72
+  },
+  {
    "k": "alvarez favio@banfield@VOL",
-   "EP": 1.09,
+   "EP": 1.1,
    "pj": 0.23
+  },
+  {
+   "k": "mendez juan ignacio@instituto@VOL",
+   "EP": 0.97,
+   "pj": 0.2
+  },
+  {
+   "k": "peluffo ignacio@tigre@VOL",
+   "EP": 0.84,
+   "pj": 0.17
   },
   {
    "k": "esponda marcelo@newells@VOL",
@@ -3587,9 +3592,9 @@
    "pj": 0.2
   },
   {
-   "k": "peluffo ignacio@tigre@VOL",
-   "EP": 0.84,
-   "pj": 0.17
+   "k": "sosa yung santiago@defensa@VOL",
+   "EP": 4.16,
+   "pj": 0.87
   },
   {
    "k": "giaccone emilio@union@VOL",
@@ -3598,23 +3603,13 @@
   },
   {
    "k": "ceballos julian@gimnasia-mza@VOL",
-   "EP": 0.92,
+   "EP": 0.91,
    "pj": 0.19
   },
   {
-   "k": "sanchez ulises@gimnasia-mza@VOL",
-   "EP": 1.06,
-   "pj": 0.22
-  },
-  {
    "k": "laplace thiago@lanus@VOL",
-   "EP": 0.61,
+   "EP": 0.6,
    "pj": 0.13
-  },
-  {
-   "k": "sosa yung santiago@defensa@VOL",
-   "EP": 4.15,
-   "pj": 0.87
   },
   {
    "k": "medina federico@banfield@VOL",
@@ -3627,9 +3622,9 @@
    "pj": 0.52
   },
   {
-   "k": "lo celso francesco@estudiantes-rc@VOL",
-   "EP": 0.58,
-   "pj": 0.12
+   "k": "sanchez ulises@gimnasia-mza@VOL",
+   "EP": 1.06,
+   "pj": 0.22
   },
   {
    "k": "ramos lucas@rosario-central@VOL",
@@ -3647,9 +3642,9 @@
    "pj": 0.14
   },
   {
-   "k": "cravero tiago@central-cordoba@VOL",
-   "EP": 0.59,
-   "pj": 0.12
+   "k": "max augusto@gimnasia-lp@VOL",
+   "EP": 0.62,
+   "pj": 0.13
   },
   {
    "k": "moreno neyder@banfield@VOL",
@@ -3659,6 +3654,21 @@
   {
    "k": "cabrera marcelo@rosario-central@VOL",
    "EP": 0.56,
+   "pj": 0.12
+  },
+  {
+   "k": "portillo ayrton@defensa@VOL",
+   "EP": 0.6,
+   "pj": 0.13
+  },
+  {
+   "k": "cravero tiago@central-cordoba@VOL",
+   "EP": 0.58,
+   "pj": 0.12
+  },
+  {
+   "k": "lo celso francesco@estudiantes-rc@VOL",
+   "EP": 0.57,
    "pj": 0.12
   },
   {
@@ -3672,28 +3682,13 @@
    "pj": 0.19
   },
   {
-   "k": "max augusto@gimnasia-lp@VOL",
-   "EP": 0.62,
-   "pj": 0.13
-  },
-  {
-   "k": "ortiz kevin@atl-tucuman@VOL",
-   "EP": 0.55,
-   "pj": 0.12
-  },
-  {
    "k": "lopez julian@defensa@VOL",
    "EP": 0.86,
    "pj": 0.18
   },
   {
-   "k": "portillo ayrton@defensa@VOL",
-   "EP": 0.6,
-   "pj": 0.13
-  },
-  {
-   "k": "abrego gonzalo@san-lorenzo@VOL",
-   "EP": 0.57,
+   "k": "ortiz kevin@atl-tucuman@VOL",
+   "EP": 0.55,
    "pj": 0.12
   },
   {
@@ -3702,13 +3697,13 @@
    "pj": 0.12
   },
   {
-   "k": "meza juan cruz@river@VOL",
-   "EP": 0.63,
-   "pj": 0.13
-  },
-  {
    "k": "zelarayan gonzalo@belgrano@VOL",
    "EP": 0.59,
+   "pj": 0.12
+  },
+  {
+   "k": "abrego gonzalo@san-lorenzo@VOL",
+   "EP": 0.57,
    "pj": 0.12
   },
   {
@@ -3717,14 +3712,14 @@
    "pj": 0.12
   },
   {
-   "k": "ortiz lautaro@talleres@VOL",
-   "EP": 0.86,
-   "pj": 0.18
-  },
-  {
    "k": "ortiz marcos@belgrano@VOL",
    "EP": 0.55,
    "pj": 0.12
+  },
+  {
+   "k": "ortiz lautaro@talleres@VOL",
+   "EP": 0.86,
+   "pj": 0.18
   },
   {
    "k": "chiavassa emiliano@talleres@VOL",
@@ -3732,19 +3727,9 @@
    "pj": 0.14
   },
   {
-   "k": "vega leonel@atl-tucuman@VOL",
-   "EP": 3.02,
-   "pj": 0.64
-  },
-  {
-   "k": "moreno anibal@river@VOL",
-   "EP": 0.64,
-   "pj": 0.14
-  },
-  {
-   "k": "peresutti mateo@union@VOL",
-   "EP": 0.56,
-   "pj": 0.12
+   "k": "meza juan cruz@river@VOL",
+   "EP": 0.63,
+   "pj": 0.13
   },
   {
    "k": "cruz facundo@independiente@VOL",
@@ -3757,14 +3742,19 @@
    "pj": 0.12
   },
   {
+   "k": "vega leonel@atl-tucuman@VOL",
+   "EP": 3.02,
+   "pj": 0.64
+  },
+  {
+   "k": "peresutti mateo@union@VOL",
+   "EP": 0.56,
+   "pj": 0.12
+  },
+  {
    "k": "baroni giovanni@talleres@VOL",
    "EP": 2.4,
    "pj": 0.51
-  },
-  {
-   "k": "rattalino juan cruz@san-lorenzo@VOL",
-   "EP": 0.85,
-   "pj": 0.18
   },
   {
    "k": "romero oscar@huracan@VOL",
@@ -3772,14 +3762,24 @@
    "pj": 0.14
   },
   {
-   "k": "barrios nahuel@san-lorenzo@VOL",
+   "k": "trey bruno@talleres@VOL",
    "EP": 0.55,
    "pj": 0.12
   },
   {
-   "k": "trey bruno@talleres@VOL",
-   "EP": 0.55,
-   "pj": 0.12
+   "k": "serrago tiago@tigre@VOL",
+   "EP": 1.09,
+   "pj": 0.23
+  },
+  {
+   "k": "rattalino juan cruz@san-lorenzo@VOL",
+   "EP": 0.84,
+   "pj": 0.18
+  },
+  {
+   "k": "moreno anibal@river@VOL",
+   "EP": 0.64,
+   "pj": 0.14
   },
   {
    "k": "duarte leandro@barracas@VOL",
@@ -3787,14 +3787,9 @@
    "pj": 0.12
   },
   {
-   "k": "gulli facundo@san-lorenzo@VOL",
-   "EP": 2.67,
-   "pj": 0.57
-  },
-  {
-   "k": "serrago tiago@tigre@VOL",
-   "EP": 1.08,
-   "pj": 0.23
+   "k": "barrios nahuel@san-lorenzo@VOL",
+   "EP": 0.55,
+   "pj": 0.12
   },
   {
    "k": "arce carlos@barracas@VOL",
@@ -3807,9 +3802,19 @@
    "pj": 0.12
   },
   {
+   "k": "gulli facundo@san-lorenzo@VOL",
+   "EP": 2.67,
+   "pj": 0.57
+  },
+  {
    "k": "sonora alan@newells@VOL",
    "EP": 1.18,
    "pj": 0.25
+  },
+  {
+   "k": "amarfil maximiliano@platense@VOL",
+   "EP": 3.04,
+   "pj": 0.65
   },
   {
    "k": "alassia gonzalo@san-lorenzo@VOL",
@@ -3822,14 +3827,14 @@
    "pj": 0.2
   },
   {
-   "k": "amarfil maximiliano@platense@VOL",
-   "EP": 3.04,
-   "pj": 0.65
-  },
-  {
    "k": "watson nicolas@riestra@VOL",
    "EP": 0.72,
    "pj": 0.16
+  },
+  {
+   "k": "dubersarsky nicolas@tigre@VOL",
+   "EP": 0.54,
+   "pj": 0.12
   },
   {
    "k": "cardozo juan jose@central-cordoba@VOL",
@@ -3847,14 +3852,19 @@
    "pj": 0.3
   },
   {
-   "k": "dubersarsky nicolas@tigre@VOL",
-   "EP": 0.54,
-   "pj": 0.12
+   "k": "perruzzi francisco@aldosivi@VOL",
+   "EP": 0.86,
+   "pj": 0.19
   },
   {
-   "k": "perruzzi francisco@aldosivi@VOL",
-   "EP": 0.85,
-   "pj": 0.19
+   "k": "longo santiago@belgrano@VOL",
+   "EP": 1.34,
+   "pj": 0.29
+  },
+  {
+   "k": "fattori federico@talleres@VOL",
+   "EP": 2.62,
+   "pj": 0.57
   },
   {
    "k": "rio martin@san-lorenzo@VOL",
@@ -3867,19 +3877,14 @@
    "pj": 0.15
   },
   {
+   "k": "ubeda martin@gimnasia-mza@VOL",
+   "EP": 0.75,
+   "pj": 0.16
+  },
+  {
    "k": "ortiz tomas@gimnasia-mza@VOL",
    "EP": 0.61,
    "pj": 0.13
-  },
-  {
-   "k": "fattori federico@talleres@VOL",
-   "EP": 2.62,
-   "pj": 0.57
-  },
-  {
-   "k": "longo santiago@belgrano@VOL",
-   "EP": 1.33,
-   "pj": 0.29
   },
   {
    "k": "arambarri mauro@river@VOL",
@@ -3887,9 +3892,9 @@
    "pj": 0.19
   },
   {
-   "k": "ubeda martin@gimnasia-mza@VOL",
-   "EP": 0.75,
-   "pj": 0.16
+   "k": "martinez david@independiente@VOL",
+   "EP": 0.63,
+   "pj": 0.14
   },
   {
    "k": "perruzzi ignacio@san-lorenzo@VOL",
@@ -3903,13 +3908,8 @@
   },
   {
    "k": "insaurralde manuel@san-lorenzo@VOL",
-   "EP": 1.02,
+   "EP": 1.01,
    "pj": 0.22
-  },
-  {
-   "k": "martinez david@independiente@VOL",
-   "EP": 0.63,
-   "pj": 0.14
   },
   {
    "k": "ramirez tiziano@central-cordoba@VOL",
@@ -3917,14 +3917,14 @@
    "pj": 0.2
   },
   {
-   "k": "kranevitter matias@racing@VOL",
-   "EP": 0.59,
-   "pj": 0.13
-  },
-  {
    "k": "gonzalez metilli francisco@belgrano@VOL",
    "EP": 1.41,
    "pj": 0.31
+  },
+  {
+   "k": "kranevitter matias@racing@VOL",
+   "EP": 0.59,
+   "pj": 0.13
   },
   {
    "k": "belmonte tomas@boca@VOL",
@@ -3933,17 +3933,17 @@
   },
   {
    "k": "vombergar andres@aldosivi@DEL",
-   "EP": 2.11,
+   "EP": 2.16,
    "pj": 0.27
   },
   {
    "k": "martinez ronaldo@velez@DEL",
-   "EP": 6.82,
+   "EP": 6.86,
    "pj": 0.88
   },
   {
    "k": "veron gaston@argentinos@DEL",
-   "EP": 6.18,
+   "EP": 6.17,
    "pj": 0.82
   },
   {
@@ -3953,32 +3953,32 @@
   },
   {
    "k": "correa angel@river@DEL",
-   "EP": 5.81,
-   "pj": 0.78
+   "EP": 6.74,
+   "pj": 0.91
   },
   {
    "k": "arce alex@ind-rivadavia@DEL",
-   "EP": 3.04,
+   "EP": 3.03,
    "pj": 0.42
   },
   {
    "k": "campaz jaminton@rosario-central@DEL",
-   "EP": 4.7,
+   "EP": 4.68,
    "pj": 0.66
   },
   {
    "k": "marabel junior@sarmiento@DEL",
-   "EP": 5.1,
-   "pj": 0.73
+   "EP": 6.19,
+   "pj": 0.89
   },
   {
    "k": "modica agustin@gimnasia-mza@DEL",
-   "EP": 5.94,
+   "EP": 5.91,
    "pj": 0.85
   },
   {
    "k": "flores leonel@boca@DEL",
-   "EP": 4.96,
+   "EP": 4.95,
    "pj": 0.71
   },
   {
@@ -3988,22 +3988,22 @@
   },
   {
    "k": "fernandez matias@ind-rivadavia@DEL",
-   "EP": 5.75,
+   "EP": 5.73,
    "pj": 0.84
   },
   {
    "k": "merentiel miguel angel@boca@DEL",
-   "EP": 3.86,
+   "EP": 3.85,
    "pj": 0.57
   },
   {
    "k": "molina tomas@argentinos@DEL",
-   "EP": 6.12,
+   "EP": 6.11,
    "pj": 0.91
   },
   {
    "k": "santos michael@central-cordoba@DEL",
-   "EP": 3.75,
+   "EP": 3.74,
    "pj": 0.56
   },
   {
@@ -4013,63 +4013,78 @@
   },
   {
    "k": "almada thiago@river@DEL",
-   "EP": 2.27,
-   "pj": 0.34
+   "EP": 3.96,
+   "pj": 0.6
+  },
+  {
+   "k": "auzmendi agustin@gimnasia-lp@DEL",
+   "EP": 5.89,
+   "pj": 0.89
   },
   {
    "k": "aquino dylan@lanus@DEL",
-   "EP": 0.96,
+   "EP": 0.95,
    "pj": 0.14
   },
   {
    "k": "tarragona cristian@union@DEL",
-   "EP": 5.77,
+   "EP": 5.75,
    "pj": 0.88
   },
   {
    "k": "montiel santiago@independiente@DEL",
-   "EP": 5.89,
+   "EP": 5.9,
    "pj": 0.91
   },
   {
    "k": "driussi sebastian@river@DEL",
-   "EP": 4.18,
-   "pj": 0.64
-  },
-  {
-   "k": "copetti enzo@rosario-central@DEL",
-   "EP": 5.56,
-   "pj": 0.86
+   "EP": 5.36,
+   "pj": 0.83
   },
   {
    "k": "salvio eduardo@lanus@DEL",
-   "EP": 5.71,
+   "EP": 5.7,
    "pj": 0.88
   },
   {
-   "k": "auzmendi agustin@gimnasia-lp@DEL",
-   "EP": 5.79,
-   "pj": 0.89
+   "k": "copetti enzo@rosario-central@DEL",
+   "EP": 5.53,
+   "pj": 0.86
   },
   {
    "k": "orsini nicolas@barracas@DEL",
-   "EP": 3.53,
+   "EP": 3.52,
    "pj": 0.55
   },
   {
-   "k": "martinez adrian@racing@DEL",
-   "EP": 5.71,
-   "pj": 0.9
-  },
-  {
    "k": "policella juan cruz@velez@DEL",
-   "EP": 3.93,
+   "EP": 3.94,
    "pj": 0.62
   },
   {
+   "k": "martinez adrian@racing@DEL",
+   "EP": 5.69,
+   "pj": 0.9
+  },
+  {
    "k": "wlk allan@lanus@DEL",
-   "EP": 4.96,
+   "EP": 4.95,
    "pj": 0.79
+  },
+  {
+   "k": "caicedo jordy@huracan@DEL",
+   "EP": 4.66,
+   "pj": 0.74
+  },
+  {
+   "k": "fernandez tomas@aldosivi@DEL",
+   "EP": 3,
+   "pj": 0.48
+  },
+  {
+   "k": "sosa alan@aldosivi@DEL",
+   "EP": 0.86,
+   "pj": 0.14
   },
   {
    "k": "fernandez nicolas emanuel@belgrano@DEL",
@@ -4082,29 +4097,24 @@
    "pj": 0.24
   },
   {
-   "k": "caicedo jordy@huracan@DEL",
-   "EP": 4.6,
-   "pj": 0.74
-  },
-  {
-   "k": "fernandez tomas@aldosivi@DEL",
-   "EP": 2.96,
-   "pj": 0.48
-  },
-  {
-   "k": "sosa alan@aldosivi@DEL",
-   "EP": 0.85,
-   "pj": 0.14
-  },
-  {
    "k": "passerini lucas@belgrano@DEL",
    "EP": 4.67,
    "pj": 0.76
   },
   {
    "k": "gaich adolfo@estudiantes-lp@DEL",
-   "EP": 5.26,
+   "EP": 5.27,
    "pj": 0.86
+  },
+  {
+   "k": "diaz leandro@atl-tucuman@DEL",
+   "EP": 1.84,
+   "pj": 0.3
+  },
+  {
+   "k": "tobio burgos joaquin@estudiantes-lp@DEL",
+   "EP": 3.47,
+   "pj": 0.56
   },
   {
    "k": "lima morais rick@talleres@DEL",
@@ -4112,29 +4122,24 @@
    "pj": 0.89
   },
   {
-   "k": "tobio burgos joaquin@estudiantes-lp@DEL",
-   "EP": 3.46,
-   "pj": 0.56
-  },
-  {
-   "k": "diaz leandro@atl-tucuman@DEL",
-   "EP": 1.83,
-   "pj": 0.3
-  },
-  {
-   "k": "auzmendi rodrigo@san-lorenzo@DEL",
-   "EP": 5.45,
-   "pj": 0.89
-  },
-  {
    "k": "russo ignacio@tigre@DEL",
-   "EP": 5.52,
+   "EP": 5.53,
    "pj": 0.91
   },
   {
-   "k": "tissera matias@instituto@DEL",
-   "EP": 4.55,
-   "pj": 0.75
+   "k": "auzmendi rodrigo@san-lorenzo@DEL",
+   "EP": 5.43,
+   "pj": 0.89
+  },
+  {
+   "k": "gutierrez juan manuel@defensa@DEL",
+   "EP": 5.17,
+   "pj": 0.86
+  },
+  {
+   "k": "cortes oscar@huracan@DEL",
+   "EP": 5.22,
+   "pj": 0.87
   },
   {
    "k": "balboa adrian@banfield@DEL",
@@ -4143,18 +4148,23 @@
   },
   {
    "k": "perez fabricio@estudiantes-lp@DEL",
-   "EP": 3.21,
+   "EP": 3.22,
    "pj": 0.54
   },
   {
-   "k": "cortes oscar@huracan@DEL",
-   "EP": 5.18,
-   "pj": 0.87
+   "k": "fernandez augusto@aldosivi@DEL",
+   "EP": 2.86,
+   "pj": 0.48
   },
   {
-   "k": "gutierrez juan manuel@defensa@DEL",
-   "EP": 5.13,
-   "pj": 0.86
+   "k": "tissera matias@instituto@DEL",
+   "EP": 4.52,
+   "pj": 0.75
+  },
+  {
+   "k": "fernandez leandro@defensa@DEL",
+   "EP": 4.93,
+   "pj": 0.83
   },
   {
    "k": "solari santiago@newells@DEL",
@@ -4162,59 +4172,34 @@
    "pj": 0.81
   },
   {
-   "k": "mazzantti walter@newells@DEL",
-   "EP": 5.42,
-   "pj": 0.91
-  },
-  {
    "k": "avalos gabriel@independiente@DEL",
    "EP": 0.82,
    "pj": 0.14
   },
   {
+   "k": "mazzantti walter@newells@DEL",
+   "EP": 5.43,
+   "pj": 0.91
+  },
+  {
    "k": "pellegrini matias@velez@DEL",
-   "EP": 1.79,
+   "EP": 1.8,
    "pj": 0.3
   },
   {
-   "k": "fernandez leandro@defensa@DEL",
-   "EP": 4.89,
-   "pj": 0.83
-  },
-  {
-   "k": "fernandez augusto@aldosivi@DEL",
-   "EP": 2.83,
-   "pj": 0.48
-  },
-  {
-   "k": "sartori fabrizio@ind-rivadavia@DEL",
-   "EP": 4.11,
-   "pj": 0.7
+   "k": "ruiz rodriguez ramiro@atl-tucuman@DEL",
+   "EP": 4.66,
+   "pj": 0.79
   },
   {
    "k": "alvarez martinez agustin@talleres@DEL",
-   "EP": 1.56,
+   "EP": 1.57,
    "pj": 0.27
   },
   {
-   "k": "ruiz rodriguez ramiro@atl-tucuman@DEL",
-   "EP": 4.64,
-   "pj": 0.79
-  },
-  {
-   "k": "pereyra lautaro@river@DEL",
-   "EP": 1.95,
-   "pj": 0.33
-  },
-  {
-   "k": "depietri valentin@talleres@DEL",
-   "EP": 4.63,
-   "pj": 0.79
-  },
-  {
-   "k": "conechny tomas@racing@DEL",
-   "EP": 3.98,
-   "pj": 0.68
+   "k": "sartori fabrizio@ind-rivadavia@DEL",
+   "EP": 4.1,
+   "pj": 0.7
   },
   {
    "k": "mendez mauro@tigre@DEL",
@@ -4222,14 +4207,34 @@
    "pj": 0.2
   },
   {
+   "k": "depietri valentin@talleres@DEL",
+   "EP": 4.63,
+   "pj": 0.79
+  },
+  {
+   "k": "cordero nicolas@aldosivi@DEL",
+   "EP": 3.29,
+   "pj": 0.56
+  },
+  {
+   "k": "cetre edwuin@estudiantes-lp@DEL",
+   "EP": 4.86,
+   "pj": 0.83
+  },
+  {
    "k": "alonso antony@riestra@DEL",
    "EP": 3.84,
    "pj": 0.66
   },
   {
-   "k": "cetre edwuin@estudiantes-lp@DEL",
-   "EP": 4.85,
-   "pj": 0.83
+   "k": "janson lucas@gimnasia-lp@DEL",
+   "EP": 4.65,
+   "pj": 0.8
+  },
+  {
+   "k": "conechny tomas@racing@DEL",
+   "EP": 3.97,
+   "pj": 0.68
   },
   {
    "k": "tempone felipe@independiente@DEL",
@@ -4237,9 +4242,9 @@
    "pj": 0.2
   },
   {
-   "k": "lazaro jeremias@instituto@DEL",
-   "EP": 4.67,
-   "pj": 0.81
+   "k": "zalazar maximiliano@gimnasia-lp@DEL",
+   "EP": 4.27,
+   "pj": 0.74
   },
   {
    "k": "rigoni emiliano@belgrano@DEL",
@@ -4247,13 +4252,8 @@
    "pj": 0.87
   },
   {
-   "k": "cordero nicolas@aldosivi@DEL",
-   "EP": 3.25,
-   "pj": 0.56
-  },
-  {
    "k": "domina jeronimo@tigre@DEL",
-   "EP": 4.06,
+   "EP": 4.07,
    "pj": 0.71
   },
   {
@@ -4262,24 +4262,19 @@
    "pj": 0.62
   },
   {
-   "k": "janson lucas@gimnasia-lp@DEL",
-   "EP": 4.59,
-   "pj": 0.8
-  },
-  {
-   "k": "salas maximiliano@ind-rivadavia@DEL",
-   "EP": 3,
-   "pj": 0.52
-  },
-  {
    "k": "monzon florian@velez@DEL",
    "EP": 0.67,
    "pj": 0.12
   },
   {
-   "k": "zalazar maximiliano@gimnasia-lp@DEL",
-   "EP": 4.23,
-   "pj": 0.74
+   "k": "lazaro jeremias@instituto@DEL",
+   "EP": 4.64,
+   "pj": 0.81
+  },
+  {
+   "k": "salas maximiliano@ind-rivadavia@DEL",
+   "EP": 2.99,
+   "pj": 0.52
   },
   {
    "k": "villa sebastian@boca@DEL",
@@ -4293,13 +4288,18 @@
   },
   {
    "k": "briasco norberto@barracas@DEL",
-   "EP": 4.71,
+   "EP": 4.7,
    "pj": 0.83
   },
   {
+   "k": "pereyra lautaro@river@DEL",
+   "EP": 2.18,
+   "pj": 0.39
+  },
+  {
    "k": "herrera jonathan@sarmiento@DEL",
-   "EP": 1.91,
-   "pj": 0.34
+   "EP": 2.26,
+   "pj": 0.4
   },
   {
    "k": "palacios carlos@boca@DEL",
@@ -4322,19 +4322,24 @@
    "pj": 0.29
   },
   {
+   "k": "nicola franco@atl-tucuman@DEL",
+   "EP": 4.43,
+   "pj": 0.8
+  },
+  {
    "k": "merlini bautista@platense@DEL",
    "EP": 4.13,
    "pj": 0.74
   },
   {
    "k": "barrera diego@central-cordoba@DEL",
-   "EP": 4.77,
+   "EP": 4.76,
    "pj": 0.86
   },
   {
-   "k": "nicola franco@atl-tucuman@DEL",
-   "EP": 4.42,
-   "pj": 0.8
+   "k": "perrotta tiziano@defensa@DEL",
+   "EP": 1.73,
+   "pj": 0.31
   },
   {
    "k": "freitas joaquin@river@DEL",
@@ -4352,11 +4357,6 @@
    "pj": 0.22
   },
   {
-   "k": "perrotta tiziano@defensa@DEL",
-   "EP": 1.72,
-   "pj": 0.31
-  },
-  {
    "k": "gimenez luciano@platense@DEL",
    "EP": 0.69,
    "pj": 0.13
@@ -4367,29 +4367,44 @@
    "pj": 0.12
   },
   {
+   "k": "colazo agustin@gimnasia-lp@DEL",
+   "EP": 2.89,
+   "pj": 0.53
+  },
+  {
    "k": "sequeira leonardo@central-cordoba@DEL",
-   "EP": 4.22,
+   "EP": 4.21,
    "pj": 0.77
   },
   {
    "k": "diaz lautaro@racing@DEL",
-   "EP": 4.35,
+   "EP": 4.34,
    "pj": 0.8
   },
   {
-   "k": "colazo agustin@gimnasia-lp@DEL",
-   "EP": 2.87,
-   "pj": 0.53
-  },
-  {
-   "k": "beltran lucas@river@DEL",
-   "EP": 1.32,
-   "pj": 0.24
-  },
-  {
    "k": "aguirre thiago@velez@DEL",
-   "EP": 2.76,
+   "EP": 2.77,
    "pj": 0.51
+  },
+  {
+   "k": "bisanz juan francisco@huracan@DEL",
+   "EP": 3.93,
+   "pj": 0.73
+  },
+  {
+   "k": "renteria jhon@sarmiento@DEL",
+   "EP": 2.97,
+   "pj": 0.55
+  },
+  {
+   "k": "palavecino agustin@aldosivi@DEL",
+   "EP": 3.4,
+   "pj": 0.63
+  },
+  {
+   "k": "carrillo guido@estudiantes-lp@DEL",
+   "EP": 1.14,
+   "pj": 0.21
   },
   {
    "k": "besozzi lucas@lanus@DEL",
@@ -4397,54 +4412,9 @@
    "pj": 0.76
   },
   {
-   "k": "carrillo guido@estudiantes-lp@DEL",
-   "EP": 1.13,
-   "pj": 0.21
-  },
-  {
-   "k": "bisanz juan francisco@huracan@DEL",
-   "EP": 3.91,
-   "pj": 0.73
-  },
-  {
-   "k": "palavecino agustin@aldosivi@DEL",
-   "EP": 3.37,
-   "pj": 0.63
-  },
-  {
    "k": "lopez santiago@tigre@DEL",
-   "EP": 4.58,
+   "EP": 4.59,
    "pj": 0.86
-  },
-  {
-   "k": "cuello alexis@san-lorenzo@DEL",
-   "EP": 3.62,
-   "pj": 0.68
-  },
-  {
-   "k": "renteria jhon@sarmiento@DEL",
-   "EP": 1.89,
-   "pj": 0.36
-  },
-  {
-   "k": "vergara duvan@racing@DEL",
-   "EP": 0.94,
-   "pj": 0.18
-  },
-  {
-   "k": "avila ezequiel@independiente@DEL",
-   "EP": 2.51,
-   "pj": 0.48
-  },
-  {
-   "k": "reali matias@ind-rivadavia@DEL",
-   "EP": 2.04,
-   "pj": 0.39
-  },
-  {
-   "k": "togni gaston@platense@DEL",
-   "EP": 1.16,
-   "pj": 0.22
   },
   {
    "k": "veron alex@velez@DEL",
@@ -4452,14 +4422,39 @@
    "pj": 0.15
   },
   {
+   "k": "avila ezequiel@independiente@DEL",
+   "EP": 2.51,
+   "pj": 0.48
+  },
+  {
+   "k": "vergara duvan@racing@DEL",
+   "EP": 0.94,
+   "pj": 0.18
+  },
+  {
+   "k": "godoy matias@aldosivi@DEL",
+   "EP": 0.82,
+   "pj": 0.16
+  },
+  {
+   "k": "cuello alexis@san-lorenzo@DEL",
+   "EP": 3.61,
+   "pj": 0.68
+  },
+  {
+   "k": "togni gaston@platense@DEL",
+   "EP": 1.16,
+   "pj": 0.22
+  },
+  {
+   "k": "reali matias@ind-rivadavia@DEL",
+   "EP": 2.03,
+   "pj": 0.39
+  },
+  {
    "k": "velazquez juan martin@belgrano@DEL",
    "EP": 1.89,
    "pj": 0.36
-  },
-  {
-   "k": "gimenez matias@argentinos@DEL",
-   "EP": 1.37,
-   "pj": 0.26
   },
   {
    "k": "gutierrez maximiliano@independiente@DEL",
@@ -4467,9 +4462,19 @@
    "pj": 0.14
   },
   {
-   "k": "godoy matias@aldosivi@DEL",
-   "EP": 0.82,
-   "pj": 0.16
+   "k": "gimenez matias@argentinos@DEL",
+   "EP": 1.37,
+   "pj": 0.26
+  },
+  {
+   "k": "anso felipe@aldosivi@DEL",
+   "EP": 1.62,
+   "pj": 0.31
+  },
+  {
+   "k": "magnin pablo@sarmiento@DEL",
+   "EP": 0.81,
+   "pj": 0.15
   },
   {
    "k": "zalazar david@banfield@DEL",
@@ -4482,33 +4487,8 @@
    "pj": 0.66
   },
   {
-   "k": "suarez facundo@instituto@DEL",
-   "EP": 1.5,
-   "pj": 0.29
-  },
-  {
    "k": "valois yoshan@lanus@DEL",
    "EP": 1.47,
-   "pj": 0.28
-  },
-  {
-   "k": "magnin pablo@sarmiento@DEL",
-   "EP": 0.8,
-   "pj": 0.15
-  },
-  {
-   "k": "sabato luciano@ind-rivadavia@DEL",
-   "EP": 0.63,
-   "pj": 0.12
-  },
-  {
-   "k": "colidio facundo@river@DEL",
-   "EP": 0.62,
-   "pj": 0.12
-  },
-  {
-   "k": "cordoba jhon emerson@instituto@DEL",
-   "EP": 1.45,
    "pj": 0.28
   },
   {
@@ -4517,9 +4497,14 @@
    "pj": 0.17
   },
   {
-   "k": "guerra nicolas@instituto@DEL",
-   "EP": 0.72,
-   "pj": 0.14
+   "k": "suarez facundo@instituto@DEL",
+   "EP": 1.5,
+   "pj": 0.29
+  },
+  {
+   "k": "sabato luciano@ind-rivadavia@DEL",
+   "EP": 0.63,
+   "pj": 0.12
   },
   {
    "k": "valdez facundo@independiente@DEL",
@@ -4527,14 +4512,19 @@
    "pj": 0.12
   },
   {
-   "k": "gonzalez gaston@sarmiento@DEL",
-   "EP": 1.26,
-   "pj": 0.24
+   "k": "godoy dilan@velez@DEL",
+   "EP": 1.03,
+   "pj": 0.2
   },
   {
-   "k": "godoy dilan@velez@DEL",
-   "EP": 1.02,
-   "pj": 0.2
+   "k": "colidio facundo@river@DEL",
+   "EP": 0.62,
+   "pj": 0.12
+  },
+  {
+   "k": "cordoba jhon emerson@instituto@DEL",
+   "EP": 1.44,
+   "pj": 0.28
   },
   {
    "k": "stringa angel@riestra@DEL",
@@ -4542,14 +4532,9 @@
    "pj": 0.15
   },
   {
-   "k": "luna diale mauro@union@DEL",
-   "EP": 3.66,
-   "pj": 0.71
-  },
-  {
-   "k": "anso felipe@aldosivi@DEL",
-   "EP": 1.61,
-   "pj": 0.31
+   "k": "merlo jeremias@gimnasia-lp@DEL",
+   "EP": 0.61,
+   "pj": 0.12
   },
   {
    "k": "graneros agustin@riestra@DEL",
@@ -4557,9 +4542,29 @@
    "pj": 0.27
   },
   {
-   "k": "merlo jeremias@gimnasia-lp@DEL",
-   "EP": 0.61,
-   "pj": 0.12
+   "k": "guerra nicolas@instituto@DEL",
+   "EP": 0.72,
+   "pj": 0.14
+  },
+  {
+   "k": "luna diale mauro@union@DEL",
+   "EP": 3.66,
+   "pj": 0.71
+  },
+  {
+   "k": "gonzalez gaston@sarmiento@DEL",
+   "EP": 1.48,
+   "pj": 0.28
+  },
+  {
+   "k": "pussetto ignacio@huracan@DEL",
+   "EP": 1.39,
+   "pj": 0.27
+  },
+  {
+   "k": "palais josias@independiente@DEL",
+   "EP": 1.42,
+   "pj": 0.27
   },
   {
    "k": "bacidalupe rodrigo@boca@DEL",
@@ -4572,14 +4577,14 @@
    "pj": 0.64
   },
   {
-   "k": "palais josias@independiente@DEL",
-   "EP": 1.42,
-   "pj": 0.27
+   "k": "beltran lucas@river@DEL",
+   "EP": 1.34,
+   "pj": 0.26
   },
   {
-   "k": "pussetto ignacio@huracan@DEL",
-   "EP": 1.39,
-   "pj": 0.27
+   "k": "blanco domingo@defensa@DEL",
+   "EP": 0.84,
+   "pj": 0.16
   },
   {
    "k": "russo jeronimo@newells@DEL",
@@ -4597,14 +4602,24 @@
    "pj": 0.35
   },
   {
-   "k": "blanco domingo@defensa@DEL",
-   "EP": 0.83,
-   "pj": 0.16
-  },
-  {
    "k": "cuitino martin@central-cordoba@DEL",
    "EP": 1.39,
    "pj": 0.27
+  },
+  {
+   "k": "contrera julian@sarmiento@DEL",
+   "EP": 2.16,
+   "pj": 0.42
+  },
+  {
+   "k": "aguirre brian@estudiantes-lp@DEL",
+   "EP": 0.74,
+   "pj": 0.14
+  },
+  {
+   "k": "diaz luis@ind-rivadavia@DEL",
+   "EP": 0.7,
+   "pj": 0.14
   },
   {
    "k": "riep alessandro@ind-rivadavia@DEL",
@@ -4617,22 +4632,17 @@
    "pj": 0.17
   },
   {
-   "k": "diaz luis@ind-rivadavia@DEL",
-   "EP": 0.71,
-   "pj": 0.14
-  },
-  {
-   "k": "aguirre brian@estudiantes-lp@DEL",
-   "EP": 0.74,
-   "pj": 0.14
+   "k": "piola lautaro@velez@DEL",
+   "EP": 0.61,
+   "pj": 0.12
   },
   {
    "k": "bogarin rodrigo@barracas@DEL",
-   "EP": 2.98,
+   "EP": 2.97,
    "pj": 0.58
   },
   {
-   "k": "piola lautaro@velez@DEL",
+   "k": "perez tomas@defensa@DEL",
    "EP": 0.6,
    "pj": 0.12
   },
@@ -4642,24 +4652,14 @@
    "pj": 0.25
   },
   {
-   "k": "sabatini ignacio@gimnasia-mza@DEL",
-   "EP": 1.19,
-   "pj": 0.24
-  },
-  {
-   "k": "perez tomas@defensa@DEL",
-   "EP": 0.6,
-   "pj": 0.12
-  },
-  {
-   "k": "cingolani luciano@gimnasia-mza@DEL",
-   "EP": 3.27,
-   "pj": 0.65
-  },
-  {
    "k": "valoyes diego@talleres@DEL",
    "EP": 1.94,
    "pj": 0.38
+  },
+  {
+   "k": "sabatini ignacio@gimnasia-mza@DEL",
+   "EP": 1.19,
+   "pj": 0.24
   },
   {
    "k": "barticciotto bruno@huracan@DEL",
@@ -4677,9 +4677,9 @@
    "pj": 0.12
   },
   {
-   "k": "ramis victorio@ind-rivadavia@DEL",
-   "EP": 0.59,
-   "pj": 0.12
+   "k": "abaldo matias@independiente@DEL",
+   "EP": 3.32,
+   "pj": 0.66
   },
   {
    "k": "gauto juan carlos@platense@DEL",
@@ -4687,24 +4687,14 @@
    "pj": 0.16
   },
   {
-   "k": "abaldo matias@independiente@DEL",
-   "EP": 3.31,
-   "pj": 0.66
-  },
-  {
    "k": "gutierrez lautaro@belgrano@DEL",
    "EP": 0.79,
    "pj": 0.16
   },
   {
-   "k": "bajamich mateo@estudiantes-rc@DEL",
-   "EP": 0.76,
-   "pj": 0.15
-  },
-  {
-   "k": "rivero joaquin@estudiantes-rc@DEL",
-   "EP": 0.74,
-   "pj": 0.15
+   "k": "panaro manuel@gimnasia-lp@DEL",
+   "EP": 0.69,
+   "pj": 0.14
   },
   {
    "k": "uribe tomas@huracan@DEL",
@@ -4712,19 +4702,19 @@
    "pj": 0.13
   },
   {
-   "k": "fraga francisco@racing@DEL",
-   "EP": 0.6,
+   "k": "ramis victorio@ind-rivadavia@DEL",
+   "EP": 0.59,
    "pj": 0.12
   },
   {
-   "k": "hesar ibrahim@estudiantes-rc@DEL",
-   "EP": 3.67,
-   "pj": 0.73
+   "k": "cingolani luciano@gimnasia-mza@DEL",
+   "EP": 3.26,
+   "pj": 0.65
   },
   {
-   "k": "panaro manuel@gimnasia-lp@DEL",
-   "EP": 0.69,
-   "pj": 0.14
+   "k": "fraga francisco@racing@DEL",
+   "EP": 0.6,
+   "pj": 0.12
   },
   {
    "k": "flores gonzalo@riestra@DEL",
@@ -4742,9 +4732,34 @@
    "pj": 0.51
   },
   {
+   "k": "brondo manuel@atl-tucuman@DEL",
+   "EP": 0.66,
+   "pj": 0.13
+  },
+  {
    "k": "lopez nicolas@platense@DEL",
    "EP": 0.66,
    "pj": 0.13
+  },
+  {
+   "k": "guzman natanael@aldosivi@DEL",
+   "EP": 0.59,
+   "pj": 0.12
+  },
+  {
+   "k": "bajamich mateo@estudiantes-rc@DEL",
+   "EP": 0.76,
+   "pj": 0.15
+  },
+  {
+   "k": "rivero joaquin@estudiantes-rc@DEL",
+   "EP": 0.73,
+   "pj": 0.15
+  },
+  {
+   "k": "chavez andres@aldosivi@DEL",
+   "EP": 1.07,
+   "pj": 0.21
   },
   {
    "k": "sanseviero lucas@instituto@DEL",
@@ -4752,27 +4767,7 @@
    "pj": 0.14
   },
   {
-   "k": "brondo manuel@atl-tucuman@DEL",
-   "EP": 0.66,
-   "pj": 0.13
-  },
-  {
    "k": "fonseca matias@instituto@DEL",
-   "EP": 0.58,
-   "pj": 0.12
-  },
-  {
-   "k": "campo alberto@racing@DEL",
-   "EP": 0.62,
-   "pj": 0.12
-  },
-  {
-   "k": "guzman natanael@aldosivi@DEL",
-   "EP": 0.58,
-   "pj": 0.12
-  },
-  {
-   "k": "rodriguez gregorio@san-lorenzo@DEL",
    "EP": 0.58,
    "pj": 0.12
   },
@@ -4782,14 +4777,19 @@
    "pj": 0.17
   },
   {
-   "k": "duarte lisandro@rosario-central@DEL",
-   "EP": 0.71,
-   "pj": 0.14
+   "k": "campo alberto@racing@DEL",
+   "EP": 0.62,
+   "pj": 0.12
   },
   {
-   "k": "felici valentino@rosario-central@DEL",
+   "k": "rodriguez gregorio@san-lorenzo@DEL",
    "EP": 0.58,
    "pj": 0.12
+  },
+  {
+   "k": "hesar ibrahim@estudiantes-rc@DEL",
+   "EP": 3.62,
+   "pj": 0.73
   },
   {
    "k": "ramirez eric@union@DEL",
@@ -4797,29 +4797,34 @@
    "pj": 0.47
   },
   {
-   "k": "badaloni tomas@rosario-central@DEL",
-   "EP": 0.63,
-   "pj": 0.13
-  },
-  {
-   "k": "chala juan camilo@estudiantes-rc@DEL",
-   "EP": 0.62,
-   "pj": 0.12
-  },
-  {
-   "k": "moreno yeison@estudiantes-rc@DEL",
-   "EP": 1.84,
-   "pj": 0.37
-  },
-  {
    "k": "peralta thaiel@huracan@DEL",
    "EP": 1.4,
    "pj": 0.28
   },
   {
+   "k": "hausch agustin@defensa@DEL",
+   "EP": 1.06,
+   "pj": 0.21
+  },
+  {
    "k": "torres marcelo@gimnasia-lp@DEL",
    "EP": 1.03,
    "pj": 0.21
+  },
+  {
+   "k": "duarte lisandro@rosario-central@DEL",
+   "EP": 0.71,
+   "pj": 0.14
+  },
+  {
+   "k": "soto martin@huracan@DEL",
+   "EP": 0.59,
+   "pj": 0.12
+  },
+  {
+   "k": "felici valentino@rosario-central@DEL",
+   "EP": 0.58,
+   "pj": 0.12
   },
   {
    "k": "canelo alexis@atl-tucuman@DEL",
@@ -4832,12 +4837,32 @@
    "pj": 0.14
   },
   {
-   "k": "soto martin@huracan@DEL",
-   "EP": 0.59,
+   "k": "badaloni tomas@rosario-central@DEL",
+   "EP": 0.63,
+   "pj": 0.13
+  },
+  {
+   "k": "gagliardi ramiro@defensa@DEL",
+   "EP": 0.58,
    "pj": 0.12
   },
   {
    "k": "martinez alejandro@huracan@DEL",
+   "EP": 0.58,
+   "pj": 0.12
+  },
+  {
+   "k": "torres franco@gimnasia-lp@DEL",
+   "EP": 1.37,
+   "pj": 0.28
+  },
+  {
+   "k": "granillo rodrigo@atl-tucuman@DEL",
+   "EP": 0.74,
+   "pj": 0.15
+  },
+  {
+   "k": "cabrera jonas@defensa@DEL",
    "EP": 0.58,
    "pj": 0.12
   },
@@ -4847,34 +4872,14 @@
    "pj": 0.28
   },
   {
-   "k": "contrera julian@sarmiento@DEL",
-   "EP": 1.19,
-   "pj": 0.24
-  },
-  {
-   "k": "chavez andres@aldosivi@DEL",
-   "EP": 1.06,
-   "pj": 0.21
-  },
-  {
-   "k": "hausch agustin@defensa@DEL",
-   "EP": 1.05,
-   "pj": 0.21
-  },
-  {
-   "k": "granillo rodrigo@atl-tucuman@DEL",
-   "EP": 0.74,
-   "pj": 0.15
-  },
-  {
    "k": "rodriguez thomas@banfield@DEL",
    "EP": 1.06,
    "pj": 0.21
   },
   {
-   "k": "andrada brian@gimnasia-mza@DEL",
-   "EP": 0.97,
-   "pj": 0.2
+   "k": "churin diego@sarmiento@DEL",
+   "EP": 0.83,
+   "pj": 0.17
   },
   {
    "k": "anselmo federico@banfield@DEL",
@@ -4882,27 +4887,7 @@
    "pj": 0.12
   },
   {
-   "k": "gagliardi ramiro@defensa@DEL",
-   "EP": 0.58,
-   "pj": 0.12
-  },
-  {
-   "k": "cabrera jonas@defensa@DEL",
-   "EP": 0.57,
-   "pj": 0.12
-  },
-  {
-   "k": "torres franco@gimnasia-lp@DEL",
-   "EP": 1.37,
-   "pj": 0.28
-  },
-  {
-   "k": "garro juan fernando@estudiantes-rc@DEL",
-   "EP": 0.61,
-   "pj": 0.12
-  },
-  {
-   "k": "crego diego@ind-rivadavia@DEL",
+   "k": "chala juan camilo@estudiantes-rc@DEL",
    "EP": 0.61,
    "pj": 0.12
   },
@@ -4912,13 +4897,28 @@
    "pj": 0.12
   },
   {
-   "k": "churin diego@sarmiento@DEL",
-   "EP": 0.83,
-   "pj": 0.17
+   "k": "moreno yeison@estudiantes-rc@DEL",
+   "EP": 1.82,
+   "pj": 0.37
+  },
+  {
+   "k": "andrada brian@gimnasia-mza@DEL",
+   "EP": 0.96,
+   "pj": 0.2
+  },
+  {
+   "k": "crego diego@ind-rivadavia@DEL",
+   "EP": 0.61,
+   "pj": 0.12
   },
   {
    "k": "cerrudo valentin@union@DEL",
    "EP": 0.59,
+   "pj": 0.12
+  },
+  {
+   "k": "bono agustin@belgrano@DEL",
+   "EP": 0.57,
    "pj": 0.12
   },
   {
@@ -4927,9 +4927,14 @@
    "pj": 0.26
   },
   {
-   "k": "bono agustin@belgrano@DEL",
-   "EP": 0.57,
-   "pj": 0.12
+   "k": "morales ivan@independiente@DEL",
+   "EP": 2.36,
+   "pj": 0.48
+  },
+  {
+   "k": "dadin juan bautista@aldosivi@DEL",
+   "EP": 0.91,
+   "pj": 0.19
   },
   {
    "k": "borre rafael santos@river@DEL",
@@ -4937,9 +4942,14 @@
    "pj": 0.17
   },
   {
-   "k": "morales ivan@independiente@DEL",
-   "EP": 2.36,
-   "pj": 0.48
+   "k": "cervi franco@rosario-central@DEL",
+   "EP": 0.8,
+   "pj": 0.16
+  },
+  {
+   "k": "garro juan fernando@estudiantes-rc@DEL",
+   "EP": 0.6,
+   "pj": 0.12
   },
   {
    "k": "armoa blas@gimnasia-mza@DEL",
@@ -4952,14 +4962,14 @@
    "pj": 0.21
   },
   {
-   "k": "cervi franco@rosario-central@DEL",
-   "EP": 0.8,
-   "pj": 0.16
+   "k": "ruben marco@rosario-central@DEL",
+   "EP": 0.97,
+   "pj": 0.2
   },
   {
-   "k": "ruben marco@rosario-central@DEL",
-   "EP": 0.98,
-   "pj": 0.2
+   "k": "alario lucas@estudiantes-lp@DEL",
+   "EP": 0.65,
+   "pj": 0.13
   },
   {
    "k": "duarte manuel@barracas@DEL",
@@ -4972,24 +4982,9 @@
    "pj": 0.12
   },
   {
-   "k": "dadin juan bautista@aldosivi@DEL",
-   "EP": 0.9,
-   "pj": 0.19
-  },
-  {
    "k": "acosta jeremias@banfield@DEL",
    "EP": 0.68,
    "pj": 0.14
-  },
-  {
-   "k": "alario lucas@estudiantes-lp@DEL",
-   "EP": 0.65,
-   "pj": 0.13
-  },
-  {
-   "k": "acosta benjamin@lanus@DEL",
-   "EP": 0.57,
-   "pj": 0.12
   },
   {
    "k": "fernandez manuel@tigre@DEL",
@@ -4997,14 +4992,14 @@
    "pj": 0.15
   },
   {
+   "k": "acosta benjamin@lanus@DEL",
+   "EP": 0.57,
+   "pj": 0.12
+  },
+  {
    "k": "heredia leonardo@platense@DEL",
    "EP": 0.61,
    "pj": 0.13
-  },
-  {
-   "k": "garnerone martin@estudiantes-rc@DEL",
-   "EP": 2.2,
-   "pj": 0.46
   },
   {
    "k": "laprida alan@central-cordoba@DEL",
@@ -5017,14 +5012,19 @@
    "pj": 0.2
   },
   {
-   "k": "rodriguez santiago@gimnasia-mza@DEL",
-   "EP": 0.61,
-   "pj": 0.13
-  },
-  {
    "k": "barbieri juan ignacio@barracas@DEL",
    "EP": 0.56,
    "pj": 0.12
+  },
+  {
+   "k": "garnerone martin@estudiantes-rc@DEL",
+   "EP": 2.18,
+   "pj": 0.46
+  },
+  {
+   "k": "rodriguez santiago@gimnasia-mza@DEL",
+   "EP": 0.61,
+   "pj": 0.13
   },
   {
    "k": "romano nicolas@gimnasia-mza@DEL",
@@ -5047,6 +5047,11 @@
    "pj": 0.12
   },
   {
+   "k": "subiabre ian@tigre@DEL",
+   "EP": 0.62,
+   "pj": 0.13
+  },
+  {
    "k": "salas alan@san-lorenzo@DEL",
    "EP": 0.61,
    "pj": 0.13
@@ -5058,18 +5063,8 @@
   },
   {
    "k": "simoni valentino@gimnasia-mza@DEL",
-   "EP": 0.62,
+   "EP": 0.61,
    "pj": 0.13
-  },
-  {
-   "k": "subiabre ian@tigre@DEL",
-   "EP": 0.62,
-   "pj": 0.13
-  },
-  {
-   "k": "ferreira javier@estudiantes-rc@DEL",
-   "EP": 0.65,
-   "pj": 0.14
   },
   {
    "k": "guaraz ivan@barracas@DEL",
@@ -5080,6 +5075,11 @@
    "k": "oviedo alfio@tigre@DEL",
    "EP": 0.8,
    "pj": 0.17
+  },
+  {
+   "k": "ferreira javier@estudiantes-rc@DEL",
+   "EP": 0.65,
+   "pj": 0.14
   },
   {
    "k": "porcel diego@argentinos@DEL",
