@@ -1,6 +1,6 @@
 {
-  "generado": "2026-09-11T00:43:44.257Z",
-  "fuente": "data365.json log[].nota · dos torneos separados por gid >= 4633318",
+  "generado": "2026-10-23T19:21:49.248Z",
+  "fuente": "data365.json log[].nota · un solo torneo",
   "minutosMinimos": 20,
   "partidosMinimos": 6,
   "remuestreos": 4000,
@@ -10,80 +10,80 @@
   },
   "kFicha": {
     "ARQ": 60,
-    "DEF": 11.2,
-    "VOL": 10.7,
-    "DEL": 13.6
+    "DEF": 10.7,
+    "VOL": 6,
+    "DEL": 15.9
   },
   "detalle": {
     "ARQ": {
-      "jugadorTorneo": 52,
-      "notas": 534,
-      "sdNota": 0.746,
-      "partidosPorMitad": 4.9,
-      "pendiente": 0.016,
-      "rPorPartido": 0.3,
+      "jugadorTorneo": 30,
+      "notas": 352,
+      "sdNota": 0.72,
+      "partidosPorMitad": 5.5,
+      "pendiente": -0.037,
+      "rPorPartido": 0,
       "rIC95": [
         0,
-        6.4
+        4.9
       ],
       "K": 60,
       "kIC95": [
-        14.7,
+        19.3,
         null
       ],
       "topeado": true
     },
     "DEF": {
-      "jugadorTorneo": 227,
-      "notas": 2127,
-      "sdNota": 0.557,
-      "partidosPorMitad": 4.5,
-      "pendiente": 0.285,
-      "rPorPartido": 8.2,
+      "jugadorTorneo": 145,
+      "notas": 1419,
+      "sdNota": 0.593,
+      "partidosPorMitad": 4.6,
+      "pendiente": 0.302,
+      "rPorPartido": 8.6,
       "rIC95": [
-        4.4,
-        13.4
+        2.9,
+        17
       ],
-      "K": 11.2,
+      "K": 10.7,
       "kIC95": [
-        6.4,
-        21.6
+        4.9,
+        33.1
       ],
       "topeado": false
     },
     "VOL": {
-      "jugadorTorneo": 209,
-      "notas": 1976,
-      "sdNota": 0.511,
-      "partidosPorMitad": 4.5,
-      "pendiente": 0.298,
-      "rPorPartido": 8.6,
+      "jugadorTorneo": 133,
+      "notas": 1293,
+      "sdNota": 0.536,
+      "partidosPorMitad": 4.6,
+      "pendiente": 0.434,
+      "rPorPartido": 14.2,
       "rIC95": [
-        4.5,
-        13.9
+        8,
+        23.2
       ],
-      "K": 10.7,
+      "K": 6,
       "kIC95": [
-        6.2,
-        21.2
+        3.3,
+        11.5
       ],
       "topeado": false
     },
     "DEL": {
-      "jugadorTorneo": 163,
-      "notas": 1470,
-      "sdNota": 0.592,
-      "partidosPorMitad": 4.3,
-      "pendiente": 0.24,
-      "rPorPartido": 6.9,
+      "jugadorTorneo": 102,
+      "notas": 978,
+      "sdNota": 0.603,
+      "partidosPorMitad": 4.5,
+      "pendiente": 0.221,
+      "rPorPartido": 5.9,
       "rIC95": [
-        1.4,
-        14.6
+        0,
+        16.7
       ],
-      "K": 13.6,
+      "K": 15.9,
       "kIC95": [
-        5.8,
-        69
+        5,
+        11275.3
       ],
       "topeado": false
     }
