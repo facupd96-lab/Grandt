@@ -11471,3 +11471,895 @@ To https://github.com/facupd96-lab/Grandt.git
    El sello se ve en el menu (...) de arriba a la derecha, abajo de todo.
 
 LISTO vie 23/10/2026 16:07:34,38 
+ 
+======================================================== 
+CIERRE DE FECHA jue 29/10/2026 22:57:20,67 
+
+  ROLES Y JUEGO AEREO - 365Scores
+  ================================
+
+   data365.json aporto 210 gameIds
+   calendario 'results': 15 partidos
+   calendario 'current': 45 partidos
+   calendario 'fixtures': 15 partidos
+   240 partidos a bajar (tarda unos minutos)
+
+   5/240  ...  0 partidos con datos        10/240  ...  0 partidos con datos        15/240  ...  0 partidos con datos        20/240  ...  0 partidos con datos        25/240  ...  0 partidos con datos        30/240  ...  0 partidos con datos        35/240  ...  4 partidos con datos        40/240  ...  9 partidos con datos        45/240  ...  14 partidos con datos        50/240  ...  19 partidos con datos        55/240  ...  24 partidos con datos        60/240  ...  29 partidos con datos        65/240  ...  34 partidos con datos        70/240  ...  39 partidos con datos        75/240  ...  44 partidos con datos        80/240  ...  49 partidos con datos        85/240  ...  54 partidos con datos        90/240  ...  59 partidos con datos        95/240  ...  64 partidos con datos        100/240  ...  69 partidos con datos        105/240  ...  74 partidos con datos        110/240  ...  79 partidos con datos        115/240  ...  84 partidos con datos        120/240  ...  89 partidos con datos        125/240  ...  94 partidos con datos        130/240  ...  99 partidos con datos        135/240  ...  104 partidos con datos        140/240  ...  109 partidos con datos        145/240  ...  114 partidos con datos        150/240  ...  119 partidos con datos        155/240  ...  124 partidos con datos        160/240  ...  129 partidos con datos        165/240  ...  134 partidos con datos        170/240  ...  139 partidos con datos        175/240  ...  144 partidos con datos        180/240  ...  149 partidos con datos        185/240  ...  154 partidos con datos        190/240  ...  159 partidos con datos        195/240  ...  164 partidos con datos        200/240  ...  169 partidos con datos        205/240  ...  174 partidos con datos        210/240  ...  179 partidos con datos        215/240  ...  184 partidos con datos        220/240  ...  189 partidos con datos        225/240  ...  194 partidos con datos        230/240  ...  199 partidos con datos        235/240  ...  204 partidos con datos        240/240  ...  209 partidos con datos        240/240  ...  210 partidos con datos      
+
+   Guardado: data365_roles.json
+   6519 filas jugador-partido de 210 partidos
+   OJO: 627 filas sin rol (365Scores no lo publico en ese partido)
+
+   ROLES QUE APARECIERON:
+     Defensa Central                    1116
+     Centro Delantero                   1050
+     Mediocampista Ofensivo             740
+     Defensa Lateral Derecho            531
+     Delantero Derecho                  497
+     Defensa Lateral Izquierdo          486
+     Mediocampista Central              442
+     Delantero Izquierdo                426
+     Portero                            422
+     Volante Derecho                    102
+     Volante Izquierdo                  60
+     Segundo Delantero                  20
+
+
+  CORNERS Y POSESION - ESPN
+  =========================
+
+   probando la conexion con ESPN...
+   conexion por: Invoke-RestMethod pelado
+   conexion OK — el calendario de hoy trae 4 partidos
+   temporada que reporta ESPN: 2026
+   calendario: 5 semanas revisadas, 62 partidos        calendario: 10 semanas revisadas, 119 partidos        calendario: 15 semanas revisadas, 122 partidos        calendario: 20 semanas revisadas, 182 partidos        calendario: 25 semanas revisadas, 270 partidos        calendario: 30 semanas revisadas, 332 partidos        calendario: 35 semanas revisadas, 377 partidos        calendario: 40 semanas revisadas, 377 partidos        calendario: 45 semanas revisadas, 419 partidos        calendario: 50 semanas revisadas, 497 partidos        calendario: 55 semanas revisadas, 556 partidos        calendario: 58 semanas revisadas, 587 partidos      
+   partido 5/587  ...  4 con estadisticas        partido 10/587  ...  9 con estadisticas        partido 15/587  ...  14 con estadisticas        partido 20/587  ...  19 con estadisticas        partido 25/587  ...  24 con estadisticas        partido 30/587  ...  29 con estadisticas        partido 35/587  ...  34 con estadisticas        partido 40/587  ...  39 con estadisticas        partido 45/587  ...  44 con estadisticas        partido 50/587  ...  49 con estadisticas        partido 55/587  ...  54 con estadisticas        partido 60/587  ...  59 con estadisticas        partido 65/587  ...  64 con estadisticas        partido 70/587  ...  69 con estadisticas        partido 75/587  ...  74 con estadisticas        partido 80/587  ...  79 con estadisticas        partido 85/587  ...  84 con estadisticas        partido 90/587  ...  89 con estadisticas        partido 95/587  ...  94 con estadisticas        partido 100/587  ...  99 con estadisticas        partido 105/587  ...  104 con estadisticas        partido 110/587  ...  109 con estadisticas        partido 115/587  ...  114 con estadisticas        partido 120/587  ...  119 con estadisticas        partido 125/587  ...  124 con estadisticas        partido 130/587  ...  129 con estadisticas        partido 135/587  ...  134 con estadisticas        partido 140/587  ...  139 con estadisticas        partido 145/587  ...  144 con estadisticas        partido 150/587  ...  149 con estadisticas        partido 155/587  ...  154 con estadisticas        partido 160/587  ...  159 con estadisticas        partido 165/587  ...  164 con estadisticas        partido 170/587  ...  169 con estadisticas        partido 175/587  ...  174 con estadisticas        partido 180/587  ...  179 con estadisticas        partido 185/587  ...  184 con estadisticas        partido 190/587  ...  189 con estadisticas        partido 195/587  ...  194 con estadisticas        partido 200/587  ...  199 con estadisticas        partido 205/587  ...  204 con estadisticas        partido 210/587  ...  209 con estadisticas        partido 215/587  ...  214 con estadisticas        partido 220/587  ...  219 con estadisticas        partido 225/587  ...  224 con estadisticas        partido 230/587  ...  229 con estadisticas        partido 235/587  ...  234 con estadisticas        partido 240/587  ...  239 con estadisticas        partido 245/587  ...  244 con estadisticas        partido 250/587  ...  249 con estadisticas        partido 255/587  ...  254 con estadisticas        partido 260/587  ...  259 con estadisticas        partido 265/587  ...  264 con estadisticas        partido 270/587  ...  269 con estadisticas        partido 275/587  ...  274 con estadisticas        partido 280/587  ...  279 con estadisticas        partido 285/587  ...  284 con estadisticas        partido 290/587  ...  289 con estadisticas        partido 295/587  ...  294 con estadisticas        partido 300/587  ...  299 con estadisticas        partido 305/587  ...  304 con estadisticas        partido 310/587  ...  309 con estadisticas        partido 315/587  ...  314 con estadisticas        partido 320/587  ...  319 con estadisticas        partido 325/587  ...  324 con estadisticas        partido 330/587  ...  329 con estadisticas        partido 335/587  ...  334 con estadisticas        partido 340/587  ...  339 con estadisticas        partido 345/587  ...  344 con estadisticas        partido 350/587  ...  349 con estadisticas        partido 355/587  ...  354 con estadisticas        partido 360/587  ...  359 con estadisticas        partido 365/587  ...  364 con estadisticas        partido 370/587  ...  369 con estadisticas        partido 375/587  ...  374 con estadisticas        partido 380/587  ...  379 con estadisticas        partido 385/587  ...  384 con estadisticas        partido 390/587  ...  389 con estadisticas        partido 395/587  ...  394 con estadisticas        partido 400/587  ...  399 con estadisticas        partido 405/587  ...  404 con estadisticas        partido 410/587  ...  409 con estadisticas        partido 415/587  ...  414 con estadisticas        partido 420/587  ...  419 con estadisticas        partido 425/587  ...  424 con estadisticas        partido 430/587  ...  429 con estadisticas        partido 435/587  ...  434 con estadisticas        partido 440/587  ...  439 con estadisticas        partido 445/587  ...  444 con estadisticas        partido 450/587  ...  449 con estadisticas        partido 455/587  ...  454 con estadisticas        partido 460/587  ...  459 con estadisticas        partido 465/587  ...  464 con estadisticas        partido 470/587  ...  469 con estadisticas        partido 475/587  ...  474 con estadisticas        partido 480/587  ...  479 con estadisticas        partido 485/587  ...  484 con estadisticas        partido 490/587  ...  489 con estadisticas        partido 495/587  ...  494 con estadisticas        partido 500/587  ...  499 con estadisticas        partido 505/587  ...  504 con estadisticas        partido 510/587  ...  509 con estadisticas        partido 515/587  ...  514 con estadisticas        partido 520/587  ...  519 con estadisticas        partido 525/587  ...  524 con estadisticas        partido 530/587  ...  529 con estadisticas        partido 535/587  ...  534 con estadisticas        partido 540/587  ...  539 con estadisticas        partido 545/587  ...  544 con estadisticas        partido 550/587  ...  549 con estadisticas        partido 555/587  ...  554 con estadisticas        partido 560/587  ...  559 con estadisticas        partido 565/587  ...  564 con estadisticas        partido 570/587  ...  569 con estadisticas        partido 575/587  ...  574 con estadisticas        partido 580/587  ...  579 con estadisticas        partido 585/587  ...  584 con estadisticas        partido 587/587  ...  587 con estadisticas      
+
+   Guardado: dataEspn.json
+   1174 filas equipo-partido de 587 partidos  ·  1174 filas de partidos TERMINADOS (son las que usa el motor)
+
+   ESTADISTICAS QUE TRAJO:
+     accurateCrosses  accurateLongBalls  accuratePasses  blockedShots  crossPct  effectiveClearance  
+     effectiveTackles  foulsCommitted  interceptions  longballPct  offsides  passPct  penaltyKickGoals  
+     penaltyKickShots  possessionPct  redCards  saves  shotPct  shotsOnTarget  tacklePct  totalClearance  
+     totalCrosses  totalLongBalls  totalPasses  totalShots  totalTackles  wonCorners  yellowCards  
+
+   Pasame este resumen y cruzo los nombres de ESPN con los nuestros.
+
+
+======================================================================
+  ACTUALIZAR TODO - Gran DT
+======================================================================
+   jueves 29/10/2026 23:05
+
+======================================================================
+  planilla oficial: puntos, cotizaciones, goles, tarjetas
+======================================================================
+   planilla: la de la fecha 13 (planilla.json, actualizada el 2026-10-23)
+   HAY PLANILLA NUEVA: Estadísticas - A la Fecha 14 - Gran DT Torneo Clausura 2026
+   la cambio sola. Antes: fecha 13. Ahora: fecha 14.
+   planilla.json actualizado
+
+-- sync planeta gran dt: bajando la planilla oficial --
+
+   buscando la planilla...
+      una sola hoja con todos los puestos: ARQ 101 · DEF 333 · DEL 271 · VOL 313
+   1 hoja(s) para procesar
+
+   procesando TODOS (gid unica) ... 1018 jugadores
+
+LISTO. Escrito: dataPlaneta.json
+
+   jugadores:        1018
+   ultima fecha:     F14
+
+   -- control de la ficha Clarin reconstruida --
+   evaluados:        748
+   dentro de 1 a 10: 746
+   fuera de rango:   2 (0,3%)
+   ficha promedio:   5,12
+   OK: la reconstruccion cierra
+
+   Top 10 en ficha Clarin limpia (el piso real del jugador):
+    1. Correa, Ángel                DEL  River                ficha 7,08  (13 PJ)
+    2. Fernández, Ignacio           VOL  Gimnasia LP          ficha 6,86  (14 PJ)
+    3. Vicentini, Manuel            ARQ  Belgrano             ficha 6,67  (3 PJ)
+    4. Martínez, Ronaldo            DEL  Vélez                ficha 6,64  (11 PJ)
+    5. Campaz, Jaminton             DEL  Rosario Ctral.       ficha 6,5  (12 PJ)
+    6. Di María, Ángel              VOL  Rosario Ctral.       ficha 6,46  (13 PJ)
+    7. Módica, Agustín              DEL  Gimnasia Mza         ficha 6,46  (13 PJ)
+    8. Miramón, Ignacio             VOL  Gimnasia LP          ficha 6,38  (13 PJ)
+    9. Fernández, Matías            DEL  Ind. Rivadavia       ficha 6,38  (13 PJ)
+   10. Paredes, Leandro             VOL  Boca                 ficha 6,38  (8 PJ)
+
+
+======================================================================
+  tiros, xG y minutos por jugador, mas tarjetas con fecha
+======================================================================
+
+-- sync365: bajando datos individuales de 365Scores --
+
+   data365.json               aporto 210 gameIds nuevos
+   data365_historico.json     aporto 208 gameIds nuevos
+   calendario 'results': 15 partidos
+   calendario 'current': 45 partidos
+   calendario 'fixtures': 15 partidos
+   161 gameIds que faltaban en el medio del bloque reciente: se agregan
+   669 gameIds a probar (esto tarda unos minutos)
+
+   probando 5/669  ...  4 partidos con datos         probando 10/669  ...  9 partidos con datos         probando 15/669  ...  14 partidos con datos         probando 20/669  ...  19 partidos con datos         probando 25/669  ...  24 partidos con datos         probando 30/669  ...  29 partidos con datos         probando 35/669  ...  34 partidos con datos         probando 40/669  ...  39 partidos con datos         probando 45/669  ...  44 partidos con datos         probando 50/669  ...  49 partidos con datos         probando 55/669  ...  54 partidos con datos         probando 60/669  ...  59 partidos con datos         probando 65/669  ...  64 partidos con datos         probando 70/669  ...  69 partidos con datos         probando 75/669  ...  74 partidos con datos         probando 80/669  ...  79 partidos con datos         probando 85/669  ...  84 partidos con datos         probando 90/669  ...  89 partidos con datos         probando 95/669  ...  94 partidos con datos         probando 100/669  ...  99 partidos con datos         probando 105/669  ...  104 partidos con datos         probando 110/669  ...  109 partidos con datos         probando 115/669  ...  114 partidos con datos         probando 120/669  ...  119 partidos con datos         probando 125/669  ...  124 partidos con datos         probando 130/669  ...  129 partidos con datos         probando 135/669  ...  134 partidos con datos         probando 140/669  ...  139 partidos con datos         probando 145/669  ...  144 partidos con datos         probando 150/669  ...  149 partidos con datos         probando 155/669  ...  154 partidos con datos         probando 160/669  ...  159 partidos con datos         probando 165/669  ...  164 partidos con datos         probando 170/669  ...  169 partidos con datos         probando 175/669  ...  174 partidos con datos         probando 180/669  ...  179 partidos con datos         probando 185/669  ...  184 partidos con datos         probando 190/669  ...  189 partidos con datos         probando 195/669  ...  194 partidos con datos         probando 200/669  ...  199 partidos con datos         probando 205/669  ...  204 partidos con datos         probando 210/669  ...  208 partidos con datos         probando 215/669  ...  208 partidos con datos         probando 220/669  ...  208 partidos con datos         probando 225/669  ...  208 partidos con datos         probando 230/669  ...  208 partidos con datos         probando 235/669  ...  208 partidos con datos         probando 240/669  ...  208 partidos con datos         probando 245/669  ...  208 partidos con datos         probando 250/669  ...  208 partidos con datos         probando 255/669  ...  208 partidos con datos         probando 260/669  ...  208 partidos con datos         probando 265/669  ...  208 partidos con datos         probando 270/669  ...  208 partidos con datos         probando 275/669  ...  208 partidos con datos         probando 280/669  ...  208 partidos con datos         probando 285/669  ...  208 partidos con datos         probando 290/669  ...  208 partidos con datos         probando 295/669  ...  208 partidos con datos         probando 300/669  ...  208 partidos con datos         probando 305/669  ...  208 partidos con datos         probando 310/669  ...  208 partidos con datos         probando 315/669  ...  208 partidos con datos         probando 320/669  ...  208 partidos con datos         probando 325/669  ...  208 partidos con datos         probando 330/669  ...  208 partidos con datos         probando 335/669  ...  208 partidos con datos         probando 340/669  ...  208 partidos con datos         probando 345/669  ...  208 partidos con datos         probando 350/669  ...  208 partidos con datos         probando 355/669  ...  208 partidos con datos         probando 360/669  ...  208 partidos con datos         probando 365/669  ...  208 partidos con datos         probando 370/669  ...  208 partidos con datos         probando 375/669  ...  208 partidos con datos         probando 380/669  ...  208 partidos con datos         probando 385/669  ...  208 partidos con datos         probando 390/669  ...  208 partidos con datos         probando 395/669  ...  208 partidos con datos         probando 400/669  ...  208 partidos con datos         probando 405/669  ...  213 partidos con datos         probando 410/669  ...  218 partidos con datos         probando 415/669  ...  223 partidos con datos         probando 420/669  ...  228 partidos con datos         probando 425/669  ...  233 partidos con datos         probando 430/669  ...  238 partidos con datos         probando 435/669  ...  243 partidos con datos         probando 440/669  ...  248 partidos con datos         probando 445/669  ...  253 partidos con datos         probando 450/669  ...  258 partidos con datos         probando 455/669  ...  263 partidos con datos         probando 460/669  ...  268 partidos con datos         probando 465/669  ...  273 partidos con datos         probando 470/669  ...  278 partidos con datos         probando 475/669  ...  283 partidos con datos         probando 480/669  ...  288 partidos con datos         probando 485/669  ...  293 partidos con datos         probando 490/669  ...  298 partidos con datos         probando 495/669  ...  303 partidos con datos         probando 500/669  ...  308 partidos con datos         probando 505/669  ...  313 partidos con datos         probando 510/669  ...  318 partidos con datos         probando 515/669  ...  323 partidos con datos         probando 520/669  ...  328 partidos con datos         probando 525/669  ...  333 partidos con datos         probando 530/669  ...  338 partidos con datos         probando 535/669  ...  343 partidos con datos         probando 540/669  ...  348 partidos con datos         probando 545/669  ...  353 partidos con datos         probando 550/669  ...  358 partidos con datos         probando 555/669  ...  363 partidos con datos         probando 560/669  ...  368 partidos con datos         probando 565/669  ...  373 partidos con datos         probando 570/669  ...  378 partidos con datos         probando 575/669  ...  383 partidos con datos         probando 580/669  ...  388 partidos con datos         probando 585/669  ...  393 partidos con datos         probando 590/669  ...  398 partidos con datos         probando 595/669  ...  403 partidos con datos         probando 600/669  ...  408 partidos con datos         probando 605/669  ...  413 partidos con datos         probando 610/669  ...  418 partidos con datos         probando 615/669  ...  418 partidos con datos         probando 620/669  ...  418 partidos con datos         probando 625/669  ...  418 partidos con datos         probando 630/669  ...  418 partidos con datos         probando 635/669  ...  418 partidos con datos         probando 640/669  ...  418 partidos con datos         probando 645/669  ...  418 partidos con datos         probando 650/669  ...  418 partidos con datos         probando 655/669  ...  418 partidos con datos         probando 660/669  ...  418 partidos con datos         probando 665/669  ...  418 partidos con datos      
+
+   418 partidos jugados con datos  ·  15 con formacion publicada sin jugar  ·  236 descartados (ids que no existen o de otro torneo)
+
+
+   torneo en curso: arranca el 23/07/2026  (240 de 448 partidos bajados)
+   (los anteriores quedan afuera de los promedios: son del torneo pasado)
+
+   tarjetas leidas: 1000  (485 jugadores)  ·  goles con minuto: 474
+   [referencia 365Scores, todas las competencias y los dos torneos]
+      a 4 amarillas: 33  ·  con roja en la fecha 14 del archivo: 4
+      lo que vale para el juego lo calcula el motor: planilla de Gran DT para las amarillas, torneo actual para las rojas.
+LISTO. Escrito: data365.json
+
+   jugadores:              812
+   con tiros registrados:  637 (78%)
+   con xG registrado:      637 (78%)
+   equipos:                30
+   formaciones probables:  15 partidos de la proxima fecha
+
+   control: tiros a favor 13,45 vs concedidos 13,45 por partido
+   OK: el dato es coherente
+
+   Top 10 en tiros por partido (archivo completo, los dos torneos juntos):
+    1. Ángel Di María             Rosario Central      3,62 tiros/p  ·  0,392 xG/p  ·  13 PJ
+    2. Angel Correa               River Plate          3,62 tiros/p  ·  0,364 xG/p  ·  13 PJ
+    3. Nicolás Fernández          Belgrano             3,4 tiros/p  ·  0,473 xG/p  ·  10 PJ
+    4. Lucas Zelarayán            Belgrano             3,27 tiros/p  ·  0,175 xG/p  ·  11 PJ
+    5. Nicolas Orsini             Barracas Central     3,25 tiros/p  ·  0,395 xG/p  ·  4 PJ
+    6. Alex Luna                  Instituto            3,23 tiros/p  ·  0,295 xG/p  ·  13 PJ
+    7. Rodrigo Auzmendi           San Lorenzo          3,14 tiros/p  ·  0,271 xG/p  ·  14 PJ
+    8. Rick                       Talleres de Córdoba  3,07 tiros/p  ·  0,156 xG/p  ·  14 PJ
+    9. Leandro Fernandez          Defensa y Justicia   3,07 tiros/p  ·  0,211 xG/p  ·  14 PJ
+   10. Cristian Tarragona         Unión de Santa Fe    3 tiros/p  ·  0,376 xG/p  ·  13 PJ
+
+
+======================================================================
+  el puesto real de cada jugador (central, lateral, enganche...)
+======================================================================
+
+  ROLES Y JUEGO AEREO - 365Scores
+  ================================
+
+   data365.json aporto 225 gameIds
+   calendario 'results': 15 partidos
+   calendario 'current': 45 partidos
+   calendario 'fixtures': 15 partidos
+   240 partidos a bajar (tarda unos minutos)
+
+   5/240  ...  0 partidos con datos        10/240  ...  0 partidos con datos        15/240  ...  0 partidos con datos        20/240  ...  0 partidos con datos        25/240  ...  0 partidos con datos        30/240  ...  0 partidos con datos        35/240  ...  4 partidos con datos        40/240  ...  9 partidos con datos        45/240  ...  14 partidos con datos        50/240  ...  19 partidos con datos        55/240  ...  24 partidos con datos        60/240  ...  29 partidos con datos        65/240  ...  34 partidos con datos        70/240  ...  39 partidos con datos        75/240  ...  44 partidos con datos        80/240  ...  49 partidos con datos        85/240  ...  54 partidos con datos        90/240  ...  59 partidos con datos        95/240  ...  64 partidos con datos        100/240  ...  69 partidos con datos        105/240  ...  74 partidos con datos        110/240  ...  79 partidos con datos        115/240  ...  84 partidos con datos        120/240  ...  89 partidos con datos        125/240  ...  94 partidos con datos        130/240  ...  99 partidos con datos        135/240  ...  104 partidos con datos        140/240  ...  109 partidos con datos        145/240  ...  114 partidos con datos        150/240  ...  119 partidos con datos        155/240  ...  124 partidos con datos        160/240  ...  129 partidos con datos        165/240  ...  134 partidos con datos        170/240  ...  139 partidos con datos        175/240  ...  144 partidos con datos        180/240  ...  149 partidos con datos        185/240  ...  154 partidos con datos        190/240  ...  159 partidos con datos        195/240  ...  164 partidos con datos        200/240  ...  169 partidos con datos        205/240  ...  174 partidos con datos        210/240  ...  179 partidos con datos        215/240  ...  184 partidos con datos        220/240  ...  189 partidos con datos        225/240  ...  194 partidos con datos        230/240  ...  199 partidos con datos        235/240  ...  204 partidos con datos        240/240  ...  209 partidos con datos        240/240  ...  210 partidos con datos      
+
+   Guardado: data365_roles.json
+   6519 filas jugador-partido de 210 partidos
+   OJO: 627 filas sin rol (365Scores no lo publico en ese partido)
+
+   ROLES QUE APARECIERON:
+     Defensa Central                    1116
+     Centro Delantero                   1050
+     Mediocampista Ofensivo             740
+     Defensa Lateral Derecho            531
+     Delantero Derecho                  497
+     Defensa Lateral Izquierdo          486
+     Mediocampista Central              442
+     Delantero Izquierdo                426
+     Portero                            422
+     Volante Derecho                    102
+     Volante Izquierdo                  60
+     Segundo Delantero                  20
+
+
+======================================================================
+  cuotas 1X2 y Over/Under de la proxima fecha
+======================================================================
+
+-- bajando cuotas de las casas de apuestas --
+
+   (Atlético Huracán vs CA Tigre BA: se usa la linea 1,5, cotizada por 5 casas. Se descartaron las lineas 2, 2.5, 1.75)
+   (Estudiantes de Río Cuarto vs Gimnasia La Plata: se usa la linea 2,5, cotizada por 6 casas. Se descartaron las lineas 2, 1.5)
+   (Sarmiento de Junin vs Rosario Central: se usa la linea 2,5, cotizada por 9 casas. Se descartaron las lineas 2.25)
+   (Deportivo Riestra vs Talleres: se usa la linea 1,5, cotizada por 5 casas. Se descartaron las lineas 2, 2.5, 1.75)
+   (Velez Sarsfield BA vs San Lorenzo: se usa la linea 2,5, cotizada por 6 casas. Se descartaron las lineas 2, 1.5)
+   (Estudiantes vs Instituto de Córdoba: se usa la linea 1,5, cotizada por 5 casas. Se descartaron las lineas 2, 2.5)
+   (Boca Juniors vs River Plate: se usa la linea 2,5, cotizada por 7 casas. Se descartaron las lineas 2)
+   (Belgrano de Cordoba vs Barracas Central: se usa la linea 1,5, cotizada por 5 casas. Se descartaron las lineas 2, 2.5)
+   (Newells Old Boys vs Union Santa Fe: se usa la linea 2,5, cotizada por 7 casas. Se descartaron las lineas 2, 2.25)
+   (Lanus vs Gimnasia Mendoza: se usa la linea 2,5, cotizada por 8 casas. Se descartaron las lineas 1.5, 2.25)
+   (Platense vs Central Córdoba: se usa la linea 2,5, cotizada por 4 casas. Se descartaron las lineas 2, 1.5, 2.25)
+   (Defensa y Justicia vs Independiente: se usa la linea 2,5, cotizada por 6 casas. Se descartaron las lineas 2, 2.25)
+   (Atlético Tucuman vs Argentinos Juniors: se usa la linea 2,5, cotizada por 7 casas. Se descartaron las lineas 2)
+LISTO. Escrito: dataCuotas.json
+
+   partidos con cuotas: 15
+
+   LOCAL                      VISITANTE                       1      X      2    P(loc)  P(emp)  P(vis)
+   Atlético Huracán           CA Tigre BA                  2,16   2,91   3,70      42 %    33 %    25 %
+   Estudiantes de Río Cuarto  Gimnasia La Plata            4,60   3,33   1,80      19 %    29 %    52 %
+   Racing Club                Aldosivi Mar del Plata       1,64   3,63   5,19      57 %    25 %    18 %
+   Sarmiento de Junin         Rosario Central              3,90   3,23   1,95      23 %    29 %    48 %
+   Deportivo Riestra          Talleres                     2,17   2,94   3,58      44 %    32 %    25 %
+   Velez Sarsfield BA         San Lorenzo                  1,92   3,15   4,14      49 %    30 %    22 %
+   Estudiantes                Instituto de Córdoba         2,11   2,99   3,66      44 %    31 %    25 %
+   Boca Juniors               River Plate                  2,24   3,02   3,29      41 %    32 %    27 %
+   Belgrano de Cordoba        Barracas Central             1,77   3,25   4,77      53 %    29 %    18 %
+   Newells Old Boys           Union Santa Fe               1,95   3,22   3,87      48 %    29 %    24 %
+   Lanus                      Gimnasia Mendoza             1,55   3,79   5,86      61 %    25 %    14 %
+   Platense                   Central Córdoba              1,68   3,37   4,86      55 %    27 %    18 %
+   Defensa y Justicia         Independiente                2,18   3,11   3,22      42 %    30 %    28 %
+   Atlético Tucuman           Argentinos Juniors           2,90   2,92   2,48      30 %    32 %    37 %
+   Independiente Rivadavia    Banfield                     1,47   4,00   5,85      63 %    22 %    14 %
+
+   margen con el MEJOR precio de cada resultado: 1,8 %  (es el que usamos)
+   margen si promediaramos las 25 casas:         8,4 %  (inflado, no lo cobra nadie)
+
+
+======================================================================
+  calendario de liga y copas, fixture y rotacion
+======================================================================
+
+-- calendario de liga y copas (fuente: 365Scores) --
+
+   probando la conexion con 365Scores... ok
+
+   liga argentina:
+      results      15 partidos (15 nuevos)
+      current      45 partidos (30 nuevos)
+      fixtures     15 partidos (0 nuevos)
+
+   completando fechas anteriores de la liga...
+      por numero de fecha (1 a 16): 0 partidos nuevos
+      por rango de fechas (ultimos 6 meses): 0 partidos nuevos
+      no salio ninguna fecha vieja: la tabla va a tener solo lo reciente
+
+
+   equipos de la liga detectados: 30
+
+   bajando el calendario de cada equipo (liga + copas)...
+   (tarda un par de minutos; si 365Scores tira 504 reintenta solo)
+      1/30  Defensa y Justicia                2/30  Argentinos Juniors                3/30  Talleres de Córdoba               4/30  Independiente Rivadavia           5/30  Aldosivi                          6/30  Estudiantes de La Plata           7/30  Gimnasia La Plata                 8/30  Atlético Tucumán                  9/30  Racing Club                       10/30  Lanús                             11/30  Estudiantes RC                    12/30  Newell's Old Boys                 13/30  Boca Juniors                      14/30  Banfield                          15/30  Belgrano                          16/30  San Lorenzo                       17/30  Sarmiento Junín                   18/30  Vélez Sarsfield                   19/30  Instituto                         20/30  Gimnasia de Mendoza               21/30  Independiente                     22/30  Platense                          23/30  Rosario Central                   24/30  Barracas Central                  25/30  Huracán                           26/30  Deportivo Riestra                 27/30  Unión de Santa Fe                 28/30  Tigre                             29/30  River Plate                       30/30  Central Córdoba SdE               30/30 equipos listos                                        
+
+   partidos: 45 de liga  +  5 de copa / otros torneos
+
+      Liga Profesional                     45 partidos
+      Copa Argentina                        2 partidos
+      Supercopa                             1 partidos
+      CONMEBOL Copa Sudamericana            1 partidos
+      CONMEBOL Copa Libertadores            1 partidos
+
+   recuperados del fixture anterior: 142 partidos jugados que 365Scores ya no devuelve
+   partidos jugados por fecha:  f4:7  f5:15  f6:15  f7:15  f8:15  f9:15  f10:15  f11:15  f12:15  f13:15  f14:15  
+
+LISTO. dataCopas.json (30 equipos)  y  dataFixture.json (187 partidos de liga, 157 jugados)
+
+   EQUIPO                     descanso  al sig.   rotac.   contexto
+   Platense                   4,9       5,8       0,15     viene de Copa Argentina vs Atlético Tucumán el mié 28/10 - despues juega Liga Profesional vs San Lorenzo el dom 08/11
+   Deportivo Riestra          4,8       7,9       0,15     viene de Liga Profesional vs Instituto el lun 26/10 - despues juega Liga Profesional vs Independiente el dom 08/11
+   Racing Club                5,1       8,7       0,15     viene de Liga Profesional vs River Plate el dom 25/10 - despues juega Liga Profesional vs Barracas Central el dom 08/11
+   Estudiantes de La Plata    5,1       7,7       0,15     viene de Liga Profesional vs Unión de Santa Fe el lun 26/10 - despues juega Liga Profesional vs Talleres de Córdoba el dom 08/11
+   Aldosivi                   5,3       8,7       0,15     viene de Liga Profesional vs Belgrano el dom 25/10 - despues juega Liga Profesional vs River Plate el dom 08/11
+   Atlético Tucumán           5         5,7       0,15     viene de Copa Argentina vs Platense el mié 28/10 - despues juega Liga Profesional vs Banfield el dom 08/11
+   Estudiantes RC             4,9       8,8       0,15     viene de Liga Profesional vs Barracas Central el dom 25/10 - despues juega Liga Profesional vs Rosario Central el dom 08/11
+   Instituto                  5         7,7       0,15     viene de Liga Profesional vs Deportivo Riestra el lun 26/10 - despues juega Liga Profesional vs Newell's Old Boys el dom 08/11
+   Banfield                   9,3       5,7       0        viene de Liga Profesional vs Lanús el sáb 24/10 - despues juega Liga Profesional vs Atlético Tucumán el dom 08/11
+   Gimnasia La Plata          7         8,8       0        viene de Liga Profesional vs Sarmiento Junín el vie 23/10 - despues juega Liga Profesional vs Belgrano el dom 08/11
+   Boca Juniors               6,9       7         0        viene de Liga Profesional vs Independiente el dom 25/10 - despues juega Liga Profesional vs Defensa y Justicia el dom 08/11
+   Talleres de Córdoba        7         7,9       0        viene de Liga Profesional vs Defensa y Justicia el sáb 24/10 - despues juega Liga Profesional vs Estudiantes de La Plata el dom 08/11
+   Belgrano                   7,2       6,8       0        viene de Liga Profesional vs Aldosivi el dom 25/10 - despues juega Liga Profesional vs Gimnasia La Plata el dom 08/11
+   Newell's Old Boys          8         6,8       0        viene de Liga Profesional vs San Lorenzo el sáb 24/10 - despues juega Liga Profesional vs Instituto el dom 08/11
+   Barracas Central           6,9       6,8       0        viene de Liga Profesional vs Estudiantes RC el dom 25/10 - despues juega Liga Profesional vs Racing Club el dom 08/11
+   Unión de Santa Fe          6         6,8       0        viene de Liga Profesional vs Estudiantes de La Plata el lun 26/10 - despues juega Liga Profesional vs Vélez Sarsfield el dom 08/11
+   Argentinos Juniors         6,1       5,7       0        viene de Liga Profesional vs Independiente Rivadavia el mar 27/10 - despues juega Liga Profesional vs Huracán el dom 08/11
+   Independiente Rivadavia    6,1       5,7       0        viene de Liga Profesional vs Argentinos Juniors el mar 27/10 - despues juega Liga Profesional vs Gimnasia de Mendoza el dom 08/11
+   Gimnasia de Mendoza        9,1       6,7       0        viene de Liga Profesional vs Platense el vie 23/10 - despues juega Liga Profesional vs Independiente Rivadavia el dom 08/11
+   Lanús                      8,2       6,7       0        viene de Liga Profesional vs Banfield el sáb 24/10 - despues juega Liga Profesional vs Central Córdoba SdE el dom 08/11
+   Tigre                      6,9       8,8       0        viene de Liga Profesional vs Atlético Tucumán el vie 23/10 - despues juega Liga Profesional vs Sarmiento Junín el dom 08/11
+   River Plate                6,8       7         0        viene de Liga Profesional vs Racing Club el dom 25/10 - despues juega Liga Profesional vs Aldosivi el dom 08/11
+   Defensa y Justicia         9,1       5,8       0        viene de Liga Profesional vs Talleres de Córdoba el sáb 24/10 - despues juega Liga Profesional vs Boca Juniors el dom 08/11
+   Rosario Central            6         8,7       0        viene de Liga Profesional vs Huracán el sáb 24/10 - despues juega Liga Profesional vs Estudiantes RC el dom 08/11
+   Central Córdoba SdE        7,9       5,8       0        viene de Liga Profesional vs Vélez Sarsfield el dom 25/10 - despues juega Liga Profesional vs Lanús el dom 08/11
+   Vélez Sarsfield            5,9       7,8       0        viene de Liga Profesional vs Central Córdoba SdE el dom 25/10 - despues juega Liga Profesional vs Unión de Santa Fe el dom 08/11
+   Huracán                    5,9       8,8       0        viene de Liga Profesional vs Rosario Central el sáb 24/10 - despues juega Liga Profesional vs Argentinos Juniors el dom 08/11
+   Independiente              8,1       5,8       0        viene de Liga Profesional vs Boca Juniors el dom 25/10 - despues juega Liga Profesional vs Deportivo Riestra el dom 08/11
+   San Lorenzo                7         7,8       0        viene de Liga Profesional vs Newell's Old Boys el sáb 24/10 - despues juega Liga Profesional vs Platense el dom 08/11
+   Sarmiento Junín            7,1       8,7       0        viene de Liga Profesional vs Gimnasia La Plata el vie 23/10 - despues juega Liga Profesional vs Tigre el dom 08/11
+
+   rojo = alta chance de rotacion (sus jugadores valen menos, los del rival mas)
+
+
+======================================================================
+  corners, posesion y tiros por equipo, de local y de visitante
+======================================================================
+
+  CORNERS Y POSESION - ESPN
+  =========================
+
+   probando la conexion con ESPN...
+   conexion por: Invoke-RestMethod pelado
+   conexion OK — el calendario de hoy trae 4 partidos
+   temporada que reporta ESPN: 2026
+   calendario: 5 semanas revisadas, 62 partidos        calendario: 10 semanas revisadas, 119 partidos        calendario: 15 semanas revisadas, 122 partidos        calendario: 20 semanas revisadas, 182 partidos        calendario: 25 semanas revisadas, 270 partidos        calendario: 30 semanas revisadas, 332 partidos        calendario: 35 semanas revisadas, 377 partidos        calendario: 40 semanas revisadas, 377 partidos        calendario: 45 semanas revisadas, 419 partidos        calendario: 50 semanas revisadas, 497 partidos        calendario: 55 semanas revisadas, 556 partidos        calendario: 58 semanas revisadas, 587 partidos      
+   partido 5/587  ...  4 con estadisticas        partido 10/587  ...  9 con estadisticas        partido 15/587  ...  14 con estadisticas        partido 20/587  ...  19 con estadisticas        partido 25/587  ...  24 con estadisticas        partido 30/587  ...  29 con estadisticas        partido 35/587  ...  34 con estadisticas        partido 40/587  ...  39 con estadisticas        partido 45/587  ...  44 con estadisticas        partido 50/587  ...  49 con estadisticas        partido 55/587  ...  54 con estadisticas        partido 60/587  ...  59 con estadisticas        partido 65/587  ...  64 con estadisticas        partido 70/587  ...  69 con estadisticas        partido 75/587  ...  74 con estadisticas        partido 80/587  ...  79 con estadisticas        partido 85/587  ...  84 con estadisticas        partido 90/587  ...  89 con estadisticas        partido 95/587  ...  94 con estadisticas        partido 100/587  ...  99 con estadisticas        partido 105/587  ...  104 con estadisticas        partido 110/587  ...  109 con estadisticas        partido 115/587  ...  114 con estadisticas        partido 120/587  ...  119 con estadisticas        partido 125/587  ...  124 con estadisticas        partido 130/587  ...  129 con estadisticas        partido 135/587  ...  134 con estadisticas        partido 140/587  ...  139 con estadisticas        partido 145/587  ...  144 con estadisticas        partido 150/587  ...  149 con estadisticas        partido 155/587  ...  154 con estadisticas        partido 160/587  ...  159 con estadisticas        partido 165/587  ...  164 con estadisticas        partido 170/587  ...  169 con estadisticas        partido 175/587  ...  174 con estadisticas        partido 180/587  ...  179 con estadisticas        partido 185/587  ...  184 con estadisticas        partido 190/587  ...  189 con estadisticas        partido 195/587  ...  194 con estadisticas        partido 200/587  ...  199 con estadisticas        partido 205/587  ...  204 con estadisticas        partido 210/587  ...  209 con estadisticas        partido 215/587  ...  214 con estadisticas        partido 220/587  ...  219 con estadisticas        partido 225/587  ...  224 con estadisticas        partido 230/587  ...  229 con estadisticas        partido 235/587  ...  234 con estadisticas        partido 240/587  ...  239 con estadisticas        partido 245/587  ...  244 con estadisticas        partido 250/587  ...  249 con estadisticas        partido 255/587  ...  254 con estadisticas        partido 260/587  ...  259 con estadisticas        partido 265/587  ...  264 con estadisticas        partido 270/587  ...  269 con estadisticas        partido 275/587  ...  274 con estadisticas        partido 280/587  ...  279 con estadisticas        partido 285/587  ...  284 con estadisticas        partido 290/587  ...  289 con estadisticas        partido 295/587  ...  294 con estadisticas        partido 300/587  ...  299 con estadisticas        partido 305/587  ...  304 con estadisticas        partido 310/587  ...  309 con estadisticas        partido 315/587  ...  314 con estadisticas        partido 320/587  ...  319 con estadisticas        partido 325/587  ...  324 con estadisticas        partido 330/587  ...  329 con estadisticas        partido 335/587  ...  334 con estadisticas        partido 340/587  ...  339 con estadisticas        partido 345/587  ...  344 con estadisticas        partido 350/587  ...  349 con estadisticas        partido 355/587  ...  354 con estadisticas        partido 360/587  ...  359 con estadisticas        partido 365/587  ...  364 con estadisticas        partido 370/587  ...  369 con estadisticas        partido 375/587  ...  374 con estadisticas        partido 380/587  ...  379 con estadisticas        partido 385/587  ...  384 con estadisticas        partido 390/587  ...  389 con estadisticas        partido 395/587  ...  394 con estadisticas        partido 400/587  ...  399 con estadisticas        partido 405/587  ...  404 con estadisticas        partido 410/587  ...  409 con estadisticas        partido 415/587  ...  414 con estadisticas        partido 420/587  ...  419 con estadisticas        partido 425/587  ...  424 con estadisticas        partido 430/587  ...  429 con estadisticas        partido 435/587  ...  434 con estadisticas        partido 440/587  ...  439 con estadisticas        partido 445/587  ...  444 con estadisticas        partido 450/587  ...  449 con estadisticas        partido 455/587  ...  454 con estadisticas        partido 460/587  ...  459 con estadisticas        partido 465/587  ...  464 con estadisticas        partido 470/587  ...  469 con estadisticas        partido 475/587  ...  474 con estadisticas        partido 480/587  ...  479 con estadisticas        partido 485/587  ...  484 con estadisticas        partido 490/587  ...  489 con estadisticas        partido 495/587  ...  494 con estadisticas        partido 500/587  ...  499 con estadisticas        partido 505/587  ...  504 con estadisticas        partido 510/587  ...  509 con estadisticas        partido 515/587  ...  514 con estadisticas        partido 520/587  ...  519 con estadisticas        partido 525/587  ...  524 con estadisticas        partido 530/587  ...  529 con estadisticas        partido 535/587  ...  534 con estadisticas        partido 540/587  ...  539 con estadisticas        partido 545/587  ...  544 con estadisticas        partido 550/587  ...  549 con estadisticas        partido 555/587  ...  554 con estadisticas        partido 560/587  ...  559 con estadisticas        partido 565/587  ...  564 con estadisticas        partido 570/587  ...  569 con estadisticas        partido 575/587  ...  574 con estadisticas        partido 580/587  ...  579 con estadisticas        partido 585/587  ...  584 con estadisticas        partido 587/587  ...  587 con estadisticas      
+
+   Guardado: dataEspn.json
+   1174 filas equipo-partido de 587 partidos  ·  1174 filas de partidos TERMINADOS (son las que usa el motor)
+
+   ESTADISTICAS QUE TRAJO:
+     accurateCrosses  accurateLongBalls  accuratePasses  blockedShots  crossPct  effectiveClearance  
+     effectiveTackles  foulsCommitted  interceptions  longballPct  offsides  passPct  penaltyKickGoals  
+     penaltyKickShots  possessionPct  redCards  saves  shotPct  shotsOnTarget  tacklePct  totalClearance  
+     totalCrosses  totalLongBalls  totalPasses  totalShots  totalTackles  wonCorners  yellowCards  
+
+   Pasame este resumen y cruzo los nombres de ESPN con los nuestros.
+
+
+======================================================================
+  ayudante de campo: lesionados, suspendidos, ley del ex
+======================================================================
+
+-- ayudante de campo del Gran DT oficial --
+   estatico: 278 KB
+   dinamico: 32 KB
+
+LISTO. Escrito: dataGranDT.json
+   fecha:            Fecha 15
+   cierran cambios:  30/10 18:59
+   jugadores:        1056
+   ley del ex:       31
+   tarjetometro:     460
+   figuras:          148
+   -- estado de cada jugador para esta fecha --
+      Habilitado          522
+      Posible Titular     270
+      En duda              87
+      Lesionado            81
+      No juega             59
+      Jugó Copa            23
+      Suspendido            7
+      Expulsado             7
+
+   NO JUEGAN (154):
+      Ruiz Rodríguez, Ramiro     Atl. Tucumán         DEL  Expulsado
+      Abeldaño, Gabriel          Atl. Tucumán         DEL  Expulsado
+      Maciel, Alejandro          Ctral. Córdoba       DEF  Expulsado
+      Maffini, Gonzalo           Estudiantes RC       DEF  Expulsado
+      Florentín, Jeremías        Talleres             ARQ  Expulsado
+      Nuccio, Gonzalo            Talleres             DEF  Expulsado
+      Aliendro, Rodrigo          Vélez                VOL  Expulsado
+      Linares, Nicolás           Aldosivi             VOL  Lesionado
+      Gaitán, Nicolás            Aldosivi             VOL  Lesionado
+      Fernández, Tomás           Aldosivi             DEL  Lesionado
+      Viveros, Emiliano          Argentinos           VOL  Lesionado
+      Vázquez, Franco            Argentinos           DEF  Lesionado
+      Suso, Gastón               Atl. Tucumán         DEF  Lesionado
+      Ortiz, Kevin               Atl. Tucumán         VOL  Lesionado
+      Benitez, Martín            Atl. Tucumán         DEL  Lesionado
+      Arteaga, Manuel            Banfield             VOL  Lesionado
+      Duarte, Manuel             Barracas Ctral.      DEL  Lesionado
+      Jappert, Kevin             Barracas Ctral.      DEF  Lesionado
+      Gamba, Lucas               Barracas Ctral.      DEL  Lesionado
+      Tobio, Fernando            Barracas Ctral.      DEF  Lesionado
+      Ortiz, Marcos              Belgrano             VOL  Lesionado
+      Fernández, Nicolás Emanuel Belgrano             DEL  Lesionado
+      Ocampo, Álvaro             Belgrano             DEF  Lesionado
+      Marchesín, Agustín         Boca                 ARQ  Lesionado
+      Bareiro, Adam              Boca                 DEL  Lesionado
+      Aranda, Tomás              Boca                 VOL  Lesionado
+      Juárez, Fernando           Ctral. Córdoba       VOL  Lesionado
+      Cravero, Tiago             Ctral. Córdoba       VOL  Lesionado
+      Román Villalba, Fernando   Def. y Justicia      DEF  Lesionado
+      Neves, Gabriel             Estudiantes          VOL  Lesionado
+      Correa, Joaquín            Estudiantes          DEL  Lesionado
+      Elías, Jalil               Estudiantes          VOL  Lesionado
+      Lo Celso, Francesco        Estudiantes RC       VOL  Lesionado
+      Ruiz Díaz, Matías          Estudiantes RC       DEF  Lesionado
+      Lozano, Raúl               Estudiantes RC       DEF  Lesionado
+      González, Lucas            Estudiantes RC       DEL  Lesionado
+      Colazo, Agustín            Gimnasia L.P.        DEL  Lesionado
+      Barros Schelotto, Bautista Gimnasia L.P.        DEF  Lesionado
+      González, Imanol           Gimnasia Mza         DEF  Lesionado
+      O' Connor, Tomás           Gimnasia Mza         VOL  Lesionado
+      Guiffrey, Germán           Gimnasia Mza         DEF  Lesionado
+      Bonifacio, Ezequiel        Ind. Rivadavia       DEF  Lesionado
+      Gómez, Luciano             Ind. Rivadavia       DEF  Lesionado
+      Díaz, Luis                 Ind. Rivadavia       DEL  Lesionado
+      Salas, Maximiliano         Ind. Rivadavia       DEL  Lesionado
+      De Irastorza, Jonathan     Independiente        DEF  Lesionado
+      Sanseviero, Lucas          Instituto            DEL  Lesionado
+      Rafaelli, Luca             Instituto            VOL  Lesionado
+      Romero, Luciano            Lanús                DEF  Lesionado
+      Moreno, Marcelino          Lanús                VOL  Lesionado
+      Arias, Gabriel             Newell's             ARQ  Lesionado
+      Escobar, Franco            Newell's             DEF  Lesionado
+      García, Mateo              Newell's             VOL  Lesionado
+      Cabrera, Bruno             Newell's             DEF  Lesionado
+      Salcedo, Saúl              Newell's             DEF  Lesionado
+      Quirós, Santiago           Platense             DEF  Lesionado
+      Ferreira, Pablo            Platense             VOL  Lesionado
+      López, Nicolás             Platense             DEL  Lesionado
+      Sumavil, Nicolás           Platense             ARQ  Lesionado
+      Bobadilla, Héctor          Platense             DEL  Lesionado
+      Nasif, Tomás               Platense             DEL  Lesionado
+      Giménez, Luciano           Platense             DEL  Lesionado
+      Di Césare, Marco           Racing               DEF  Lesionado
+      Forneris, Alan             Racing               VOL  Lesionado
+      Carboni, Valentín          Racing               VOL  Lesionado
+      Vera, Fausto               River                VOL  Lesionado
+      Ruberto, Agustín           River                DEL  Lesionado
+      Portillo, Juan Carlos      River                DEF  Lesionado
+      Fernández, Guillermo       Rosario Ctral.       VOL  Lesionado
+      Navarro, Federico          Rosario Ctral.       VOL  Lesionado
+      Cantizano, Giovanni        Rosario Ctral.       VOL  Lesionado
+      Duarte, Gaspar             Rosario Ctral.       VOL  Lesionado
+      Cerutti, Ezequiel          San Lorenzo          DEL  Lesionado
+      Barrios, Nahuel            San Lorenzo          VOL  Lesionado
+      Hernández, Gastón          San Lorenzo          DEF  Lesionado
+      Salas, Alan                San Lorenzo          DEL  Lesionado
+      Abrego, Gonzalo            San Lorenzo          VOL  Lesionado
+      Rentería, Jhon             Sarmiento            DEL  Lesionado
+      Villalba, Carlos           Sarmiento            VOL  Lesionado
+      Cristaldo, Franco          Talleres             VOL  Lesionado
+      Gómez, Matías Ezequiel     Talleres             VOL  Lesionado
+      Rivero, Simón              Tigre                VOL  Lesionado
+      Arias, Ramón               Tigre                DEF  Lesionado
+      Vargas, Lautaro            Unión                DEF  Lesionado
+      Menossi, Lucas             Unión                VOL  Lesionado
+      Gomes Gerth, Federico      Unión                ARQ  Lesionado
+      Mammana, Emanuel           Vélez                DEF  Lesionado
+      Prima, Simón               Vélez                DEL  Lesionado
+      Morello, Matías            Aldosivi             VOL  No juega
+      Lescano, Alan              Argentinos           VOL  No juega
+      Vega, Leonel               Atl. Tucumán         VOL  No juega
+      Román, Lucas               Atl. Tucumán         VOL  No juega
+      Caballero, Tiago           Banfield             DEL  No juega
+      Morales, Gonzalo           Barracas Ctral.      DEL  No juega
+      Zenón, Kevin               Boca                 VOL  No juega
+      Gelini, Gonzalo            Boca                 DEL  No juega
+      Toloza, Santiago           Def. y Justicia      VOL  No juega
+      González, Luciano          Def. y Justicia      DEL  No juega
+      Cornejo, Lucas             Estudiantes          VOL  No juega
+      Manyoma, Alexis            Estudiantes          DEL  No juega
+      Amondarain, Mikel          Estudiantes          VOL  No juega
+      Romero, Francisco          Estudiantes RC       VOL  No juega
+      Forclaz, Ezequiel          Estudiantes RC       VOL  No juega
+      De Asís, Jorge             Gimnasia L.P.        DEL  No juega
+      Martínez, Alejandro        Huracán              DEL  No juega
+      Muro, Tomás                Ind. Rivadavia       VOL  No juega
+      Suárez, Luciano            Ind. Rivadavia       DEF  No juega
+      Barros Ayala, Luciano      Independiente        DEF  No juega
+      Ávalos, Gabriel            Independiente        DEL  No juega
+      Gutiérrez, Maximiliano     Independiente        DEL  No juega
+      Lomonaco, Kevin            Independiente        DEF  No juega
+      Valdéz, Facundo            Independiente        DEL  No juega
+      Morro, Mateo               Independiente        ARQ  No juega
+      Maldonado, Lautaro         Instituto            ARQ  No juega
+      Bou, Walter                Lanús                DEL  No juega
+      De Martis, Thomas          Lanús                DEL  No juega
+      Aquino, Dylan              Lanús                DEL  No juega
+      Noguera, Fabián            Newell's             DEF  No juega
+      Ortega, Martín             Newell's             DEF  No juega
+      Barlasina, Williams        Newell's             ARQ  No juega
+      Pizarro, Damián            Racing               DEL  No juega
+      Martirena, Gastón          Racing               DEF  No juega
+      García Basso, Agustín      Racing               DEF  No juega
+      Sosa, Gonzalo              Racing               DEL  No juega
+      Sosa, Santiago             Racing               VOL  No juega
+      Barbieri, Miguel           Riestra              DEF  No juega
+      Caro Torres, Nicolás       Riestra              DEF  No juega
+      Flores, Gonzalo            Riestra              DEL  No juega
+      García, Matías             Riestra              VOL  No juega
+      Aiello, Manuel             Riestra              DEF  No juega
+      Colidio, Facundo           River                DEL  No juega
+      Quintero, Juan Fernando    River                VOL  No juega
+      Freitas, Joaquín           River                DEL  No juega
+      Aguirre, Braian            Rosario Ctral.       DEF  No juega
+      Cervera, Tobías            Rosario Ctral.       DEL  No juega
+      Gill, Orlando              San Lorenzo          ARQ  No juega
+      Escalante, Valentín        San Lorenzo          VOL  No juega
+      Rodríguez, Gregorio        San Lorenzo          DEL  No juega
+      Montenegro, Lautaro        San Lorenzo          DEF  No juega
+      Mónaco, Manuel             Sarmiento            VOL  No juega
+      Rosales, Matías            Sarmiento            DEF  No juega
+      Baroni, Giovanni           Talleres             VOL  No juega
+      Cabrera, Elías             Tigre                VOL  No juega
+      Romero, David              Tigre                DEL  No juega
+      Rodríguez, Maizon          Unión                DEF  No juega
+      Monzón, Florian            Vélez                DEL  No juega
+      Quirós, Aaron              Vélez                DEF  No juega
+      Fernández, Damián          Def. y Justicia      DEF  Suspendido
+      González Pirez, Leandro    Estudiantes          DEF  Suspendido
+      Caicedo, Jordy             Huracán              DEL  Suspendido
+      Marcone, Iván              Independiente        VOL  Suspendido
+      Izquierdoz, Carlos         Lanús                DEF  Suspendido
+      Ibarra, Franco             Rosario Ctral.       VOL  Suspendido
+      Contrera, Julián           Sarmiento            DEL  Suspendido
+
+
+======================================================================
+  recalculando el motor y regenerando datos.js
+======================================================================
+MOTOR v38 · 07/09/2026 — motorV3.cjs   100647 bytes  ·  17/9, 10:27 p. m.
+              riesgo.cjs     23892 bytes  ·  6/9, 10:08 p. m.
+ROLES — data365_roles.json: 6519 filas de 210 partidos, 698 jugadores con rol. NO toca ningun puntaje.
+TORNEOS — receso de 80 dias detectado; el torneo actual arranca el 2026-07-23. Todo partido con gid > 4631800 es de este torneo.
+  goles recibidos recortados al torneo actual en 812 jugadores (365Scores los trae de carrera; salvadas y penales atajados no se pueden recortar y quedan de carrera)
+  data365_historico.json traia 6060 filas del torneo ACTUAL. Se sacaron: el historico queda con 208 partidos del torneo anterior.
+FECHA 15 — 15 de 15 partidos con cuotas, del 2026-10-30 al 2026-11-03
+AYUDANTE DE CAMPO (Fecha 15) — 1017 de 1018 jugadores cruzados (1 sin cruzar: O'Connor, Tomás (Gimnasia Mza))  ·  cierran cambios 30/10/2026, 06:59:00
+  estados: Habilitado 520 · Posible Titular 270 · En duda 87 · Lesionado 80 · No juega 24 · Jugó Copa 22 · Expulsado 7 · Suspendido 7
+TARJETAS — las rojas se rehicieron con el torneo actual: 5 jugadores corregidos (0 tenian rojas que eran del torneo pasado). La ultima fecha con tarjetas pasa de 14 a 14.
+suspendidos cargados a mano: 9 (tarjetero a cumplir en la fecha 7)
+control de sanidad: OK, ningun gol imposible en las dos fuentes
+formaciones: ninguna confirmada todavia (se publican ~1 hora antes de cada partido; conviene correr SYNC_365.bat de nuevo justo antes de cerrar el equipo)
+TRANSFERIDOS: 16 jugadores que en la planilla ya estan en el club nuevo y en 365Scores siguen en el viejo. Se les recuperan los minutos y el xG, marcados como transferidos: Banfield->Def. y Justicia, Racing Club->Estudiantes LP, Tigre->Estudiantes LP, Racing Club->Estudiantes LP, Talleres de Córdoba->Huracán, Tigre->Independiente, ...
+  OJO — pases.json: no encontre a "Sepúlveda, Bruno" en Banfield. O el nombre no coincide, o la planilla ya lo movio sola.
+SE FUE DEL TORNEO: Lescano, Alan (Argentinos) — vendido a Vasco da Gama. Jugo la fecha 7 y se fue: la planilla y el ayudante de campo todavia lo listan en Argentinos.. No entra en ningun ranking ni once.
+BAJA CARGADA A MANO: Módica, Agustín (Gimnasia Mza) — lesion muscular, confirmado que no juega contra Boca. El Ayudante de campo todavia no lo actualizo.. No entra en ningun ranking ni once.
+jugadores: 821 (se dejaron afuera 197 que nunca jugaron) | cruzados con 365Scores: 817 (100%)  [1 cruzados por nombre de pila]
+  ex clubes detectados en 70 jugadores (torneo pasado + pases de este torneo)
+rotacion por copas: 30 equipos cruzados
+  8 equipo(s) traian rotacion pero su partido esta lejos: no se les toca nada. Atlético Tucumán (5d de descanso) · Racing Club (5.1d de descanso) · Deportivo Riestra (4.8d de descanso) · Estudiantes RC (4.9d de descanso) · Instituto (5d de descanso) · Estudiantes de La Plata (5.1d de descanso) · Aldosivi (5.3d de descanso) · Platense (4.9d de descanso)
+LIGA — ventaja de local sobre 613 partidos: xG local 1.32 vs visitante 1.03  (+28%)
+PENALES — 56 pateados en el torneo, en 25 de 30 equipos. El pateador cobra su parte de los penales de SU equipo, no un recorte de su gol de jugada.
+validacion ficha: OK | media 5.12 | fuera 0.27%
+nombres repetidos en la planilla: 7 (se distinguen por puesto y equipo, no se pisan las cotizaciones)
+  OJO — 1 del tarjetero no aparecen en el ranking (o el nombre no coincide, o nunca jugaron y quedaron afuera): Duarte, Lautaro (Deportivo Riestra)
+ONCE — 89 jugadores quedaron afuera del once por estar lesionados, suspendidos o expulsados. Estaban en el once recomendado: Izquierdoz, Carlos (Suspendido)
+ONCE ARRIESGADO — 150.000 fechas simuladas en 47.6s
+               media     sd   1 de 200    p99    max   P>=100
+  conservador    77.2   11.5      112    108    138     3.37%
+  arriesgado     74.3   14.4      114    110    143     4.34%
+  o sea: en su mejor fecha de cada 200, el arriesgado hace +2.6 puntos que el solido (114 contra 112). Eso es lo que se esta maximizando.
+  arriesgado: 1-5-3-2, $36.7M — Werner, Ávila, Conti, Ovando, Sández, Vicente, Florentín, Di María, Miramón, Auzmendi, Campaz
+FIXTURE — 240 partidos | 210 jugados | por fecha: f1:15 f2:15 f3:15 f4:15 f5:15 f6:15 f7:15 f8:15 f9:15 f10:15 f11:15 f12:15 f13:15 f14:15
+  resultados:  7 coinciden en las dos fuentes, 150 nuevos de 365Scores, 0 sueltos
+  OJO ESPN — no cruzan 2 clubes: San Martín (San Juan), Godoy Cruz Antonio Tomba. Esos equipos quedan sin corners ni posesion.
+ESPN — 587 partidos, 32 clubes (30 cruzados). Corners, posesion y tiros por equipo, local y visitante: 30 equipos con datos del torneo actual (desde el 2026-07-23).
+  73 jugaron pero Planeta no les registra puntaje: su ficha es el promedio de la liga, quedan marcados
+  COBERTURA — a 10 jugadores 365Scores les registra MENOS partidos que la planilla: sus tiros y su xG salen de menos futbol del que jugaron. Quedan marcados en la app.
+  OJO — 1 con goles y CERO tiros en 365Scores, que es imposible: le faltan partidos a 365. Hernández, Matías
+  once ideal de la fecha 14: 4-2-4, 228 puntos, $34.9M
+  en duda: 87 con peso  ·  bajas: 89
+DATOS DE LA FECHA — ley del ex: 27 | en racha: 43 | le deben goles: 8 | al filo: 30 | bajas: 89
+   ex mas caro: Blondel, Lucas (Huracán) contra Tigre
+  variacion del puntaje por fecha (medida sobre 5520 fechas-jugador): ARQ 5.6±3.3 · DEF 6.0±3.1 · VOL 5.7±3.1 · DEL 6.0±3.6
+  foto guardada: historial/fecha_15.json  (821 jugadores con su esperado)
+  dataHist.js: 7 fecha(s) con el esperado de cada jugador (203 KB)
+  (fechas 6, 7, 8 quedaron afuera: su foto es anterior al campo que guarda el esperado de cada jugador)
+OK -> salida.json y datos.js   [motor v38 · 07/09/2026]
+
+   datos.js regenerado.
+
+======================================================================
+  auditoria de los datos
+======================================================================
+
+  ══════════════════════════════════════════════════════════════
+   AUDITORIA DE DATOS   ·   motor v38 · 07/09/2026
+   fecha objetivo 15  ·  ultima fecha jugada 14  ·  821 jugadores
+  ══════════════════════════════════════════════════════════════
+
+  ! PARA MIRAR (6)
+     • 2 jugador(es) con mas partidos que fechas jugadas: Sosa Yung, Santiago 15 PJ, Fernández, Julián 16 PJ  → casi seguro copa
+     • 2 jugadores que metieron mucho mas de lo que su xG esperaba (racha, no error): Martínez, Ronaldo, Módica, Agustín
+     • 73 jugadores sin ficha propia (usan el promedio de la liga, quedan marcados en la app)
+     • 1 partido(s) con margen de casa netamente negativo (Boca Juniors-River Plate -0.011). Eso no existe en un mercado previo: casi seguro se mezclaron cuotas en vivo con cuotas viejas.
+     • 1 jugador(es) con goles y CERO tiros medidos en 365Scores: Hernández, Matías. El gol cae en un partido que 365 no le tiene cargado. La app muestra el cero real y, al lado, cuantos partidos le faltan.
+     • 10 jugadores con menos partidos en 365 que en la planilla: su ritmo por 90 sale de menos futbol del que jugaron. Van marcados.
+
+  ✓ CONTROLES QUE PASARON (28)
+     · la fecha que se proyecta (15) todavia no empezo
+     · minutos dentro de lo posible (maximo 1260' en 14 fechas)
+     · el corte de torneos funciona: el archivo trae 2 jugadores con fechas de los dos torneos y el motor los deja en 2 (copas)
+     · 4 nombres repetidos, cada uno con sus propios datos: Martínez, David, Vázquez, Franco, González, Tomás, Fernández, Julián
+     · todas las fichas caen dentro del 1 al 10
+     · ningun xG por partido absurdo
+     · ningun promedio de goles imposible
+     · el xG y los goles hablan del mismo torneo
+     · el desglose suma exactamente los puntos si entra, en los 821 jugadores
+     · los 15 partidos de la fecha caen en 3 dias
+     · ningun partido futuro marcado como jugado
+     · las probabilidades de las 15 cuotas suman 1
+     · margen de las casas entre -1.1% y 3.2%
+     · la tabla cierra: puntos = 3×ganados + empatados en los 30 equipos
+     · los goles a favor y en contra de la liga cierran (474)
+     · el 100% de los jugadores tiene datos de 365Scores
+     · todos los jugadores tienen cotizacion
+     · 30 equipos, todos reconocidos
+     · 89 suspendidos detectados · 16 transferidos marcados
+     · el fixture sabe que se jugo: ningun partido vencido sin resultado (dataFixture.json de hace 0.0 dias)
+     · la planilla de Planeta esta al dia (fecha 14)
+     · el ayudante de campo cruza con el 100% del ranking · 89 bajas detectadas
+     · ninguna baja se colo en el once recomendado
+     · cierre de cambios: 2026-10-30 21:59 UTC (lo publica el juego)
+     · ningun partido sin jugar tiene resultado cargado
+     · ninguna cuota se bajo con el partido ya empezado
+     · 365Scores tiene los 210 partidos jugados del torneo
+     · la tabla de local y visitante tiene todos los partidos jugados de los 30 equipos
+
+  ══════════════════════════════════════════════════════════════
+   Todo en orden.
+  ══════════════════════════════════════════════════════════════
+
+
+======================================================================
+  coherencia entre la pantalla y el motor
+======================================================================
+
+  ══════════════════════════════════════════════════════════════
+   COHERENCIA ENTRE LO QUE SE MUESTRA Y LO QUE CALCULA EL MOTOR
+  ══════════════════════════════════════════════════════════════
+
+  ✓ CONTROLES QUE PASARON (15)
+     · las amenazas/90 caen todas entre 0 y 3
+     · el ataque de cada equipo se escala por un solo factor, entre 0.75 y 1 (los minutos que el once cubre de los 900)
+     · a ningun equipo se le reparte mas gol del que va a hacer
+     · los minutos del once probable son creibles en los 30 equipos (media 841' de 900; el reparto del ataque ya se escala por eso)
+     · el gol bruto de cada uno = su parte del ataque x los goles de su equipo x lo que juega
+     · el gol que muestra la tabla es la suma exacta del gol de jugada y el de penal
+     · los minutos "si juega" caen siempre dentro de lo que jugo, arrancando o entrando
+     · tiros/90 y xG/90 salen de los minutos jugados, encogidos hacia abajo en los de poca muestra
+     · los 30 equipos del ranking cruzan con la tabla: ningun jugador queda sin cruce de condiciones
+     · en los 30 equipos, local + visitante = partidos jugados
+     · el once recomendado tiene 11 jugadores distintos
+     · ninguna baja se colo en el once
+     · el once arriesgado tiene 11 jugadores y comparte 4 con el solido
+     · el once recomendado entra en el presupuesto ($53.4M de $65M)
+     · el once ideal de la fecha pasada tiene 11
+
+   Todo coherente.
+  ══════════════════════════════════════════════════════════════
+
+
+======================================================================
+  auditoria del algoritmo
+======================================================================
+
+  ══════════════════════════════════════════════════════════════
+   AUDITORIA DEL ALGORITMO   ·   motor v38 · 07/09/2026
+  ══════════════════════════════════════════════════════════════
+
+  ✗ PROBLEMAS (1)
+     • 2 jugadores cuyos minutos "si juega" caen fuera de lo que jugo: Duarte, Gaspar 20' con arranques de 16 y entrando 10, 1, Duarte, Lisandro 20' con arranques de 16 y entrando 10, 1
+
+  ✓ CONTROLES QUE PASARON (19)
+     · en los 821 jugadores, el desglose suma exactamente el puntaje
+     · el gol de penal lo cobra solo el que patea penales, y paga 3 (5 de visitante)
+     · el gol paga ARQ 12 · DEF 9 · VOL 6 · DEL 4, mas 2 de visitante, en todos
+     · el termino del gol es siempre los goles esperados por el valor que declara
+     · la valla invicta la cobran solo arqueros y defensores
+     · la valla paga 3 al arquero y 2 al defensor, por la chance de que su equipo no reciba
+     · la figura paga 4 puntos por su probabilidad
+     · las tarjetas siempre restan
+     · en ningun equipo las chances de ser figura suman mas de 1 (hay una figura por partido)
+     · el gol escala con los minutos que juega; la ficha y la valla no (piden 20 minutos, no 90)
+     · a los que nunca arrancaron no se les inventan minutos de titular
+     · los cuatro rankings vienen ordenados por puntaje si juega
+     · el capitan suma su ficha una vez mas, no el puntaje entero
+     · la cinta va al de mayor ficha esperada en este partido, no al de mejor promedio
+     · ningun puntaje absurdo (todos entre 0 y 25)
+     · todas las probabilidades caen entre 0 y 1
+     · el once arriesgado comparte 4 de 11 con el solido
+     · el arriesgado dispersa mas que el solido (sd 14.4 vs 11.5)
+     · el arriesgado tiene mas chance de fecha grande (>=140: 0.001% vs 0.000%)
+
+   HAY 1 PROBLEMA(S) EN EL ALGORITMO.
+  ══════════════════════════════════════════════════════════════
+
+
+======================================================================
+  listo
+======================================================================
+   tardo 15,7 minutos
+   todo ok. Abri index.html y recarga con Ctrl+F5.
+      dataPlaneta.json          2.050 KB   29/10 23:05
+      data365.json             10.251 KB   29/10 23:10
+      dataCuotas.json              14 KB   29/10 23:11
+      dataCopas.json               33 KB   29/10 23:12
+      dataFixture.json             73 KB   29/10 23:12
+      datos.js                  2.998 KB   29/10 23:21
+
+
+-- puntajes en vivo: bajando los posts de Planeta --
+   feed bajado: 812 KB
+
+-- puntajes en vivo: leyendo los posts de Planeta --
+  (--cerrada) la ultima fecha completa es la 14
+  fecha 14 · 821 jugadores en la app
+   post: Puntajes Gran DT - Martes 27/10 - Fecha 14 - Torneo Clausura 2026
+   post: Puntajes Gran DT - Lunes 26/10 - Fecha 14 - Torneo Clausura 2026
+   post: Puntajes Gran DT - Domingo 25/10 - Fecha 14 - Torneo Clausura 2026
+   post: Puntajes Gran DT - Sábado 24/10 - Fecha 14 - Torneo Clausura 2026
+   post: Puntajes Gran DT - Viernes 23/10 - Fecha 14 - Torneo Clausura 2026
+
+  partidos leidos: 15
+  filas de jugador: 464
+  cruzaron con la app: 464  (100%)
+  fichas de Clarin publicadas: 383   (solo las destacadas: sirven para saber cuanto pago la cinta)
+     por exacto: 464
+
+OK -> dataVivo.js  (fecha 14, 464 jugadores con puntaje)
+
+
+TORNEO DE AMIGOS — fecha 15 — 7 equipos
+
+== Falcon de ramon   (1-3-3-4)
+   ARQ  Arce, Ignacio             Dep. Riestra     PTS  5.81
+   DEF  Blondel, Lucas            Huracán          PTS   6.7
+   DEF  Di Lollo, Lautaro         Boca             PTS  6.19
+   DEF  Vallejo, Luciano          Atl. Tucumán     PTS  6.07
+   VOL  Ascacíbar, Santiago       Boca             PTS  6.94
+   VOL  Luna, Alex                Instituto        PTS  6.75
+   VOL  Lucco, Jeremías           Def. y Justicia  PTS  6.24
+   DEL  Martínez, Ronaldo         Vélez            PTS  7.62
+   DEL  Fernández, Matías         Ind. Rivadavia   PTS  7.22   <<< CAPITAN
+   DEL  Verón, Gastón             Argentinos       PTS  6.95
+   DEL  Martínez, Adrián          Racing           PTS  6.51
+   banco: ARQ Ingolotti · DEF Silvero · VOL Di María · DEL Merentiel
+
+== La Aplanadora Danesa   (1-3-3-4)
+   ARQ  Ingolotti, Luis           Atl. Tucumán     PTS  5.03
+   DEF  Silvero, Thiago           Vélez            PTS  6.56
+   DEF  Martínez, David           Def. y Justicia  PTS   6.4
+   DEF  Escudero, Gonzalo         Racing           PTS  6.25
+   VOL  Di María, Ángel           Rosario Ctral.   PTS  8.26   <<< CAPITAN
+   VOL  Luna, Alex                Instituto        PTS  6.75
+   VOL  Gaitán, Nicolás           Aldosivi         PTS  5.46
+   DEL  Martínez, Ronaldo         Vélez            PTS  7.62
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.83
+   DEL  Vombergar, Andrés         Aldosivi         PTS  6.64
+   DEL  Fernández, Leandro        Def. y Justicia  PTS  6.21
+   banco: ARQ Acosta · DEF Cerato · VOL Barbona · DEL Cóccaro
+
+== Runnero atomico   (1-3-3-4)
+   ARQ  Ingolotti, Luis           Atl. Tucumán     PTS  5.03
+   DEF  Ávila, Gastón             Rosario Ctral.   PTS  7.01
+   DEF  Blondel, Lucas            Huracán          PTS   6.7
+   DEF  Lozano, Leandro           Boca             PTS  6.17
+   VOL  Farías, Facundo           San Lorenzo      PTS  5.99
+   VOL  Palacios, Tiago           Estudiantes LP   PTS  5.97
+   VOL  Paredes, Leandro          Boca             PTS  5.91   <<< CAPITAN
+   DEL  Auzmendi, Agustín         Gimnasia LP      PTS  7.69
+   DEL  Martínez, Ronaldo         Vélez            PTS  7.62
+   DEL  Martínez, Adrián          Racing           PTS  6.51
+   DEL  Merentiel, Miguel Ángel   Boca             PTS  6.28
+   banco: ARQ Bolcato · DEF Escudero · VOL Meza · DEL Módica
+
+== Atilio Chara FC   (1-3-3-4)
+   ARQ  Borgogno, Matías          Def. y Justicia  PTS  5.36
+   DEF  Martínez, David           Def. y Justicia  PTS   6.4
+   DEF  Vallejo, Luciano          Atl. Tucumán     PTS  6.07
+   DEF  Cerato, Giuliano          Instituto        PTS  6.04
+   VOL  Di María, Ángel           Rosario Ctral.   PTS  8.26   <<< CAPITAN
+   VOL  Florentín, José           Ind. Rivadavia   PTS  7.18
+   VOL  Ascacíbar, Santiago       Boca             PTS  6.94
+   DEL  Martínez, Ronaldo         Vélez            PTS  7.62
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.83
+   DEL  Martínez, Adrián          Racing           PTS  6.51
+   DEL  Merentiel, Miguel Ángel   Boca             PTS  6.28
+   banco: ARQ Ingolotti · DEF Ovando · VOL Lanzini · DEL Cóccaro
+
+== El Favorito de la Tati   (1-3-3-4)
+   ARQ  Ingolotti, Luis           Atl. Tucumán     PTS  5.03
+   DEF  Izquierdoz, Carlos        Lanús            PTS  7.04
+   DEF  López, Lisandro           Belgrano         PTS   6.7
+   DEF  Martínez, David           Def. y Justicia  PTS   6.4
+   VOL  Di María, Ángel           Rosario Ctral.   PTS  8.26
+   VOL  Zelarayán, Lucas          Belgrano         PTS  7.29   <<< CAPITAN
+   VOL  Lanzini, Manuel           Vélez            PTS  6.75
+   DEL  Verón, Gastón             Argentinos       PTS  6.95
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.83
+   DEL  Passerini, Lucas          Belgrano         PTS   6.8
+   DEL  Tarragona, Cristian       Unión            PTS  6.55
+   banco: ARQ Marchiori · DEF Ávila · VOL López Muñoz · DEL Copetti
+
+== Giri FC   (1-3-3-4)
+   ARQ  Cambeses, Facundo         Racing           PTS  5.97
+   DEF  Escudero, Gonzalo         Racing           PTS  6.25
+   DEF  Cannavo, Ezequiel         Racing           PTS  6.06
+   DEF  Cerato, Giuliano          Instituto        PTS  6.04
+   VOL  Di María, Ángel           Rosario Ctral.   PTS  8.26
+   VOL  Florentín, José           Ind. Rivadavia   PTS  7.18
+   VOL  Lanzini, Manuel           Vélez            PTS  6.75
+   DEL  Martínez, Ronaldo         Vélez            PTS  7.62
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.83
+   DEL  Martínez, Adrián          Racing           PTS  6.51
+   DEL  Merentiel, Miguel Ángel   Boca             PTS  6.28   <<< CAPITAN
+   banco: ARQ Marchiori · DEF Rak · VOL Barbona · DEL Russo
+
+== La Bestia FC   (1-3-3-4)
+   ARQ  Marchiori, Tomás          Vélez            PTS  5.98
+   DEF  Silvero, Thiago           Vélez            PTS  6.56
+   DEF  Di Lollo, Lautaro         Boca             PTS  6.19
+   DEF  Gómez, Elías              Vélez            PTS   5.8
+   VOL  Di María, Ángel           Rosario Ctral.   PTS  8.26   <<< CAPITAN
+   VOL  Zelarayán, Lucas          Belgrano         PTS  7.29
+   VOL  Lanzini, Manuel           Vélez            PTS  6.75
+   DEL  Auzmendi, Agustín         Gimnasia LP      PTS  7.69
+   DEL  Módica, Agustín           Gimnasia Mza     PTS  6.83
+   DEL  Martínez, Adrián          Racing           PTS  6.51
+   DEL  Fernández, Leandro        Def. y Justicia  PTS  6.21
+   banco: ARQ Ayala · DEF Muñoz · VOL Florentín · DEL Tarragona
+
+jugadores distintos en el torneo: 40
+escrito dataLiga.js (5.9 KB) — ahora corre SUBIR_A_GITHUB.bat
+
+-- la foto de la fecha, desde los archivos --
+  fecha 14 · 15 partidos · 386 jugadores con puntaje
+  el motor: 99 puntos, 11 de 11 jugaron · cinta +6
+   1. El Favorito de la Tati      115 (oficial)   11/11 jugaron · cinta +6   OJO: nuestro once da 111, faltan 4
+   2. La Aplanadora Danesa        111 (oficial)   11/11 jugaron · cinta +6   OJO: nuestro once da 131, sobran 20
+   3. La Bestia FC                111 (oficial)   11/11 jugaron · cinta +6   OJO: nuestro once da 94, faltan 17
+   4. Giri FC                     107 (oficial)   11/11 jugaron · cinta +4   OJO: nuestro once da 97, faltan 10
+   5. Falcon de ramon              98 (oficial)   11/11 jugaron · cinta +7   OJO: nuestro once da 101, sobran 3
+   6. Atilio Chara FC              98 (oficial)   11/11 jugaron · cinta +6   OJO: nuestro once da 102, sobran 4
+   7. Runnero atomico              96 (oficial)   11/11 jugaron · cinta +6   OJO: nuestro once da 101, sobran 5
+
+OK -> dataFotos.js  (9 fecha(s) guardada(s), 8 que ya estaban)
+
+
+  ══════════════════════════════════════════════════════════════
+   AUDITORIA DE DATOS   ·   motor v38 · 07/09/2026
+   fecha objetivo 15  ·  ultima fecha jugada 14  ·  821 jugadores
+  ══════════════════════════════════════════════════════════════
+
+  ! PARA MIRAR (6)
+     • 2 jugador(es) con mas partidos que fechas jugadas: Sosa Yung, Santiago 15 PJ, Fernández, Julián 16 PJ  → casi seguro copa
+     • 2 jugadores que metieron mucho mas de lo que su xG esperaba (racha, no error): Martínez, Ronaldo, Módica, Agustín
+     • 73 jugadores sin ficha propia (usan el promedio de la liga, quedan marcados en la app)
+     • 1 partido(s) con margen de casa netamente negativo (Boca Juniors-River Plate -0.011). Eso no existe en un mercado previo: casi seguro se mezclaron cuotas en vivo con cuotas viejas.
+     • 1 jugador(es) con goles y CERO tiros medidos en 365Scores: Hernández, Matías. El gol cae en un partido que 365 no le tiene cargado. La app muestra el cero real y, al lado, cuantos partidos le faltan.
+     • 10 jugadores con menos partidos en 365 que en la planilla: su ritmo por 90 sale de menos futbol del que jugaron. Van marcados.
+
+  ✓ CONTROLES QUE PASARON (28)
+     · la fecha que se proyecta (15) todavia no empezo
+     · minutos dentro de lo posible (maximo 1260' en 14 fechas)
+     · el corte de torneos funciona: el archivo trae 2 jugadores con fechas de los dos torneos y el motor los deja en 2 (copas)
+     · 4 nombres repetidos, cada uno con sus propios datos: Martínez, David, Vázquez, Franco, González, Tomás, Fernández, Julián
+     · todas las fichas caen dentro del 1 al 10
+     · ningun xG por partido absurdo
+     · ningun promedio de goles imposible
+     · el xG y los goles hablan del mismo torneo
+     · el desglose suma exactamente los puntos si entra, en los 821 jugadores
+     · los 15 partidos de la fecha caen en 3 dias
+     · ningun partido futuro marcado como jugado
+     · las probabilidades de las 15 cuotas suman 1
+     · margen de las casas entre -1.1% y 3.2%
+     · la tabla cierra: puntos = 3×ganados + empatados en los 30 equipos
+     · los goles a favor y en contra de la liga cierran (474)
+     · el 100% de los jugadores tiene datos de 365Scores
+     · todos los jugadores tienen cotizacion
+     · 30 equipos, todos reconocidos
+     · 89 suspendidos detectados · 16 transferidos marcados
+     · el fixture sabe que se jugo: ningun partido vencido sin resultado (dataFixture.json de hace 0.0 dias)
+     · la planilla de Planeta esta al dia (fecha 14)
+     · el ayudante de campo cruza con el 100% del ranking · 89 bajas detectadas
+     · ninguna baja se colo en el once recomendado
+     · cierre de cambios: 2026-10-30 21:59 UTC (lo publica el juego)
+     · ningun partido sin jugar tiene resultado cargado
+     · ninguna cuota se bajo con el partido ya empezado
+     · 365Scores tiene los 210 partidos jugados del torneo
+     · la tabla de local y visitante tiene todos los partidos jugados de los 30 equipos
+
+  ══════════════════════════════════════════════════════════════
+   Todo en orden.
+  ══════════════════════════════════════════════════════════════
+
+
+======================================================================
+  1. Reviso que este todo listo
+======================================================================
+   git instalado: OK
+   la carpeta es un repositorio: OK
+   sos: facupd96-lab <facupd96@gmail.com>
+
+======================================================================
+  2. Rehago index.html con lo ultimo de la carpeta
+======================================================================
